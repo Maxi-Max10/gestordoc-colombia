@@ -389,14 +389,14 @@ sap.ui.define([
           },
           success: function(oData) {
             // obtengo la empresa desde jobInfoNav
-            const sCompany = oData?.empInfo?.jobInfoNav?.results?.[0]?.company || "DO01";
+            const sCompany = oData?.empInfo?.jobInfoNav?.results?.[0]?.company || "CO10";
             console.log("Empresa del usuario:", sCompany);
             resolve(sCompany);
           },
           error: function(oError) {
             console.error("Error al obtener empresa:", oError);
             // si da error, usar empresa por defecto
-            resolve("DO01");
+            resolve("CO10");
           }
         });
       });
@@ -495,7 +495,7 @@ sap.ui.define([
       
       // obtengo la empresa del usuario logueado
       const oUserModel = this.getOwnerComponent().getModel("user");
-      const sUserCompany = oUserModel.getProperty("/company") || "DO01";
+      const sUserCompany = oUserModel.getProperty("/company") || "CO10";
       // Define los campos a seleccionar (optimiza la carga)
       const sSelect = [
         "userId",
@@ -561,9 +561,9 @@ sap.ui.define([
           user.paycompvalue = salaryRaw || 0;
           user.paycompValue = salaryRaw || 0;
 
-          // 2. Extrae la cédula (busca cardType ZC o ZP)
+          // 2. Extrae la cédula solo si cardType es CC
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          const targetObject = nationalIdResults.find(item => item.cardType === "ZC" || item.cardType === "ZP");
+          const targetObject = nationalIdResults.find(item => item.cardType === "CC");
           user.nationalId = targetObject?.nationalId ?? "";
 
           // 3. Mapea el sueldo
@@ -759,7 +759,7 @@ sap.ui.define([
       
       // obtengo la empresa del usuario logueado
       const oUserModel = this.getOwnerComponent().getModel("user");
-      const sUserCompany = oUserModel.getProperty("/company") || "DO01";
+      const sUserCompany = oUserModel.getProperty("/company") || "CO10";
       
       const sSelect = [
         "userId",
@@ -861,7 +861,7 @@ sap.ui.define([
           }
 
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          const targetObject = nationalIdResults.find(item => item.cardType === "ZC" || item.cardType === "ZP");
+          const targetObject = nationalIdResults.find(item => item.cardType === "CC");
           user.nationalId = targetObject?.nationalId ?? "";
 
           aUsers.push(user);
@@ -1383,42 +1383,63 @@ sap.ui.define([
     },
 
     onDocumentSearch: function (oEvent) {
-      const sValue = oEvent?.getParameter("newValue") ?? oEvent?.getParameter("query") ?? this.byId("documentSearch")?.getValue() ?? "";
+      const oSearchField = this.byId("documentSearch");
+      const sValue = oEvent?.getParameter("newValue") ?? oEvent?.getParameter("query") ?? oSearchField?.getValue() ?? "";
       const sQuery = this._normalizeSearchText(sValue);
       const aCards = this._getDocumentSearchCards();
+      const oGrid = this.byId("gridItems");
 
-      if (sQuery && !this._documentSearchBaseVisibility) {
-        this._documentSearchBaseVisibility = {};
+      oSearchField?.toggleStyleClass("documentSearchFieldActive", Boolean(sQuery));
+
+      if (!oGrid) {
+        return;
+      }
+
+      if (sQuery && !this._documentSearchBaseState) {
+        const aCurrentContent = oGrid.getContent();
+        this._documentSearchBaseState = {};
         aCards.forEach(oCard => {
           const oItem = this.byId(oCard.id);
           if (oItem) {
-            this._documentSearchBaseVisibility[oCard.id] = oItem.getVisible();
+            this._documentSearchBaseState[oCard.id] = {
+              inGrid: aCurrentContent.includes(oItem),
+              visible: oItem.getVisible()
+            };
           }
         });
       }
 
       if (!sQuery) {
-        if (this._documentSearchBaseVisibility) {
+        if (this._documentSearchBaseState) {
+          oGrid.removeAllContent();
           aCards.forEach(oCard => {
             const oItem = this.byId(oCard.id);
-            if (oItem && Object.prototype.hasOwnProperty.call(this._documentSearchBaseVisibility, oCard.id)) {
-              oItem.setVisible(this._documentSearchBaseVisibility[oCard.id]);
+            const oState = this._documentSearchBaseState[oCard.id];
+
+            if (oItem && oState?.inGrid && oState.visible) {
+              oItem.setVisible(true);
+              oGrid.addContent(oItem);
             }
           });
-          this._documentSearchBaseVisibility = null;
+          this._documentSearchBaseState = null;
         }
         return;
       }
 
+      oGrid.removeAllContent();
       aCards.forEach(oCard => {
         const oItem = this.byId(oCard.id);
-        if (!oItem) {
+        const oState = this._documentSearchBaseState?.[oCard.id];
+
+        if (!oItem || !oState?.inGrid || !oState.visible) {
           return;
         }
 
-        const bWasVisible = this._documentSearchBaseVisibility?.[oCard.id] !== false;
         const sSearchText = this._normalizeSearchText(`${oCard.title} ${oCard.desc}`);
-        oItem.setVisible(bWasVisible && sSearchText.includes(sQuery));
+        if (sSearchText.includes(sQuery)) {
+          oItem.setVisible(true);
+          oGrid.addContent(oItem);
+        }
       });
     },
 
