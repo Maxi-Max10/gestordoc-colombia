@@ -1,10 +1,10 @@
 sap.ui.define([
     "sap/ui/core/UIComponent",
-    "gestordoc/model/models"
+    "gestordoccolombia/model/models"
 ], (UIComponent, models) => {
     "use strict";
 
-    return UIComponent.extend("gestordoc.Component", {
+    return UIComponent.extend("gestordoccolombia.Component", {
         metadata: {
             manifest: "json",
             interfaces: [

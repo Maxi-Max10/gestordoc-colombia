@@ -2,29 +2,29 @@ sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
   "sap/m/MessageToast",
-  "gestordoc/util/LibraryLoader",
+  "gestordoccolombia/util/LibraryLoader",
   // Helpers genéricos  
-  "gestordoc/controller/helpers/pdfGenerator",
-  "gestordoc/controller/helpers/wordGenerator",
-  "gestordoc/controller/helpers/uiHelpers",
-  "gestordoc/controller/helpers/formatHelpers",
+  "gestordoccolombia/controller/helpers/pdfGenerator",
+  "gestordoccolombia/controller/helpers/wordGenerator",
+  "gestordoccolombia/controller/helpers/uiHelpers",
+  "gestordoccolombia/controller/helpers/formatHelpers",
   //funciones de contratos
-  "gestordoc/controller/functions/confidencial",
-  "gestordoc/controller/functions/contrato",
-  "gestordoc/controller/functions/excolaborador",
-  "gestordoc/controller/functions/carta_mensual",
-  "gestordoc/controller/functions/cartaMensualUsuario",
-  "gestordoc/controller/functions/desahucio",
-  "gestordoc/controller/functions/notSalida_ministerio",
-  "gestordoc/controller/functions/carta_anual",
-  "gestordoc/controller/functions/notAmonestacion",
-  "gestordoc/controller/functions/notAusInjus"
+  "gestordoccolombia/controller/functions/confidencial",
+  "gestordoccolombia/controller/functions/contrato",
+  "gestordoccolombia/controller/functions/excolaborador",
+  "gestordoccolombia/controller/functions/carta_mensual",
+  "gestordoccolombia/controller/functions/cartaMensualUsuario",
+  "gestordoccolombia/controller/functions/desahucio",
+  "gestordoccolombia/controller/functions/notSalida_ministerio",
+  "gestordoccolombia/controller/functions/carta_anual",
+  "gestordoccolombia/controller/functions/notAmonestacion",
+  "gestordoccolombia/controller/functions/notAusInjus"
 ], 
 
 (Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, confidencial, contrato, excolaborador, carta_mensual, cartaMensualUsuario, desahucio, notSalida_ministerio, carta_anual, notAmonestacion, notAusInjus) => {
   "use strict";
 
-  return Controller.extend("gestordoc.controller.View1", {
+  return Controller.extend("gestordoccolombia.controller.View1", {
     getRouter: function () {
       return this.getOwnerComponent().getRouter();
     },
@@ -354,7 +354,7 @@ sap.ui.define([
       //Carga el logo
       var oImage = this.byId("_IDGenImageeee");
       if (oImage) {
-        oImage.setSrc(sap.ui.require.toUrl("gestordoc/img/logo.png"));
+        oImage.setSrc(sap.ui.require.toUrl("gestordoccolombia/img/logo.png"));
       }
       // Adjunta eventos a los tiles
       this.attachBoxEvents();
@@ -1472,7 +1472,7 @@ sap.ui.define([
 
       if (!this._oManualDateDialog) {
         sap.ui.core.Fragment.load({
-          name: "gestordoc.view.manualDateDialog",
+          name: "gestordoccolombia.view.manualDateDialog",
           controller: this
         }).then(function (oDialog) {
           this._oManualDateDialog = oDialog;
@@ -1547,7 +1547,7 @@ sap.ui.define([
 
       if (!this._oManualDateDialogAusencia) {
         sap.ui.core.Fragment.load({
-          name: "gestordoc.view.manualDateDialogAusencia",
+          name: "gestordoccolombia.view.manualDateDialogAusencia",
           controller: this
         }).then(function (oDialog) {
           this._oManualDateDialogAusencia = oDialog;

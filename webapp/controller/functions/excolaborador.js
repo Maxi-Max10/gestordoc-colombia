@@ -96,7 +96,7 @@ sap.ui.define([
 
                     `;
 
-                if (sButtonId === "container-gestordoc---View1--wordDataInfo") {
+                if (sButtonId === "container-gestordoccolombia---View1--wordDataInfo") {
                     htmlRaw += firmaHTML;
                     const header = `
                         <html xmlns:o='urn:schemas-microsoft-com:office:office'

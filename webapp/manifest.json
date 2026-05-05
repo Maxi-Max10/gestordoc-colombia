@@ -79,7 +79,7 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "gestordoc.i18n.i18n"
+                    "bundleName": "gestordoccolombia.i18n.i18n"
                 }
             },
             "": {
@@ -107,9 +107,9 @@
                 "transition": "slide",
                 "type": "View",
                 "viewType": "XML",
-                "path": "gestordoc.view",
+                "path": "gestordoccolombia.view",
                 "async": true,
-                "viewPath": "gestordoc.view"
+                "viewPath": "gestordoccolombia.view"
             },
             "routes": [
                 {
@@ -128,7 +128,7 @@
             }
         },
         "rootView": {
-            "viewName": "gestordoc.view.App",
+            "viewName": "gestordoccolombia.view.App",
             "type": "XML",
             "id": "App"
         }

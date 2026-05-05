@@ -4,7 +4,7 @@ sap.ui.define([
     "use strict";
 
     const mPromises = Object.create(null);
-    const DATA_ATTR = "data-gestordoc-lib-url";
+    const DATA_ATTR = "data-gestordoccolombia-lib-url";
 
     const loadScript = function (sUrl) {
         return new Promise((resolve, reject) => {

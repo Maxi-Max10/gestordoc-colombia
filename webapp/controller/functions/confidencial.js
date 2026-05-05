@@ -1,6 +1,6 @@
 sap.ui.define([
   "sap/m/MessageToast",
-  "gestordoc/controller/helpers/pdfGenerator"
+  "gestordoccolombia/controller/helpers/pdfGenerator"
 ], (MessageToast) => {
   "use strict";
 
@@ -184,7 +184,7 @@ sap.ui.define([
       <p style='margin:0cm;font-size:16px;font-family:"Times New Roman",serif;text-align:center;'><span style='font-size:15px;font-family:"Calibri",sans-serif;color:black;'>__________________________________</span></p>
               <p style='margin:0cm;font-size:16px;font-family:"Times New Roman",serif;text-align:center;'><span style='font-size:15px;font-family:"Calibri",sans-serif;color:black;'><strong>`+ user.firstName + ` ` + user.lastName + ` ` + segundoNombre + `</strong></span></p>
                 `;
-        if (sButtonId === "container-gestordoc---View1--wordDataInfo") {
+        if (sButtonId === "container-gestordoccolombia---View1--wordDataInfo") {
           const header = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office'
                       xmlns:w='urn:schemas-microsoft-com:office:word'

@@ -111,7 +111,7 @@ sap.ui.define([
                 <p><strong><span style="font-size:11pt;font-family:Arial,sans-serif;">Anexo: </span></strong><span style="font-size:11pt;font-family:Arial,sans-serif;">Carta firmada del colaborador</span></p>
                 <p><span style="font-size:11pt;font-family:Arial,sans-serif;">El DGT-3 fue presentado en fecha ${fechaAjustada}</span></p>`;
 
-            if (sButtonId === "container-gestordoc---View1--wordDataInfo") {
+            if (sButtonId === "container-gestordoccolombia---View1--wordDataInfo") {
                 htmlRaw += firmaHTML;
                 const header = `
                     <html xmlns:o='urn:schemas-microsoft-com:office:office'

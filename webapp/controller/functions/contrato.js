@@ -274,7 +274,7 @@ sap.ui.define([
             sap.m.MessageToast.show("Usuario/s sin datos");
             return;
           }
-          if (sButtonId === "container-gestordoc---View1--wordDataInfo") {
+          if (sButtonId === "container-gestordoccolombia---View1--wordDataInfo") {
             const header = `
               <html xmlns:o='urn:schemas-microsoft-com:office:office'
                     xmlns:w='urn:schemas-microsoft-com:office:word'

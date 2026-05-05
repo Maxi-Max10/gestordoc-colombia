@@ -3,7 +3,7 @@ sap.ui.define([
 ], (BaseController) => {
   "use strict";
 
-  return BaseController.extend("gestordoc.controller.App", {
+  return BaseController.extend("gestordoccolombia.controller.App", {
       onInit() {
       }
   });

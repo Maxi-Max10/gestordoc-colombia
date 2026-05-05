@@ -3,7 +3,7 @@
 QUnit.config.autostart = false;
 
 sap.ui.require([
-	"gestordoc/test/unit/AllTests"
+	"gestordoccolombia/test/unit/AllTests"
 ], function (Controller) {
 	"use strict";
 	QUnit.start();

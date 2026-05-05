@@ -1,6 +1,6 @@
 sap.ui.define([
     "sap/m/MessageToast",
-    "gestordoc/controller/helpers/pdfGenerator" // ← Importo para usar funciones auxiliares
+    "gestordoccolombia/controller/helpers/pdfGenerator" // ← Importo para usar funciones auxiliares
 ], function (MessageToast, pdfGenerator) { // ← AGREGADO: recibir pdfGenerator como parámetro
     "use strict";
 
@@ -65,7 +65,7 @@ sap.ui.define([
                 `;
 
                 // chequea qué botón se apretó para generar el Word o el PDF
-                if (sButtonId === "container-gestordoc---View1--wordDataInfo") {
+                if (sButtonId === "container-gestordoccolombia---View1--wordDataInfo") {
                     // creo el Word
                     const header = `
                         <html xmlns:o='urn:schemas-microsoft-com:office:office'

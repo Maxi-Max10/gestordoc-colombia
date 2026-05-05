@@ -1,7 +1,7 @@
 /*global QUnit*/
 
 sap.ui.define([
-	"gestordoc/controller/View1.controller"
+	"gestordoccolombia/controller/View1.controller"
 ], function (Controller) {
 	"use strict";
 

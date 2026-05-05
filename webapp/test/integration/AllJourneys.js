@@ -7,7 +7,7 @@ sap.ui.define([
 
 	Opa5.extendConfig({
 		arrangements: new Startup(),
-		viewNamespace: "gestordoc.view.",
+		viewNamespace: "gestordoccolombia.view.",
 		autoWait: true
 	});
 });
