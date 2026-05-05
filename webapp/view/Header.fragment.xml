@@ -3,7 +3,7 @@
     xmlns:core="sap.ui.core"
     xmlns:tnt="sap.tnt">
 
-    <tnt:ToolHeader id="_IDGenToolHeader1" class="sapUiTinyMarginEnd sapUiTinyMarginBegin">
+    <tnt:ToolHeader id="_IDGenToolHeader1" class="customToolHeader">
          <Image id="_IDGenImageeee"
         alt="Logo"
         width="120px"

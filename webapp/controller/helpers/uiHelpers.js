@@ -24,6 +24,19 @@ sap.ui.define([], function () {
 
             // Coloca el texto calculado en el elemento con ID "greetingText"
             oView.byId("greetingText").setText(greetingText);
+
+            var oDateText = oView.byId("bannerDateText");
+            if (oDateText) {
+                var currentDate = new Date();
+                var formattedDate = currentDate.toLocaleDateString("es-ES", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                });
+                formattedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+                oDateText.setText(formattedDate);
+            }
         },
 
         /**

@@ -6,7 +6,10 @@
     xmlns:micro="sap.suite.ui.microchart"
     controllerName="gestordoccolombia.controller.View1"
 >
-    <Shell id="_IDGenShell">
+    <Shell
+        id="_IDGenShell"
+        appWidthLimited="false"
+    >
         <Page
             id="contentContainer"
             title="Categorias"
@@ -21,7 +24,8 @@
                     id="_IDGenVBox1"
                     width="100%"
                     height="200px"
-                    alignItems="Center"
+                    alignItems="Start"
+                    justifyContent="Center"
                     class="imageContainer sapUiSmallMarginTop"
                 >
                     <Text
@@ -29,74 +33,120 @@
                         text=""
                         class="greetingText"
                     />
+                    <Text
+                        text="Bienvenido al sistema de Gestión Documental."
+                        class="bannerSubtitle"
+                    />
+                    <HBox
+                        alignItems="Center"
+                        class="bannerDateRow"
+                    >
+                        <core:Icon
+                            src="sap-icon://calendar"
+                            class="bannerDateIcon"
+                        />
+                        <Text
+                            id="bannerDateText"
+                            text=""
+                            class="bannerDateText"
+                        />
+                    </HBox>
                 </VBox>
-                <Title id="_IDGenTitle"
-                    text="Gestión de Documentos"
-                    titleStyle="H4"
-                    textAlign="Left"
-                    class="sapUiMediumMarginTop sapUiTinyMarginBottom sapUiTinyMarginBegin sapUiTinyMarginEnd"
-                />
+                <HBox
+                    width="100%"
+                    alignItems="Center"
+                    justifyContent="SpaceBetween"
+                    class="documentsHeader"
+                >
+                    <Title
+                        id="_IDGenTitle"
+                        text="Gestión de Documentos"
+                        titleStyle="H4"
+                        textAlign="Left"
+                        class="sectionTitle"
+                    />
+                    <SearchField
+                        id="documentSearch"
+                        width="24rem"
+                        placeholder="Buscar documentos"
+                        liveChange="onDocumentSearch"
+                        search="onDocumentSearch"
+                        class="documentSearchField"
+                    />
+                </HBox>
                 <sap.ui.layout:Grid
                     xmlns:sap.ui.layout="sap.ui.layout"
                     id="gridItems"
                     width="100%"
-                    defaultSpan="XL2 L3 M4 S6"
+                    defaultSpan="XL3 L3 M6 S12"
                     hSpacing="1"
                     vSpacing="1"
-                    position="Center"
+                    position="Left"
                     class="customGrid"
                 >
                 <!-- botones para usuarios. -->
                     <sap.ui.layout:content>
-                    <CustomListItem
+                        <CustomListItem
                             id="customListItemcartaMensualUsuario"
-                            class="customListItem blue"
+                            class="customListItem card-horizontal blue"
                             press="onDownloadCartaMensualUsuario"
                             type="Active"
-                            visible="false"
+                            visible="true"
                         >
-                            <VBox
-                                id="_IDGenVBox20"
-                                alignItems="Center"
-                                justifyContent="Center"
-                                class="interactiveBox"
-                            >
-                                <core:Icon
-                                    id="_IDGenIcon21"
-                                    src="sap-icon://document-text"
-                                    class="customIcon"
-                                />
-                                <Text
-                                    id="_IDGenText20"
-                                    text="Cartas - Trabajo Mensual"
-                                    class="customText"
-                                />
-                            </VBox>
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box blue">
+                                    <core:Icon
+                                        id="_IDGenIcon21"
+                                        src="sap-icon://document-text"
+                                        class="customIcon card-icon"
+                                    />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text
+                                        id="_IDGenText20"
+                                        text="Cartas - Trabajo Mensual"
+                                        class="card-title"
+                                    />
+                                    <Text
+                                        text="Gestionar cartas de trabajo mensual"
+                                        class="card-desc"
+                                    />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
                         <CustomListItem
                             id="customListItemCartaAnualUsuario"
-                            class="customListItem gray"
+                            class="customListItem card-horizontal gray"
                             press="onDownloadCartaAnualUsuario"
-                            visible="false"
+                            visible="true"
                             type="Active"
                         >
-                            <VBox
-                                id="_IDGenVBox21"
-                                alignItems="Center"
-                                justifyContent="Center"
-                                class="interactiveBox"
-                            >
-                                <core:Icon
-                                    id="_IDGenIcon22"
-                                    src="sap-icon://calendar"
-                                    class="customIcon"
-                                />
-                                <Text
-                                    id="_IDGenTex21"
-                                    text="Cartas - Trabajo Anual"
-                                    class="customText"
-                                />
-                            </VBox>
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box gray">
+                                    <core:Icon
+                                        id="_IDGenIcon22"
+                                        src="sap-icon://calendar"
+                                        class="customIcon card-icon"
+                                    />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text
+                                        id="_IDGenTex21"
+                                        text="Cartas - Trabajo Anual"
+                                        class="card-title"
+                                    />
+                                    <Text
+                                        text="Gestionar cartas de trabajo anual"
+                                        class="card-desc"
+                                    />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
                         <!-- 
 
@@ -109,50 +159,62 @@
 
                         <CustomListItem
                             id="customListItemConfidencialidad"
-                            class="customListItem blue"
-                            visible="false"
+                            class="customListItem card-horizontal"
+                            visible="true"
                         >
-                            <VBox
-                                id="_IDGenVBox4"
-                                alignItems="Center"
-                                justifyContent="Center"
-                                class="interactiveBox"
-                            >
-                                <core:Icon
-                                    id="_IDGenIcon2"
-                                    src="sap-icon://locked"
-                                    class="customIcon"
-                                />
-                                <Text
-                                    id="_IDGenText7"
-                                    text="Confidencialidad"
-                                    class="customText"
-                                />
-                            </VBox>
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box blue">
+                                    <core:Icon
+                                        id="_IDGenIcon2"
+                                        src="sap-icon://locked"
+                                        class="customIcon card-icon"
+                                    />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text
+                                        id="_IDGenText7"
+                                        text="Confidencialidad"
+                                        class="card-title"
+                                    />
+                                    <Text
+                                        text="Gestionar documentos confidenciales"
+                                        class="card-desc"
+                                    />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
 
                         <CustomListItem
                             id="customListItemContrato"
-                            class="customListItem pink"
-                            visible="false"
+                            class="customListItem card-horizontal pink"
+                            visible="true"
                         >
-                            <VBox
-                                id="_IDGenVBox5"
-                                alignItems="Center"
-                                justifyContent="Center"
-                                class="interactiveBox"
-                            >
-                                <core:Icon
-                                    id="_IDGenIcon3"
-                                    src="sap-icon://signature"
-                                    class="customIcon"
-                                />
-                                <Text
-                                    id="_IDGenText8"
-                                    text="Contrato De Trabajo"
-                                    class="customText"
-                                />
-                            </VBox>
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box pink">
+                                    <core:Icon
+                                        id="_IDGenIcon3"
+                                        src="sap-icon://signature"
+                                        class="customIcon card-icon"
+                                    />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text
+                                        id="_IDGenText8"
+                                        text="Contrato De Trabajo"
+                                        class="card-title"
+                                    />
+                                    <Text
+                                        text="Gestionar contratos de trabajo"
+                                        class="card-desc"
+                                    />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
                         <!--
                             <CustomListItem id="customListItemPasantes" class="customListItem skyblue">
@@ -171,89 +233,135 @@
 
                         <CustomListItem
                             id="customCertificadoEx"
-                            class="customListItem teal"
-                            visible="false"
+                            class="customListItem card-horizontal teal"
+                            visible="true"
                         >
-                            <VBox
-                                id="_IDGenVBox11"
-                                alignItems="Center"
-                                justifyContent="Center"
-                                class="interactiveBox"
-                            >
-                                <core:Icon
-                                    id="_IDGenIcon10"
-                                    src="sap-icon://employee-approvals"
-                                    class="customIcon"
-                                />
-                                <Text
-                                    id="_IDGenText101"
-                                    text="Certificado Laboral Excolaborador"
-                                    class="customText"
-                                />
-                            </VBox>
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box teal">
+                                    <core:Icon
+                                        id="_IDGenIcon10"
+                                        src="sap-icon://employee-approvals"
+                                        class="customIcon card-icon"
+                                    />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text
+                                        id="_IDGenText101"
+                                        text="Certificado Laboral Excolaborador"
+                                        class="card-title"
+                                    />
+                                    <Text
+                                        text="Gestionar certificados laborales"
+                                        class="card-desc"
+                                    />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
-                        <CustomListItem id="customListItemSalida" class="customListItem purple" visible="false">
-                            <VBox id="_IDGenVBox6" alignItems="Center" justifyContent="Center"
-                                class="interactiveBox">
-                                <core:Icon id="_IDGenIcon4" src="sap-icon://business-card"
-                                    class="customIcon" />
-                                <Text id="_IDGenText9" text="Notificación Salida Ministerio"
-                                    class="customText" />
-                            </VBox>
+                        <CustomListItem id="customListItemSalida" class="customListItem card-horizontal purple" visible="true">
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box purple">
+                                    <core:Icon id="_IDGenIcon4" src="sap-icon://business-card" class="customIcon card-icon" />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text id="_IDGenText9" text="Notificación Salida Ministerio" class="card-title" />
+                                    <Text text="Gestionar notificaciones de salida" class="card-desc" />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
-                        <CustomListItem id="customListItemCartasM" class="customListItem gray" visible="false">
-                            <VBox id="_IDGenVBox7" alignItems="Center" justifyContent="Center"
-                                class="interactiveBox">
-                                <core:Icon id="_IDGenIcon5" src="sap-icon://document-text"
-                                    class="customIcon" />
-                                <Text id="_IDGenText10" text="Cartas de Trabajo Mensual"
-                                    class="customText" />
-                            </VBox>
+                        <CustomListItem id="customListItemCartasM" class="customListItem card-horizontal gray" visible="true">
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box gray">
+                                    <core:Icon id="_IDGenIcon5" src="sap-icon://document-text" class="customIcon card-icon" />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text id="_IDGenText10" text="Cartas de Trabajo Mensual" class="card-title" />
+                                    <Text text="Gestionar cartas de trabajo mensual" class="card-desc" />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
                         <CustomListItem
                             id="customListItemDeshausio"
-                            class="customListItem blue"
+                            class="customListItem card-horizontal blue"
                             type="Active"
                             press="onDesahucioPress"
-                            visible="false"
+                            visible="true"
                         >
-                            <VBox
-                                id="_IDGenVBox8"
-                                alignItems="Center"
-                                justifyContent="Center"
-                                class="interactiveBox"
-                            >
-                                <core:Icon
-                                    id="_IDGenIcon11"
-                                    src="sap-icon://outgoing-call"
-                                    class="customIcon"
-                                />
-                                <Text
-                                    id="_IDGenText11"
-                                    text="Carta Desahucio"
-                                    class="customText"
-                                />
-                            </VBox>
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box blue">
+                                    <core:Icon
+                                        id="_IDGenIcon11"
+                                        src="sap-icon://outgoing-call"
+                                        class="customIcon card-icon"
+                                    />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text
+                                        id="_IDGenText11"
+                                        text="Carta Desahucio"
+                                        class="card-title"
+                                    />
+                                    <Text
+                                        text="Gestionar cartas de desahucio"
+                                        class="card-desc"
+                                    />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
-                        <CustomListItem id="customListItemCartasA" class="customListItem pink" visible="false">
-                                <VBox id="_IDGenVBox2" alignItems="Center" justifyContent="Center" class="interactiveBox">
-                                    <core:Icon id="_IDGenIcon" src="sap-icon://calendar" class="customIcon" />
-                                    <Text id="_IDGenText5" text="Cartas De Trabajo Anual" class="customText" />
+                        <CustomListItem id="customListItemCartasA" class="customListItem card-horizontal pink" visible="true">
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box pink">
+                                    <core:Icon id="_IDGenIcon" src="sap-icon://calendar" class="customIcon card-icon" />
                                 </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text id="_IDGenText5" text="Cartas De Trabajo Anual" class="card-title" />
+                                    <Text text="Gestionar cartas de trabajo anual" class="card-desc" />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
                         </CustomListItem>
-                        <CustomListItem id="customListItemAmonestacion" class="customListItem teal" visible="false">
-                                <VBox id="_IDGenVBox12" alignItems="Center" justifyContent="Center" class="interactiveBox">
-                                    <core:Icon id="_IDGenIcon6" src="sap-icon://education" class="customIcon" />
-                                    <Text id="_IDGenText12" text="Notificación De Amonestación" class="customText" />
+                        <CustomListItem id="customListItemAmonestacion" class="customListItem card-horizontal teal" visible="true">
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box teal">
+                                    <core:Icon id="_IDGenIcon6" src="sap-icon://education" class="customIcon card-icon" />
                                 </VBox>
-                            </CustomListItem>
-                        <CustomListItem id="customListItemAuseInjus" class="customListItem purple" type="Active"
-                            press="onAusenciaInjustificadaPress" visible="false">
-                                <VBox id="_IDGenVBox13" alignItems="Center" justifyContent="Center" class="interactiveBox">
-                                    <core:Icon id="_IDGenIcon13" src="sap-icon://away" class="customIcon" />
-                                    <Text id="_IDGenText13" text="Notificación De Ausencia Injustificada" class="customText" />
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text id="_IDGenText12" text="Notificación De Amonestación" class="card-title" />
+                                    <Text text="Gestionar notificaciones de amonestación" class="card-desc" />
                                 </VBox>
-                            </CustomListItem>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
+                        </CustomListItem>
+                        <CustomListItem id="customListItemAuseInjus" class="customListItem card-horizontal purple" type="Active"
+                            press="onAusenciaInjustificadaPress" visible="true">
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box purple">
+                                    <core:Icon id="_IDGenIcon13" src="sap-icon://away" class="customIcon card-icon" />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text id="_IDGenText13" text="Notificación De Ausencia Injustificada" class="card-title" />
+                                    <Text text="Gestionar notificaciones de ausencia" class="card-desc" />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
+                        </CustomListItem>
                     </sap.ui.layout:content>
                 </sap.ui.layout:Grid>
 

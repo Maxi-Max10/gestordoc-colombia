@@ -1358,6 +1358,70 @@ sap.ui.define([
       });
     },
 
+    _getDocumentSearchCards: function () {
+      return [
+        { id: "customListItemcartaMensualUsuario", title: "Cartas - Trabajo Mensual", desc: "Gestionar cartas de trabajo mensual" },
+        { id: "customListItemCartaAnualUsuario", title: "Cartas - Trabajo Anual", desc: "Gestionar cartas de trabajo anual" },
+        { id: "customListItemConfidencialidad", title: "Confidencialidad", desc: "Gestionar documentos confidenciales" },
+        { id: "customListItemContrato", title: "Contrato De Trabajo", desc: "Gestionar contratos de trabajo" },
+        { id: "customCertificadoEx", title: "Certificado Laboral Excolaborador", desc: "Gestionar certificados laborales" },
+        { id: "customListItemSalida", title: "Notificación Salida Ministerio", desc: "Gestionar notificaciones de salida" },
+        { id: "customListItemCartasM", title: "Cartas de Trabajo Mensual", desc: "Gestionar cartas de trabajo mensual" },
+        { id: "customListItemDeshausio", title: "Carta Desahucio", desc: "Gestionar cartas de desahucio" },
+        { id: "customListItemCartasA", title: "Cartas De Trabajo Anual", desc: "Gestionar cartas de trabajo anual" },
+        { id: "customListItemAmonestacion", title: "Notificación De Amonestación", desc: "Gestionar notificaciones de amonestación" },
+        { id: "customListItemAuseInjus", title: "Notificación De Ausencia Injustificada", desc: "Gestionar notificaciones de ausencia" }
+      ];
+    },
+
+    _normalizeSearchText: function (sValue) {
+      return String(sValue || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+    },
+
+    onDocumentSearch: function (oEvent) {
+      const sValue = oEvent?.getParameter("newValue") ?? oEvent?.getParameter("query") ?? this.byId("documentSearch")?.getValue() ?? "";
+      const sQuery = this._normalizeSearchText(sValue);
+      const aCards = this._getDocumentSearchCards();
+
+      if (sQuery && !this._documentSearchBaseVisibility) {
+        this._documentSearchBaseVisibility = {};
+        aCards.forEach(oCard => {
+          const oItem = this.byId(oCard.id);
+          if (oItem) {
+            this._documentSearchBaseVisibility[oCard.id] = oItem.getVisible();
+          }
+        });
+      }
+
+      if (!sQuery) {
+        if (this._documentSearchBaseVisibility) {
+          aCards.forEach(oCard => {
+            const oItem = this.byId(oCard.id);
+            if (oItem && Object.prototype.hasOwnProperty.call(this._documentSearchBaseVisibility, oCard.id)) {
+              oItem.setVisible(this._documentSearchBaseVisibility[oCard.id]);
+            }
+          });
+          this._documentSearchBaseVisibility = null;
+        }
+        return;
+      }
+
+      aCards.forEach(oCard => {
+        const oItem = this.byId(oCard.id);
+        if (!oItem) {
+          return;
+        }
+
+        const bWasVisible = this._documentSearchBaseVisibility?.[oCard.id] !== false;
+        const sSearchText = this._normalizeSearchText(`${oCard.title} ${oCard.desc}`);
+        oItem.setVisible(bWasVisible && sSearchText.includes(sQuery));
+      });
+    },
+
     
 
     //Carpeta: Functions - Lógica específica de cada tipo de contrato/documento -----------------------------------------------------------------------------
