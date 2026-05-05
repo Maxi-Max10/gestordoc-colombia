@@ -1,0 +1,188 @@
+/* Fondo general de toda la aplicación */
+body,
+html,
+.sapUiBody {
+  background-color: #ebedec !important;
+}
+.sapMShell, .sapMShellBG, .sapMShellGlobalOuterBackground {
+    background: transparent !important;
+  }
+  
+  #contentContainer {
+    background: none !important;
+    box-shadow: none !important;
+    height: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+.customGrid {
+    margin-top: 20px;
+}
+
+.customTable th {
+    background-color: #d3d3d3 !important; 
+}
+
+.blurredBackground {
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+    pointer-events: none; 
+}
+
+.greetingText {
+    font-size: 3rem;
+    font-weight: bold; 
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.imageContainer {
+  background-image: url("../img/portada.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 80vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Asegura que el Grid tenga el tamaño adecuado */
+.customGrid {
+    margin-top: 20px;
+}
+
+/* Estilos generales para los ítems de la lista */
+.customListItem {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 7rem !important; /* Ajusta la altura */
+    border-radius: 15px !important;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2) !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    padding: 1rem !important;
+    font-size: 0.7rem !important;
+    text-align: center !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    color: white !important;
+    word-wrap: break-word !important; /* Permite que el texto largo se divida en varias líneas */
+    white-space: normal !important; /* Evita que el texto se corte en una sola línea */
+}
+
+/* Efecto hover */
+.customListItem:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3) !important;
+    cursor: pointer !important;
+}
+
+/* Ícono dentro del ítem (centrado y más grande en pantallas grandes) */
+.customIcon {
+    margin-top: 5px;
+    font-size: 2.5rem !important; /* Tamaño base */
+    color: white !important;
+    margin-bottom: 8px !important; /* Espaciado entre icono y texto */
+    display: block;
+    text-align: center;
+    cursor: pointer !important;
+}
+
+
+/* Texto centrado debajo del icono */
+.customText {
+    font-size: 0.7rem !important; /* Tamaño base del texto */
+    font-weight: bold !important;
+    color: white !important;
+    text-align: center !important;
+    max-width: 120% !important;
+    overflow-wrap: break-word !important;
+    transition: font-size 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+
+/* Colores personalizados por clase */
+.blue { background-color: #0057D2 !important; }
+.pink { background-color: #DF1278 !important; }
+.teal { background-color: #078387 !important; }
+.purple { background-color: #7858FF !important; }
+.gray { background-color: #5B738B !important; }
+
+
+
+/* Contenedor general del Dialog */
+.dialogContainer {
+    width: 100%;
+    padding: 0rem;
+    box-sizing: border-box;
+  }
+  
+  /* HBox contenedor de filtros */
+  .filterBar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Asegura que los inputs usen bien el espacio */
+  #searchField,
+  #dateRange {
+    height: 2.5rem;
+  }
+
+  .customToolHeader {
+    background-color: white !important;
+    width: 100%;
+    height: 4rem;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0 !important;
+    position: relative;
+    z-index: 1000;
+  }
+  
+  /* Logo del header */
+  .headerLogo {
+    height: 40px;
+    object-fit: contain;
+  }
+  
+  /* Navegación del header */
+  .headerNav {
+    flex-grow: 1;
+    background: transparent;
+    color: black;
+    margin-left: 1rem;
+    box-shadow: 0 2px 22px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    border-radius: 4px;
+  }
+  
+  .headerNav .sapMITBFilterText {
+    color: black !important;
+    font-weight: 600;
+    font-size: 1.1rem;
+    
+  }
+  
+  .headerNav .sapMITBSelected .sapMITBFilterText {
+    color: #027dc5 !important; 
+  }
+
+  

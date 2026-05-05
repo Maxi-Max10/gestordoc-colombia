@@ -1,0 +1,8 @@
+{
+    "bg-color-macro.name": "Color",
+    "bg-color-macro.desc": "Allow users to add a background colour around selected content.",
+    "bg-color-macro.param.color.label": "Color",
+    "bg-color-macro.param.color.desc": "Enter the color in HEX",
+    "bg-color-macro.param.style.label": "CSS Styles",
+    "bg-color-macro.param.style.desc": "Add more CSS styles here"
+ }

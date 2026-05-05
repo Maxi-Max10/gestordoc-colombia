@@ -1,0 +1,33 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog
+        id="manualDateDialogAusencia"
+        title="Ingrese la fecha de la Ausencia Injustificada"
+        contentWidth="auto"
+        contentHeight="auto"
+        class="responsiveDialog"
+    >
+        <VBox id="_IDGenVBox3"
+            width="auto"
+            class="sapUiSmallMargin"
+        >
+            <DatePicker
+                id="manualDatePickerAusencia"
+                placeholder="Seleccione la fecha"
+                width="100%"
+            />
+        </VBox>
+
+        <buttons>
+            <Button id="_IDGenButton1"
+                text="Confirmar"
+                type="Emphasized"
+                press="onConfirmManualDateAusencia"
+            />
+            <Button id="_IDGenButton3"
+                text="Cancelar"
+                type="Reject"
+                press="onCancelManualDateAusencia"
+            />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

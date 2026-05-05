@@ -1,0 +1,371 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    xmlns:micro="sap.suite.ui.microchart"
+    controllerName="gestordoc.controller.View1"
+>
+    <Shell id="_IDGenShell">
+        <Page
+            id="contentContainer"
+            title="Categorias"
+            showHeader="false"
+        >
+            <content>
+                <core:Fragment
+                    fragmentName="gestordoc.view.Header"
+                    type="XML"
+                />
+                <VBox
+                    id="_IDGenVBox1"
+                    width="100%"
+                    height="200px"
+                    alignItems="Center"
+                    class="imageContainer sapUiSmallMarginTop"
+                >
+                    <Text
+                        id="greetingText"
+                        text=""
+                        class="greetingText"
+                    />
+                </VBox>
+                <Title id="_IDGenTitle"
+                    text="Gestión de Documentos"
+                    titleStyle="H4"
+                    textAlign="Left"
+                    class="sapUiMediumMarginTop sapUiTinyMarginBottom sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                />
+                <sap.ui.layout:Grid
+                    xmlns:sap.ui.layout="sap.ui.layout"
+                    id="gridItems"
+                    width="100%"
+                    defaultSpan="XL2 L3 M4 S6"
+                    hSpacing="1"
+                    vSpacing="1"
+                    position="Center"
+                    class="customGrid"
+                >
+                <!-- botones para usuarios. -->
+                    <sap.ui.layout:content>
+                    <CustomListItem
+                            id="customListItemcartaMensualUsuario"
+                            class="customListItem blue"
+                            press="onDownloadCartaMensualUsuario"
+                            type="Active"
+                            visible="false"
+                        >
+                            <VBox
+                                id="_IDGenVBox20"
+                                alignItems="Center"
+                                justifyContent="Center"
+                                class="interactiveBox"
+                            >
+                                <core:Icon
+                                    id="_IDGenIcon21"
+                                    src="sap-icon://document-text"
+                                    class="customIcon"
+                                />
+                                <Text
+                                    id="_IDGenText20"
+                                    text="Cartas - Trabajo Mensual"
+                                    class="customText"
+                                />
+                            </VBox>
+                        </CustomListItem>
+                        <CustomListItem
+                            id="customListItemCartaAnualUsuario"
+                            class="customListItem gray"
+                            press="onDownloadCartaAnualUsuario"
+                            visible="false"
+                            type="Active"
+                        >
+                            <VBox
+                                id="_IDGenVBox21"
+                                alignItems="Center"
+                                justifyContent="Center"
+                                class="interactiveBox"
+                            >
+                                <core:Icon
+                                    id="_IDGenIcon22"
+                                    src="sap-icon://calendar"
+                                    class="customIcon"
+                                />
+                                <Text
+                                    id="_IDGenTex21"
+                                    text="Cartas - Trabajo Anual"
+                                    class="customText"
+                                />
+                            </VBox>
+                        </CustomListItem>
+                        <!-- 
+
+                            <CustomListItem id="customListItemCertificado" class="customListItem pink">
+                                <VBox id="_IDGenVBox3" alignItems="Center" justifyContent="Center" class="interactiveBox">
+                                    <core:Icon id="_IDGenIcon1" src="sap-icon://employee" class="customIcon" />
+                                    <Text id="_IDGenText6" text="Certificado Laboral" class="customText" />
+                                </VBox>
+                            </CustomListItem>-->
+
+                        <CustomListItem
+                            id="customListItemConfidencialidad"
+                            class="customListItem blue"
+                            visible="false"
+                        >
+                            <VBox
+                                id="_IDGenVBox4"
+                                alignItems="Center"
+                                justifyContent="Center"
+                                class="interactiveBox"
+                            >
+                                <core:Icon
+                                    id="_IDGenIcon2"
+                                    src="sap-icon://locked"
+                                    class="customIcon"
+                                />
+                                <Text
+                                    id="_IDGenText7"
+                                    text="Confidencialidad"
+                                    class="customText"
+                                />
+                            </VBox>
+                        </CustomListItem>
+
+                        <CustomListItem
+                            id="customListItemContrato"
+                            class="customListItem pink"
+                            visible="false"
+                        >
+                            <VBox
+                                id="_IDGenVBox5"
+                                alignItems="Center"
+                                justifyContent="Center"
+                                class="interactiveBox"
+                            >
+                                <core:Icon
+                                    id="_IDGenIcon3"
+                                    src="sap-icon://signature"
+                                    class="customIcon"
+                                />
+                                <Text
+                                    id="_IDGenText8"
+                                    text="Contrato De Trabajo"
+                                    class="customText"
+                                />
+                            </VBox>
+                        </CustomListItem>
+                        <!--
+                            <CustomListItem id="customListItemPasantes" class="customListItem skyblue">
+                                <VBox id="_IDGenVBox8" alignItems="Center" justifyContent="Center" class="interactiveBox">
+                                    <core:Icon id="_IDGenIcon6" src="sap-icon://education" class="customIcon" />
+                                    <Text id="_IDGenText11" text="Contrato Pasantes" class="customText" />
+                                </VBox>
+                            </CustomListItem>
+
+                          <CustomListItem id="customListItemTemporeros" class="customListItem orange">
+                                <VBox id="_IDGenVBox9" alignItems="Center" justifyContent="Center" class="interactiveBox">
+                                    <core:Icon id="_IDGenIcon7" src="sap-icon://calendar" class="customIcon" />
+                                    <Text id="_IDGenText12" text="Contrato Temporeros" class="customText" />
+                                </VBox>
+                            </CustomListItem> -->
+
+                        <CustomListItem
+                            id="customCertificadoEx"
+                            class="customListItem teal"
+                            visible="false"
+                        >
+                            <VBox
+                                id="_IDGenVBox11"
+                                alignItems="Center"
+                                justifyContent="Center"
+                                class="interactiveBox"
+                            >
+                                <core:Icon
+                                    id="_IDGenIcon10"
+                                    src="sap-icon://employee-approvals"
+                                    class="customIcon"
+                                />
+                                <Text
+                                    id="_IDGenText101"
+                                    text="Certificado Laboral Excolaborador"
+                                    class="customText"
+                                />
+                            </VBox>
+                        </CustomListItem>
+                        <CustomListItem id="customListItemSalida" class="customListItem purple" visible="false">
+                            <VBox id="_IDGenVBox6" alignItems="Center" justifyContent="Center"
+                                class="interactiveBox">
+                                <core:Icon id="_IDGenIcon4" src="sap-icon://business-card"
+                                    class="customIcon" />
+                                <Text id="_IDGenText9" text="Notificación Salida Ministerio"
+                                    class="customText" />
+                            </VBox>
+                        </CustomListItem>
+                        <CustomListItem id="customListItemCartasM" class="customListItem gray" visible="false">
+                            <VBox id="_IDGenVBox7" alignItems="Center" justifyContent="Center"
+                                class="interactiveBox">
+                                <core:Icon id="_IDGenIcon5" src="sap-icon://document-text"
+                                    class="customIcon" />
+                                <Text id="_IDGenText10" text="Cartas de Trabajo Mensual"
+                                    class="customText" />
+                            </VBox>
+                        </CustomListItem>
+                        <CustomListItem
+                            id="customListItemDeshausio"
+                            class="customListItem blue"
+                            type="Active"
+                            press="onDesahucioPress"
+                            visible="false"
+                        >
+                            <VBox
+                                id="_IDGenVBox8"
+                                alignItems="Center"
+                                justifyContent="Center"
+                                class="interactiveBox"
+                            >
+                                <core:Icon
+                                    id="_IDGenIcon11"
+                                    src="sap-icon://outgoing-call"
+                                    class="customIcon"
+                                />
+                                <Text
+                                    id="_IDGenText11"
+                                    text="Carta Desahucio"
+                                    class="customText"
+                                />
+                            </VBox>
+                        </CustomListItem>
+                        <CustomListItem id="customListItemCartasA" class="customListItem pink" visible="false">
+                                <VBox id="_IDGenVBox2" alignItems="Center" justifyContent="Center" class="interactiveBox">
+                                    <core:Icon id="_IDGenIcon" src="sap-icon://calendar" class="customIcon" />
+                                    <Text id="_IDGenText5" text="Cartas De Trabajo Anual" class="customText" />
+                                </VBox>
+                        </CustomListItem>
+                        <CustomListItem id="customListItemAmonestacion" class="customListItem teal" visible="false">
+                                <VBox id="_IDGenVBox12" alignItems="Center" justifyContent="Center" class="interactiveBox">
+                                    <core:Icon id="_IDGenIcon6" src="sap-icon://education" class="customIcon" />
+                                    <Text id="_IDGenText12" text="Notificación De Amonestación" class="customText" />
+                                </VBox>
+                            </CustomListItem>
+                        <CustomListItem id="customListItemAuseInjus" class="customListItem purple" type="Active"
+                            press="onAusenciaInjustificadaPress" visible="false">
+                                <VBox id="_IDGenVBox13" alignItems="Center" justifyContent="Center" class="interactiveBox">
+                                    <core:Icon id="_IDGenIcon13" src="sap-icon://away" class="customIcon" />
+                                    <Text id="_IDGenText13" text="Notificación De Ausencia Injustificada" class="customText" />
+                                </VBox>
+                            </CustomListItem>
+                    </sap.ui.layout:content>
+                </sap.ui.layout:Grid>
+
+                
+                <!-- DIALOG -->
+                <Dialog
+                    id="employeeDialog"
+                    title=""
+                    beforeOpen="onBeforeOpenDialog"
+                    afterOpen="onAfterOpenDialog"
+                    afterClose="onAfterCloseDialog"
+                    contentWidth="50%"
+                    contentHeight="auto"
+                    class="responsiveDialog"
+                >
+                    <VBox
+                        id="_IDGenVBox10"
+                        class="dialogContainer"
+                        width="100%"
+                    >
+                        <OverflowToolbar
+                            id="_IDGenOverflowToolbar"
+                        >
+                            <ToolbarSpacer id="_IDGenToolbarSpacer1" />
+                            <SearchField
+                                id="searchField"
+                                liveChange="onSearchFieldChange"
+                                width="50%"
+                                placeholder="Buscar colaborador..."
+                            >
+                                <layoutData>
+                                    <OverflowToolbarLayoutData
+                                        id="_IDGenOverflowToolbarLayoutData"
+                                        priority="NeverOverflow"
+                                    />
+                                </layoutData>
+                            </SearchField>
+                            <ToolbarSeparator id="_IDGenToolbarSeparator" />
+                            <DateRangeSelection
+                                id="dateRange"
+                                width="35%"
+                                change="onDateFilterChange"
+                                placeholder="Filtrar por fecha"
+                            >
+                                <layoutData>
+                                    <OverflowToolbarLayoutData
+                                        id="_IDGenOverflowToolbarLayoutData1"
+                                        priority="NeverOverflow"
+                                    />
+                                </layoutData>
+                            </DateRangeSelection>
+                            <ToolbarSpacer id="_IDGenToolbarSpacer2" />
+                        </OverflowToolbar>
+                        <!-- TABLA -->
+                        <Table
+                            id="idUserTable"
+                            class="customTable"
+                            growing="true"
+                            growingThreshold="40"
+                            growingScrollToLoad="false"
+                            selectionChange="onSelectionChange"
+                            
+                            inset="false"
+                            mode="MultiSelect"
+                            items="{ path: 'view>/FilteredUsers', sorter: { path: 'lastName' } }"
+                        >
+                            <columns>
+                                 <Column id="_IDGenColumn1" width="20%">
+                                    <Text id="_IDGenText" text="ID" />
+                                </Column>
+                                <Column id="_IDGenColumn2" width="50%">
+                                    <Text id="_IDGenText1" text="Colaborador" />
+                                </Column>
+                                <Column id="_IDGenColumn3" width="30%" minScreenWidth="Tablet" demandPopin="true">
+                                    <Text id="_IDGenText2" text="Documento" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem id="_IDGenColumnListItem">
+                                    <cells>
+                                    <Text id="_IDGenText3" text="{view>customLong1}" />
+                                    <Text id="_IDGenText4" text="{view>firstName} {view>lastName}" />
+                                    <Text id="_IDGenText6" text="{view>nationalId}" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </VBox>
+
+                    <buttons>
+                        <Button
+                            id="wordDataInfo"
+                            text="Generar Word"
+                            press="onDownloadPDF"
+                            class="wordButtonCustom"
+                            type="Emphasized"
+                        />
+                        <Button
+                            id="pdfDataInfo"
+                            text="Generar PDF"
+                            press="onDownloadPDF"
+                            type="Accept"
+                        />
+                        <Button
+                            id="_IDGenButton2"
+                            icon="sap-icon://undo"
+                            press="onCloseDialog"
+                            type="Reject"
+                        />
+                    </buttons>
+                </Dialog>
+            </content>
+        </Page>
+    </Shell>
+</mvc:View>

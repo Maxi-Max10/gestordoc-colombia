@@ -1,0 +1,31 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt">
+
+    <tnt:ToolHeader id="_IDGenToolHeader1" class="sapUiTinyMarginEnd sapUiTinyMarginBegin">
+         <Image id="_IDGenImageeee"
+        alt="Logo"
+        width="120px"
+        class="headerLogo"
+    />
+      <ToolbarSpacer id="_IDGenToolbarSpacer" width="1rem" />
+        <IconTabHeader
+            id="iconTabHeader"
+            selectedKey="invalidKey"
+            backgroundDesign="Transparent"
+            mode="Inline"
+            select="onSelectHeader"
+            class="headerNav">
+            
+            <layoutData>
+                <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData2" priority="NeverOverflow" shrinkable="true"/>
+            </layoutData>
+            <items>
+                <IconTabFilter id="_IDGenIconTabFilter" text="Inicio" key="1"  />
+            </items>
+        </IconTabHeader>
+
+    </tnt:ToolHeader>
+
+</core:FragmentDefinition>
