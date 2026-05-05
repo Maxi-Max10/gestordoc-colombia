@@ -13,3 +13,4 @@ dist/
 mta_archives/
 *.mtar
 .env
+*.bak
