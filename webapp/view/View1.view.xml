@@ -362,6 +362,39 @@
                                 </VBox>
                             </HBox>
                         </CustomListItem>
+
+                        <CustomListItem
+                            id="customListItemKitRetiro"
+                            class="customListItem card-horizontal orange"
+                            type="Active"
+                            press="onKitRetiroPress"
+                            visible="true"
+                        >
+                            <HBox width="100%" height="100%" class="card-hbox">
+                                <VBox width="80px" height="100%" class="card-icon-box orange">
+                                    <core:Icon
+                                        id="_IDGenIconKitRetiro"
+                                        src="sap-icon://physical-activity"
+                                        class="customIcon card-icon"
+                                    />
+                                </VBox>
+                                <VBox width="auto" height="100%" class="card-content-box">
+                                    <Text
+                                        id="_IDGenTextKitRetiro"
+                                        text="Kit De Retiro"
+                                        class="card-title"
+                                    />
+                                    <Text
+                                        text="Gestionar documentos de retiro"
+                                        class="card-desc"
+                                    />
+                                </VBox>
+                                <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
+                                    <core:Icon src="sap-icon://navigation-right-arrow" class="card-arrow"/>
+                                </VBox>
+                            </HBox>
+                        </CustomListItem>
+
                     </sap.ui.layout:content>
                 </sap.ui.layout:Grid>
 

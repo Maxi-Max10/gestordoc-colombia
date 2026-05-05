@@ -18,10 +18,11 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/notSalida_ministerio",
   "gestordoccolombia/controller/functions/carta_anual",
   "gestordoccolombia/controller/functions/notAmonestacion",
-  "gestordoccolombia/controller/functions/notAusInjus"
+  "gestordoccolombia/controller/functions/notAusInjus",
+  "gestordoccolombia/controller/functions/kitRetiro"
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, confidencial, contrato, excolaborador, carta_mensual, cartaMensualUsuario, desahucio, notSalida_ministerio, carta_anual, notAmonestacion, notAusInjus) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, confidencial, contrato, excolaborador, carta_mensual, cartaMensualUsuario, desahucio, notSalida_ministerio, carta_anual, notAmonestacion, notAusInjus, kitRetiro) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -690,6 +691,7 @@ sap.ui.define([
           var oButtonConfiden = that.byId("customListItemConfidencialidad");
           var oButtonCartMensualUSuario = that.byId("customListItemcartaMensualUsuario");
           var oButtonCartAnualUSuario = that.byId("customListItemCartaAnualUsuario");
+          var oButtonKitRetiro = that.byId("customListItemKitRetiro");
 
           // Botones solo para usuarios normales (los que queremos quitar si es admin)
           const aUserOnly = [
@@ -1285,6 +1287,9 @@ sap.ui.define([
         case "mensual usuario":
           this.onDownloadCartaMensualUsuario(oEvent)
           break;
+        case "Kit de Retiro":
+          this.onDownloadPDFKitRetiro(sButtonId);
+          break;
         default:
           sap.m.MessageToast.show("No hay función definida para este documento.");
           break;
@@ -1330,7 +1335,8 @@ sap.ui.define([
         { id: "customListItemAmonestacion", title: "Notificación De Amonestación" },
         { id: "customListItemPasantes", title: "Contrato Pasantes" },
         { id: "customListItemTemporeros", title: "Contrato Temporeros" },
-        { id: "customCertificadoEx", title: "Certificado Laboral Excolaborador" }
+        { id: "customCertificadoEx", title: "Certificado Laboral Excolaborador" },
+        { id: "customListItemKitRetiro", title: "Kit de Retiro" }
       ];
 
       boxMap.forEach(box => {
@@ -1370,7 +1376,8 @@ sap.ui.define([
         { id: "customListItemDeshausio", title: "Carta Desahucio", desc: "Gestionar cartas de desahucio" },
         { id: "customListItemCartasA", title: "Cartas De Trabajo Anual", desc: "Gestionar cartas de trabajo anual" },
         { id: "customListItemAmonestacion", title: "Notificación De Amonestación", desc: "Gestionar notificaciones de amonestación" },
-        { id: "customListItemAuseInjus", title: "Notificación De Ausencia Injustificada", desc: "Gestionar notificaciones de ausencia" }
+        { id: "customListItemAuseInjus", title: "Notificación De Ausencia Injustificada", desc: "Gestionar notificaciones de ausencia" },
+        { id: "customListItemKitRetiro", title: "Kit de Retiro", desc: "Gestionar kit de retiro" }
       ];
     },
 
@@ -1719,6 +1726,11 @@ sap.ui.define([
     onDownloadPDFNotAusInjus: async function (sButtonId) {
       notAusInjus.onDownloadPDFNotAusInjus(this, sButtonId);
     },
+
+    //PRUEBA NUEVO ARCHIVO KIT RETIRO
+    onDownloadPDFKitRetiro: async function (sButtonId) {
+      kitRetiro.onDownloadPDFKitRetiro(this, sButtonId);
+    }
 
 
 

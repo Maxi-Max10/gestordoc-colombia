@@ -43,6 +43,8 @@ sap.ui.define([
 
             const doc = this.createWordDocument(docx, textContent);
             await this.downloadWordDocument(docx, doc, oUser, sTitle);
+
+            console.log(fileName);
         },
 
         getContractFileName: function(context, oUser, sTitle) {
