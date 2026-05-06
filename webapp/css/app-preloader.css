@@ -1,0 +1,241 @@
+.appPreloader {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(10, 110, 209, 0.08), transparent 30%),
+    linear-gradient(135deg, #ffffff 0%, #f8fbff 52%, #eef6ff 100%);
+  color: #123766;
+  font-family: "72", "72full", Arial, Helvetica, sans-serif;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+
+.appPreloader.is-hiding {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.appPreloader::before,
+.appPreloader::after {
+  content: "";
+  position: absolute;
+  width: 23rem;
+  height: 7rem;
+  border-radius: 4rem;
+  border: 3px solid rgba(255, 255, 255, 0.82);
+  background: linear-gradient(135deg, rgba(10, 110, 209, 0.86), rgba(144, 198, 244, 0.22));
+  box-shadow: 0 18px 50px rgba(10, 110, 209, 0.16);
+  transform: rotate(-45deg);
+}
+
+.appPreloader::before {
+  top: -1.8rem;
+  left: -8.5rem;
+}
+
+.appPreloader::after {
+  right: -8.2rem;
+  bottom: -1.8rem;
+}
+
+.appPreloader__corner {
+  position: absolute;
+  width: 12rem;
+  height: 12rem;
+  pointer-events: none;
+}
+
+.appPreloader__corner--top {
+  top: 3.5rem;
+  right: 7rem;
+}
+
+.appPreloader__corner--bottom {
+  left: 3.8rem;
+  bottom: 13rem;
+}
+
+.appPreloader__dots {
+  width: 100%;
+  height: 100%;
+  opacity: 0.42;
+  background-image: radial-gradient(#0a6ed1 1.7px, transparent 1.7px);
+  background-size: 1rem 1rem;
+}
+
+.appPreloader__content {
+  position: relative;
+  z-index: 1;
+  width: min(38rem, calc(100vw - 2rem));
+  text-align: center;
+}
+
+.appPreloader__brand {
+  margin: 0;
+  font-size: clamp(4.2rem, 8vw, 7.2rem);
+  line-height: 0.88;
+  font-weight: 800;
+  letter-spacing: -0.08em;
+  color: #0a58ca;
+}
+
+.appPreloader__brand span {
+  color: #123766;
+}
+
+.appPreloader__title {
+  margin-top: 1rem;
+  color: #425773;
+  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.12;
+}
+
+.appPreloader__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.3rem;
+  height: 5.3rem;
+  margin-top: 1.9rem;
+  border-radius: 50%;
+  border: 2px solid #d8e9ff;
+  color: #0a6ed1;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 12px 30px rgba(10, 110, 209, 0.12);
+}
+
+.appPreloader__icon svg {
+  width: 2.8rem;
+  height: 2.8rem;
+}
+
+.appPreloader__status {
+  margin-top: 1.4rem;
+  color: #0a6ed1;
+  font-size: 1.22rem;
+  font-weight: 800;
+}
+
+.appPreloader__copy {
+  margin-top: 0.55rem;
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.appPreloader__progress {
+  width: min(27.5rem, 72vw);
+  height: 0.74rem;
+  margin: 1.55rem auto 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d9dee7;
+}
+
+.appPreloader__bar {
+  width: 12%;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.12)),
+    #0a6ed1;
+  background-size: 3rem 100%, auto;
+  animation: appPreloaderStripes 0.85s linear infinite;
+  transition: width 0.35s ease;
+}
+
+.appPreloader__percent {
+  margin-top: 0.75rem;
+  color: #0a6ed1;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.appPreloader__footer {
+  position: relative;
+  width: min(34rem, 78vw);
+  margin: 3.8rem auto 0;
+  padding-top: 2rem;
+  color: #304867;
+  font-size: 0.94rem;
+  border-top: 1px solid #c9def6;
+}
+
+.appPreloader__seal {
+  position: absolute;
+  top: -1.55rem;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.1rem;
+  height: 3.1rem;
+  border-radius: 50%;
+  border: 1px solid #b8d6f6;
+  background: #ffffff;
+  color: #0a6ed1;
+  transform: translateX(-50%);
+}
+
+.appPreloader__seal svg {
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+.appPreloader__footer strong {
+  color: #0a6ed1;
+}
+
+.appPreloader__steps {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.15rem;
+}
+
+.appPreloader__step {
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 50%;
+  background: #b8d6f6;
+}
+
+.appPreloader__step:first-child {
+  background: #0a6ed1;
+}
+
+@keyframes appPreloaderStripes {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 3rem 0, 0 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .appPreloader::before,
+  .appPreloader::after {
+    width: 16rem;
+    height: 5rem;
+  }
+
+  .appPreloader__corner--top {
+    right: 1.2rem;
+  }
+
+  .appPreloader__corner--bottom {
+    left: 1.2rem;
+    bottom: 8rem;
+  }
+
+  .appPreloader__icon {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+}

@@ -91,7 +91,7 @@
                             class="customListItem card-horizontal blue"
                             press="onDownloadCartaMensualUsuario"
                             type="Active"
-                            visible="true"
+                            visible="false"
                         >
                             <HBox width="100%" height="100%" class="card-hbox">
                                 <VBox width="80px" height="100%" class="card-icon-box blue">
@@ -121,7 +121,7 @@
                             id="customListItemCartaAnualUsuario"
                             class="customListItem card-horizontal gray"
                             press="onDownloadCartaAnualUsuario"
-                            visible="true"
+                            visible="false"
                             type="Active"
                         >
                             <HBox width="100%" height="100%" class="card-hbox">
@@ -373,48 +373,63 @@
                     beforeOpen="onBeforeOpenDialog"
                     afterOpen="onAfterOpenDialog"
                     afterClose="onAfterCloseDialog"
-                    contentWidth="50%"
+                    contentWidth="58rem"
                     contentHeight="auto"
-                    class="responsiveDialog"
+                    class="responsiveDialog employeeDialog"
                 >
+                    <customHeader>
+                        <Toolbar class="employeeDialogHeader">
+                            <HBox alignItems="Center" class="employeeDialogHeaderInfo">
+                                <VBox alignItems="Center" justifyContent="Center" class="employeeDialogIconBadge">
+                                    <core:Icon src="sap-icon://document-text" class="employeeDialogHeaderIcon" />
+                                </VBox>
+                                <VBox justifyContent="Center" class="employeeDialogTitleBlock">
+                                    <Title
+                                        text="{view>/DialogTitle}"
+                                        titleStyle="H5"
+                                        class="employeeDialogTitle"
+                                    />
+                                    <Text
+                                        text="Seleccione colaboradores para generar los documentos correspondientes."
+                                        class="employeeDialogSubtitle"
+                                    />
+                                </VBox>
+                            </HBox>
+                            <ToolbarSpacer />
+                            <Button
+                                icon="sap-icon://decline"
+                                press="onCloseDialog"
+                                type="Transparent"
+                                class="employeeDialogCloseButton"
+                            />
+                        </Toolbar>
+                    </customHeader>
                     <VBox
                         id="_IDGenVBox10"
                         class="dialogContainer"
                         width="100%"
                     >
-                        <OverflowToolbar
+                        <HBox
                             id="_IDGenOverflowToolbar"
+                            width="100%"
+                            alignItems="Center"
+                            class="employeeFilterBar"
                         >
-                            <ToolbarSpacer id="_IDGenToolbarSpacer1" />
                             <SearchField
                                 id="searchField"
                                 liveChange="onSearchFieldChange"
-                                width="50%"
-                                placeholder="Buscar colaborador..."
-                            >
-                                <layoutData>
-                                    <OverflowToolbarLayoutData
-                                        id="_IDGenOverflowToolbarLayoutData"
-                                        priority="NeverOverflow"
-                                    />
-                                </layoutData>
-                            </SearchField>
-                            <ToolbarSeparator id="_IDGenToolbarSeparator" />
+                                width="100%"
+                                placeholder="Buscar por ID, colaborador o documento..."
+                                class="employeeSearchField"
+                            />
                             <DateRangeSelection
                                 id="dateRange"
-                                width="35%"
+                                width="16rem"
                                 change="onDateFilterChange"
                                 placeholder="Filtrar por fecha"
-                            >
-                                <layoutData>
-                                    <OverflowToolbarLayoutData
-                                        id="_IDGenOverflowToolbarLayoutData1"
-                                        priority="NeverOverflow"
-                                    />
-                                </layoutData>
-                            </DateRangeSelection>
-                            <ToolbarSpacer id="_IDGenToolbarSpacer2" />
-                        </OverflowToolbar>
+                                class="employeeDateRange"
+                            />
+                        </HBox>
                         <!-- TABLA -->
                         <Table
                             id="idUserTable"
@@ -422,6 +437,7 @@
                             growing="true"
                             growingThreshold="40"
                             growingScrollToLoad="false"
+                            growingTriggerText="Cargar más"
                             selectionChange="onSelectionChange"
                             
                             inset="false"
@@ -455,6 +471,7 @@
                         <Button
                             id="wordDataInfo"
                             text="Generar Word"
+                            icon="sap-icon://doc-attachment"
                             press="onDownloadPDF"
                             class="wordButtonCustom"
                             type="Emphasized"
@@ -462,14 +479,18 @@
                         <Button
                             id="pdfDataInfo"
                             text="Generar PDF"
+                            icon="sap-icon://pdf-attachment"
                             press="onDownloadPDF"
+                            class="pdfButtonCustom"
                             type="Accept"
                         />
                         <Button
                             id="_IDGenButton2"
-                            icon="sap-icon://undo"
+                            text="Cancelar"
+                            icon="sap-icon://decline"
                             press="onCloseDialog"
-                            type="Reject"
+                            class="dialogCancelButton"
+                            type="Default"
                         />
                     </buttons>
                 </Dialog>

@@ -321,7 +321,8 @@ sap.ui.define([
       var oViewModel = new JSONModel({
         BaseUsers: [], // Base estable para filtros (según documento)
         FilteredUsers: [],// Usuarios filtrados en la tabla
-        SelectedUsers: [] //Array para guardar temporalmente los Usuarios seleccionados
+        SelectedUsers: [], //Array para guardar temporalmente los Usuarios seleccionados
+        DialogTitle: ""
       });
       oViewModel.setSizeLimit(999999); // Aumenta límite para muchos registros
       // Inicializa variables de estado
@@ -358,6 +359,97 @@ sap.ui.define([
       }
       // Adjunta eventos a los tiles
       this.attachBoxEvents();
+    },
+
+    _hideInitialPreloader: function () {
+      if (this._initialPreloaderHideRequested) {
+        return;
+      }
+
+      this._initialPreloaderHideRequested = true;
+
+      const fnHide = () => {
+        if (typeof window.gmaHideAppPreloader === "function") {
+          window.gmaHideAppPreloader();
+        }
+      };
+
+      this._waitForInitialLayoutReady()
+        .then(fnHide)
+        .catch(fnHide);
+    },
+
+    _waitForInitialLayoutReady: function () {
+      const iMinWait = 2400;
+      const iMaxWait = 6500;
+      const iRequiredStableFrames = 12;
+      const iStartedAt = Date.now();
+      const fnNextFrame = window.requestAnimationFrame || function (fnCallback) {
+        return window.setTimeout(fnCallback, 16);
+      };
+
+      try {
+        sap.ui.getCore().applyChanges();
+      } catch (oError) {
+        console.warn("No se pudieron aplicar cambios antes de ocultar el preload:", oError);
+      }
+
+      return new Promise((resolve) => {
+        let sLastSignature = "";
+        let iStableFrames = 0;
+
+        const fnGetLayoutSignature = () => {
+          const oGrid = this.byId("gridItems");
+          const oGridDomRef = oGrid?.getDomRef();
+          const aContent = oGrid?.getContent?.() || [];
+
+          if (!oGridDomRef || !aContent.length) {
+            return "";
+          }
+
+          const oGridRect = oGridDomRef.getBoundingClientRect();
+          const aVisibleRects = aContent
+            .filter((oItem) => oItem.getVisible && oItem.getVisible())
+            .map((oItem) => oItem.getDomRef && oItem.getDomRef())
+            .filter(Boolean)
+            .map((oDomRef) => {
+              const oRect = oDomRef.getBoundingClientRect();
+              return [
+                Math.round(oRect.left - oGridRect.left),
+                Math.round(oRect.top - oGridRect.top),
+                Math.round(oRect.width),
+                Math.round(oRect.height)
+              ].join(":");
+            });
+
+          if (!aVisibleRects.length) {
+            return "";
+          }
+
+          return aVisibleRects.join("|");
+        };
+
+        const fnCheck = () => {
+          const iElapsed = Date.now() - iStartedAt;
+          const sSignature = fnGetLayoutSignature();
+
+          if (sSignature && sSignature === sLastSignature) {
+            iStableFrames += 1;
+          } else {
+            sLastSignature = sSignature;
+            iStableFrames = 0;
+          }
+
+          if ((iElapsed >= iMinWait && iStableFrames >= iRequiredStableFrames) || iElapsed >= iMaxWait) {
+            resolve();
+            return;
+          }
+
+          fnNextFrame(fnCheck);
+        };
+
+        fnNextFrame(fnCheck);
+      });
     },
 
 
@@ -433,11 +525,13 @@ sap.ui.define([
           console.error("Error obteniendo empresa del usuario:", oError);
           sap.m.MessageToast.show("Error al obtener información de la empresa");
           that.oGlobalBusyDialog.close();
+          that._hideInitialPreloader();
         });
       });
       
       UseroModel.attachRequestFailed(function () {
         that.oGlobalBusyDialog.close();
+        that._hideInitialPreloader();
       });
     },
 
@@ -655,6 +749,7 @@ sap.ui.define([
 
           that.getOwnerComponent().getModel("user").setProperty("/datos", cleanData);
           that.getOwnerComponent().getModel("user").setProperty("/displayName", cleanData.displayName);
+          that.updateGreeting();
 
           //Mapea el genero
           if (cleanData.gender === "F") {
@@ -730,11 +825,14 @@ sap.ui.define([
             oButtonContrato?.setVisible(false);
             oButtonConfiden?.setVisible(false);
           }
+
+          that._hideInitialPreloader();
         },
 
         error: function (oError) {
           sap.m.MessageToast.show("Error al leer grupo de usuario");
           console.log(oError);
+          that._hideInitialPreloader();
         }
       });
     },
@@ -976,6 +1074,7 @@ sap.ui.define([
       // 3. Actualiza el modelo de vista
       oViewStateModel.setProperty("/BaseUsers", aFilteredUsers);
       oViewStateModel.setProperty("/FilteredUsers", aFilteredUsers);
+      oViewStateModel.setProperty("/DialogTitle", sTitle);
 
       // 4. Abre el diálogo
       if (oDialog) {
@@ -1304,7 +1403,9 @@ sap.ui.define([
 
     // Helpers de UI
     updateGreeting: function () {
-     uiHelpers.updateGreeting(this.getView());
+      const oUserModel = this.getOwnerComponent().getModel("user");
+      const sDisplayName = oUserModel?.getProperty("/displayName") || oUserModel?.getProperty("/firstname") || "";
+      uiHelpers.updateGreeting(this.getView(), sDisplayName);
     },
 
     attachBoxEvents: function () {
