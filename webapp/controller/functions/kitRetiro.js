@@ -1,8 +1,8 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "../helpers/wordGenerator"
+], function (MessageToast, WordGenerator) {
     "use strict";
-
     async function onDownloadPDFKitRetiro(oController, sButtonId) {
         try {
             await oController._ensurePdfToolkit();
@@ -41,7 +41,6 @@ sap.ui.define([
                 const sSalida     = user.empEndDate ? _formatDate(new Date(user.empEndDate)) : "XXXX";
                 const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
 
-                // Ciudad: buscar el campo correcto de SSFF
                 const sCity = user.location || user.city || user.addressLine1 || "";
 
                 const htmlRaw = `
@@ -231,68 +230,80 @@ sap.ui.define([
 
 `;
 
-                // ── Generar PDF ───────────────────────────────────────────────
-                const contentBlocks = htmlRaw.split("<!--PAGEBREAK-->");
+                // ── Chequea qué botón se apretó ──────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
 
-                const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf").then(res => res.arrayBuffer());
-                const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
-                const [templatePage] = pdfDoc.getPages();
-                const { width, height } = templatePage.getSize();
-                const templatePageImage = await pdfDoc.embedPage(templatePage);
+                    // ── GENERAR WORD ─────────────────────────────────────────
+                    await WordGenerator.onDownloadWord(oController);
+                    return;
 
-                for (const blockHtml of contentBlocks) {
-                    const div = document.createElement("div");
-                    div.style.width           = "794px";
-                    div.style.height          = "760px";
-                    div.style.padding         = "40px";
-                    div.style.backgroundColor = "white";
-                    div.style.fontSize        = "12px";
-                    div.style.boxSizing       = "border-box";
-                    div.style.position        = "absolute";
-                    div.style.top             = "-9999px";
-                    div.innerHTML             = blockHtml;
-                    document.body.appendChild(div);
+                } else {
 
-                    const canvas = await html2canvasRef(div, {
-                        scale: 2,
-                        useCORS: true
-                    });
-                    const imgData = canvas.toDataURL("image/png");
+                    // ── GENERAR PDF ──────────────────────────────────────────
+                    const contentBlocks = htmlRaw.split("<!--PAGEBREAK-->");
 
-                    document.body.removeChild(div);
+                    const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf").then(res => res.arrayBuffer());
+                    const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
+                    const [templatePage] = pdfDoc.getPages();
+                    const { width, height } = templatePage.getSize();
+                    const templatePageImage = await pdfDoc.embedPage(templatePage);
 
-                    const img     = await pdfDoc.embedPng(imgData);
-                    const newPage = pdfDoc.addPage([width, height]);
-                    newPage.drawPage(templatePageImage);
+                    for (const blockHtml of contentBlocks) {
+                        const div = document.createElement("div");
+                        div.style.width           = "794px";
+                        div.style.height          = "760px";
+                        div.style.padding         = "40px";
+                        div.style.backgroundColor = "white";
+                        div.style.fontSize        = "12px";
+                        div.style.boxSizing       = "border-box";
+                        div.style.position        = "absolute";
+                        div.style.top             = "-9999px";
+                        div.innerHTML             = blockHtml;
+                        document.body.appendChild(div);
 
-                    const imgWidth  = width * 0.9;
-                    const imgHeight = (img.height * imgWidth) / img.width;
+                        const canvas = await html2canvasRef(div, {
+                            scale: 2,
+                            useCORS: true
+                        });
+                        const imgData = canvas.toDataURL("image/png");
 
-                    newPage.drawImage(img, {
-                        x:      (width - imgWidth) / 2,
-                        y:      height - imgHeight - 130,
-                        width:  imgWidth,
-                        height: imgHeight
-                    });
+                        document.body.removeChild(div);
+
+                        const img     = await pdfDoc.embedPng(imgData);
+                        const newPage = pdfDoc.addPage([width, height]);
+                        newPage.drawPage(templatePageImage);
+
+                        const imgWidth  = width * 0.9;
+                        const imgHeight = (img.height * imgWidth) / img.width;
+
+                        newPage.drawImage(img, {
+                            x:      (width - imgWidth) / 2,
+                            y:      height - imgHeight - 130,
+                            width:  imgWidth,
+                            height: imgHeight
+                        });
+                    }
+
+                    pdfDoc.removePage(0);
+
+                    const pdfBytes = await pdfDoc.save();
+                    const fileName = `${user.firstName}_${user.lastName}_Kit_Retiro.pdf`;
+
+                    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                    const link = document.createElement("a");
+                    link.href     = URL.createObjectURL(blob);
+                    link.download = fileName;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
                 }
-
-                pdfDoc.removePage(0);
-
-                const pdfBytes = await pdfDoc.save();
-                const fileName = `${user.firstName}_${user.lastName}_Kit_Retiro`;
-
-                const blob = new Blob([pdfBytes], { type: "application/pdf" });
-                const link = document.createElement("a");
-                link.href     = URL.createObjectURL(blob);
-                link.download = fileName;
-                link.click();
-                URL.revokeObjectURL(link.href);
             }
 
-            const mensaje = aUsers.length > 1
-                ? `${aUsers.length} documentos generados correctamente.`
-                : "Documento generado correctamente.";
-            MessageToast.show(mensaje);
+            if (!sButtonId.includes("wordDataInfo")) {
+                const mensaje = aUsers.length > 1
+                    ? `${aUsers.length} documentos generados correctamente.`
+                    : "Documento generado correctamente.";
+                MessageToast.show(mensaje);
+            }
 
         } catch (error) {
             console.error("Error generando el Kit de Retiro:", error);

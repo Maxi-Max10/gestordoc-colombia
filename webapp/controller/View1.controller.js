@@ -1022,6 +1022,9 @@ sap.ui.define([
         case "Notificación De Ausencia Injustificada":
           this.onDownloadPDFNotAusInjus();
           break;
+        case "Kit Retiro":
+          this.onDownloadPDFKitRetiro();
+          break;
         default:
           MessageToast.show("No hay función asociada para este documento.");
       }
@@ -1287,7 +1290,7 @@ sap.ui.define([
         case "mensual usuario":
           this.onDownloadCartaMensualUsuario(oEvent)
           break;
-        case "Kit de Retiro":
+        case "Kit De Retiro":
           this.onDownloadPDFKitRetiro(sButtonId);
           break;
         default:
@@ -1536,6 +1539,18 @@ sap.ui.define([
           console.error("Error al preparar datos de desahucio:", oError);
           sap.m.MessageToast.show("Error cargando los datos.");
         });
+    },
+
+    onKitRetiroPress: function () {
+      const sTitle = "Kit De Retiro";
+      this.sSelectedContract = sTitle;
+      this._currentCategory = "kitRetiro";
+
+      this._handleTileSelection(sTitle)
+          .catch(oError => {
+              console.error("Error al preparar datos de Kit de Retiro:", oError);
+              sap.m.MessageToast.show("Error cargando los datos.");
+          });
     },
 
     _openManualDateDialog: function () {
