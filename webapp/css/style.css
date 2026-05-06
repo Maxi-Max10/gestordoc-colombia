@@ -9,6 +9,7 @@ html,
   --page-gutter: 1rem;
   --app-font-family: "72", "72full", Arial, Helvetica, sans-serif;
   --sapFontFamily: "72", "72full", Arial, Helvetica, sans-serif;
+  --sapContent_FocusColor: transparent;
 }
 
 body,
