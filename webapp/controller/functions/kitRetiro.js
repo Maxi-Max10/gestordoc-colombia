@@ -42,193 +42,193 @@ sap.ui.define([
                 const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
 
                 const sCity = user.location || user.city || user.addressLine1 || "";
-
+                
                 const htmlRaw = `
 
-<!-- ═══════════════════ PÁGINA 1 — Lista de documentos ═══════════════════ -->
-<p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
+                <!-- ═══════════════════ PÁGINA 1 — Lista de documentos ═══════════════════ -->
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor(a):</p>
-<p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
-<p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">Ciudad</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor(a):</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">Ciudad</p>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 16px 0;">
-    Con referencia al retiro de la empresa, a continuación, se relaciona lista documentos
-    entregados en la fecha:
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 16px 0;">
+                    Con referencia al retiro de la empresa, a continuación, se relaciona lista documentos
+                    entregados en la fecha:
+                </p>
 
-<ol style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 24px 20px;line-height:1.8;">
-    <li>Aprobación para envío de documentación, datos de notificación y pago de liquidación final</li>
-    <li>Certificación laboral</li>
-    <li>Comunicación plazo máximo para realización exámenes de egreso</li>
-    <li>Exámenes médicos post – ocupacionales</li>
-    <li>Paz y salvo de Seguridad social y parafiscales</li>
-    <li>Formato Paz y Salvo</li>
-    <li>Encuesta de retiro</li>
-</ol>
+                <ol style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 24px 20px;line-height:1.8;">
+                    <li>Aprobación para envío de documentación, datos de notificación y pago de liquidación final</li>
+                    <li>Certificación laboral</li>
+                    <li>Comunicación plazo máximo para realización exámenes de egreso</li>
+                    <li>Exámenes médicos post – ocupacionales</li>
+                    <li>Paz y salvo de Seguridad social y parafiscales</li>
+                    <li>Formato Paz y Salvo</li>
+                    <li>Encuesta de retiro</li>
+                </ol>
 
-<img src="${qrBase64}" style="width:130px;height:130px;display:block;margin:0 0 20px 0;" />
+                <img src="${qrBase64}" style="width:130px;height:130px;display:block;margin:0 0 20px 0;" />
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 60px 0;">Cordialmente,</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 60px 0;">Cordialmente,</p>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;
-   border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
-    Gestión Personas
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;
+                border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
+                    Gestión Personas
+                </p>
 
-<!--PAGEBREAK-->
+                <!--PAGEBREAK-->
 
-<!-- ═══════════════════ PÁGINA 2 — Aprobación y datos de notificación ═══════════════════ -->
-<p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 4px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
+                <!-- ═══════════════════ PÁGINA 2 — Aprobación y datos de notificación ═══════════════════ -->
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 4px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor:</p>
-<p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
-<p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">Ciudad</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor:</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">Ciudad</p>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 14px 0;">
-    Pensando en su comodidad, tenemos disponible para usted las siguientes opciones (Marque X):
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 14px 0;">
+                    Pensando en su comodidad, tenemos disponible para usted las siguientes opciones (Marque X):
+                </p>
 
-<table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
-    <tr>
-        <td style="width:24px;vertical-align:top;font-weight:bold;">1.</td>
-        <td style="text-align:justify;">
-            <strong>Envío de documentos de retiro a correo electrónico:</strong>
-            Recibir, revisar y aprobar a través de su correo electrónico, los documentos de su
-            paquete de egreso. Una vez dicha documentación de egreso haya sido aprobada por usted,
-            deberá imprimirla, firmarla en señal de aceptación y enviarla escaneada al correo
-            electrónico <span style="text-decoration:underline;">nominadiaco@diaco.com.co</span><br><br>
-            <p style="text-align:center;margin:0;">Acepto______&nbsp;&nbsp;&nbsp;No Acepto ______</p>
-        </td>
-    </tr>
-</table>
+                <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                    <tr>
+                        <td style="width:24px;vertical-align:top;font-weight:bold;">1.</td>
+                        <td style="text-align:justify;">
+                            <strong>Envío de documentos de retiro a correo electrónico:</strong>
+                            Recibir, revisar y aprobar a través de su correo electrónico, los documentos de su
+                            paquete de egreso. Una vez dicha documentación de egreso haya sido aprobada por usted,
+                            deberá imprimirla, firmarla en señal de aceptación y enviarla escaneada al correo
+                            electrónico <span style="text-decoration:underline;">nominadiaco@diaco.com.co</span><br><br>
+                            <p style="text-align:center;margin:0;">Acepto______&nbsp;&nbsp;&nbsp;No Acepto ______</p>
+                        </td>
+                    </tr>
+                </table>
 
-<table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
-    <tr>
-        <td style="width:24px;vertical-align:top;font-weight:bold;">2.</td>
-        <td style="text-align:justify;">
-            <strong>Pago de liquidación de prestaciones sociales, por medio de transferencia electrónica:</strong>
-            Una vez nómina, haya recibido los documentos de egreso firmados en señal de aceptación,
-            realizaremos el pago de su liquidación final de prestaciones sociales dentro de los tres (3)
-            días hábiles siguientes, directamente a la cuenta bancaria Davivienda matriculada con la
-            empresa, por medio de transferencia electrónica.<br><br>
-            <p style="text-align:center;margin:0;">Acepto______&nbsp;&nbsp;&nbsp;No Acepto ______</p>
-        </td>
-    </tr>
-</table>
+                <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                    <tr>
+                        <td style="width:24px;vertical-align:top;font-weight:bold;">2.</td>
+                        <td style="text-align:justify;">
+                            <strong>Pago de liquidación de prestaciones sociales, por medio de transferencia electrónica:</strong>
+                            Una vez nómina, haya recibido los documentos de egreso firmados en señal de aceptación,
+                            realizaremos el pago de su liquidación final de prestaciones sociales dentro de los tres (3)
+                            días hábiles siguientes, directamente a la cuenta bancaria Davivienda matriculada con la
+                            empresa, por medio de transferencia electrónica.<br><br>
+                            <p style="text-align:center;margin:0;">Acepto______&nbsp;&nbsp;&nbsp;No Acepto ______</p>
+                        </td>
+                    </tr>
+                </table>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 14px 0;">
-    En caso contrario de no aceptación de los puntos 1 o 2, deberá dirigirse personalmente a las
-    instalaciones de la empresa, para recibir los documentos o reclamar el pago de su liquidación
-    de prestaciones sociales.
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 14px 0;">
+                    En caso contrario de no aceptación de los puntos 1 o 2, deberá dirigirse personalmente a las
+                    instalaciones de la empresa, para recibir los documentos o reclamar el pago de su liquidación
+                    de prestaciones sociales.
+                </p>
 
-<table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
-    <tr>
-        <td style="width:24px;vertical-align:top;font-weight:bold;">3.</td>
-        <td style="text-align:justify;">
-            <strong>Cesantías años anteriores consignadas en Fondo privado:</strong>
-            Confirmo que SI ___ NO ___, deseo retirar mis cesantías de años anteriores consignadas
-            por esta compañía en mi cuenta del Fondo de Cesantías _________________________.
-            (En caso afirmativo la compañía solicitará al fondo la consignación en su cuenta bancaria
-            de nómina, en caso negativo puede solicitar a la compañía posteriormente cuando lo requiera
-            al correo electrónico <span style="text-decoration:underline;">nominadiaco@diaco.com.co</span>).
-        </td>
-    </tr>
-</table>
+                <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                    <tr>
+                        <td style="width:24px;vertical-align:top;font-weight:bold;">3.</td>
+                        <td style="text-align:justify;">
+                            <strong>Cesantías años anteriores consignadas en Fondo privado:</strong>
+                            Confirmo que SI ___ NO ___, deseo retirar mis cesantías de años anteriores consignadas
+                            por esta compañía en mi cuenta del Fondo de Cesantías _________________________.
+                            (En caso afirmativo la compañía solicitará al fondo la consignación en su cuenta bancaria
+                            de nómina, en caso negativo puede solicitar a la compañía posteriormente cuando lo requiera
+                            al correo electrónico <span style="text-decoration:underline;">nominadiaco@diaco.com.co</span>).
+                        </td>
+                    </tr>
+                </table>
 
-<table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
-    <tr>
-        <td style="width:24px;vertical-align:top;font-weight:bold;">4.</td>
-        <td>
-            <strong>Datos de notificación:</strong>
-            <table style="width:100%;border-collapse:collapse;margin-top:8px;">
-                <tr>
-                    <td style="padding:3px 0;width:55%;">Ciudad de Residencia:</td>
-                    <td style="border-bottom:1px solid #000;width:45%;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px 0;">Dirección (incluir el barrio/sector):</td>
-                    <td style="border-bottom:1px solid #000;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px 0;">Teléfono:</td>
-                    <td style="border-bottom:1px solid #000;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px 0;">Correo Electrónico:</td>
-                    <td style="border-bottom:1px solid #000;">&nbsp;</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+                <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                    <tr>
+                        <td style="width:24px;vertical-align:top;font-weight:bold;">4.</td>
+                        <td>
+                            <strong>Datos de notificación:</strong>
+                            <table style="width:100%;border-collapse:collapse;margin-top:8px;">
+                                <tr>
+                                    <td style="padding:3px 0;width:55%;">Ciudad de Residencia:</td>
+                                    <td style="border-bottom:1px solid #000;width:45%;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:3px 0;">Dirección (incluir el barrio/sector):</td>
+                                    <td style="border-bottom:1px solid #000;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:3px 0;">Teléfono:</td>
+                                    <td style="border-bottom:1px solid #000;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:3px 0;">Correo Electrónico:</td>
+                                    <td style="border-bottom:1px solid #000;">&nbsp;</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 24px 0;">
-    Declaró que comprendí la información contenida en esta comunicación y en señal a lo anterior
-    firmo de recibido y enterado.
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 24px 0;">
+                    Declaró que comprendí la información contenida en esta comunicación y en señal a lo anterior
+                    firmo de recibido y enterado.
+                </p>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;
-   border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
-    <strong>${sNombre}</strong><br>
-    <strong>C.C. ${sCedula}</strong>
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;
+                border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
+                    <strong>${sNombre}</strong><br>
+                    <strong>C.C. ${sCedula}</strong>
+                </p>
 
-<!--PAGEBREAK-->
+                <!--PAGEBREAK-->
 
-<!-- ═══════════════════ PÁGINA 3 — Certificación laboral ═══════════════════ -->
-<p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;
-   text-align:center;letter-spacing:1px;margin:0 0 28px 0;">
-    EL ÁREA DE GESTIÓN DE PERSONAS
-</p>
+                <!-- ═══════════════════ PÁGINA 3 — Certificación laboral ═══════════════════ -->
+                <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;
+                text-align:center;letter-spacing:1px;margin:0 0 28px 0;">
+                    EL ÁREA DE GESTIÓN DE PERSONAS
+                </p>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;
-   text-align:center;letter-spacing:6px;margin:0 0 40px 0;">
-    C E R T I F I C A
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;
+                text-align:center;letter-spacing:6px;margin:0 0 40px 0;">
+                    C E R T I F I C A
+                </p>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;
-   line-height:1.7;margin:0 0 24px 0;">
-    Que, <strong>${sNombre}</strong> ${sIdentif} con cédula de ciudadanía número
-    <strong>${sCedula},</strong> trabajó en la empresa con contrato a término indefinido, desde
-    <strong>${sIngreso}</strong> hasta el <strong>${sSalida}</strong>
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;
+                line-height:1.7;margin:0 0 24px 0;">
+                    Que, <strong>${sNombre}</strong> ${sIdentif} con cédula de ciudadanía número
+                    <strong>${sCedula},</strong> trabajó en la empresa con contrato a término indefinido, desde
+                    <strong>${sIngreso}</strong> hasta el <strong>${sSalida}</strong>
+                </p>
 
-<table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:28px;">
-    <tr>
-        <td style="padding:4px 0;font-weight:bold;width:40%;">Ultimo cargo desempeñado:</td>
-        <td style="padding:4px 0;">${sCargo}</td>
-    </tr>
-    <tr>
-        <td style="padding:4px 0;font-weight:bold;">Ciudad de trabajo:</td>
-        <td style="padding:4px 0;">${sCiudadWork}</td>
-    </tr>
-    <tr>
-        <td style="padding:4px 0;font-weight:bold;">Salario:</td>
-        <td style="padding:4px 0;text-align:right;">${sSalario}</td>
-    </tr>
-</table>
+                <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:28px;">
+                    <tr>
+                        <td style="padding:4px 0;font-weight:bold;width:40%;">Ultimo cargo desempeñado:</td>
+                        <td style="padding:4px 0;">${sCargo}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px 0;font-weight:bold;">Ciudad de trabajo:</td>
+                        <td style="padding:4px 0;">${sCiudadWork}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px 0;font-weight:bold;">Salario:</td>
+                        <td style="padding:4px 0;text-align:right;">${sSalario}</td>
+                    </tr>
+                </table>
 
-<p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 60px 0;">
-    La anterior se expide en Ciudad de Bogotá el ${_getDayMonth()} de
-    ${_numToWords(new Date().getFullYear())} (${new Date().getFullYear()}).
-</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 60px 0;">
+                    La anterior se expide en Ciudad de Bogotá el ${_getDayMonth()} de
+                    ${_numToWords(new Date().getFullYear())} (${new Date().getFullYear()}).
+                </p>
 
-<div style="text-align:center;">
-    <p style="font-size:11pt;font-family:Arial,sans-serif;
-       border-top:1.5px solid #000;width:260px;margin:0 auto;padding-top:6px;">
-        <strong>${sNombre}</strong><br>
-        <strong>Gestión Personas</strong>
-    </p>
-</div>
+                <div style="text-align:center;">
+                    <p style="font-size:11pt;font-family:Arial,sans-serif;
+                    border-top:1.5px solid #000;width:260px;margin:0 auto;padding-top:6px;">
+                        <strong>${sNombre}</strong><br>
+                        <strong>Gestión Personas</strong>
+                    </p>
+                </div>
 
-<!--PAGEBREAK-->
+                <!--PAGEBREAK-->
 
-<!-- ═══════════════════ PÁGINA 4 — En blanco (solo membrete) ═══════════════════ -->
-<p style="margin:0;">&nbsp;</p>
+                <!-- ═══════════════════ PÁGINA 4 — En blanco (solo membrete) ═══════════════════ -->
+                <p style="margin:0;">&nbsp;</p>
 
-`;
+                `;
 
                 // ── Chequea qué botón se apretó ──────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -369,9 +369,7 @@ sap.ui.define([
         };
         return map[year] || String(year);
     }
-
     return {
         onDownloadPDFKitRetiro
     };
-
 });

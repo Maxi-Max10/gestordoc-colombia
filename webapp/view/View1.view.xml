@@ -457,7 +457,7 @@
 
                         <!-- 17. OTRO SÍ - RODAMIENTO  ── color: blue -->
                         <CustomListItem
-                            id="itemOtroSiRodamiento"
+                            id="customListItemOtroSiRodamiento"
                             class="customListItem card-horizontal card-sky"
                             type="Active"
                             press="onOtroSiRodamientoPress"
