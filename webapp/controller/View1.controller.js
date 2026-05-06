@@ -128,7 +128,7 @@ sap.ui.define([
     ],
 
     // ========================================
-    // SISTEMA DE BUSY DIALOG (Indicador de carga)
+    // SISTEMA DE BUSY DIALOG (Indicador de carga)---------------------------DEJAR
     // ========================================
     // Incrementa el contador y muestra el busy dialog. Usa un sistema de contador para manejar múltiples operaciones simultáneas
 
@@ -163,7 +163,7 @@ sap.ui.define([
 
 
     // ========================================
-    // CARGA DE LIBRERÍAS EXTERNAS
+    // CARGA DE LIBRERÍAS EXTERNAS---------------------------DEJAR
     // ========================================
     _ensurePdfToolkit: function () {
       if (!this._pdfToolkitPromise) {// Si ya está en proceso de carga, retorna la promesa existente
@@ -226,7 +226,7 @@ sap.ui.define([
 
 
     // ========================================
-    // CARGA DE DATOS MAESTROS (MDF)
+    // CARGA DE DATOS MAESTROS (MDF)---------------------------DEJAR
     // ========================================
 
     // Carga los datos del mantenedor (factores salariales, fechas, etc.)
@@ -266,7 +266,7 @@ sap.ui.define([
     },
 
     // ========================================
-    // CARGA INTELIGENTE DE DATOS
+    // CARGA INTELIGENTE DE DATOS ---------------------------DEJAR
     // ========================================
 
      //Determina qué datos cargar según el tipo de documento

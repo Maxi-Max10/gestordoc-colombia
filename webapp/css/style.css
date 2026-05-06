@@ -887,4 +887,98 @@ html,
 .card-arrow {
   color: #B0B0B0 !important;
   font-size: 1rem !important;
+
 }
+
+/* ── BASE DE LA CARD ─────────────────────────────────────────────── */
+.customListItem.card-horizontal {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    background: #ffffff;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+    min-height: 72px;
+    cursor: pointer;
+}
+
+.customListItem.card-horizontal:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+/* ── LAYOUT INTERNO ──────────────────────────────────────────────── */
+.card-hbox {
+    height: 100%;
+    min-height: 72px;
+}
+
+.card-icon-box {
+    width: 80px;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--card-color);
+    flex-shrink: 0;
+}
+
+.card-icon {
+    font-size: 1.6rem;
+    color: #ffffff !important;
+}
+
+.card-content-box {
+    flex: 1;
+    padding: 10px 12px;
+    justify-content: center;
+    min-width: 0;
+}
+
+.card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    white-space: normal;
+    overflow-wrap: break-word;
+    line-height: 1.3;
+}
+
+.card-desc {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 2px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.card-arrow-box {
+    width: 28px;
+    flex-shrink: 0;
+    padding-right: 8px;
+}
+
+.card-arrow {
+    font-size: 0.9rem;
+    color: var(--card-color) !important;
+    opacity: 0.6;
+}
+
+/* ── Colores para las CARDS ───────────────────────────────────────────── */
+.card-red     { --card-color: #e53e3e; }
+.card-blue    { --card-color: #3b82f6; }
+.card-teal    { --card-color: #0d9488; }
+.card-gray    { --card-color: #6b7280; }
+.card-pink    { --card-color: #ec4899; }
+.card-purple  { --card-color: #9333ea; }
+.card-indigo  { --card-color: #4f46e5; }
+.card-orange  { --card-color: #f97316; }
+.card-green   { --card-color: #16a34a; }
+.card-brown   { --card-color: #92400e; }
+.card-lime    { --card-color: #65a30d; }
+.card-cyan    { --card-color: #0891b2; }
+.card-violet  { --card-color: #7c3aed; }
+.card-amber   { --card-color: #d97706; }
+.card-rose    { --card-color: #f43f5e; }
+.card-emerald { --card-color: #059669; }
+.card-sky     { --card-color: #0284c7; }
