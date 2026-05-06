@@ -83,7 +83,7 @@ sap.ui.define([
           : "No disponible";
 
         const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-        const targetObject = nationalIdResults.find(item => item.cardType === "ZC" || item.cardType === "ZP");
+        const targetObject = nationalIdResults.find(item => item.cardType === "CC");
         user.nationalId = targetObject?.nationalId ?? "";
 
         if (user.salutation === "3526") {

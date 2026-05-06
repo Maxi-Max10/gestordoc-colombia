@@ -7,19 +7,20 @@ sap.ui.define([], function () {
          * Actualiza el saludo según la hora actual del día.
          * @param {sap.ui.core.mvc.View} oView - La vista desde donde se accederá al control del texto.
          */
-        updateGreeting: function (oView) {
+        updateGreeting: function (oView, sFirstName) {
 
             // Obtiene la hora actual del sistema (0–23)
             var currentHour = new Date().getHours();
             var greetingText = "";
+            var firstName = String(sFirstName || "").trim().split(/\s+/)[0] || "";
 
             // Determina el saludo dependiendo del rango horario
             if (currentHour >= 1 && currentHour < 12) {
-                greetingText = "¡Buenos Días!";
+                greetingText = "¡Buenos Días" + (firstName ? ", " + firstName : "") + "!";
             } else if (currentHour >= 12 && currentHour <= 19) {
-                greetingText = "¡Buenas Tardes!";
+                greetingText = "¡Buenas Tardes" + (firstName ? ", " + firstName : "") + "!";
             } else {
-                greetingText = "¡Buenas Noches!";
+                greetingText = "¡Buenas Noches" + (firstName ? ", " + firstName : "") + "!";
             }
 
             // Coloca el texto calculado en el elemento con ID "greetingText"

@@ -322,7 +322,8 @@ sap.ui.define([
       var oViewModel = new JSONModel({
         BaseUsers: [], // Base estable para filtros (según documento)
         FilteredUsers: [],// Usuarios filtrados en la tabla
-        SelectedUsers: [] //Array para guardar temporalmente los Usuarios seleccionados
+        SelectedUsers: [], //Array para guardar temporalmente los Usuarios seleccionados
+        DialogTitle: ""
       });
       oViewModel.setSizeLimit(999999); // Aumenta límite para muchos registros
       // Inicializa variables de estado
@@ -361,6 +362,97 @@ sap.ui.define([
       this.attachBoxEvents();
     },
 
+    _hideInitialPreloader: function () {
+      if (this._initialPreloaderHideRequested) {
+        return;
+      }
+
+      this._initialPreloaderHideRequested = true;
+
+      const fnHide = () => {
+        if (typeof window.gmaHideAppPreloader === "function") {
+          window.gmaHideAppPreloader();
+        }
+      };
+
+      this._waitForInitialLayoutReady()
+        .then(fnHide)
+        .catch(fnHide);
+    },
+
+    _waitForInitialLayoutReady: function () {
+      const iMinWait = 2400;
+      const iMaxWait = 6500;
+      const iRequiredStableFrames = 12;
+      const iStartedAt = Date.now();
+      const fnNextFrame = window.requestAnimationFrame || function (fnCallback) {
+        return window.setTimeout(fnCallback, 16);
+      };
+
+      try {
+        sap.ui.getCore().applyChanges();
+      } catch (oError) {
+        console.warn("No se pudieron aplicar cambios antes de ocultar el preload:", oError);
+      }
+
+      return new Promise((resolve) => {
+        let sLastSignature = "";
+        let iStableFrames = 0;
+
+        const fnGetLayoutSignature = () => {
+          const oGrid = this.byId("gridItems");
+          const oGridDomRef = oGrid?.getDomRef();
+          const aContent = oGrid?.getContent?.() || [];
+
+          if (!oGridDomRef || !aContent.length) {
+            return "";
+          }
+
+          const oGridRect = oGridDomRef.getBoundingClientRect();
+          const aVisibleRects = aContent
+            .filter((oItem) => oItem.getVisible && oItem.getVisible())
+            .map((oItem) => oItem.getDomRef && oItem.getDomRef())
+            .filter(Boolean)
+            .map((oDomRef) => {
+              const oRect = oDomRef.getBoundingClientRect();
+              return [
+                Math.round(oRect.left - oGridRect.left),
+                Math.round(oRect.top - oGridRect.top),
+                Math.round(oRect.width),
+                Math.round(oRect.height)
+              ].join(":");
+            });
+
+          if (!aVisibleRects.length) {
+            return "";
+          }
+
+          return aVisibleRects.join("|");
+        };
+
+        const fnCheck = () => {
+          const iElapsed = Date.now() - iStartedAt;
+          const sSignature = fnGetLayoutSignature();
+
+          if (sSignature && sSignature === sLastSignature) {
+            iStableFrames += 1;
+          } else {
+            sLastSignature = sSignature;
+            iStableFrames = 0;
+          }
+
+          if ((iElapsed >= iMinWait && iStableFrames >= iRequiredStableFrames) || iElapsed >= iMaxWait) {
+            resolve();
+            return;
+          }
+
+          fnNextFrame(fnCheck);
+        };
+
+        fnNextFrame(fnCheck);
+      });
+    },
+
 
     // ========================================
     //  UTILIDADES DE URL Y USUARIO
@@ -390,14 +482,14 @@ sap.ui.define([
           },
           success: function(oData) {
             // obtengo la empresa desde jobInfoNav
-            const sCompany = oData?.empInfo?.jobInfoNav?.results?.[0]?.company || "DO01";
+            const sCompany = oData?.empInfo?.jobInfoNav?.results?.[0]?.company || "CO10";
             console.log("Empresa del usuario:", sCompany);
             resolve(sCompany);
           },
           error: function(oError) {
             console.error("Error al obtener empresa:", oError);
             // si da error, usar empresa por defecto
-            resolve("DO01");
+            resolve("CO10");
           }
         });
       });
@@ -434,11 +526,13 @@ sap.ui.define([
           console.error("Error obteniendo empresa del usuario:", oError);
           sap.m.MessageToast.show("Error al obtener información de la empresa");
           that.oGlobalBusyDialog.close();
+          that._hideInitialPreloader();
         });
       });
       
       UseroModel.attachRequestFailed(function () {
         that.oGlobalBusyDialog.close();
+        that._hideInitialPreloader();
       });
     },
 
@@ -496,7 +590,7 @@ sap.ui.define([
       
       // obtengo la empresa del usuario logueado
       const oUserModel = this.getOwnerComponent().getModel("user");
-      const sUserCompany = oUserModel.getProperty("/company") || "DO01";
+      const sUserCompany = oUserModel.getProperty("/company") || "CO10";
       // Define los campos a seleccionar (optimiza la carga)
       const sSelect = [
         "userId",
@@ -562,9 +656,9 @@ sap.ui.define([
           user.paycompvalue = salaryRaw || 0;
           user.paycompValue = salaryRaw || 0;
 
-          // 2. Extrae la cédula (busca cardType ZC o ZP)
+          // 2. Extrae la cédula solo si cardType es CC
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          const targetObject = nationalIdResults.find(item => item.cardType === "ZC" || item.cardType === "ZP");
+          const targetObject = nationalIdResults.find(item => item.cardType === "CC");
           user.nationalId = targetObject?.nationalId ?? "";
 
           // 3. Mapea el sueldo
@@ -656,6 +750,7 @@ sap.ui.define([
 
           that.getOwnerComponent().getModel("user").setProperty("/datos", cleanData);
           that.getOwnerComponent().getModel("user").setProperty("/displayName", cleanData.displayName);
+          that.updateGreeting();
 
           //Mapea el genero
           if (cleanData.gender === "F") {
@@ -732,11 +827,14 @@ sap.ui.define([
             oButtonContrato?.setVisible(false);
             oButtonConfiden?.setVisible(false);
           }
+
+          that._hideInitialPreloader();
         },
 
         error: function (oError) {
           sap.m.MessageToast.show("Error al leer grupo de usuario");
           console.log(oError);
+          that._hideInitialPreloader();
         }
       });
     },
@@ -761,7 +859,7 @@ sap.ui.define([
       
       // obtengo la empresa del usuario logueado
       const oUserModel = this.getOwnerComponent().getModel("user");
-      const sUserCompany = oUserModel.getProperty("/company") || "DO01";
+      const sUserCompany = oUserModel.getProperty("/company") || "CO10";
       
       const sSelect = [
         "userId",
@@ -863,7 +961,7 @@ sap.ui.define([
           }
 
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          const targetObject = nationalIdResults.find(item => item.cardType === "ZC" || item.cardType === "ZP");
+          const targetObject = nationalIdResults.find(item => item.cardType === "CC");
           user.nationalId = targetObject?.nationalId ?? "";
 
           aUsers.push(user);
@@ -978,6 +1076,7 @@ sap.ui.define([
       // 3. Actualiza el modelo de vista
       oViewStateModel.setProperty("/BaseUsers", aFilteredUsers);
       oViewStateModel.setProperty("/FilteredUsers", aFilteredUsers);
+      oViewStateModel.setProperty("/DialogTitle", sTitle);
 
       // 4. Abre el diálogo
       if (oDialog) {
@@ -1312,7 +1411,9 @@ sap.ui.define([
 
     // Helpers de UI
     updateGreeting: function () {
-     uiHelpers.updateGreeting(this.getView());
+      const oUserModel = this.getOwnerComponent().getModel("user");
+      const sDisplayName = oUserModel?.getProperty("/displayName") || oUserModel?.getProperty("/firstname") || "";
+      uiHelpers.updateGreeting(this.getView(), sDisplayName);
     },
 
     attachBoxEvents: function () {
@@ -1393,42 +1494,63 @@ sap.ui.define([
     },
 
     onDocumentSearch: function (oEvent) {
-      const sValue = oEvent?.getParameter("newValue") ?? oEvent?.getParameter("query") ?? this.byId("documentSearch")?.getValue() ?? "";
+      const oSearchField = this.byId("documentSearch");
+      const sValue = oEvent?.getParameter("newValue") ?? oEvent?.getParameter("query") ?? oSearchField?.getValue() ?? "";
       const sQuery = this._normalizeSearchText(sValue);
       const aCards = this._getDocumentSearchCards();
+      const oGrid = this.byId("gridItems");
 
-      if (sQuery && !this._documentSearchBaseVisibility) {
-        this._documentSearchBaseVisibility = {};
+      oSearchField?.toggleStyleClass("documentSearchFieldActive", Boolean(sQuery));
+
+      if (!oGrid) {
+        return;
+      }
+
+      if (sQuery && !this._documentSearchBaseState) {
+        const aCurrentContent = oGrid.getContent();
+        this._documentSearchBaseState = {};
         aCards.forEach(oCard => {
           const oItem = this.byId(oCard.id);
           if (oItem) {
-            this._documentSearchBaseVisibility[oCard.id] = oItem.getVisible();
+            this._documentSearchBaseState[oCard.id] = {
+              inGrid: aCurrentContent.includes(oItem),
+              visible: oItem.getVisible()
+            };
           }
         });
       }
 
       if (!sQuery) {
-        if (this._documentSearchBaseVisibility) {
+        if (this._documentSearchBaseState) {
+          oGrid.removeAllContent();
           aCards.forEach(oCard => {
             const oItem = this.byId(oCard.id);
-            if (oItem && Object.prototype.hasOwnProperty.call(this._documentSearchBaseVisibility, oCard.id)) {
-              oItem.setVisible(this._documentSearchBaseVisibility[oCard.id]);
+            const oState = this._documentSearchBaseState[oCard.id];
+
+            if (oItem && oState?.inGrid && oState.visible) {
+              oItem.setVisible(true);
+              oGrid.addContent(oItem);
             }
           });
-          this._documentSearchBaseVisibility = null;
+          this._documentSearchBaseState = null;
         }
         return;
       }
 
+      oGrid.removeAllContent();
       aCards.forEach(oCard => {
         const oItem = this.byId(oCard.id);
-        if (!oItem) {
+        const oState = this._documentSearchBaseState?.[oCard.id];
+
+        if (!oItem || !oState?.inGrid || !oState.visible) {
           return;
         }
 
-        const bWasVisible = this._documentSearchBaseVisibility?.[oCard.id] !== false;
         const sSearchText = this._normalizeSearchText(`${oCard.title} ${oCard.desc}`);
-        oItem.setVisible(bWasVisible && sSearchText.includes(sQuery));
+        if (sSearchText.includes(sQuery)) {
+          oItem.setVisible(true);
+          oGrid.addContent(oItem);
+        }
       });
     },
 

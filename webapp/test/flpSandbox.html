@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{appTitle}}</title>
+    <link rel="stylesheet" href="../css/app-preloader.css">
 
     <!-- Bootstrap the unified shell in sandbox mode for standalone usage.
 
@@ -71,11 +72,45 @@
     </script>
     <script id="locate-reuse-libs" src="./locate-reuse-libs.js" data-sap-ui-manifest-uri="../manifest.json">
     </script>
+    <script src="../util/appPreloader.js" defer></script>
 </head>
 
 <!-- UI Content -->
 
 <body class="sapUiBody" id="content">
+    <div id="appPreloader" class="appPreloader" aria-live="polite" aria-label="Cargando aplicación">
+        <div class="appPreloader__corner appPreloader__corner--top"><div class="appPreloader__dots"></div></div>
+        <div class="appPreloader__corner appPreloader__corner--bottom"><div class="appPreloader__dots"></div></div>
+        <div class="appPreloader__content">
+            <h1 class="appPreloader__brand">G<span>M</span>A</h1>
+            <div class="appPreloader__title">Gestión de Documentos<br>Ministerio</div>
+            <div class="appPreloader__icon">
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                    <path d="M18 8h22l10 10v38H18z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+                    <path d="M40 8v12h10" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+                    <path d="M25 30h18M25 39h18M25 48h11" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="appPreloader__status">Cargando...</div>
+            <div class="appPreloader__copy">Por favor espere mientras preparamos su experiencia</div>
+            <div class="appPreloader__progress"><div class="appPreloader__bar"></div></div>
+            <div class="appPreloader__percent">8%</div>
+            <div class="appPreloader__footer">
+                <div class="appPreloader__seal">
+                    <svg viewBox="0 0 64 64" aria-hidden="true">
+                        <path d="M32 6l20 8v15c0 13-8 24-20 29C20 53 12 42 12 29V14z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+                        <path d="M23 31l6 6 13-14" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <strong>GMA</strong> - Comprometidos con una gestión eficiente y transparente
+                <div class="appPreloader__steps">
+                    <span class="appPreloader__step"></span>
+                    <span class="appPreloader__step"></span>
+                    <span class="appPreloader__step"></span>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
