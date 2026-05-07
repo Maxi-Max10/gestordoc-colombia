@@ -315,6 +315,7 @@ sap.ui.define([
     //Se ejecuta al inicializar el controller. Configura todo el estado inicial de la aplicación
     onInit: function () {
       const oView = this.getView();
+      const bDarkMode = this._readStoredThemeMode();
       // Crea el busy dialog global
       this.oGlobalBusyDialog = new sap.m.BusyDialog();
       this._busyCounter = 0;
@@ -323,11 +324,15 @@ sap.ui.define([
         BaseUsers: [], // Base estable para filtros (según documento)
         FilteredUsers: [],// Usuarios filtrados en la tabla
         SelectedUsers: [], //Array para guardar temporalmente los Usuarios seleccionados
-        DialogTitle: ""
+        DialogTitle: "",
+        IsDarkMode: bDarkMode,
+        ThemeToggleText: bDarkMode ? "☾" : "☀",
+        ThemeToggleTooltip: bDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
       });
       oViewModel.setSizeLimit(999999); // Aumenta límite para muchos registros
       // Inicializa variables de estado
       this.getOwnerComponent().setModel(oViewModel, "view");
+      this._applyThemeMode(bDarkMode);
       this.aSelectedEmployees = [];
       this._activeEmployeesLoaded = false;
       this._inactiveEmployeesLoaded = false;
@@ -360,6 +365,43 @@ sap.ui.define([
       }
       // Adjunta eventos a los tiles
       this.attachBoxEvents();
+    },
+
+    _readStoredThemeMode: function () {
+      try {
+        return window.localStorage.getItem("gestordoccolombia-theme") === "dark";
+      } catch (oError) {
+        return false;
+      }
+    },
+
+    _applyThemeMode: function (bDarkMode) {
+      const sThemeClass = "gdDarkMode";
+      const oViewModel = this.getOwnerComponent().getModel("view");
+
+      document.documentElement.classList.toggle(sThemeClass, bDarkMode);
+      if (document.body) {
+        document.body.classList.toggle(sThemeClass, bDarkMode);
+      }
+
+      if (oViewModel) {
+        oViewModel.setProperty("/IsDarkMode", bDarkMode);
+        oViewModel.setProperty("/ThemeToggleText", bDarkMode ? "☾" : "☀");
+        oViewModel.setProperty("/ThemeToggleTooltip", bDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+      }
+
+      try {
+        window.localStorage.setItem("gestordoccolombia-theme", bDarkMode ? "dark" : "light");
+      } catch (oError) {
+        console.warn("No se pudo guardar la preferencia de tema:", oError);
+      }
+
+    },
+
+    onToggleTheme: function () {
+      const oViewModel = this.getOwnerComponent().getModel("view");
+      const bDarkMode = !(oViewModel && oViewModel.getProperty("/IsDarkMode"));
+      this._applyThemeMode(bDarkMode);
     },
 
     _hideInitialPreloader: function () {

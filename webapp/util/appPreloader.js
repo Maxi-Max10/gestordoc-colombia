@@ -2,6 +2,7 @@
   "use strict";
 
   var oTimer = null;
+  var oFailsafeTimer = null;
   var iProgress = 8;
   var iTarget = 84;
 
@@ -35,6 +36,12 @@
         iTarget += 1;
       }
     }, 280);
+
+    oFailsafeTimer = window.setTimeout(function () {
+      if (typeof window.gmaHideAppPreloader === "function") {
+        window.gmaHideAppPreloader();
+      }
+    }, 9000);
   }
 
   window.gmaHideAppPreloader = function () {
@@ -44,6 +51,7 @@
     }
 
     window.clearInterval(oTimer);
+    window.clearTimeout(oFailsafeTimer);
     updateProgress(100);
 
     window.setTimeout(function () {

@@ -25,6 +25,18 @@
                 <IconTabFilter id="_IDGenIconTabFilter" text="Inicio" key="1"  />
             </items>
         </IconTabHeader>
+        <Button
+            id="themeToggleButton"
+            text="{view>/ThemeToggleText}"
+            type="Transparent"
+            tooltip="{view>/ThemeToggleTooltip}"
+            press="onToggleTheme"
+            class="themeToggleButton"
+        >
+            <layoutData>
+                <OverflowToolbarLayoutData id="_IDGenThemeToggleLayoutData" priority="NeverOverflow" />
+            </layoutData>
+        </Button>
 
     </tnt:ToolHeader>
 

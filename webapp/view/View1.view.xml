@@ -484,7 +484,7 @@
                                 <Column id="_IDGenColumn2" width="50%">
                                     <Text id="_IDGenText1" text="Colaborador" />
                                 </Column>
-                                <Column id="_IDGenColumn3" width="30%" minScreenWidth="Tablet" demandPopin="true">
+                                <Column id="_IDGenColumn3" width="30%" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
                                     <Text id="_IDGenText2" text="Documento" />
                                 </Column>
                             </columns>
