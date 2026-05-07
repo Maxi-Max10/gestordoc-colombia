@@ -10,10 +10,13 @@ sap.ui.define([
   "gestordoccolombia/controller/helpers/formatHelpers",
   //funciones de contratos
   "gestordoccolombia/controller/functions/kitRetiro",
-  "gestordoccolombia/controller/functions/otroSiRodamiento"
+  "gestordoccolombia/controller/functions/otroSiRodamiento",
+  "gestordoccolombia/controller/functions/otroSiAlimentacion15",
+  "gestordoccolombia/controller/functions/otroSiAlimentacion11",
+  "gestordoccolombia/controller/functions/otroSiAlimentacion10"
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -762,14 +765,23 @@ sap.ui.define([
           // Referencias a los botones
           var oButtonKitRetiro = that.byId("customListItemKitRetiro");
           var oButtonOtroSiRodamiento = that.byId("customListItemOtroSiRodamiento");
+          var oButtonOtroSiAlimentacion15 = that.byId("customListItemOtroSiAlimentacion15");
+          var oButtonOtroSiAlimentacion11 = that.byId("customListItemOtroSiAlimentacion11");
+          var oButtonOtroSiAlimentacion10 = that.byId("customListItemOtroSiAlimentacion10");
 
           //Configuracion de visibilidad segun los permisos
           if (permisos === "admin") {
               oButtonKitRetiro?.setVisible(true);
               oButtonOtroSiRodamiento?.setVisible(true);
+              oButtonOtroSiAlimentacion15?.setVisible(true);
+              oButtonOtroSiAlimentacion11?.setVisible(true);
+              oButtonOtroSiAlimentacion10?.setVisible(true);
           } else if (permisos === "usuario") {
               oButtonKitRetiro?.setVisible(false);
               oButtonOtroSiRodamiento?.setVisible(false);
+              oButtonOtroSiAlimentacion15?.setVisible(false);
+              oButtonOtroSiAlimentacion11?.setVisible(false);
+              oButtonOtroSiAlimentacion10?.setVisible(false);
           }
 
           that._hideInitialPreloader();
@@ -1256,6 +1268,15 @@ sap.ui.define([
             case "Otro Sí - Rodamiento":
                 this.onDownloadPDFOtroSiRodamiento(sButtonId);
                 break;
+            case "Otro Sí - Alimentación 15":
+                this.onDownloadPDFOtroSiAlimentacion15(sButtonId);
+                break;
+            case "Otro Sí - Alimentación 11":
+                this.onDownloadPDFOtroSiAlimentacion11(sButtonId);
+                break;
+            case "Otro Sí - Alimentación 10":
+                this.onDownloadPDFOtroSiAlimentacion10(sButtonId);
+                break;
             default:
                 sap.m.MessageToast.show("No hay función definida para este documento.");
                 break;
@@ -1284,46 +1305,18 @@ sap.ui.define([
 
     attachBoxEvents: function () {
       if (this._tilesEventsAttached) {
-        return;
+          return;
       }
       this._tilesEventsAttached = true;
-
-      const view = this.getView();
-      const boxMap = [
-        { id: "customListItemKitRetiro", title: "Kit De Retiro" },
-        //{ id: "customListItemOtroSiRodamiento", title: "Otro Sí - Rodamiento" }
-        
-      ];
-
-      boxMap.forEach(box => {
-        const oItem = view.byId(box.id);
-        if (!oItem) {
-          console.warn("No se encontró el CustomListItem con ID:", box.id);
-          return;
-        }
-
-        oItem.addStyleClass("boxHover");
-        oItem.attachBrowserEvent("click", () => {
-          this.sSelectedContract = box.title;
-          this._handleTileSelection(box.title).catch(oError => {
-            console.error("Error al preparar la selección:", oError);
-            sap.m.MessageToast.show("Error cargando los datos.");
-          });
-        });
-      });
-
-      ["customListItemDeshausio", "customListItemAuseInjus"].forEach(sId => {
-        const oItem = view.byId(sId);
-        if (oItem) {
-          oItem.addStyleClass("boxHover");
-        }
-      });
+      // eventos de cards migrados a press handlers en la vista XML
     },
-
     _getDocumentSearchCards: function () {
       return [
         { id: "customListItemKitRetiro", title: "Kit De Retiro", desc: "Gestionar kit De retiro" },
-        { id: "customListItemOtroSiRodamiento", title: "Otro Sí - Rodamiento", desc: "Auxilio de rodamiento" }
+        { id: "customListItemOtroSiRodamiento", title: "Otro Sí - Rodamiento", desc: "Auxilio de rodamiento" },
+        { id: "customListItemOtroSiAlimentacion15", title: "Otro Sí - Alimentación 15", desc: "Auxilio de alimentación 15" },
+        { id: "customListItemOtroSiAlimentacion11", title: "Otro Sí - Alimentación 11", desc: "Auxilio de alimentación 11" },
+        { id: "customListItemOtroSiAlimentacion10", title: "Otro Sí - Alimentación 10", desc: "Auxilio de alimentación 10" }
       ];
     },
 
@@ -1420,6 +1413,42 @@ sap.ui.define([
         this._handleTileSelection(sTitle)
             .catch(oError => {
                 console.error("Error al preparar datos de Otro Sí - Rodamiento:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onOtroSiAlimentacion15Press: function () {
+        const sTitle = "Otro Sí - Alimentación 15";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "otroSiAlimentacion15";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Otro Sí - Alimentación 15:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onOtroSiAlimentacion11Press: function () {
+        const sTitle = "Otro Sí - Alimentación 11";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "otroSiAlimentacion11";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Otro Sí - Alimentación 11:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onOtroSiAlimentacion10Press: function () {
+        const sTitle = "Otro Sí - Alimentación 10";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "otroSiAlimentacion10";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Otro Sí - Alimentación 10:", oError);
                 sap.m.MessageToast.show("Error cargando los datos.");
             });
     },
@@ -1532,6 +1561,20 @@ sap.ui.define([
         otroSiRodamiento.onDownloadPDFOtroSiRodamiento(this, sButtonId);
     },
 
+    //Archivo: OTRO SI - ALIMENTACION 15.000
+    onDownloadPDFOtroSiAlimentacion15: async function (sButtonId) {
+        otroSiAlimentacion15.onDownloadPDFOtroSiAlimentacion15(this, sButtonId);
+    },
+
+    //Archivo: OTRO SI - ALIMENTACION 11.500
+    onDownloadPDFOtroSiAlimentacion11: async function (sButtonId) {
+        otroSiAlimentacion11.onDownloadPDFOtroSiAlimentacion11(this, sButtonId);
+    },
+
+    //Archivo: OTRO SI - ALIMENTACION 10.000
+    onDownloadPDFOtroSiAlimentacion10: async function (sButtonId) {
+        otroSiAlimentacion10.onDownloadPDFOtroSiAlimentacion10(this, sButtonId);
+    },
 
 
   });

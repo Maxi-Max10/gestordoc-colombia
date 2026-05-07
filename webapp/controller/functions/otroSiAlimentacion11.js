@@ -3,7 +3,7 @@ sap.ui.define([
 ], function (MessageToast) {
     "use strict";
 
-    async function onDownloadPDFOtroSiRodamiento(oController, sButtonId) {
+    async function onDownloadPDFOtroSiAlimentacion11(oController, sButtonId) {
         try {
             await oController._ensurePdfToolkit();
 
@@ -43,11 +43,6 @@ sap.ui.define([
                         lastName:           user.lastName,
                         sNombre,
                         sCedula,
-                        sRodamiento,
-                        sRodamientoLetras,
-                        sIdentificado,
-                        sCiudadFirma,
-                        localDate
                     });
                     continue;
                 }
@@ -59,55 +54,42 @@ sap.ui.define([
                     <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;">
                         OTRO SI AL CONTRATO DE TRABAJO
                     </p>
-                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 28px 0;">
-                        AUXÍLIO NO SALARIAL DE TRANSPORTE EXTRALEGAL
-                    </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        Siendo, el ${localDate}, se reunieron por una parte <strong>${sNombre}</strong>
-                        ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong>
-                        como aparece al pie de su firma y quien en adelante se denominará
-                        <strong>EL TRABAJADOR</strong>, y por la otra,
-                        <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312
-                        y quien actúa en representación de <strong>DIACO S.A.</strong>, quien en adelante
-                        se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo
-                        provisto de las siguientes cláusulas.
+                        En Sabaneta, a los 03 días del mes de marzo de 2026 se reunieron por una parte <strong>${sNombre}</strong>
+                        ${sIdentificado} <strong>${sCedula}</strong> como aparece al pie de su firma y quien actúa en su propio nombre y por la otra,
+                        <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de  <strong>DIACO S.A.</strong>, 
+                        con el fin de suscribir un acuerdo provisto de las siguientes cláusulas:
                     </p>
 
                     <p style="text-align:justify;margin:0 0 10px 0;">
-                        <strong>PRIMERA:</strong> EL EMPLEADOR por mera liberalidad, en consideración a la
-                        necesidad que tiene EL TRABAJADOR de desplazarse a diferentes lugares en virtud del
-                        cargo que desempeña, y con el objeto de proporcionar un instrumento que le permita
-                        cumplir los fines de su cargo, otorga a EL TRABAJADOR un auxilio de transporte
-                        extralegal.
+                        <strong>PRIMERA:</strong> El empleador de mera liberalidad y como parte de su política de bienestar otorga al trabajador un auxilio de alimentación. 
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        En consecuencia, de lo anterior, las partes han convenido que EL TRABAJADOR reciba
-                        un valor de <strong>UN MILLÓN CUATROCIENTOS SETENTA Y UN MIL DOCIENTOS SESENTA Y SIETE PESOS M/CTE ($1.471.267)</strong>, como monto fijo
-                        mensual que será consignado a la cuenta de nómina del colaborador, con el ánimo de
-                        reintegrar al trabajador el dinero que gaste en su movilización para la realización
-                        del cargo que desempeña en Diaco S.A.
+                        Con esta finalidad, las partes han convenido que por cada día laborado el trabajador recibe un valor de
+                        <strong>ONCE MIL QUINIENTOS PESOS 00/100 MCTE. ($11.500,00)</strong>, por día trabajado, por medio de una tarjeta recargable con la cual 
+                        podrá acceder a comprar alimentos en los establecimientos que tengan y acepten el convenio con la entidad expendedora de las tarjetas. 
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        <strong>SEGUNDA:</strong> Las partes convienen y así lo hacen constar que el
-                        beneficio extralegal que mediante este acuerdo se otorga, no constituye salario para
-                        ningún efecto legal conforme a lo estipulado en el artículo 15 de la Ley 50 de 1990,
-                        en tanto constituye un auxilio de transporte que no tiene por finalidad retribuir de
-                        manera directa el servicio prestado por el trabajador.
+                        <strong>SEGUNDA:</strong> Las partes convienen y así lo hacen constar que el beneficio extralegal que mediante este acuerdo se otorga, 
+                        en tanto constituye un subsidio de alimentación que no tiene por finalidad retribuir de manera directa el servicio, no constituye salario 
+                        para ningún efecto legal conforme a lo estipulado en el artículo 15 de la Ley 50 de 1990. 
                     </p>
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        <strong>TERCERA:</strong> Las partes declaran y así lo hacen constar que el presente
-                        beneficio, en tanto deriva de la mera liberalidad del EL EMPLEADOR, podrá ser
-                        modificado o eliminado de manera unilateral por EL EMPLEADOR cuando las necesidades
-                        así lo ameriten, sin que por ello se entienda desmejora en las condiciones del
-                        trabajador.
+                        <strong>TERCERA:</strong> Las partes declaran y así lo hacen constar que el presente beneficio, en tanto deriva de la mera liberalidad
+                        de la empresa, podrá ser modificado o eliminado de manera unilateral por la compañía cuando las necesidades así lo ameriten, sin que
+                        por ello se entienda desmejora en las condiciones del trabajador.
+                    </p>
+
+                    <p style="text-align:justify;margin:0 0 20px 0;">
+                        Ratifico que, desde el primer pago recibido por concepto de auxilio de alimentación, este fue pactado como no salarial por las partes.
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        En constancia se firma en ${sCiudadFirma}, el ${localDate}.
+                        En constancia se firma en la ciudad de Sabaneta a los tres (03) días del mes de marzo de dos mil veintiséis (2026).
                     </p>
 
                     <div style="width:100%;display:table;">
@@ -171,7 +153,7 @@ sap.ui.define([
                 }
 
                 const pdfBytes = await pdfDoc.save();
-                const fileName = `${user.firstName}_${user.lastName}_OtroSi_Rodamiento.pdf`;
+                const fileName = `${user.firstName}_${user.lastName}_OtroSi_Alimentacion_11.500.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
                 const link     = document.createElement("a");
                 link.href      = URL.createObjectURL(blob);
@@ -189,16 +171,16 @@ sap.ui.define([
             }
 
         } catch (error) {
-            console.error("Error generando Otro Sí - Rodamiento:", error);
+            console.error("Error generando Otro Sí - Aliementacion 11.500:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
     }
 
-    // ─── Word con JSZip + plantilla OtroSi_Rodamiento.docx ──────────────────
+    // ─── Word con JSZip + plantilla OtroSi_Alimentacion_11.500.docx ──────────────────
     async function _generateWord(data) {
         const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Otro_Si_Rodamiento.docx").then(res => {
-        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Rodamiento.docx (${res.status})`);
+        const templateBytes = await fetch("pdf/Otro_Si_Alimentacion_11.docx").then(res => {
+        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Alimentacion_11.docx (${res.status})`);
             return res.arrayBuffer();
         });
         const zip = await JSZip.loadAsync(templateBytes);
@@ -206,11 +188,6 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]":           data.sNombre,
             "[[Cedula]]":           data.sCedula,
-            "[[Rodamiento]]":       data.sRodamiento,
-            "[[RodamientoLetras]]": data.sRodamientoLetras,
-            "[[Identificado]]":     data.sIdentificado,
-            "[[CiudadFirma]]":      data.sCiudadFirma,
-            "[[Fecha]]":            data.localDate
         };
 
         const targets = [
@@ -240,7 +217,7 @@ sap.ui.define([
         const blob = await zip.generateAsync({ type: "blob" });
         const link = document.createElement("a");
         link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_OtroSi_Rodamiento.docx`;
+        link.download = `${data.firstName}_${data.lastName}_Otro_Si_Alimentacion_11.docx`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -333,5 +310,5 @@ sap.ui.define([
         return resultado + " PESOS M/CTE";
     }
 
-    return { onDownloadPDFOtroSiRodamiento };
+    return { onDownloadPDFOtroSiAlimentacion11 };
 });

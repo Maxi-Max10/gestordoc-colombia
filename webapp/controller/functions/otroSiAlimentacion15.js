@@ -3,7 +3,7 @@ sap.ui.define([
 ], function (MessageToast) {
     "use strict";
 
-    async function onDownloadPDFOtroSiRodamiento(oController, sButtonId) {
+    async function onDownloadPDFOtroSiAlimentacion15(oController, sButtonId) {
         try {
             await oController._ensurePdfToolkit();
 
@@ -43,11 +43,6 @@ sap.ui.define([
                         lastName:           user.lastName,
                         sNombre,
                         sCedula,
-                        sRodamiento,
-                        sRodamientoLetras,
-                        sIdentificado,
-                        sCiudadFirma,
-                        localDate
                     });
                     continue;
                 }
@@ -75,39 +70,34 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 10px 0;">
-                        <strong>PRIMERA:</strong> EL EMPLEADOR por mera liberalidad, en consideración a la
-                        necesidad que tiene EL TRABAJADOR de desplazarse a diferentes lugares en virtud del
-                        cargo que desempeña, y con el objeto de proporcionar un instrumento que le permita
-                        cumplir los fines de su cargo, otorga a EL TRABAJADOR un auxilio de transporte
-                        extralegal.
+                        <strong>PRIMERA:</strong> El empleador de mera liberalidad y como parte de su política de bienestar otorga al trabajador un 
+                        auxilio de alimentación.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        En consecuencia, de lo anterior, las partes han convenido que EL TRABAJADOR reciba
-                        un valor de <strong>UN MILLÓN CUATROCIENTOS SETENTA Y UN MIL DOCIENTOS SESENTA Y SIETE PESOS M/CTE ($1.471.267)</strong>, como monto fijo
-                        mensual que será consignado a la cuenta de nómina del colaborador, con el ánimo de
-                        reintegrar al trabajador el dinero que gaste en su movilización para la realización
-                        del cargo que desempeña en Diaco S.A.
+                        Con esta finalidad, las partes han convenido que por cada día laborado el trabajador recibe un valor de
+                        <strong>QUINCE MIL PESOS 00/100 MCTE. ($15.000,00)</strong>, por día trabajado, por medio de una tarjeta recargable con la cual 
+                        podrá acceder a comprar alimentos en los establecimientos que tengan y acepten el convenio con la entidad expendedora de las tarjeta.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        <strong>SEGUNDA:</strong> Las partes convienen y así lo hacen constar que el
-                        beneficio extralegal que mediante este acuerdo se otorga, no constituye salario para
-                        ningún efecto legal conforme a lo estipulado en el artículo 15 de la Ley 50 de 1990,
-                        en tanto constituye un auxilio de transporte que no tiene por finalidad retribuir de
-                        manera directa el servicio prestado por el trabajador.
+                        <strong>SEGUNDA:</strong> Las partes convienen y así lo hacen constar que el beneficio extralegal que mediante este acuerdo se otorga, en 
+                        tanto constituye un subsidio de alimentación que no tiene por finalidad retribuir de manera directa el servicio, no constituye salario 
+                        para ningún efecto legal conforme a lo estipulado en el artículo 15 de la Ley 50 de 1990.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        <strong>TERCERA:</strong> Las partes declaran y así lo hacen constar que el presente
-                        beneficio, en tanto deriva de la mera liberalidad del EL EMPLEADOR, podrá ser
-                        modificado o eliminado de manera unilateral por EL EMPLEADOR cuando las necesidades
-                        así lo ameriten, sin que por ello se entienda desmejora en las condiciones del
-                        trabajador.
+                        <strong>TERCERA:</strong> Las partes declaran y así lo hacen constar que el presente beneficio, en tanto deriva de la mera liberalidad
+                         de la empresa, podrá ser modificado o eliminado de manera unilateral por la compañía cuando las necesidades así lo ameriten, 
+                         sin que por ello se entienda desmejora en las condiciones del trabajador.
+                    </p>
+
+                    <p style="text-align:justify;margin:0 0 20px 0;">
+                        Ratifico que, desde el primer pago recibido por concepto de auxilio de alimentación, este fue pactado como no salarial por las partes.
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        En constancia se firma en ${sCiudadFirma}, el ${localDate}.
+                        En constancia se firma en la ciudad de Medellin a los doce (12) días del mes de diciembre de 2023.
                     </p>
 
                     <div style="width:100%;display:table;">
@@ -171,7 +161,7 @@ sap.ui.define([
                 }
 
                 const pdfBytes = await pdfDoc.save();
-                const fileName = `${user.firstName}_${user.lastName}_OtroSi_Rodamiento.pdf`;
+                const fileName = `${user.firstName}_${user.lastName}_OtroSi_Alimentacion_15.000.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
                 const link     = document.createElement("a");
                 link.href      = URL.createObjectURL(blob);
@@ -189,16 +179,16 @@ sap.ui.define([
             }
 
         } catch (error) {
-            console.error("Error generando Otro Sí - Rodamiento:", error);
+            console.error("Error generando Otro Sí - Aliementacion 15.000:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
     }
 
-    // ─── Word con JSZip + plantilla OtroSi_Rodamiento.docx ──────────────────
+    // ─── Word con JSZip + plantilla OtroSi_Alimentacion_15.000.docx ──────────────────
     async function _generateWord(data) {
         const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Otro_Si_Rodamiento.docx").then(res => {
-        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Rodamiento.docx (${res.status})`);
+        const templateBytes = await fetch("pdf/Otro_Si_Alimentacion_15.docx").then(res => {
+        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Alimentacion_15.docx (${res.status})`);
             return res.arrayBuffer();
         });
         const zip = await JSZip.loadAsync(templateBytes);
@@ -206,11 +196,6 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]":           data.sNombre,
             "[[Cedula]]":           data.sCedula,
-            "[[Rodamiento]]":       data.sRodamiento,
-            "[[RodamientoLetras]]": data.sRodamientoLetras,
-            "[[Identificado]]":     data.sIdentificado,
-            "[[CiudadFirma]]":      data.sCiudadFirma,
-            "[[Fecha]]":            data.localDate
         };
 
         const targets = [
@@ -240,7 +225,7 @@ sap.ui.define([
         const blob = await zip.generateAsync({ type: "blob" });
         const link = document.createElement("a");
         link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_OtroSi_Rodamiento.docx`;
+        link.download = `${data.firstName}_${data.lastName}_Otro_Si_Alimentacion_15.docx`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -333,5 +318,5 @@ sap.ui.define([
         return resultado + " PESOS M/CTE";
     }
 
-    return { onDownloadPDFOtroSiRodamiento };
+    return { onDownloadPDFOtroSiAlimentacion15 };
 });
