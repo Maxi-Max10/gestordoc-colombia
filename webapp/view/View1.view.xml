@@ -590,7 +590,7 @@
                             id="wordDataInfo"
                             text="Generar Word"
                             icon="sap-icon://doc-attachment"
-                            press="onDownloadWord"
+                            press="onDownloadPDF"
                             class="wordButtonCustom"
                             type="Emphasized"
                         />

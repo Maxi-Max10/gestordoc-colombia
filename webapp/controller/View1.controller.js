@@ -1291,7 +1291,7 @@ sap.ui.define([
       const view = this.getView();
       const boxMap = [
         { id: "customListItemKitRetiro", title: "Kit De Retiro" },
-        { id: "customListItemOtroSiRodamiento", title: "Otro Sí - Rodamiento" }
+        //{ id: "customListItemOtroSiRodamiento", title: "Otro Sí - Rodamiento" }
         
       ];
 

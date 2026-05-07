@@ -1,12 +1,9 @@
 sap.ui.define([
-    "sap/m/MessageToast",
+    "sap/m/MessageToast"
 ], function (MessageToast) {
     "use strict";
 
     async function onDownloadPDFOtroSiRodamiento(oController, sButtonId) {
-        console.log("=== onDownloadPDFOtroSiRodamiento llamado ===");
-        console.log("sButtonId:", sButtonId);
-        console.log("sSelectedContract:", oController.sSelectedContract);
         try {
             await oController._ensurePdfToolkit();
 
@@ -32,26 +29,25 @@ sap.ui.define([
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                const sNombre          = `${user.firstName} ${user.lastName}`;
-                const sCedula          = user.nationalId || "";
-                const sRodamiento      = _formatSalary(user.rodamientoValue || user.paycompValue || 0);
+                const sNombre           = `${user.firstName} ${user.lastName}`;
+                const sCedula           = user.nationalId || "";
+                const sRodamiento       = _formatSalary(user.rodamientoValue || user.paycompValue || 0);
                 const sRodamientoLetras = _salaryToWords(user.rodamientoValue || user.paycompValue || 0);
-                const sIdentificado    = (user.gender === "F") ? "identificada" : "identificado";
-                const sCiudadFirma     = user.location || user.city || "Bucaramanga";
+                const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
+                const sCiudadFirma      = user.location || user.city || "Bucaramanga";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    console.log("Entrando a _generateWord para rodamiento");
-                    await _generateWord(oController, {
+                    await _generateWord({
                         firstName:          user.firstName,
                         lastName:           user.lastName,
-                        sNombre:            sNombre,
-                        sCedula:            sCedula,
-                        sRodamiento:        sRodamiento,
-                        sRodamientoLetras:  sRodamientoLetras,
-                        sIdentificado:      sIdentificado,
-                        sCiudadFirma:       sCiudadFirma,
-                        localDate:          localDate
+                        sNombre,
+                        sCedula,
+                        sRodamiento,
+                        sRodamientoLetras,
+                        sIdentificado,
+                        sCiudadFirma,
+                        localDate
                     });
                     continue;
                 }
@@ -126,7 +122,7 @@ sap.ui.define([
                             <div style="display:table-cell;width:50%;vertical-align:top;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${sNombre}</strong><br>
-                                    C.C. GNo. ${sCedula}
+                                    C.C. No. ${sCedula}
                                 </div>
                             </div>
                         </div>
@@ -134,9 +130,8 @@ sap.ui.define([
 
                 </div>`;
 
-                // Renderiza el HTML en un div oculto para medir altura real
                 const div = document.createElement("div");
-                div.style.width           = "714px";   // 595pt * (96/72) ≈ 794px - 80px padding
+                div.style.width           = "714px";
                 div.style.padding         = "40px";
                 div.style.backgroundColor = "#ffffff";
                 div.style.boxSizing       = "border-box";
@@ -154,22 +149,19 @@ sap.ui.define([
                 const imgData = canvas.toDataURL("image/png");
                 document.body.removeChild(div);
 
-                // Dimensiones reales del canvas → calcular páginas necesarias
-                const pdfDoc   = await PDFLibRef.PDFDocument.create();
-                const img      = await pdfDoc.embedPng(imgData);
+                const pdfDoc  = await PDFLibRef.PDFDocument.create();
+                const img     = await pdfDoc.embedPng(imgData);
 
-                const PAGE_W   = 595;   // A4 puntos
-                const PAGE_H   = 842;
-                const MARGIN   = 40;
-                const drawW    = PAGE_W - MARGIN * 2;
-                const drawH    = (img.height * drawW) / img.width; // alto total escalado
-
-                const sliceH   = PAGE_H - MARGIN * 2;             // alto útil por página
+                const PAGE_W  = 595;
+                const PAGE_H  = 842;
+                const MARGIN  = 40;
+                const drawW   = PAGE_W - MARGIN * 2;
+                const drawH   = (img.height * drawW) / img.width;
+                const sliceH  = PAGE_H - MARGIN * 2;
                 const totalPgs = Math.ceil(drawH / sliceH);
 
                 for (let p = 0; p < totalPgs; p++) {
                     const pg = pdfDoc.addPage([PAGE_W, PAGE_H]);
-                    // Desplaza la imagen hacia arriba en cada página siguiente
                     pg.drawImage(img, {
                         x:      MARGIN,
                         y:      PAGE_H - MARGIN - drawH + p * sliceH,
@@ -202,85 +194,69 @@ sap.ui.define([
         }
     }
 
-    // ─── Word: usa JSZip + plantilla OtroSi_Rodamiento.docx ─────────────────
-    async function _generateWord(oController, data) {
-        console.log("_generateWord llamado con:", data.firstName, data.lastName);
-        console.log("Cargando plantilla: pdf/OtroSi_Rodamiento.docx");
-        try {
-            const JSZip         = await _ensureJSZip();
-            const templateBytes = await _loadTemplate("pdf/OtroSi_Rodamiento.docx");
-            const zip           = await JSZip.loadAsync(templateBytes);
+    // ─── Word con JSZip + plantilla OtroSi_Rodamiento.docx ──────────────────
+    async function _generateWord(data) {
+        const JSZip         = await _ensureJSZip();
+        const templateBytes = await fetch("pdf/Otro_Si_Retiro.docx").then(res => {
+        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Retiro.docx (${res.status})`);
+            return res.arrayBuffer();
+        });
+        const zip = await JSZip.loadAsync(templateBytes);
 
-            const variables = {
-                "[[Nombre]]":          data.sNombre,
-                "[[Cedula]]":          data.sCedula,
-                "[[Rodamiento]]":      data.sRodamiento,
-                "[[RodamientoLetras]]": data.sRodamientoLetras,
-                "[[Identificado]]":    data.sIdentificado,
-                "[[CiudadFirma]]":     data.sCiudadFirma,
-                "[[Fecha]]":           data.localDate
-            };
+        const variables = {
+            "[[Nombre]]":           data.sNombre,
+            "[[Cedula]]":           data.sCedula,
+            "[[Rodamiento]]":       data.sRodamiento,
+            "[[RodamientoLetras]]": data.sRodamientoLetras,
+            "[[Identificado]]":     data.sIdentificado,
+            "[[CiudadFirma]]":      data.sCiudadFirma,
+            "[[Fecha]]":            data.localDate
+        };
 
-            const targets = [
-                "word/document.xml",
-                "word/header1.xml",
-                "word/header2.xml",
-                "word/footer1.xml",
-                "word/footer2.xml"
-            ];
+        const targets = [
+            "word/document.xml",
+            "word/header1.xml",
+            "word/header2.xml",
+            "word/footer1.xml",
+            "word/footer2.xml"
+        ];
 
-            for (const path of targets) {
-                if (zip.files[path]) {
-                    let xml = await zip.files[path].async("string");
-                    xml = _replaceVariables(xml, variables);
-                    zip.file(path, xml);
+        for (const path of targets) {
+            if (zip.files[path]) {
+                let xml = await zip.files[path].async("string");
+                for (const [key, value] of Object.entries(variables)) {
+                    xml = xml.split(key).join(_escXml(value));
+                    const frag = new RegExp(
+                        "\\[\\[" +
+                        key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
+                        "\\]\\]", "g"
+                    );
+                    xml = xml.replace(frag, _escXml(value));
                 }
+                zip.file(path, xml);
             }
-
-            const blob     = await zip.generateAsync({ type: "blob" });
-            const fileName = `${data.firstName}_${data.lastName}_OtroSi_Rodamiento.docx`;
-            const link     = document.createElement("a");
-            link.href      = URL.createObjectURL(blob);
-            link.download  = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
-
-            MessageToast.show("Documento Word generado correctamente.");
-
-        } catch (err) {
-            console.error("Error generando Word Otro Sí - Rodamiento:", err);
-            MessageToast.show("Error generando el Word: " + err.message);
         }
+
+        const blob = await zip.generateAsync({ type: "blob" });
+        const link = document.createElement("a");
+        link.href  = URL.createObjectURL(blob);
+        link.download = `${data.firstName}_${data.lastName}_OtroSi_Rodamiento.docx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+
+        MessageToast.show("Documento Word generado correctamente.");
     }
 
-    function _replaceVariables(xml, variables) {
-        for (const [key, value] of Object.entries(variables)) {
-            xml = xml.split(key).join(_escapeXml(value));
-            const fragmented = new RegExp(
-                "\\[\\[" +
-                key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
-                "\\]\\]", "g"
-            );
-            xml = xml.replace(fragmented, _escapeXml(value));
-        }
-        return xml;
-    }
+    // ─── Helpers ─────────────────────────────────────────────────────────────
 
-    function _escapeXml(str) {
+    function _escXml(str) {
         return String(str)
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;");
-    }
-
-    function _loadTemplate(path) {
-        return fetch(path).then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar la plantilla: ${path} (${res.status})`);
-            return res.arrayBuffer();
-        });
     }
 
     function _ensureJSZip() {
@@ -293,8 +269,6 @@ sap.ui.define([
             document.head.appendChild(script);
         });
     }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
 
     function _formatDateLong(date) {
         const d      = new Date(date);
