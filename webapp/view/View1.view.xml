@@ -237,7 +237,7 @@
 
                         <!-- 7. DEDUCCIONES DE RETENCIÓN  ── color: indigo -->
                         <CustomListItem
-                            id="itemDeduccionesRetencion"
+                            id="customListItemSolicitudDeduccionesRetencion"
                             class="customListItem card-horizontal card-indigo"
                             type="Active"
                             press="onDeduccionesPress"
@@ -259,10 +259,10 @@
 
                         <!-- 8. BENEFICIOS EXTRALEGALES  ── color: orange -->
                         <CustomListItem
-                            id="itemBeneficios"
+                            id="customListItemBeneficios"
                             class="customListItem card-horizontal card-orange"
                             type="Active"
-                            press="onBeneficiosPress"
+                            press="onBeneficiosExtralegalesPress"
                             visible="true"
                         >
                             <HBox width="100%" height="100%" class="card-hbox">

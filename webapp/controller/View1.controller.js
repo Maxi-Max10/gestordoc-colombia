@@ -13,10 +13,12 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/otroSiRodamiento",
   "gestordoccolombia/controller/functions/otroSiAlimentacion15",
   "gestordoccolombia/controller/functions/otroSiAlimentacion11",
-  "gestordoccolombia/controller/functions/otroSiAlimentacion10"
+  "gestordoccolombia/controller/functions/otroSiAlimentacion10",
+  "gestordoccolombia/controller/functions/beneficiosExtralegales",
+  "gestordoccolombia/controller/functions/solicitudDeduccionesRetencion"
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -768,6 +770,8 @@ sap.ui.define([
           var oButtonOtroSiAlimentacion15 = that.byId("customListItemOtroSiAlimentacion15");
           var oButtonOtroSiAlimentacion11 = that.byId("customListItemOtroSiAlimentacion11");
           var oButtonOtroSiAlimentacion10 = that.byId("customListItemOtroSiAlimentacion10");
+          var oButtonBeneficiosExtralegales = that.byId("customListItemBeneficiosExtralegales");
+          var oButtonSolicitudDeduccionesRetencion = that.byId("customListItemSolicitudDeduccionesRetencion");
 
           //Configuracion de visibilidad segun los permisos
           if (permisos === "admin") {
@@ -776,12 +780,16 @@ sap.ui.define([
               oButtonOtroSiAlimentacion15?.setVisible(true);
               oButtonOtroSiAlimentacion11?.setVisible(true);
               oButtonOtroSiAlimentacion10?.setVisible(true);
+              oButtonBeneficiosExtralegales?.setVisible(true);
+              oButtonSolicitudDeduccionesRetencion?.setVisible(true);
           } else if (permisos === "usuario") {
               oButtonKitRetiro?.setVisible(false);
               oButtonOtroSiRodamiento?.setVisible(false);
               oButtonOtroSiAlimentacion15?.setVisible(false);
               oButtonOtroSiAlimentacion11?.setVisible(false);
               oButtonOtroSiAlimentacion10?.setVisible(false);
+              oButtonBeneficiosExtralegales?.setVisible(false);
+              oButtonSolicitudDeduccionesRetencion?.setVisible(false);
           }
 
           that._hideInitialPreloader();
@@ -1006,6 +1014,11 @@ sap.ui.define([
       switch (sTitle) {
         case "Kit De Retiro":
         case "Otro Sí - Rodamiento":
+        case "Otro Sí - Alimentación 15":
+        case "Otro Sí - Alimentación 11":
+        case "Otro Sí - Alimentación 10":
+        case "Beneficios Extralegales":
+        case "Solicitud Deducciones Retencion":
         default:
           // Solo Administrativos
           aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
@@ -1277,6 +1290,12 @@ sap.ui.define([
             case "Otro Sí - Alimentación 10":
                 this.onDownloadPDFOtroSiAlimentacion10(sButtonId);
                 break;
+            case "Beneficios Extralegales":
+                this.onDownloadPDFBeneficiosExtralegales(sButtonId);
+                break;
+            case "Solicitud Deducciones Retencion":
+                this.onDownloadPDFRetencionFuente(sButtonId);
+                break;
             default:
                 sap.m.MessageToast.show("No hay función definida para este documento.");
                 break;
@@ -1316,7 +1335,9 @@ sap.ui.define([
         { id: "customListItemOtroSiRodamiento", title: "Otro Sí - Rodamiento", desc: "Auxilio de rodamiento" },
         { id: "customListItemOtroSiAlimentacion15", title: "Otro Sí - Alimentación 15", desc: "Auxilio de alimentación 15" },
         { id: "customListItemOtroSiAlimentacion11", title: "Otro Sí - Alimentación 11", desc: "Auxilio de alimentación 11" },
-        { id: "customListItemOtroSiAlimentacion10", title: "Otro Sí - Alimentación 10", desc: "Auxilio de alimentación 10" }
+        { id: "customListItemOtroSiAlimentacion10", title: "Otro Sí - Alimentación 10", desc: "Auxilio de alimentación 10" },
+        { id: "customListItemBeneficiosExtralegales", title: "Beneficios Extralegales", desc: "Gestionar beneficios extralegales" },
+        { id: "customListItemSolicitudDeduccionesRetencion", title: "Solicitud Deducciones Retencion", desc: "Gestionar solicitud de deducciones y retenciones" }
       ];
     },
 
@@ -1453,6 +1474,30 @@ sap.ui.define([
             });
     },
 
+    onBeneficiosExtralegalesPress: function () {
+        const sTitle = "Beneficios Extralegales";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "beneficiosExtralegales";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Beneficios Extralegales:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onDeduccionesPress: function () {
+        const sTitle = "Solicitud Deducciones Retencion";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "solicitudDeduccionesRetencion";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Solicitud Deducciones Retencion:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
     _openManualDateDialog: function () { //---------------------------NO SE SI DEJAR ESTA FUNCION
       const oView = this.getView();
 
@@ -1574,6 +1619,16 @@ sap.ui.define([
     //Archivo: OTRO SI - ALIMENTACION 10.000
     onDownloadPDFOtroSiAlimentacion10: async function (sButtonId) {
         otroSiAlimentacion10.onDownloadPDFOtroSiAlimentacion10(this, sButtonId);
+    },
+
+    //Archivo: BENEFICIOS EXTRALEGALES
+    onDownloadPDFBeneficiosExtralegales: async function (sButtonId) {
+        beneficiosExtralegales.onDownloadPDFBeneficiosExtralegales(this, sButtonId);
+    },
+
+    //Archivo: SOLICITUD DEDUCCIONES RETENCION
+    onDownloadPDFRetencionFuente: async function (sButtonId) {
+        solicitudDeduccionesRetencion.onDownloadPDFRetencionFuente(this, sButtonId);
     },
 
 
