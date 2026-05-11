@@ -265,6 +265,7 @@ sap.ui.define([
                     div.style.height          = "760px";
                     div.style.padding         = "40px";
                     div.style.backgroundColor = "transparent";
+                    div.style.background      = "none";
                     div.style.fontSize        = "12px";
                     div.style.boxSizing       = "border-box";
                     div.style.position        = "absolute";
@@ -274,7 +275,8 @@ sap.ui.define([
 
                     const canvas = await html2canvasRef(div, {
                         scale: 2,
-                        useCORS: true
+                        useCORS: true,
+                        backgroundColor: null
                     });
                     const imgData = canvas.toDataURL("image/png");
 

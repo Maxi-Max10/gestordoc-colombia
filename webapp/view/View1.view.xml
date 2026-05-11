@@ -103,7 +103,7 @@
                 >
                     <sap.ui.layout:content>
 
-                        <!-- 1. KIT DE RETIRO  ── color: red -->
+                        <!-- 1. KIT DE RETIRO  ── color: red         LISTO -->
                         <CustomListItem
                             id="customListItemKitRetiro"
                             class="customListItem card-horizontal card-red"
@@ -235,7 +235,7 @@
                             </HBox>
                         </CustomListItem>
 
-                        <!-- 7. DEDUCCIONES DE RETENCIÓN  ── color: indigo -->
+                        <!-- 7. DEDUCCIONES DE RETENCIÓN  ── color: indigo         LISTO -->        
                         <CustomListItem
                             id="customListItemSolicitudDeduccionesRetencion"
                             class="customListItem card-horizontal card-indigo"
@@ -257,7 +257,7 @@
                             </HBox>
                         </CustomListItem>
 
-                        <!-- 8. BENEFICIOS EXTRALEGALES  ── color: orange -->
+                        <!-- 8. BENEFICIOS EXTRALEGALES  ── color: orange         LISTO -->
                         <CustomListItem
                             id="customListItemBeneficios"
                             class="customListItem card-horizontal card-orange"
@@ -389,7 +389,7 @@
                             </HBox>
                         </CustomListItem>
 
-                        <!-- 14. OTRO SÍ - ALIMENTACIÓN 10.000  ── color: orange -->
+                        <!-- 14. OTRO SÍ - ALIMENTACIÓN 10.000  ── color: orange         LISTO -->
                         <CustomListItem
                             id="customListItemOtroSiAlimentacion10"
                             class="customListItem card-horizontal card-amber"
@@ -411,7 +411,7 @@
                             </HBox>
                         </CustomListItem>
 
-                        <!-- 15. OTRO SÍ - ALIMENTACIÓN 11.500  ── color: pink -->
+                        <!-- 15. OTRO SÍ - ALIMENTACIÓN 11.500  ── color: pink         LISTO -->
                         <CustomListItem
                             id="customListItemOtroSiAlimentacion11"
                             class="customListItem card-horizontal card-rose"
@@ -433,7 +433,7 @@
                             </HBox>
                         </CustomListItem>
 
-                        <!-- 16. OTRO SÍ - ALIMENTACIÓN 15.000  ── color: teal -->
+                        <!-- 16. OTRO SÍ - ALIMENTACIÓN 15.000  ── color: teal         LISTO -->
                         <CustomListItem
                             id="customListItemOtroSiAlimentacion15"
                             class="customListItem card-horizontal card-emerald"
@@ -455,7 +455,7 @@
                             </HBox>
                         </CustomListItem>
 
-                        <!-- 17. OTRO SÍ - RODAMIENTO  ── color: blue -->
+                        <!-- 17. OTRO SÍ - RODAMIENTO  ── color: blue         LISTO -->
                         <CustomListItem
                             id="customListItemOtroSiRodamiento"
                             class="customListItem card-horizontal card-sky"

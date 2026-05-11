@@ -137,12 +137,6 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 8px 0;">
-                            En constancia se firma en la ciudad de ${sCiudadFirma}, a los ${localDate}.
-                        </p>
-
-                        <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 25px 0;">Cordialmente,</p>
-
                         <div style="border-top:1px solid #000;width:260px;padding-top:6px;margin-bottom:10px; margin-bottom: 20px">
                             <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;"><strong>${sNombre}</strong></p>
                             <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">NOMBRE TRABAJADOR</p>
