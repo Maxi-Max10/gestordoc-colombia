@@ -64,7 +64,7 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        Siendo, el ${localDate}, se reunieron por una parte <strong>${sNombre}</strong>
+                        <mark style="background-color:#d9d9d9;padding:0;"> Siendo, el ${localDate}, se reunieron por una parte </mark><strong>${sNombre}</strong>
                         ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong>
                         como aparece al pie de su firma y quien en adelante se denominará
                         <strong>EL TRABAJADOR</strong>, y por la otra,
@@ -122,7 +122,7 @@ sap.ui.define([
                             <div style="display:table-cell;width:50%;vertical-align:top;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${sNombre}</strong><br>
-                                    C.C. No. ${sCedula}
+                                    <mark style="background-color:#d9d9d9;padding:0;"> C.C. GNo. </mark>${sCedula}
                                 </div>
                             </div>
                         </div>

@@ -51,7 +51,7 @@ sap.ui.define([
                 const htmlRaw = `
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
-                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;">
+                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0; margin-bottom: 20px;">
                         OTRO SI AL CONTRATO DE TRABAJO
                     </p>
 

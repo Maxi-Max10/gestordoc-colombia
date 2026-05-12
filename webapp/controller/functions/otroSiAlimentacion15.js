@@ -39,8 +39,8 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await _generateWord({
-                        firstName:          user.firstName,
-                        lastName:           user.lastName,
+                        firstName: user.firstName,
+                        lastName:  user.lastName,
                         sNombre,
                         sCedula,
                     });
@@ -51,15 +51,12 @@ sap.ui.define([
                 const htmlRaw = `
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
-                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;">
+                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;margin-bottom: 20px;">
                         OTRO SI AL CONTRATO DE TRABAJO
-                    </p>
-                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 28px 0;">
-                        AUXÍLIO NO SALARIAL DE TRANSPORTE EXTRALEGAL
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        Siendo, el ${localDate}, se reunieron por una parte <strong>${sNombre}</strong>
+                        <mark style="background-color:#ea80fc;padding:0;"> En Medellin, al ${localDate}, se reunieron por una parte </mark><strong>${sNombre}</strong>
                         ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong>
                         como aparece al pie de su firma y quien en adelante se denominará
                         <strong>EL TRABAJADOR</strong>, y por la otra,
@@ -97,7 +94,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        En constancia se firma en la ciudad de Medellin a los doce (12) días del mes de diciembre de 2023.
+                        <mark style="background-color:#ea80fc;padding:0;">En constancia se firma en la ciudad de Medellin a los doce (12) días del mes de diciembre de 2023.</mark>
                     </p>
 
                     <div style="width:100%;display:table;">
@@ -112,7 +109,7 @@ sap.ui.define([
                             <div style="display:table-cell;width:50%;vertical-align:top;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${sNombre}</strong><br>
-                                    C.C. No. ${sCedula}
+                                    <mark style="background-color:#ea80fc;padding:0;"> C.C. </mark>${sCedula}
                                 </div>
                             </div>
                         </div>
@@ -120,45 +117,52 @@ sap.ui.define([
 
                 </div>`;
 
+                // Insertar en DOM y esperar layout completo antes de capturar
                 const div = document.createElement("div");
-                div.style.width           = "714px";
-                div.style.padding         = "40px";
-                div.style.backgroundColor = "#ffffff";
-                div.style.boxSizing       = "border-box";
                 div.style.position        = "absolute";
                 div.style.top             = "-9999px";
                 div.style.left            = "-9999px";
+                div.style.width           = "794px";
+                div.style.padding         = "60px 56px";
+                div.style.backgroundColor = "#ffffff";
+                div.style.boxSizing       = "border-box";
                 div.innerHTML             = htmlRaw;
                 document.body.appendChild(div);
+
+                // Dos frames para que el navegador calcule el layout completo
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+                const totalHeight = div.scrollHeight;
 
                 const canvas = await html2canvasRef(div, {
                     scale:           2,
                     useCORS:         true,
-                    backgroundColor: "#ffffff"
+                    backgroundColor: "#ffffff",
+                    width:           794,
+                    height:          totalHeight,
+                    windowWidth:     794,
+                    scrollY:         0
                 });
                 const imgData = canvas.toDataURL("image/png");
                 document.body.removeChild(div);
 
-                const pdfDoc  = await PDFLibRef.PDFDocument.create();
-                const img     = await pdfDoc.embedPng(imgData);
+                const pdfDoc = await PDFLibRef.PDFDocument.create();
+                const img    = await pdfDoc.embedPng(imgData);
 
-                const PAGE_W  = 595;
-                const PAGE_H  = 842;
-                const MARGIN  = 40;
-                const drawW   = PAGE_W - MARGIN * 2;
-                const drawH   = (img.height * drawW) / img.width;
-                const sliceH  = PAGE_H - MARGIN * 2;
-                const totalPgs = Math.ceil(drawH / sliceH);
+                // Página cuya altura se ajusta exactamente al contenido — sin cortes
+                const PAGE_W = 595;
+                const MARGIN = 36;
+                const drawW  = PAGE_W - MARGIN * 2;
+                const drawH  = (img.height * drawW) / img.width;
+                const PAGE_H = drawH + MARGIN * 2;
 
-                for (let p = 0; p < totalPgs; p++) {
-                    const pg = pdfDoc.addPage([PAGE_W, PAGE_H]);
-                    pg.drawImage(img, {
-                        x:      MARGIN,
-                        y:      PAGE_H - MARGIN - drawH + p * sliceH,
-                        width:  drawW,
-                        height: drawH
-                    });
-                }
+                const pg = pdfDoc.addPage([PAGE_W, PAGE_H]);
+                pg.drawImage(img, {
+                    x:      MARGIN,
+                    y:      MARGIN,
+                    width:  drawW,
+                    height: drawH
+                });
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_OtroSi_Alimentacion_15.000.pdf`;
@@ -179,23 +183,23 @@ sap.ui.define([
             }
 
         } catch (error) {
-            console.error("Error generando Otro Sí - Aliementacion 15.000:", error);
+            console.error("Error generando Otro Sí - Alimentacion 15.000:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
     }
 
-    // ─── Word con JSZip + plantilla OtroSi_Alimentacion_15.000.docx ──────────────────
+    // ─── Word con JSZip + plantilla OtroSi_Alimentacion_15.000.docx ──────────
     async function _generateWord(data) {
         const JSZip         = await _ensureJSZip();
         const templateBytes = await fetch("pdf/Otro_Si_Alimentacion_15.docx").then(res => {
-        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Alimentacion_15.docx (${res.status})`);
+            if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Alimentacion_15.docx (${res.status})`);
             return res.arrayBuffer();
         });
         const zip = await JSZip.loadAsync(templateBytes);
 
         const variables = {
-            "[[Nombre]]":           data.sNombre,
-            "[[Cedula]]":           data.sCedula,
+            "[[Nombre]]": data.sNombre,
+            "[[Cedula]]": data.sCedula,
         };
 
         const targets = [
@@ -247,10 +251,10 @@ sap.ui.define([
     function _ensureJSZip() {
         if (window.JSZip) return Promise.resolve(window.JSZip);
         return new Promise((resolve, reject) => {
-            const script    = document.createElement("script");
-            script.src      = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload   = () => resolve(window.JSZip);
-            script.onerror  = () => reject(new Error("No se pudo cargar JSZip."));
+            const script   = document.createElement("script");
+            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+            script.onload  = () => resolve(window.JSZip);
+            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
             document.head.appendChild(script);
         });
     }

@@ -15,10 +15,11 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/otroSiAlimentacion11",
   "gestordoccolombia/controller/functions/otroSiAlimentacion10",
   "gestordoccolombia/controller/functions/beneficiosExtralegales",
-  "gestordoccolombia/controller/functions/solicitudDeduccionesRetencion"
+  "gestordoccolombia/controller/functions/solicitudDeduccionesRetencion",
+  "gestordoccolombia/controller/functions/compromisoEtica"
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -772,6 +773,7 @@ sap.ui.define([
           var oButtonOtroSiAlimentacion10 = that.byId("customListItemOtroSiAlimentacion10");
           var oButtonBeneficiosExtralegales = that.byId("customListItemBeneficiosExtralegales");
           var oButtonSolicitudDeduccionesRetencion = that.byId("customListItemSolicitudDeduccionesRetencion");
+          var oButtonCompromisoEtica = that.byId("customListItemCompromisoEtica");
 
           //Configuracion de visibilidad segun los permisos
           if (permisos === "admin") {
@@ -782,6 +784,7 @@ sap.ui.define([
               oButtonOtroSiAlimentacion10?.setVisible(true);
               oButtonBeneficiosExtralegales?.setVisible(true);
               oButtonSolicitudDeduccionesRetencion?.setVisible(true);
+              oButtonCompromisoEtica?.setVisible(true);
           } else if (permisos === "usuario") {
               oButtonKitRetiro?.setVisible(false);
               oButtonOtroSiRodamiento?.setVisible(false);
@@ -790,6 +793,7 @@ sap.ui.define([
               oButtonOtroSiAlimentacion10?.setVisible(false);
               oButtonBeneficiosExtralegales?.setVisible(false);
               oButtonSolicitudDeduccionesRetencion?.setVisible(false);
+              oButtonCompromisoEtica?.setVisible(false);
           }
 
           that._hideInitialPreloader();
@@ -1019,6 +1023,7 @@ sap.ui.define([
         case "Otro Sí - Alimentación 10":
         case "Beneficios Extralegales":
         case "Solicitud Deducciones Retencion":
+        case "Compromiso con la Ética":
         default:
           // Solo Administrativos
           aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
@@ -1296,6 +1301,9 @@ sap.ui.define([
             case "Solicitud Deducciones Retencion":
                 this.onDownloadPDFRetencionFuente(sButtonId);
                 break;
+            case "Compromiso con la Ética":
+                this.onDownloadPDFCompromisoEtica(sButtonId);
+                break;
             default:
                 sap.m.MessageToast.show("No hay función definida para este documento.");
                 break;
@@ -1337,7 +1345,8 @@ sap.ui.define([
         { id: "customListItemOtroSiAlimentacion11", title: "Otro Sí - Alimentación 11", desc: "Auxilio de alimentación 11" },
         { id: "customListItemOtroSiAlimentacion10", title: "Otro Sí - Alimentación 10", desc: "Auxilio de alimentación 10" },
         { id: "customListItemBeneficiosExtralegales", title: "Beneficios Extralegales", desc: "Gestionar beneficios extralegales" },
-        { id: "customListItemSolicitudDeduccionesRetencion", title: "Solicitud Deducciones Retencion", desc: "Gestionar solicitud de deducciones y retenciones" }
+        { id: "customListItemSolicitudDeduccionesRetencion", title: "Solicitud Deducciones Retencion", desc: "Gestionar solicitud de deducciones y retenciones" },
+        { id: "customListItemCompromisoEtica", title: "Compromiso con la Ética", desc: "Declaración de principios éticos" }
       ];
     },
 
@@ -1498,6 +1507,18 @@ sap.ui.define([
             });
     },
 
+    onCompromisoEticaPress: function () {
+        const sTitle = "Compromiso con la Ética";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "compromisoEtica";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Compromiso con la Ética:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
     _openManualDateDialog: function () { //---------------------------NO SE SI DEJAR ESTA FUNCION
       const oView = this.getView();
 
@@ -1629,6 +1650,11 @@ sap.ui.define([
     //Archivo: SOLICITUD DEDUCCIONES RETENCION
     onDownloadPDFRetencionFuente: async function (sButtonId) {
         solicitudDeduccionesRetencion.onDownloadPDFRetencionFuente(this, sButtonId);
+    },
+
+    //Archivo Compromiso Etica
+    onDownloadPDFCompromisoEtica: async function (sButtonId) {
+        compromisoEtica.onDownloadPDFCompromisoEtica(this, sButtonId);
     },
 
 

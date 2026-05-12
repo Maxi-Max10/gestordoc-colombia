@@ -51,13 +51,13 @@ sap.ui.define([
                 const htmlRaw = `
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
-                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;">
+                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0; margin-bottom: 20px;">
                         OTRO SI AL CONTRATO DE TRABAJO
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        En Sibate, a los 06 días del mes de enero de 2026 se reunieron por una parte <strong>${sNombre}</strong>
-                        ${sIdentificado} <strong>${sCedula}</strong> como aparece al pie de su firma y quien actúa en su propio nombre y por la otra,
+                        <mark style="background-color:#fff380;padding:0;"> En Sibate, a los 06 días del mes de enero de 2026 se reunieron por una parte <strong>${sNombre}</strong>
+                        ${sIdentificado} con C.C. </mark><strong>${sCedula}</strong> como aparece al pie de su firma y quien actúa en su propio nombre y por la otra,
                         <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de  <strong>DIACO S.A.</strong>, 
                         con el fin de suscribir un acuerdo provisto de las siguientes cláusulas:
                     </p>
@@ -89,7 +89,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        En constancia se firma en la ciudad de Sabaneta a los seis (06) días del mes de enero de dos mil veintiséis (2026).
+                        <mark style="background-color:#fff380;padding:0;"> En constancia se firma en la ciudad de Sabaneta a los seis (06) días del mes de enero de dos mil veintiséis (2026).</mark>
                     </p>
 
                     <div style="width:100%;display:table;">
@@ -104,7 +104,7 @@ sap.ui.define([
                             <div style="display:table-cell;width:50%;vertical-align:top;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${sNombre}</strong><br>
-                                    C.C. No. ${sCedula}
+                                    <mark style="background-color:#fff380;padding:0;"> C.C. No. </mark> ${sCedula}
                                 </div>
                             </div>
                         </div>

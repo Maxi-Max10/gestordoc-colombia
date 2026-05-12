@@ -50,9 +50,9 @@ sap.ui.define([
 
                 // ── PDF ───────────────────────────────────────────────────────
                 const htmlRaw = `
-                    <div style="font-family:Arial,sans-serif;font-size:10pt;line-height:1.55;color:#000;width:100%;box-sizing:border-box; padding-bottom:80px; overflow: visible;">
+                    <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
-                        <p style="text-align:center;font-weight:bold;font-size:11pt;margin:0 0 4px 0; margin-bottom: 20px;">
+                        <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;">
                             CONOCIMIENTO Y DECLARACIÓN PLAN DE BENEFICIOS EXTRALEGALES
                         </p>
 
@@ -125,7 +125,7 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:60px;">
+                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">7.</td>
                                 <td style="text-align:justify;">
@@ -137,40 +137,50 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <div style="border-top:1px solid #000;width:260px;padding-top:6px;margin-bottom:10px; margin-bottom: 20px">
+                        <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 8px 0;">
+                            En constancia se firma en la ciudad de ${sCiudadFirma}, a los ${localDate}.
+                        </p>
+
+                        <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 60px 0;">Cordialmente,</p>
+
+                        <div style="border-top:1.5px solid #000;width:260px;padding-top:6px;margin-bottom:40px;">
                             <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;"><strong>${sNombre}</strong></p>
                             <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">NOMBRE TRABAJADOR</p>
                             <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;"><strong>C.C. ${sCedula}</strong> de ____________</p>
                         </div>
 
-                        <div style="width:100%; margin-top:20px; padding-bottom:30px;text-align:right;font-size:9pt; font-family:Arial,sans-serif; color:#555; box-sizing:border-box;">
+                        <p style="font-size:9pt;font-family:Arial,sans-serif;margin:0;text-align:right;color:#555;">
                             Pág. 1 de 1
-                        </div>
+                        </p>
 
                     </div>
                 `;
 
+                // Crear el div fuera de pantalla y dejar que el navegador
+                // calcule su altura real ANTES de hacer la captura
                 const div = document.createElement("div");
-                div.style.width           = "714px";
-                div.style.padding         = "40px";
-                div.style.backgroundColor = "#ffffff";
-                div.style.boxSizing       = "border-box";
                 div.style.position        = "absolute";
                 div.style.top             = "-9999px";
                 div.style.left            = "-9999px";
+                div.style.width           = "794px";
+                div.style.padding         = "60px 56px";
+                div.style.backgroundColor = "#ffffff";
+                div.style.boxSizing       = "border-box";
+                div.innerHTML             = htmlRaw;
                 document.body.appendChild(div);
-                div.innerHTML = htmlRaw;
 
-                // Esperar un tick para que el navegador calcule el layout completo
-                await new Promise(r => setTimeout(r, 50));
+                // Esperar dos frames para que el layout esté completamente calculado
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+                const totalHeight = div.scrollHeight;
 
                 const canvas = await html2canvasRef(div, {
                     scale:           2,
                     useCORS:         true,
                     backgroundColor: "#ffffff",
+                    width:           794,
+                    height:          totalHeight,
                     windowWidth:     794,
-                    height: div.scrollHeight,
-                    windowHeight: div.scrollHeight,
                     scrollY:         0
                 });
                 const imgData = canvas.toDataURL("image/png");
@@ -179,35 +189,22 @@ sap.ui.define([
                 const pdfDoc = await PDFLibRef.PDFDocument.create();
                 const img    = await pdfDoc.embedPng(imgData);
 
-                const PAGE_W = 595;
-                const PAGE_H = 842;
-                const MARGIN = 45;
+                // Página A4 en puntos
+                const PAGE_W  = 595;
+                const MARGIN  = 36;
+                const drawW   = PAGE_W - MARGIN * 2;
+                // Altura proporcional real de la imagen escalada al ancho de página
+                const drawH   = (img.height * drawW) / img.width;
+                const PAGE_H  = drawH + MARGIN * 2;
 
-                const drawW = PAGE_W - (MARGIN * 2);
-                const drawH = (img.height * drawW) / img.width;
-
-                const page = pdfDoc.addPage([PAGE_W, PAGE_H]);
-
-                page.drawImage(img, {
-                    x: MARGIN,
-                    y: PAGE_H - drawH - MARGIN,
-                    width: drawW,
+                // Una sola página que contiene todo el documento sin cortar nada
+                const pg = pdfDoc.addPage([PAGE_W, PAGE_H]);
+                pg.drawImage(img, {
+                    x:      MARGIN,
+                    y:      MARGIN,
+                    width:  drawW,
                     height: drawH
                 });
-
-                // Rectángulo negro sin relleno que enmarca el área de contenido
-                const { rgb } = PDFLibRef;
-                page.drawRectangle({
-                    x:            MARGIN,
-                    y:            MARGIN,
-                    width:        PAGE_W - MARGIN * 2,
-                    height:       PAGE_H - MARGIN * 2,
-                    borderColor:  rgb(0, 0, 0),
-                    borderWidth:  1,
-                    color:        undefined,     // sin relleno
-                    opacity:      0
-                });
- 
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Beneficios_Extralegales.pdf`;
@@ -325,6 +322,10 @@ sap.ui.define([
         return words[day] || String(day);
     }
 
+    function _formatSalary(value) {
+        if (!value) return "$ 0";
+        return "$ " + Number(value).toLocaleString("es-CO");
+    }
 
     function _salaryToWords(value) {
         const n = Math.round(Number(value) || 0);
