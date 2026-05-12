@@ -215,10 +215,10 @@
 
                         <!-- 6. AUTORIZACIÓN DE DESCUENTO  ── color: purple -->
                         <CustomListItem
-                            id="itemDescuento"
+                            id="customListItemAutorizacionDescuento"
                             class="customListItem card-horizontal card-purple"
                             type="Active"
-                            press="onDescuentoPress"
+                            press="onAutorizacionDescuentoPress"
                             visible="true"
                         >
                             <HBox width="100%" height="100%" class="card-hbox">
