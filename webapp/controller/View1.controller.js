@@ -9,20 +9,17 @@ sap.ui.define([
   "gestordoccolombia/controller/helpers/uiHelpers",
   "gestordoccolombia/controller/helpers/formatHelpers",
   //funciones de contratos
-  "gestordoccolombia/controller/functions/confidencial",
-  "gestordoccolombia/controller/functions/contrato",
-  "gestordoccolombia/controller/functions/excolaborador",
-  "gestordoccolombia/controller/functions/carta_mensual",
-  "gestordoccolombia/controller/functions/cartaMensualUsuario",
-  "gestordoccolombia/controller/functions/desahucio",
-  "gestordoccolombia/controller/functions/notSalida_ministerio",
-  "gestordoccolombia/controller/functions/carta_anual",
-  "gestordoccolombia/controller/functions/notAmonestacion",
-  "gestordoccolombia/controller/functions/notAusInjus",
-  "gestordoccolombia/controller/functions/kitRetiro"
+  "gestordoccolombia/controller/functions/kitRetiro",
+  "gestordoccolombia/controller/functions/otroSiRodamiento",
+  "gestordoccolombia/controller/functions/otroSiAlimentacion15",
+  "gestordoccolombia/controller/functions/otroSiAlimentacion11",
+  "gestordoccolombia/controller/functions/otroSiAlimentacion10",
+  "gestordoccolombia/controller/functions/beneficiosExtralegales",
+  "gestordoccolombia/controller/functions/solicitudDeduccionesRetencion",
+  "gestordoccolombia/controller/functions/compromisoEtica"
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, confidencial, contrato, excolaborador, carta_mensual, cartaMensualUsuario, desahucio, notSalida_ministerio, carta_anual, notAmonestacion, notAusInjus, kitRetiro) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -128,7 +125,7 @@ sap.ui.define([
     ],
 
     // ========================================
-    // SISTEMA DE BUSY DIALOG (Indicador de carga)
+    // SISTEMA DE BUSY DIALOG (Indicador de carga)---------------------------DEJAR
     // ========================================
     // Incrementa el contador y muestra el busy dialog. Usa un sistema de contador para manejar múltiples operaciones simultáneas
 
@@ -163,7 +160,7 @@ sap.ui.define([
 
 
     // ========================================
-    // CARGA DE LIBRERÍAS EXTERNAS
+    // CARGA DE LIBRERÍAS EXTERNAS---------------------------DEJAR
     // ========================================
     _ensurePdfToolkit: function () {
       if (!this._pdfToolkitPromise) {// Si ya está en proceso de carga, retorna la promesa existente
@@ -226,7 +223,7 @@ sap.ui.define([
 
 
     // ========================================
-    // CARGA DE DATOS MAESTROS (MDF)
+    // CARGA DE DATOS MAESTROS (MDF)---------------------------DEJAR
     // ========================================
 
     // Carga los datos del mantenedor (factores salariales, fechas, etc.)
@@ -266,7 +263,7 @@ sap.ui.define([
     },
 
     // ========================================
-    // CARGA INTELIGENTE DE DATOS
+    // CARGA INTELIGENTE DE DATOS ---------------------------DEJAR
     // ========================================
 
      //Determina qué datos cargar según el tipo de documento
@@ -274,12 +271,6 @@ sap.ui.define([
     _ensureDataForTitle: function (sTitle) {
       let needsActive = true;
       let needsInactive = false;
-
-      // Documentos que requieren empleados INACTIVOS
-      if (sTitle === "Certificado Laboral Excolaborador" || sTitle === "Notificación Salida Ministerio") {
-        needsActive = false;
-        needsInactive = true;
-      }
 
       const aPromises = [];
 
@@ -817,57 +808,34 @@ sap.ui.define([
           var oGrid = that.byId("gridItems");
 
           // Referencias a los botones
-          var oButtonSalida = that.byId("customListItemSalida");
-          var oButtonCartasM = that.byId("customListItemCartasM");
-          var oButtonCartasA = that.byId("customListItemCartasA");
-          var oButtonAmonestacion = that.byId("customListItemAmonestacion");
-          var oButtonAusenInjus = that.byId("customListItemAuseInjus");
-          var oButtonDeshausio = that.byId("customListItemDeshausio");
-          var oButtonCertEx = that.byId("customCertificadoEx");
-          var oButtonContrato = that.byId("customListItemContrato");
-          var oButtonConfiden = that.byId("customListItemConfidencialidad");
-          var oButtonCartMensualUSuario = that.byId("customListItemcartaMensualUsuario");
-          var oButtonCartAnualUSuario = that.byId("customListItemCartaAnualUsuario");
           var oButtonKitRetiro = that.byId("customListItemKitRetiro");
-
-          // Botones solo para usuarios normales (los que queremos quitar si es admin)
-          const aUserOnly = [
-            oButtonCartMensualUSuario,
-            oButtonCartAnualUSuario
-          ];
+          var oButtonOtroSiRodamiento = that.byId("customListItemOtroSiRodamiento");
+          var oButtonOtroSiAlimentacion15 = that.byId("customListItemOtroSiAlimentacion15");
+          var oButtonOtroSiAlimentacion11 = that.byId("customListItemOtroSiAlimentacion11");
+          var oButtonOtroSiAlimentacion10 = that.byId("customListItemOtroSiAlimentacion10");
+          var oButtonBeneficiosExtralegales = that.byId("customListItemBeneficiosExtralegales");
+          var oButtonSolicitudDeduccionesRetencion = that.byId("customListItemSolicitudDeduccionesRetencion");
+          var oButtonCompromisoEtica = that.byId("customListItemCompromisoEtica");
 
           //Configuracion de visibilidad segun los permisos
           if (permisos === "admin") {
-            // Admin: Remueve botones de usuario y muestra solo los de admin
-            aUserOnly.forEach(oItem => {
-              if (oItem) oGrid.removeContent(oItem);
-            });
-
-            // Mostrar solo los de admin
-            oButtonSalida?.setVisible(true);
-            oButtonCartasM?.setVisible(true);
-            oButtonCartasA?.setVisible(true);
-            oButtonAmonestacion?.setVisible(true);
-            oButtonAusenInjus?.setVisible(true);
-            oButtonDeshausio?.setVisible(true);
-            oButtonCertEx?.setVisible(true);
-            oButtonContrato?.setVisible(true);
-            oButtonConfiden?.setVisible(true);
-            // Usuario: Solo muestra sus botones
+              oButtonKitRetiro?.setVisible(true);
+              oButtonOtroSiRodamiento?.setVisible(true);
+              oButtonOtroSiAlimentacion15?.setVisible(true);
+              oButtonOtroSiAlimentacion11?.setVisible(true);
+              oButtonOtroSiAlimentacion10?.setVisible(true);
+              oButtonBeneficiosExtralegales?.setVisible(true);
+              oButtonSolicitudDeduccionesRetencion?.setVisible(true);
+              oButtonCompromisoEtica?.setVisible(true);
           } else if (permisos === "usuario") {
-            oButtonCartMensualUSuario?.setVisible(true);
-            oButtonCartAnualUSuario?.setVisible(true);
-
-            // Ocultar los de admin
-            oButtonSalida?.setVisible(false);
-            oButtonCartasM?.setVisible(false);
-            oButtonCartasA?.setVisible(false);
-            oButtonAmonestacion?.setVisible(false);
-            oButtonAusenInjus?.setVisible(false);
-            oButtonDeshausio?.setVisible(false);
-            oButtonCertEx?.setVisible(false);
-            oButtonContrato?.setVisible(false);
-            oButtonConfiden?.setVisible(false);
+              oButtonKitRetiro?.setVisible(false);
+              oButtonOtroSiRodamiento?.setVisible(false);
+              oButtonOtroSiAlimentacion15?.setVisible(false);
+              oButtonOtroSiAlimentacion11?.setVisible(false);
+              oButtonOtroSiAlimentacion10?.setVisible(false);
+              oButtonBeneficiosExtralegales?.setVisible(false);
+              oButtonSolicitudDeduccionesRetencion?.setVisible(false);
+              oButtonCompromisoEtica?.setVisible(false);
           }
 
           that._hideInitialPreloader();
@@ -883,7 +851,7 @@ sap.ui.define([
 
 
     // ========================================
-    //  CARGA DE EMPLEADOS INACTIVOS
+    //  CARGA DE EMPLEADOS INACTIVOS 
     // ========================================
     
     /**
@@ -1045,7 +1013,7 @@ sap.ui.define([
 
     
     // ========================================
-    //  APERTURA DEL DIÁLOGO DE EMPLEADOS
+    //  APERTURA DEL DIÁLOGO DE EMPLEADOS -------------------------------CAMBIOS A PARTIR DE ACÁ
     // ========================================
     
     /**
@@ -1090,22 +1058,14 @@ sap.ui.define([
       // 2. Aplica el filtro especial según el documento, si corresponde
       let aFilteredUsers;
       switch (sTitle) {
-        case "Contrato De Trabajo":
-          // Solo Administrativos y Operativos
-          aFilteredUsers = aUsers.filter(user =>
-            user.custom02 === "Administrativo" || user.custom02 === "Operativo"
-          );
-          break;
-        case "Confidencialidad":
-        case "Carta Desahucio":
-        case "Cartas De Trabajo Mensual":
-        case "Cartas De Trabajo Anual":
-        case "Certificado Laboral Excolaborador":
-        case "Notificación Salida Ministerio":
-        case "Notificación De Amonestación":
-        case "Notificación De Ausencia Injustificada":
-          aFilteredUsers = aUsers; // MOSTRAR TODOS
-          break;
+        case "Kit De Retiro":
+        case "Otro Sí - Rodamiento":
+        case "Otro Sí - Alimentación 15":
+        case "Otro Sí - Alimentación 11":
+        case "Otro Sí - Alimentación 10":
+        case "Beneficios Extralegales":
+        case "Solicitud Deducciones Retencion":
+        case "Compromiso con la Ética":
         default:
           // Solo Administrativos
           aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
@@ -1133,42 +1093,6 @@ sap.ui.define([
 
       // 5. Aplica filtros combinados para asegurarte de que arranque limpio
       this._applyCombinedFilters();
-
-      // 6. Ejecuta la función asociada al documento
-      switch (sTitle) {
-        case "Confidencialidad":
-          this.onDownloadPDFConfidencialidad();
-          break;
-        case "Contrato De Trabajo":
-          this.onDownloadPDFContratoTrabajo();
-          break;
-        case "Certificado Laboral Excolaborador":
-          this.onDownloadPDFExcolaborador();
-          break;
-        case "Notificación Salida Ministerio":
-          this.onDownloadPDFSalidaMinisterio();
-          break;
-        case "Cartas De Trabajo Mensual":
-          this.onDownloadPDFCartaMensual();
-          break;
-        case "Carta Desahucio":
-          this.onDownloadPDFDesahucio(aFilteredUsers);
-          break;
-        case "Cartas De Trabajo Anual":
-          this.onDownloadPDFCartaAnual();
-          break;
-        case "Notificación De Amonestación":
-          this.onDownloadPDFNotAmonestacion();
-          break;
-        case "Notificación De Ausencia Injustificada":
-          this.onDownloadPDFNotAusInjus();
-          break;
-        case "Kit Retiro":
-          this.onDownloadPDFKitRetiro();
-          break;
-        default:
-          MessageToast.show("No hay función asociada para este documento.");
-      }
     },
 
 
@@ -1253,7 +1177,7 @@ sap.ui.define([
      * - Aplica filtro de texto si existe
      * - Actualiza el modelo "view" con los resultados
      */
-    _applyCombinedFilters: function () {
+    _applyCombinedFilters: function () { //------------------------NO SE SI DEJAR ESTA FUNCION
       const oView = this.getView();
 
       // Definí si es excolaborador
@@ -1392,52 +1316,40 @@ sap.ui.define([
     },
 
     onDownloadPDF: function (oEvent) {
-      var sTitle = this.sSelectedContract; // Asumimos que el título ya está guardado
-      const oButton = oEvent.getSource();
-      const sButtonId = oButton.getId();
-      const sButtonText = oButton.getText();
-      // Verificar qué documento se debe generar
-      switch (sTitle) {
-        case "Confidencialidad":
-          this.onDownloadPDFConfidencialidad(sButtonId);
-          break;
-        case "Contrato De Trabajo":
-          this.onDownloadPDFContratoTrabajo(sButtonId);
-          break;
-        case "Certificado Laboral Excolaborador":
-          this.onDownloadPDFExcolaborador(sButtonId);
-          break;
-        case "Notificación Salida Ministerio":
-          this.onDownloadPDFSalidaMinisterio(sButtonId);
-          break;
-        case "Cartas De Trabajo Mensual":
-          this.onDownloadPDFCartaMensual(sButtonId);
-          break;
-        case "Carta Desahucio":
-          this.onDownloadPDFDesahucio(sButtonId);
-          break;
-        case "Cartas De Trabajo Anual":
-          this.onDownloadPDFCartaAnual(sButtonId)
-          break;
-        case "Notificación De Amonestación":
-          this.onDownloadPDFNotAmonestacion(sButtonId)
-          break;
-        case "Notificación De Ausencia Injustificada":
-          this.onDownloadPDFNotAusInjus(sButtonId)
-          break;
-        case "anual usuario":
-          this.onDownloadCartaAnualUsuario(oEvent)
-          break;
-        case "mensual usuario":
-          this.onDownloadCartaMensualUsuario(oEvent)
-          break;
-        case "Kit De Retiro":
-          this.onDownloadPDFKitRetiro(sButtonId);
-          break;
-        default:
-          sap.m.MessageToast.show("No hay función definida para este documento.");
-          break;
-      }
+        const sTitle    = this.sSelectedContract;
+        const oButton   = oEvent.getSource();
+        const sButtonId = oButton.getId();
+        console.log("=== onDownloadPDF ===", sTitle, sButtonId);
+ 
+        switch (sTitle) {
+            case "Kit De Retiro":
+                this.onDownloadPDFKitRetiro(sButtonId);
+                break;
+            case "Otro Sí - Rodamiento":
+                this.onDownloadPDFOtroSiRodamiento(sButtonId);
+                break;
+            case "Otro Sí - Alimentación 15":
+                this.onDownloadPDFOtroSiAlimentacion15(sButtonId);
+                break;
+            case "Otro Sí - Alimentación 11":
+                this.onDownloadPDFOtroSiAlimentacion11(sButtonId);
+                break;
+            case "Otro Sí - Alimentación 10":
+                this.onDownloadPDFOtroSiAlimentacion10(sButtonId);
+                break;
+            case "Beneficios Extralegales":
+                this.onDownloadPDFBeneficiosExtralegales(sButtonId);
+                break;
+            case "Solicitud Deducciones Retencion":
+                this.onDownloadPDFRetencionFuente(sButtonId);
+                break;
+            case "Compromiso con la Ética":
+                this.onDownloadPDFCompromisoEtica(sButtonId);
+                break;
+            default:
+                sap.m.MessageToast.show("No hay función definida para este documento.");
+                break;
+        }
     },
 
     //Carpeta: Helpers -----------------------------------------------------------------------
@@ -1458,72 +1370,25 @@ sap.ui.define([
       uiHelpers.updateGreeting(this.getView(), sDisplayName);
     },
 
-    attachBoxEvents: function () {
-      uiHelpers.attachBoxEvents(this); 
-    },
-
     //----------------------------------------------------------------------------------------------
 
     attachBoxEvents: function () {
       if (this._tilesEventsAttached) {
-        return;
+          return;
       }
       this._tilesEventsAttached = true;
-
-      const view = this.getView();
-      const boxMap = [
-        { id: "customListItemCartasM", title: "Cartas De Trabajo Mensual" },
-        { id: "customListItemCartasA", title: "Cartas De Trabajo Anual" },
-        { id: "customListItemCertificado", title: "Certificado Laboral" },
-        { id: "customListItemConfidencialidad", title: "Confidencialidad" },
-        { id: "customListItemContrato", title: "Contrato De Trabajo" },
-        { id: "customListItemSalida", title: "Notificación Salida Ministerio" },
-        { id: "customListItemAmonestacion", title: "Notificación De Amonestación" },
-        { id: "customListItemPasantes", title: "Contrato Pasantes" },
-        { id: "customListItemTemporeros", title: "Contrato Temporeros" },
-        { id: "customCertificadoEx", title: "Certificado Laboral Excolaborador" },
-        { id: "customListItemKitRetiro", title: "Kit de Retiro" }
-      ];
-
-      boxMap.forEach(box => {
-        const oItem = view.byId(box.id);
-        if (!oItem) {
-          console.warn("No se encontró el CustomListItem con ID:", box.id);
-          return;
-        }
-
-        oItem.addStyleClass("boxHover");
-        oItem.attachBrowserEvent("click", () => {
-          this.sSelectedContract = box.title;
-          this._handleTileSelection(box.title).catch(oError => {
-            console.error("Error al preparar la selección:", oError);
-            sap.m.MessageToast.show("Error cargando los datos.");
-          });
-        });
-      });
-
-      ["customListItemDeshausio", "customListItemAuseInjus"].forEach(sId => {
-        const oItem = view.byId(sId);
-        if (oItem) {
-          oItem.addStyleClass("boxHover");
-        }
-      });
+      // eventos de cards migrados a press handlers en la vista XML
     },
-
     _getDocumentSearchCards: function () {
       return [
-        { id: "customListItemcartaMensualUsuario", title: "Cartas - Trabajo Mensual", desc: "Gestionar cartas de trabajo mensual" },
-        { id: "customListItemCartaAnualUsuario", title: "Cartas - Trabajo Anual", desc: "Gestionar cartas de trabajo anual" },
-        { id: "customListItemConfidencialidad", title: "Confidencialidad", desc: "Gestionar documentos confidenciales" },
-        { id: "customListItemContrato", title: "Contrato De Trabajo", desc: "Gestionar contratos de trabajo" },
-        { id: "customCertificadoEx", title: "Certificado Laboral Excolaborador", desc: "Gestionar certificados laborales" },
-        { id: "customListItemSalida", title: "Notificación Salida Ministerio", desc: "Gestionar notificaciones de salida" },
-        { id: "customListItemCartasM", title: "Cartas de Trabajo Mensual", desc: "Gestionar cartas de trabajo mensual" },
-        { id: "customListItemDeshausio", title: "Carta Desahucio", desc: "Gestionar cartas de desahucio" },
-        { id: "customListItemCartasA", title: "Cartas De Trabajo Anual", desc: "Gestionar cartas de trabajo anual" },
-        { id: "customListItemAmonestacion", title: "Notificación De Amonestación", desc: "Gestionar notificaciones de amonestación" },
-        { id: "customListItemAuseInjus", title: "Notificación De Ausencia Injustificada", desc: "Gestionar notificaciones de ausencia" },
-        { id: "customListItemKitRetiro", title: "Kit de Retiro", desc: "Gestionar kit de retiro" }
+        { id: "customListItemKitRetiro", title: "Kit De Retiro", desc: "Gestionar kit De retiro" },
+        { id: "customListItemOtroSiRodamiento", title: "Otro Sí - Rodamiento", desc: "Auxilio de rodamiento" },
+        { id: "customListItemOtroSiAlimentacion15", title: "Otro Sí - Alimentación 15", desc: "Auxilio de alimentación 15" },
+        { id: "customListItemOtroSiAlimentacion11", title: "Otro Sí - Alimentación 11", desc: "Auxilio de alimentación 11" },
+        { id: "customListItemOtroSiAlimentacion10", title: "Otro Sí - Alimentación 10", desc: "Auxilio de alimentación 10" },
+        { id: "customListItemBeneficiosExtralegales", title: "Beneficios Extralegales", desc: "Gestionar beneficios extralegales" },
+        { id: "customListItemSolicitudDeduccionesRetencion", title: "Solicitud Deducciones Retencion", desc: "Gestionar solicitud de deducciones y retenciones" },
+        { id: "customListItemCompromisoEtica", title: "Compromiso con la Ética", desc: "Declaración de principios éticos" }
       ];
     },
 
@@ -1600,111 +1465,6 @@ sap.ui.define([
 
     //Carpeta: Functions - Lógica específica de cada tipo de contrato/documento -----------------------------------------------------------------------------
 
-    //Archivo: Confidencial
-    onDownloadPDFConfidencialidad: async function (sButtonId) {
-      confidencial.onDownloadPDFConfidencialidad(this, sButtonId);
-    },
-
-    //Archivo: Contrato
-    onDownloadPDFContratoTrabajo: async function (sButtonId) {
-      contrato.onDownloadPDFContratoTrabajo(this, sButtonId);
-    },
-
-    //Archivo: ExColaborador 
-    onDownloadPDFExcolaborador: async function (sButtonId) {
-      excolaborador.onDownloadPDFExcolaborador(this, sButtonId);
-    },
-
-    //Archivo: Carta Mensual
-    onDownloadPDFCartaMensual: async function (sButtonId, data) {
-      carta_mensual.onDownloadPDFCartaMensual(this, sButtonId, data);
-    },
-
-    //Archivo: Carta Mensual (usuario)
-    onDownloadCartaMensualUsuario: function (oEvent) {
-      return cartaMensualUsuario.onDownloadCartaMensualUsuario(this, oEvent);
-    },
-
-    //Archivo: Carta Anual (usuario)
-    onDownloadCartaAnualUsuario: function (oEvent) {
-      const oBusyDialog = this.oGlobalBusyDialog;
-      if (oBusyDialog) {
-        oBusyDialog.open();
-      }
-
-      const sButtonId = typeof oEvent === "string"
-        ? oEvent
-        : oEvent?.getSource?.()?.getId?.();
-
-      const oUserModel = this.getOwnerComponent().getModel("user");
-      const userId = oUserModel?.getProperty("/firstname");
-      const oComponentModel = this.getOwnerComponent().getModel();
-
-      if (!userId || !oComponentModel) {
-        MessageToast.show("No se encontró información del usuario.");
-        if (oBusyDialog) {
-          oBusyDialog.close();
-        }
-        return;
-      }
-
-      oComponentModel.read("/User", {
-        urlParameters: {
-          "$select": "userId,status,manager/jobCode,firstName,empInfo/customDate1,lastName,jobCode,email,nationality,jobCode,title,custom02,businessPhone,state,custom10,hireDate,country,salutation,empInfo/personNav/nationalIdNav/nationalId,empInfo/compInfoNav,empInfo/personNav,empInfo/startDate,empInfo/endDate,empInfo/jobInfoNav/eventReason,division,department,gender",
-          "$filter": `userId eq '${userId}'`,
-          "$expand": "manager,empInfo,empInfo/compInfoNav,empInfo/jobInfoNav,empInfo/personNav,empInfo/personNav/nationalIdNav,empInfo/compInfoNav/empPayCompRecurringNav,empInfo/personNav/personalInfoNav"
-        },
-        success: (oData) => {
-          const aUsers = oData?.results || [];
-          if (!aUsers.length) {
-            MessageToast.show("No se encontró información del usuario.");
-            if (oBusyDialog) {
-              oBusyDialog.close();
-            }
-            return;
-          }
-
-          const enrichedUsers = aUsers.map(user => {
-            const compInfo = user.empInfo?.compInfoNav?.results?.[0];
-            const recurring = compInfo?.empPayCompRecurringNav?.results?.[0];
-            const rawSal = recurring?.paycompvalue;
-            const salarioBase = rawSal && !isNaN(Number(rawSal)) ? Number(rawSal) : 0;
-            user.paycompValue = salarioBase;
-            user.paycompvalue = salarioBase;
-            return user;
-          });
-
-          carta_anual.onDownloadPDFCartaAnual(this, sButtonId, enrichedUsers);
-
-          if (oBusyDialog) {
-            oBusyDialog.close();
-          }
-        },
-        error: (oError) => {
-          console.error("Error cargando /User:", oError);
-          MessageToast.show("Error cargando los datos del usuario.");
-          if (oBusyDialog) {
-            oBusyDialog.close();
-          }
-        }
-      });
-    },
-
-    onDesahucioPress: function () {
-      const sTitle = "Carta Desahucio";
-      this.sSelectedContract = sTitle;
-      this._currentCategory = "desahucio";
-
-      this._handleTileSelection(sTitle)
-        .then(() => {
-          this._openManualDateDialog();
-        })
-        .catch(oError => {
-          console.error("Error al preparar datos de desahucio:", oError);
-          sap.m.MessageToast.show("Error cargando los datos.");
-        });
-    },
-
     onKitRetiroPress: function () {
       const sTitle = "Kit De Retiro";
       this.sSelectedContract = sTitle;
@@ -1712,12 +1472,96 @@ sap.ui.define([
 
       this._handleTileSelection(sTitle)
           .catch(oError => {
-              console.error("Error al preparar datos de Kit de Retiro:", oError);
+              console.error("Error al preparar datos de Kit De Retiro:", oError);
               sap.m.MessageToast.show("Error cargando los datos.");
           });
     },
 
-    _openManualDateDialog: function () {
+    onOtroSiRodamientoPress: function () {
+        const sTitle = "Otro Sí - Rodamiento";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "otroSiRodamiento";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Otro Sí - Rodamiento:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onOtroSiAlimentacion15Press: function () {
+        const sTitle = "Otro Sí - Alimentación 15";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "otroSiAlimentacion15";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Otro Sí - Alimentación 15:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onOtroSiAlimentacion11Press: function () {
+        const sTitle = "Otro Sí - Alimentación 11";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "otroSiAlimentacion11";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Otro Sí - Alimentación 11:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onOtroSiAlimentacion10Press: function () {
+        const sTitle = "Otro Sí - Alimentación 10";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "otroSiAlimentacion10";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Otro Sí - Alimentación 10:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onBeneficiosExtralegalesPress: function () {
+        const sTitle = "Beneficios Extralegales";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "beneficiosExtralegales";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Beneficios Extralegales:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onDeduccionesPress: function () {
+        const sTitle = "Solicitud Deducciones Retencion";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "solicitudDeduccionesRetencion";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Solicitud Deducciones Retencion:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    onCompromisoEticaPress: function () {
+        const sTitle = "Compromiso con la Ética";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "compromisoEtica";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Compromiso con la Ética:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
+    _openManualDateDialog: function () { //---------------------------NO SE SI DEJAR ESTA FUNCION
       const oView = this.getView();
 
       if (!this._oManualDateDialog) {
@@ -1777,67 +1621,6 @@ sap.ui.define([
       oView.byId("employeeDialog").close();
     },
 
-    onAusenciaInjustificadaPress: function () {
-      const sTitle = "Notificación De Ausencia Injustificada";
-      this.sSelectedContract = sTitle;
-      this._currentCategory = "ausenciaInjustificada";
-
-      this._handleTileSelection(sTitle)
-        .then(() => {
-          this._openManualDateDialogAusencia();
-        })
-        .catch(oError => {
-          console.error("Error al preparar datos de ausencia injustificada:", oError);
-          sap.m.MessageToast.show("Error cargando los datos.");
-        });
-    },
-
-    _openManualDateDialogAusencia: function () {
-      const oView = this.getView();
-
-      if (!this._oManualDateDialogAusencia) {
-        sap.ui.core.Fragment.load({
-          name: "gestordoccolombia.view.manualDateDialogAusencia",
-          controller: this
-        }).then(function (oDialog) {
-          this._oManualDateDialogAusencia = oDialog;
-          oView.addDependent(oDialog);
-          oDialog.open();
-        }.bind(this));
-      } else {
-        this._oManualDateDialogAusencia.open();
-      }
-    },
-
-    onConfirmManualDateAusencia: function () {
-      const oDatePicker = sap.ui.getCore().byId("manualDatePickerAusencia");
-      const sDateValue = oDatePicker.getValue();
-
-      if (!sDateValue) {
-        sap.m.MessageToast.show("Por favor, seleccione una fecha.");
-        return;
-      }
-
-      this._manualAusenciaDate = sDateValue;
-
-      // Cerramos el Dialog manual de la fecha
-      const oDialog = sap.ui.getCore().byId("manualDateDialogAusencia");
-      oDialog.close();
-
-      sap.m.MessageToast.show("Fecha de Ausencia Injustificada seleccionada: " + sDateValue);
-    },
-
-    onCancelManualDateAusencia: function () {
-      const oView = this.getView();
-
-      this._manualAusenciaDate = null;
-      this._oManualDateDialogAusencia.close();
-
-      oView.byId("employeeDialog").close();
-    },
-
-
-
     onSelectionChange: function (oEvent) {
       const oTable = oEvent.getSource();
       const oContext = oEvent.getParameter("listItem").getBindingContext("view");
@@ -1865,12 +1648,6 @@ sap.ui.define([
       }
     },
 
-    //Archivo: Desahucio
-    onDownloadPDFDesahucio: async function (sButtonId) {
-      desahucio.onDownloadPDFDesahucio(this, sButtonId);
-    },
-
-
     getEventReasonDescription: function (sCode) {
       const match = this.aEventReasonDescriptions.find(desc => desc.includes(`(${sCode})`));
       if (match) {
@@ -1882,35 +1659,45 @@ sap.ui.define([
       return sCode;
     },
 
-
-    //Archivo: Salida Minesterio
-    onDownloadPDFSalidaMinisterio: async function (sButtonId) {
-      notSalida_ministerio.onDownloadPDFSalidaMinisterio(this, sButtonId);
-    },
-
-
-    //Archivo: Carta Anual
-    onDownloadPDFCartaAnual: async function (sButtonId) {
-      carta_anual.onDownloadPDFCartaAnual(this, sButtonId);
-    },
-    
-
-    //Archivo: Amonestacion
-    onDownloadPDFNotAmonestacion: async function (sButtonId) {
-      notAmonestacion.onDownloadPDFNotAmonestacion(this, sButtonId);
-    },
-    
-
-    //Archivo: notAusInjus (Notificacion de Ausencia Injustificada)
-    onDownloadPDFNotAusInjus: async function (sButtonId) {
-      notAusInjus.onDownloadPDFNotAusInjus(this, sButtonId);
-    },
-
-    //PRUEBA NUEVO ARCHIVO KIT RETIRO
+    //Archivo: KIT RETIRO
     onDownloadPDFKitRetiro: async function (sButtonId) {
       kitRetiro.onDownloadPDFKitRetiro(this, sButtonId);
-    }
+    },
 
+    //Archivo: OTRO SI - RODAMIENTO
+    onDownloadPDFOtroSiRodamiento: async function (sButtonId) {
+        otroSiRodamiento.onDownloadPDFOtroSiRodamiento(this, sButtonId);
+    },
+
+    //Archivo: OTRO SI - ALIMENTACION 15.000
+    onDownloadPDFOtroSiAlimentacion15: async function (sButtonId) {
+        otroSiAlimentacion15.onDownloadPDFOtroSiAlimentacion15(this, sButtonId);
+    },
+
+    //Archivo: OTRO SI - ALIMENTACION 11.500
+    onDownloadPDFOtroSiAlimentacion11: async function (sButtonId) {
+        otroSiAlimentacion11.onDownloadPDFOtroSiAlimentacion11(this, sButtonId);
+    },
+
+    //Archivo: OTRO SI - ALIMENTACION 10.000
+    onDownloadPDFOtroSiAlimentacion10: async function (sButtonId) {
+        otroSiAlimentacion10.onDownloadPDFOtroSiAlimentacion10(this, sButtonId);
+    },
+
+    //Archivo: BENEFICIOS EXTRALEGALES
+    onDownloadPDFBeneficiosExtralegales: async function (sButtonId) {
+        beneficiosExtralegales.onDownloadPDFBeneficiosExtralegales(this, sButtonId);
+    },
+
+    //Archivo: SOLICITUD DEDUCCIONES RETENCION
+    onDownloadPDFRetencionFuente: async function (sButtonId) {
+        solicitudDeduccionesRetencion.onDownloadPDFRetencionFuente(this, sButtonId);
+    },
+
+    //Archivo Compromiso Etica
+    onDownloadPDFCompromisoEtica: async function (sButtonId) {
+        compromisoEtica.onDownloadPDFCompromisoEtica(this, sButtonId);
+    },
 
 
   });
