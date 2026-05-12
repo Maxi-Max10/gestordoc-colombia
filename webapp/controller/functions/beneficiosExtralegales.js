@@ -52,7 +52,7 @@ sap.ui.define([
                 const htmlRaw = `
                     <div style="font-family:Arial,sans-serif;font-size:10pt;line-height:1.55;color:#000;width:100%;box-sizing:border-box; padding-bottom:80px; overflow: visible;">
 
-                        <p style="text-align:center;font-weight:bold;font-size:11pt;margin:0 0 4px 0;">
+                        <p style="text-align:center;font-weight:bold;font-size:11pt;margin:0 0 4px 0; margin-bottom: 20px;">
                             CONOCIMIENTO Y DECLARACIÓN PLAN DE BENEFICIOS EXTRALEGALES
                         </p>
 
@@ -125,7 +125,7 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:60px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">7.</td>
                                 <td style="text-align:justify;">
@@ -181,7 +181,7 @@ sap.ui.define([
 
                 const PAGE_W = 595;
                 const PAGE_H = 842;
-                const MARGIN = 25;
+                const MARGIN = 45;
 
                 const drawW = PAGE_W - (MARGIN * 2);
                 const drawH = (img.height * drawW) / img.width;
@@ -194,6 +194,20 @@ sap.ui.define([
                     width: drawW,
                     height: drawH
                 });
+
+                // Rectángulo negro sin relleno que enmarca el área de contenido
+                const { rgb } = PDFLibRef;
+                page.drawRectangle({
+                    x:            MARGIN,
+                    y:            MARGIN,
+                    width:        PAGE_W - MARGIN * 2,
+                    height:       PAGE_H - MARGIN * 2,
+                    borderColor:  rgb(0, 0, 0),
+                    borderWidth:  1,
+                    color:        undefined,     // sin relleno
+                    opacity:      0
+                });
+ 
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Beneficios_Extralegales.pdf`;
@@ -311,10 +325,6 @@ sap.ui.define([
         return words[day] || String(day);
     }
 
-    function _formatSalary(value) {
-        if (!value) return "$ 0";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
 
     function _salaryToWords(value) {
         const n = Math.round(Number(value) || 0);
