@@ -17,11 +17,12 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/beneficiosExtralegales",
   "gestordoccolombia/controller/functions/solicitudDeduccionesRetencion",
   "gestordoccolombia/controller/functions/compromisoEtica",
-  "gestordoccolombia/controller/functions/autorizacionDescuento"
+  "gestordoccolombia/controller/functions/autorizacionDescuento",
+  "gestordoccolombia/controller/functions/datosPersonales"
 
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica, autorizacionDescuento) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica, autorizacionDescuento, datosPersonales) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -819,6 +820,7 @@ sap.ui.define([
           var oButtonSolicitudDeduccionesRetencion = that.byId("customListItemSolicitudDeduccionesRetencion");
           var oButtonCompromisoEtica = that.byId("customListItemCompromisoEtica");
           var oButtonAutorizacionDescuento = that.byId("customListItemAutorizacionDescuento");
+          var oButtonDatosPersonales = that.byId("customListItemDatosPersonales");
 
           //Configuracion de visibilidad segun los permisos
           if (permisos === "admin") {
@@ -831,6 +833,7 @@ sap.ui.define([
               oButtonSolicitudDeduccionesRetencion?.setVisible(true);
               oButtonCompromisoEtica?.setVisible(true);
               oButtonAutorizacionDescuento?.setVisible(true);
+              oButtonDatosPersonales?.setVisible(true);
           } else if (permisos === "usuario") {
               oButtonKitRetiro?.setVisible(false);
               oButtonOtroSiRodamiento?.setVisible(false);
@@ -841,6 +844,7 @@ sap.ui.define([
               oButtonSolicitudDeduccionesRetencion?.setVisible(false);
               oButtonCompromisoEtica?.setVisible(false);
               oButtonAutorizacionDescuento?.setVisible(false);
+              oButtonDatosPersonales?.setVisible(false);
           }
 
           that._hideInitialPreloader();
@@ -1072,6 +1076,7 @@ sap.ui.define([
         case "Solicitud Deducciones Retencion":
         case "Compromiso con la Ética":
         case "Autorización de Descuento":
+        case "Datos Personales":
         default:
           // Solo Administrativos
           aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
@@ -1355,6 +1360,9 @@ sap.ui.define([
             case "Autorización de Descuento":
                 this.onDownloadPDFAutorizacionDescuento(sButtonId);
                 break;
+            case "Datos Personales":
+                this.onDownloadPDFDatosPersonales(sButtonId);
+                break;
             default:
                 sap.m.MessageToast.show("No hay función definida para este documento.");
                 break;
@@ -1398,7 +1406,8 @@ sap.ui.define([
         { id: "customListItemBeneficiosExtralegales", title: "Beneficios Extralegales", desc: "Gestionar beneficios extralegales" },
         { id: "customListItemSolicitudDeduccionesRetencion", title: "Solicitud Deducciones Retencion", desc: "Gestionar solicitud de deducciones y retenciones" },
         { id: "customListItemCompromisoEtica", title: "Compromiso con la Ética", desc: "Declaración de principios éticos" },
-        { id: "customListItemAutorizacionDescuento", title: "Autorización de Descuento", desc: "Gestionar autorización de descuento" }
+        { id: "customListItemAutorizacionDescuento", title: "Autorización de Descuento", desc: "Gestionar autorización de descuento" },
+        { id: "customListItemDatosPersonales", title: "Datos Personales", desc: "Actualizar datos personales" }
       ];
     },
 
@@ -1584,6 +1593,18 @@ sap.ui.define([
             });
     },
 
+    onDatosPersonalesPress: function () {
+        const sTitle = "Datos Personales";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "datosPersonales";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Datos Personales:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
 
     _openManualDateDialog: function () { //---------------------------NO SE SI DEJAR ESTA FUNCION
       const oView = this.getView();
@@ -1727,6 +1748,11 @@ sap.ui.define([
     onDownloadPDFAutorizacionDescuento: async function (sButtonId) {
         autorizacionDescuento.onDownloadPDFAutorizacionDescuento(this, sButtonId);
     } ,
+
+    //Archivo: DATOS PERSONALES
+    onDownloadPDFDatosPersonales: async function (sButtonId) {
+        datosPersonales.onDownloadPDFDatosPersonales(this, sButtonId);  
+    },
 
 
   });

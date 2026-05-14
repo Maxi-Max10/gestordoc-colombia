@@ -149,7 +149,7 @@
 
                         <!-- 3. AUTORIZACIÓN DE DATOS PERSONALES  ── color: teal -->
                         <CustomListItem
-                            id="itemDatosPersonales"
+                            id="customListItemDatosPersonales"
                             class="customListItem card-horizontal card-teal"
                             type="Active"
                             press="onDatosPersonalesPress"
