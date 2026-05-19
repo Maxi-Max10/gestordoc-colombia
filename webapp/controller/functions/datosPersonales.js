@@ -51,514 +51,373 @@ sap.ui.define([
                     <title>Formato DIACO</title>
 
                     <style>
-                        *{
-                            box-sizing:border-box;
-                            margin:0;
-                            padding:0;
-                            font-family:Arial, Helvetica, sans-serif;
-                            color:#000;
+                        * {
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                            font-family: Arial, Helvetica, sans-serif;
+                            color: #000;
                         }
 
-                        body{
-                            background:transparent;
-                            padding:0;
-                            margin:0;
+                        body {
+                            background: #fff;
+                            padding: 12px;
                         }
 
-                        .container{
-                            width:794px;
-                            margin:auto;
-                            background:transparent;
-                            padding:8px;
-                            border:none;
+                        /* ── Contenedor principal con borde grueso exterior ── */
+                        .form-outer {
+                            width: 760px;
+                            margin-left: 10px;   /* valores correctos para alineacion del borde izquierdo general de la tabla con la plantilla */
+                            margin-right: auto;
+                            border: 2px solid #000;
                         }
 
-                        table{
-                            width:100%;
-                            border-collapse:collapse;
+                        /* ── Todas las filas comparten borde fino ── */
+                        .row {
+                            display: flex;
+                            border-top: 1px solid #000;
+                            min-height: 26px;
                         }
 
-                        td{
-                            border:1px solid #000;
-                            padding:6px 8px;
-                            font-size:10px;
-                            vertical-align:top;
-                            line-height:1.4;
+                        .row:first-child {
+                            border-top: none;
                         }
 
-                        .top-header td{
-                            height:58px;
+                        .cell {
+                            padding: 4px 7px;
+                            font-size: 10px;
+                            line-height: 1.45;
+                            vertical-align: top;
+                            flex-shrink: 0;
                         }
 
-                        .logo{
-                            width:140px;
-                            text-align:center;
-                            vertical-align:middle;
+                        .cell + .cell {
+                            border-left: 1px solid #000;
                         }
 
-                        .logo h1{
-                            font-size:28px;
-                            color:#5f5f5f;
-                            letter-spacing:1px;
+                        .cell-full { width: 100%; }
+                        .cell-45   { width: 45%; }
+                        .cell-55   { width: 55%; }
+                        .cell-50   { width: 50%; }
+                        .cell-30   { width: 30%; }
+                        .cell-70   { width: 70%; }
+                        .cell-65   { width: 65%; }
+                        .cell-35   { width: 35%; }
+
+                        /* Fila de sección azul */
+                        .section-header {
+                            background: #0070a8;
+                            color: #fff;
+                            text-align: center;
+                            font-weight: bold;
+                            font-size: 10.5px;
+                            padding: 4px 8px;
+                            border-top: 1px solid #000;
+                            line-height: 1.4;
                         }
 
-                        .title{
-                            text-align:center;
-                            font-weight:bold;
-                            font-size:10px;
-                            line-height:1.25;
+                        .section-header span {
+                            display: block;
+                            font-weight: normal;
+                            font-size: 12px;
+                            color: #fff;
                         }
 
-                        .restricted{
-                            width:120px;
-                            text-align:center;
-                            font-weight:bold;
-                            font-size:10px;
+                        strong {
+                            font-weight: bold;
                         }
 
-                        .section{
-                            background:#0070a8;
-                            color:#fff;
-                            text-align:center;
-                            font-weight:bold;
-                            font-size:10px;
-                            padding:3px;
+                        /* Underline para campos de texto */
+                        .underline {
+                            border-bottom: 1px solid #000;
+                            display: block;
+                            min-height: 14px;
+                            margin-top: 3px;
                         }
 
-                        .small-text{
-                            font-size:8px;
+                        /* Checkboxes cuadrados, visibles */
+                        input[type="checkbox"] {
+                            -webkit-appearance: none;
+                            appearance: none;
+                            width: 10px;
+                            height: 10px;
+                            border: 1px solid #000;
+                            background: #fff;
+                            display: inline-block;
+                            vertical-align: middle;
+                            margin: 0 1px;
+                            flex-shrink: 0;
                         }
 
-                        .field{
-                            height:22px;
+                        input[type="checkbox"]:checked {
+                            background: #000;
                         }
 
-                        .large-field{
-                            height:55px;
+                        /* Divisor vertical interno dentro de una celda */
+                        .sub-row {
+                            display: flex;
+                            width: 100%;
                         }
 
-                        .line{
-                            border-bottom:1px solid #000;
-                            width:100%;
-                            height:20px;
-                            margin-top:4px;
+                        .sub-cell {
+                            padding: 4px 6px;
+                            font-size: 10px;
+                            line-height: 1.45;
                         }
 
-                        input[type="checkbox"]{
-                            width:9px;
-                            height:9px;
-                            margin-left:2px;
-                            transform:translateY(1px);
+                        .sub-cell + .sub-cell {
+                            border-left: 1px solid #000;
                         }
 
-                        .dependiente td{
-                            height:34px;
-                        }
+                        /* Altura de filas compactas */
+                        .h-auto { min-height: 26px; }
+                        .h-tall  { min-height: 52px; }
+                        .h-dep   { min-height: 70px; }
 
-                        .spacer{
-                            height:4px;
-                        }
-
-                        strong{
-                            font-weight:bold;
+                        .label-block {
+                            display: block;
+                            margin-bottom: 2px;
                         }
                     </style>
                     </head>
-
                     <body>
 
-                    <div class="container">
+                    <div class="form-outer">
 
-                    <!-- FECHA -->
-                        <table style="margin-bottom:0;">
-                            <tr>
-                                <td style="
-                                    border:1px solid #000;
-                                    font-size:10px;
-                                    padding:6px 8px;
-                                    height:28px;
-                                ">
-                                    <strong>Fecha de diligenciamiento:</strong>
-                                </td>
-                            </tr>
-                        </table>
-                    <!-- TITULO -->
-                        <table style="margin-top:-1px;">
-                        <tr>
-                            <td class="section">
-                            INFORMACIÓN GENERAL – DATOS PERSONALES
-                            </td>
-                        </tr>
-                        </table>
-
-                        <!-- DATOS PERSONALES -->
-                        <table style="margin-top:-1px;">
-
-                        <tr>
-                            <td width="45%">
-                            <strong>Nombre Completo:</strong>
-                            <div class="line"></div>
-                            </td>
-
-                            <td width="55%">
-                            <strong>Documento de Identificación</strong>
-
-                            C.C.
-                            <input type="checkbox" class="checkbox">
-
-                            C.E.
-                            <input type="checkbox" class="checkbox">
-
-                            <br>
-
-                            <strong>No.</strong>
-
-                            <br>
-
-                            <div style="
-                                display:flex;
-                                align-items:center;
-                                gap:6px;
-                                margin-top:4px;
-                            ">
-                                <strong style="white-space:nowrap;">
-                                    Fecha de expedición del documento:
-                                </strong>
-
-                                <div class="line" style="
-                                    flex:1;
-                                    margin-top:0;
-                                    height:14px;
-                                "></div>
+                        <!-- Fecha -->
+                        <div class="row h-auto" style="border-top:none;">
+                            <div class="cell cell-full" style="min-height:28px;">
+                                <strong>Fecha de diligenciamiento:</strong>
                             </div>
-                            </td>
-                            
-                        </tr>
+                        </div>
 
-                        <tr>
-                            <td colspan="2" class="large-field">
+                        <!-- Sección Datos Personales -->
+                        <div class="section-header">INFORMACIÓN GENERAL – DATOS PERSONALES</div>
+
+                        <!-- Nombre + Documento -->
+                        <div class="row">
+                            <div class="cell cell-45" style="min-height:62px;">
+                                <strong>Nombre Completo:</strong>
+                                <span class="underline" style="margin-top:10px;"></span>
+                                <span class="underline" style="margin-top:10px;"></span>
+                            </div>
+                            <div class="cell cell-55" style="min-height:62px;">
+                                <strong>Documento de Identificación</strong>
+                                &nbsp; C.C. <input type="checkbox">
+                                &nbsp; C.E. <input type="checkbox">
+                                <br>
+                                <strong>No.</strong>
+                                <br>
+                                <div style="display:flex; align-items:center; gap:4px; margin-top:4px;">
+                                    <strong style="white-space:nowrap; font-size:10px;">Fecha de expedición del documento:</strong>
+                                    <span class="underline" style="flex:1; margin-top:0;"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cargo -->
+                        <div class="row h-tall">
+                            <div class="cell cell-full">
                                 <strong>Cargo desempeñado dentro de la Compañía:</strong>
+                                <span class="underline" style="margin-top:16px;"></span>
+                            </div>
+                        </div>
 
-                                <div class="line" style="
-                                    margin-top:8px;
-                                    height:18px;
-                                "></div>
-                            </td>
-                        </tr>
+                        <!-- Ciudad / País + Jefe inmediato -->
+                        <div class="row">
+                            <div class="cell cell-45" style="padding:0;">
+                                <div class="sub-row" style="min-height:26px;">
+                                    <div class="sub-cell" style="width:62%; padding:4px 7px;"><strong>Ciudad</strong></div>
+                                    <div class="sub-cell" style="width:38%; padding:4px 7px;"><strong>País</strong></div>
+                                </div>
+                            </div>
+                            <div class="cell cell-55">
+                                <strong>Nombre del jefe inmediato:</strong>
+                            </div>
+                        </div>
 
-                        <td>
-                            <table style="width:100%; border-collapse:collapse;">
-                                <tr style="height:28px;">
-                                    <td style="
-                                        border:none;
-                                        border-right:1px solid #000;
-                                        width:70%;
-                                        padding:4px 6px 4px 0;
-                                    ">
-                                        <strong>Ciudad</strong>
-                                    </td>
+                        <!-- Dirección + Planta -->
+                        <div class="row">
+                            <div class="cell cell-45"><strong>Dirección de residencia:</strong></div>
+                            <div class="cell cell-55"><strong>Planta a la que pertenece:</strong></div>
+                        </div>
 
-                                    <td style="
-                                        border:none;
-                                        width:30%;
-                                        padding:4px 0 4px 6px;
-                                        text-align:left;
-                                    ">
-                                        <strong>País</strong>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
+                        <!-- Teléfono -->
+                        <div class="row">
+                            <div class="cell cell-45"><strong>Teléfono:</strong></div>
+                            <div class="cell cell-55"></div>
+                        </div>
 
-                        <td style="border-bottom:none;">
-                            <strong>Nombre del jefe inmediato:</strong>
-                        </td>
+                        <!-- Correo -->
+                        <div class="row">
+                            <div class="cell cell-45"><strong>Correo Electrónico:</strong></div>
+                            <div class="cell cell-55"></div>
+                        </div>
 
-                    </tr>
+                        <!-- Fecha nacimiento + Estado Civil -->
+                        <div class="row">
+                            <div class="cell cell-45"><strong>Fecha de nacimiento:</strong></div>
+                            <div class="cell cell-55"><strong>Estado Civil:</strong></div>
+                        </div>
 
-                        <tr>
-                            <td>
-                            <strong>Dirección de residencia:</strong>
-                            </td>
+                        <!-- Nacionalidad + RH -->
+                        <div class="row">
+                            <div class="cell cell-45"><strong>Nacionalidad:</strong></div>
+                            <div class="cell cell-55"><strong>RH y grupo sanguíneo:</strong></div>
+                        </div>
 
-                            <td style="border-top:none; border-bottom:none;">
-                                <strong>Planta a la que pertenece:</strong>
-                            </td>
-                        </tr>
+                        <!-- Sexo + Dependientes -->
+                        <div class="row">
+                            <div class="cell cell-45"><strong>Sexo:</strong></div>
+                            <div class="cell cell-55" style="padding:0;">
+                                <div class="sub-row" style="align-items:center; min-height:26px;">
+                                    <div class="sub-cell" style="width:40%; padding:4px 7px; white-space:nowrap;">
+                                        <strong>Dependientes:</strong>
+                                    </div>
+                                    <div class="sub-cell" style="padding:4px 7px;">
+                                        SI <input type="checkbox">
+                                        &nbsp;&nbsp;
+                                        NO <input type="checkbox">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                        <tr>
-                            <td>
-                            <strong>Teléfono:</strong>
-                            </td>
-
-                            <td style="border-top:none; border-bottom:none;"></td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                            <strong>Correo Electrónico:</strong>
-                            </td>
-
-                            <td style="border-top:none; border-bottom:none;"></td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                            <strong>Fecha de nacimiento:</strong>
-                            </td>
-
-                            <td>
-                            <strong>Estado Civil:</strong>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                            <strong>Nacionalidad:</strong>
-                            </td>
-
-                            <td>
-                            <strong>RH y grupo sanguíneo:</strong>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>
-                            <strong>Sexo:</strong>
-                            </td>
-
-                            <td>
-                                <table style="width:100%; border-collapse:collapse;">
-                                    <tr>
-                                        <td style="
-                                            border:none;
-                                            border-right:1px solid #000;
-                                            width:10%;
-                                            padding:0 6px 0 0;
-                                        ">
-                                            <strong>Dependientes</strong>
-                                        </td>
-
-                                        <td style="
-                                            border:none;
-                                            width:45%;
-                                            padding:0 0 0 6px;
-                                            white-space:nowrap;
-                                        ">
-                                            SI <input type="checkbox" class="checkbox">
-
-                                            &nbsp;&nbsp;
-
-                                            NO <input type="checkbox" class="checkbox">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-
-                        </table >
-
-                    <!-- DEPENDIENTES -->
-                        <table style="margin-top:-1px;">
-                        <tr>
-                            <td class="section">
+                        <!-- Sección Dependientes -->
+                        <div class="section-header">
                             INFORMACIÓN DEPENDIENTES
-                            <br>
-                            <span class="small-text" style="color:#fff;">
-                                Si este espacio no es suficiente, por favor adicione la información en documento aparte
-                            </span>
-                            </td>
-                        </tr>
-                        </table>
+                            <span>Si este espacio no es suficiente, por favor adicione la información en documento aparte</span>
+                        </div>
 
-                        <table class="dependiente" style="margin-top:-1px;">
+                        <!-- Macro: cada dependiente -->
 
-                            <!-- DEPENDIENTE 1 -->
-                            <tr>
-                                <tr>
-                                    <td colspan="2" style="padding:0;">
+                        <!-- DEP 1 -->
+                        <div class="row">
+                            <div class="cell cell-full" style="padding:4px 7px; min-height:32px;">
+                                <strong>Nombre y Apellidos:</strong>
+                                <span class="underline" style="margin-top:6px;"></span>
+                            </div>
+                        </div>
+                        <div class="row" style="border-top:none;">
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Tipo de vínculo:</strong>
+                                <br><br>
+                                Cónyuge <input type="checkbox">
+                                Hijo <input type="checkbox">
+                                Padre <input type="checkbox">
+                                Madre <input type="checkbox">
+                                Otro <input type="checkbox">
+                                <br><br>
+                                <strong>Cual:</strong>
+                            </div>
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Documento de Identificación C.C.</strong>
+                                <input type="checkbox">
+                                C.E. <input type="checkbox">
+                                TI <input type="checkbox">
+                                RC <input type="checkbox">
+                                <br><br>
+                                <strong>No.</strong>
+                                <br><br>
+                                <strong>Fecha de expedición del documento:</strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell-50"><strong>Fecha de nacimiento:</strong></div>
+                            <div class="cell cell-50"><strong>Teléfono de contacto</strong></div>
+                        </div>
 
-                                        <!-- FILA NOMBRE -->
-                                        <div style="
-                                            border-bottom:1px solid #000;
-                                            padding:6px 8px;
-                                        ">
-                                            <strong>Nombre y Apellidos:</strong>
-                                        </div>
+                        <!-- DEP 2 -->
+                        <div class="row">
+                            <div class="cell cell-full" style="padding:4px 7px; min-height:32px;">
+                                <strong>Nombre y Apellidos:</strong>
+                                <span class="underline" style="margin-top:6px;"></span>
+                            </div>
+                        </div>
+                        <div class="row" style="border-top:none;">
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Tipo de vínculo:</strong>
+                                <br><br>
+                                Cónyuge <input type="checkbox">
+                                Hijo <input type="checkbox">
+                                Padre <input type="checkbox">
+                                Madre <input type="checkbox">
+                                Otro <input type="checkbox">
+                                <br><br>
+                                <strong>Cual:</strong>
+                            </div>
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Documento de Identificación C.C.</strong>
+                                <input type="checkbox">
+                                C.E. <input type="checkbox">
+                                TI <input type="checkbox">
+                                RC <input type="checkbox">
+                                <br><br>
+                                <strong>No.</strong>
+                                <br><br>
+                                <strong>Fecha de expedición del documento:</strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell-50"><strong>Fecha de nacimiento:</strong></div>
+                            <div class="cell cell-50"><strong>Teléfono de contacto</strong></div>
+                        </div>
 
-                                        <!-- CONTENIDO DIVIDIDO -->
-                                        <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
-                                            <colgroup><col style="width:calc(50% - 0.5px);"><col style="width:calc(50% + 0.5px);"></colgroup>
-                                            <tr>
+                        <!-- DEP 3 -->
+                        <div class="row">
+                            <div class="cell cell-full" style="padding:4px 7px; min-height:32px;">
+                                <strong>Nombre y Apellidos:</strong>
+                                <span class="underline" style="margin-top:6px;"></span>
+                            </div>
+                        </div>
+                        <div class="row" style="border-top:none;">
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Tipo de vínculo:</strong>
+                                <br><br>
+                                Cónyuge <input type="checkbox">
+                                Hijo <input type="checkbox">
+                                Padre <input type="checkbox">
+                                Madre <input type="checkbox">
+                                Otro <input type="checkbox">
+                                <br><br>
+                                <strong>Cual:</strong>
+                            </div>
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Documento de Identificación C.C.</strong>
+                                <input type="checkbox">
+                                C.E. <input type="checkbox">
+                                TI <input type="checkbox">
+                                RC <input type="checkbox">
+                                <br><br>
+                                <strong>No.</strong>
+                                <br><br>
+                                <strong>Fecha de expedición del documento:</strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell-50"><strong>Fecha de nacimiento:</strong></div>
+                            <div class="cell cell-50"><strong>Teléfono de contacto</strong></div>
+                        </div>
 
-                                                <!-- IZQUIERDA -->
-                                                <td style="
-                                                    border:none;
-                                                    border-right:1px solid #000;
-                                                    padding:8px;
-                                                    vertical-align:top;
-                                                ">
-                                                    <strong>Tipo de vínculo:</strong>
-
-                                                    <br><br>
-
-                                                    Cónyuge <input type="checkbox">
-                                                    Hijo <input type="checkbox">
-                                                    Padre <input type="checkbox">
-                                                    Madre <input type="checkbox">
-                                                    Otro <input type="checkbox">
-
-                                                    <br><br>
-
-                                                    <strong>Cual:</strong>
-                                                </td>
-
-                                                <!-- DERECHA -->
-                                                <td style="
-                                                    width:50%;
-                                                    border:none;
-                                                    padding:8px;
-                                                    vertical-align:top;
-                                                ">
-                                                    <strong>Documento de Identificación C.C.</strong>
-                                                    <input type="checkbox">
-
-                                                    C.E.
-                                                    <input type="checkbox">
-
-                                                    TI
-                                                    <input type="checkbox">
-
-                                                    RC
-                                                    <input type="checkbox">
-
-                                                    <br><br>
-
-                                                    <strong>No.</strong>
-
-                                                    <br><br>
-
-                                                    <strong>Fecha de expedición del documento:</strong>
-                                                </td>
-
-                                            </tr>
-                                        </table>
-
-                                    </td>
-                                </tr>
-                            </tr>
-
-                            <tr>
-                                <td width="50%">
-                                    <strong>Fecha de nacimiento:</strong>
-                                </td>
-
-                                <td width="50%">
-                                    <strong>Teléfono de contacto</strong>
-                                </td>
-                            </tr>
-
-                            <!-- DEPENDIENTE 2 -->
-                            <tr>
-                                <td colspan="2" style="padding:0;">
-                                    <div style="border-bottom:1px solid #000; padding:6px 8px;">
-                                        <strong>Nombre y Apellidos:</strong>
-                                    </div>
-                                    <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
-                                        <colgroup><col style="width:calc(50% - 0.5px);"><col style="width:calc(50% + 0.5px);"></colgroup>
-                                        <tr>
-                                            <td style="border:none; border-right:1px solid #000; padding:8px; vertical-align:top;">
-                                                <strong>Tipo de vínculo:</strong><br><br>
-                                                Cónyuge <input type="checkbox">
-                                                Hijo <input type="checkbox">
-                                                Padre <input type="checkbox">
-                                                Madre <input type="checkbox">
-                                                Otro <input type="checkbox">
-                                                <br><br>
-                                                <strong>Cual:</strong>
-                                            </td>
-                                            <td style="border:none; padding:8px; vertical-align:top;">
-                                                <strong>Documento de Identificación C.C.</strong>
-                                                <input type="checkbox"> C.E. <input type="checkbox"> TI <input type="checkbox"> RC <input type="checkbox">
-                                                <br><br>
-                                                <strong>No.</strong>
-                                                <br><br>
-                                                <strong>Fecha de expedición del documento:</strong>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="50%"><strong>Fecha de nacimiento:</strong></td>
-                                <td width="50%"><strong>Teléfono de contacto</strong></td>
-                            </tr>
-
-                            <!-- DEPENDIENTE 3 -->
-                            <tr>
-                                <td colspan="2" style="padding:0;">
-                                    <div style="border-bottom:1px solid #000; padding:6px 8px;">
-                                        <strong>Nombre y Apellidos:</strong>
-                                    </div>
-                                    <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
-                                        <colgroup><col style="width:calc(50% - 0.5px);"><col style="width:calc(50% + 0.5px);"></colgroup>
-                                        <tr>
-                                            <td style="border:none; border-right:1px solid #000; padding:8px; vertical-align:top;">
-                                                <strong>Tipo de vínculo:</strong><br><br>
-                                                Cónyuge <input type="checkbox">
-                                                Hijo <input type="checkbox">
-                                                Padre <input type="checkbox">
-                                                Madre <input type="checkbox">
-                                                Otro <input type="checkbox">
-                                                <br><br>
-                                                <strong>Cual:</strong>
-                                            </td>
-                                            <td style="border:none; padding:8px; vertical-align:top;">
-                                                <strong>Documento de Identificación C.C.</strong>
-                                                <input type="checkbox"> C.E. <input type="checkbox"> TI <input type="checkbox"> RC <input type="checkbox">
-                                                <br><br>
-                                                <strong>No.</strong>
-                                                <br><br>
-                                                <strong>Fecha de expedición del documento:</strong>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="50%"><strong>Fecha de nacimiento:</strong></td>
-                                <td width="50%"><strong>Teléfono de contacto</strong></td>
-                            </tr>
-
-                            <!-- DEPENDIENTE 4 -->
-                            <tr>
-                                <td colspan="2" style="padding:0;">
-                                    <div style="border-bottom:1px solid #000; padding:6px 8px;">
-                                        <strong>Nombre y Apellidos:</strong>
-                                    </div>
-                                    <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
-                                        <colgroup><col style="width:calc(50% - 0.5px);"><col style="width:calc(50% + 0.5px);"></colgroup>
-                                        <tr>
-                                            <td style="border:none; border-right:1px solid #000; padding:8px; vertical-align:top;">
-                                                <strong>Tipo de vínculo:</strong><br><br>
-                                                Cónyuge <input type="checkbox">
-                                                Hijo <input type="checkbox">
-                                                Padre <input type="checkbox">
-                                                Madre <input type="checkbox">
-                                                Otro <input type="checkbox">
-                                                <br><br>
-                                                <strong>Cual:</strong>
-                                            </td>
-                                            <td style="border:none; padding:8px; vertical-align:top;">
-                                                <strong>Documento de Identificación C.C.</strong>
-                                                <input type="checkbox"> C.E. <input type="checkbox"> TI <input type="checkbox"> RC <input type="checkbox">
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-
-                        </table>
+                        <!-- DEP 4 (parcial) -->
+                        <div class="row">
+                            <div class="cell cell-full" style="padding:4px 7px; min-height:32px;">
+                                <strong>Nombre y Apellidos:</strong>
+                                <span class="underline" style="margin-top:6px;"></span>
+                            </div>
+                        </div>
+                        <div class="row" style="border-top:none;">
+                            <div class="cell cell-50" style="padding:6px 7px; min-height:26px;">
+                                <strong>Tipo de vínculo:</strong>
+                            </div>
+                            <div class="cell cell-50" style="padding:6px 7px; min-height:26px;">
+                                <strong>Documento de Identificación C.C.</strong>
+                                <input type="checkbox">
+                                C.E. <input type="checkbox">
+                                TI <input type="checkbox">
+                                RC <input type="checkbox">
+                            </div>
+                        </div>
 
                     </div>
 
