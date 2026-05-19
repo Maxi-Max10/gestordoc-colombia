@@ -19,11 +19,12 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/compromisoEtica",
   "gestordoccolombia/controller/functions/autorizacionDescuento",
   "gestordoccolombia/controller/functions/datosPersonales",
-  "gestordoccolombia/controller/functions/noDeclarante"
+  "gestordoccolombia/controller/functions/noDeclarante",
+  "gestordoccolombia/controller/functions/protocoloRecibo"
 
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante ) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante, protocoloRecibo ) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -823,6 +824,7 @@ sap.ui.define([
           var oButtonAutorizacionDescuento = that.byId("customListItemAutorizacionDescuento");
           var oButtonDatosPersonales = that.byId("customListItemDatosPersonales");
           var oButtonNoDeclarante = that.byId("customListItemNoDeclarante");
+          var oButtonProtocoloRecibo = that.byId("customListItemProtocoloRecibo");
 
           //Configuracion de visibilidad segun los permisos
           if (permisos === "admin") {
@@ -837,6 +839,7 @@ sap.ui.define([
               oButtonAutorizacionDescuento?.setVisible(true);
               oButtonDatosPersonales?.setVisible(true);
               oButtonNoDeclarante?.setVisible(true);
+              oButtonProtocoloRecibo?.setVisible(true);
           } else if (permisos === "usuario") {
               oButtonKitRetiro?.setVisible(false);
               oButtonOtroSiRodamiento?.setVisible(false);
@@ -849,6 +852,7 @@ sap.ui.define([
               oButtonAutorizacionDescuento?.setVisible(false);
               oButtonDatosPersonales?.setVisible(false);
               oButtonNoDeclarante?.setVisible(false);
+              oButtonProtocoloRecibo?.setVisible(false);
           }
 
           that._hideInitialPreloader();
@@ -1082,6 +1086,7 @@ sap.ui.define([
         case "Autorización de Descuento":
         case "Datos Personales":
         case "No Declarante":
+        case "Protocolo de Recibo":
         default:
           // Solo Administrativos
           aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
@@ -1371,6 +1376,9 @@ sap.ui.define([
             case "No Declarante":
                 this.onDownloadPDFNoDeclarante(sButtonId);
                 break;
+            case "Protocolo de Recibo":
+                this.onDownloadPDFProtocoloRecibo(sButtonId);
+                break;
             default:
                 sap.m.MessageToast.show("No hay función definida para este documento.");
                 break;
@@ -1416,7 +1424,8 @@ sap.ui.define([
         { id: "customListItemCompromisoEtica", title: "Compromiso con la Ética", desc: "Declaración de principios éticos" },
         { id: "customListItemAutorizacionDescuento", title: "Autorización de Descuento", desc: "Gestionar autorización de descuento" },
         { id: "customListItemDatosPersonales", title: "Datos Personales", desc: "Actualizar datos personales" },
-        { id: "customListItemNoDeclarante", title: "No Declarante", desc: "Certificado de no declarante" }
+        { id: "customListItemNoDeclarante", title: "No Declarante", desc: "Certificado de no declarante" },
+        { id: "customListItemProtocoloRecibo", title: "Protocolo de Recibo", desc: "Generar protocolo de recibo" }
       ];
     },
 
@@ -1623,7 +1632,19 @@ sap.ui.define([
             .catch(oError => {
                 console.error("Error al preparar datos de No Declarante:", oError);
                 sap.m.MessageToast.show("Error cargando los datos.");
-            });
+            });     
+    },
+
+    onProtocoloReciboPress: function () {
+        const sTitle = "Protocolo de Recibo";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "protocoloRecibo";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Protocolo de Recibo:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });     
     },
 
 
@@ -1779,6 +1800,11 @@ sap.ui.define([
     onDownloadPDFNoDeclarante: async function (sButtonId) {
         noDeclarante.onDownloadPDFNoDeclarante(this, sButtonId);   
     },   
+
+    //Archivo: PROTOCOLO DE RECIBO
+    onDownloadPDFProtocoloRecibo: async function (sButtonId) {
+        protocoloRecibo.onDownloadPDFProtocoloRecibo(this, sButtonId);  
+    },
 
 
   });

@@ -1,0 +1,227 @@
+sap.ui.define([
+    "sap/m/MessageToast"
+], function (MessageToast) {
+    "use strict";
+
+    async function onDownloadPDFProtocoloRecibo(oController, sButtonId) {
+        try {
+            await oController._ensurePdfToolkit();
+
+            const PDFLibRef      = window.PDFLib      || oController._pdfLibRef;
+            const html2canvasRef = window.html2canvas  || oController._html2canvasRef;
+
+            if (!PDFLibRef || !html2canvasRef) {
+                throw new Error("No se pudieron cargar las bibliotecas PDF/Canvas requeridas.");
+            }
+
+            const aUsers = oController.getSelectedUsers();
+            if (aUsers.length === 0) {
+                MessageToast.show("Seleccione al menos un colaborador.");
+                return;
+            }
+
+            for (let i = 0; i < aUsers.length; i++) {
+                const user = aUsers[i];
+
+                if (aUsers.length > 1) {
+                    MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
+                }
+
+                const sNombre = `${user.firstName} ${user.lastName}`;
+                const sCedula = user.nationalId || "";
+
+                // ── Word ─────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    await _generateWord({
+                        firstName: user.firstName,
+                        lastName:  user.lastName,
+                        sNombre,
+                        sCedula
+                    });
+                    continue;
+                }
+
+                // ── PDF — con plantilla de fondo ──────────────────────────────
+                const htmlPagina1 = `
+                <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+
+                    <p style="text-align:justify;margin:0 0 28px 0;">
+                        Yo, <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u> identificado con documento de identidad N° <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u> declaro que he recibido la socialización del contenido del Reglamento Interno de Trabajo, Comité de convivencia Laboral y Política de Alcohol, Tabaco y Drogas.
+                    </p>
+
+                    <p style="text-align:justify;margin:0 0 28px 0;">
+                        Entiendo que Diaco S.A. podrá actualizar, corregir o alterar los contenidos en dichos documentos, los cuales serán debidamente divulgados, a través de los canales de comunicación internos, que declaro conocer.
+                    </p>
+
+                    <p style="text-align:justify;margin:0 0 80px 0;">
+                        Las reglas contenidas en el Reglamento Interno de Trabajo, el Comité de convivencia Laboral y la Política de Alcohol, Tabaco y Drogas, integran mi contrato individual de trabajo con Diaco S.A., para todos los efectos, de modo que el incumplimiento de dichas reglas permitirá a la empresa aplicar las medidas establecidas en la legislación vigente, para los casos de incumplimiento de las normas laborales contractuales.
+                    </p>
+
+                    <div style="width:100%;margin-bottom:40px;text-align:center;">
+                        <div style="display:inline-block;margin-left:200px;text-align:center;">
+                            <div style="border-top:1.5px solid #000;width:180px;padding-top:6px;">
+                                Firma
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width:100%;border:1px solid #000;border-collapse:collapse;display:table;margin-top:20px;">
+                        <div style="display:table-row;">
+                            <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
+                                <strong>Fecha:</strong>
+                            </div>
+                            <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
+                                <strong>Planta:</strong>
+                            </div>
+                            <div style="display:table-cell;width:34%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
+                                <strong>Área:</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>`;
+
+                const contentBlocks = [htmlPagina1];
+
+                // ── Carga plantilla de fondo ───────────────────────────────────
+                const existingPdfBytes = await fetch("pdf/plantilaProtocoloRecibo.pdf")
+                    .then(res => res.arrayBuffer());
+
+                const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
+                const [templatePage] = pdfDoc.getPages();
+                const { width, height } = templatePage.getSize();
+                const templatePageImage = await pdfDoc.embedPage(templatePage);
+
+                for (let pageIndex = 0; pageIndex < contentBlocks.length; pageIndex++) {
+                    const blockHtml = contentBlocks[pageIndex];
+                    const div = document.createElement("div");
+                    div.style.width           = "680px";
+                    div.style.height          = "1400px";
+                    div.style.padding         = "10px";
+                    div.style.backgroundColor = "transparent";
+                    div.style.boxSizing       = "border-box";
+                    div.style.position        = "absolute";
+                    div.style.top             = "-9999px";
+                    div.style.left            = "-9999px";
+                    div.innerHTML             = blockHtml;
+                    document.body.appendChild(div);
+
+                    const canvas  = await html2canvasRef(div, { scale: 2, useCORS: true, backgroundColor: null });
+                    const imgData = canvas.toDataURL("image/png");
+                    document.body.removeChild(div);
+
+                    const img     = await pdfDoc.embedPng(imgData);
+                    const newPage = pdfDoc.addPage([width, height]);
+
+                    // Dibujar plantilla de fondo
+                    newPage.drawPage(templatePageImage);
+
+                    // Contenido HTML encima
+                    const imgWidth  = width * 0.78;
+                    const imgHeight = (img.height * imgWidth) / img.width;
+
+                    newPage.drawImage(img, {
+                        x:      (width - imgWidth) / 2,
+                        y:      height - imgHeight - 210,  // 160 = espacio que ocupa el header de la plantilla
+                        width:  imgWidth,
+                        height: imgHeight
+                    });
+                }
+
+                pdfDoc.removePage(0);
+                const pdfBytes = await pdfDoc.save();
+                const fileName = `${user.firstName}_${user.lastName}_Protocolo_Recibo.pdf`;
+                const blob     = new Blob([pdfBytes], { type: "application/pdf" });
+                const link     = document.createElement("a");
+                link.href      = URL.createObjectURL(blob);
+                link.download  = fileName;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }
+
+            if (!sButtonId.includes("wordDataInfo")) {
+                MessageToast.show(
+                    aUsers.length > 1
+                        ? `${aUsers.length} documentos generados correctamente.`
+                        : "Documento generado correctamente."
+                );
+            }
+
+        } catch (error) {
+            console.error("Error generando Protocolo de Recibo:", error);
+            MessageToast.show("Error generando el documento: " + error.message);
+        }
+    }
+
+    // ─── Word con JSZip + plantilla ───────────────────────────────────────────
+    async function _generateWord(data) {
+        const JSZip         = await _ensureJSZip();
+        const templateBytes = await fetch("pdf/Protocolo_Recibo.docx").then(res => {
+            if (!res.ok) throw new Error(`No se pudo cargar Protocolo_Recibo.docx (${res.status})`);
+            return res.arrayBuffer();
+        });
+        const zip = await JSZip.loadAsync(templateBytes);
+
+        const variables = {
+            "[[Nombre]]": data.sNombre,
+            "[[Cedula]]": data.sCedula
+        };
+
+        const targets = [
+            "word/document.xml",
+            "word/header1.xml",
+            "word/header2.xml",
+            "word/footer1.xml",
+            "word/footer2.xml"
+        ];
+
+        for (const path of targets) {
+            if (zip.files[path]) {
+                let xml = await zip.files[path].async("string");
+                for (const [key, value] of Object.entries(variables)) {
+                    xml = xml.split(key).join(_escXml(value));
+                    const frag = new RegExp(
+                        "\\[\\[" +
+                        key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
+                        "\\]\\]", "g"
+                    );
+                    xml = xml.replace(frag, _escXml(value));
+                }
+                zip.file(path, xml);
+            }
+        }
+
+        const blob = await zip.generateAsync({ type: "blob" });
+        const link = document.createElement("a");
+        link.href  = URL.createObjectURL(blob);
+        link.download = `${data.firstName}_${data.lastName}_Protocolo_Recibo.docx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+
+        MessageToast.show("Documento Word generado correctamente.");
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+    function _escXml(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function _ensureJSZip() {
+        if (window.JSZip) return Promise.resolve(window.JSZip);
+        return new Promise((resolve, reject) => {
+            const script   = document.createElement("script");
+            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+            script.onload  = () => resolve(window.JSZip);
+            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
+            document.head.appendChild(script);
+        });
+    }
+
+    return { onDownloadPDFProtocoloRecibo };
+});
