@@ -883,7 +883,284 @@ sap.ui.define([
                     </html>
                 `;
 
-                const contentBlocks = [htmlPagina1, htmlPagina2];
+                const htmlPagina3 = `
+                    <!DOCTYPE html>
+                    <html lang="es">
+                    <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+                    <style>
+                        *{
+                            box-sizing:border-box;
+                            margin:0;
+                            padding:0;
+                            font-family:Arial, Helvetica, sans-serif;
+                            color:#000;
+                        }
+
+                        body{
+                            background:#fff;
+                            padding:12px;
+                        }
+
+                        .form-outer{
+                            width:760px;
+                            margin-left:10px;
+                            margin-right:auto;
+                            border:2px solid #000;
+                        }
+
+                        .row{
+                            display:flex;
+                            border-top:1px solid #000;
+                            min-height:26px;
+                        }
+
+                        .row:first-child{
+                            border-top:none;
+                        }
+
+                        .cell{
+                            padding:4px 7px;
+                            font-size:10px;
+                            line-height:1.45;
+                            vertical-align:top;
+                            flex-shrink:0;
+                        }
+
+                        .cell + .cell{
+                            border-left:1px solid #000;
+                        }
+
+                        .cell-full{ width:100%; }
+                        .cell-50{ width:50%; }
+                        .cell-65{ width:65%; }
+                        .cell-35{ width:35%; }
+
+                        strong{
+                            font-weight:bold;
+                        }
+
+                        input[type="checkbox"]{
+                            -webkit-appearance:none;
+                            appearance:none;
+                            width:10px;
+                            height:10px;
+                            border:1px solid #000;
+                            background:#fff;
+                            display:inline-block;
+                            vertical-align:middle;
+                            margin:0 1px;
+                            flex-shrink:0;
+                        }
+
+                        input[type="checkbox"]:checked{
+                            background:#000;
+                        }
+
+                    </style>
+                    </head>
+
+                    <body>
+
+                        <!-- CONTINUACIÓN FINALIDADES -->
+                        <div style="
+                            width:730px;
+                            margin-left:28px;
+                            border:1px solid #000;
+                            font-size:10px;
+                            line-height:1.45;
+                        ">
+
+                            <!-- FILA VACÍA SUPERIOR -->
+                            <div style="
+                                height:18px;
+                                border-bottom:1px solid #000;
+                            "></div>
+
+                            <div style="
+                                padding:6px 8px;
+                                border-bottom:1px solid #000;
+                            ">
+                                Incluir la información de Dependientes dentro al Sistema físico y digital de Información de la Compañía.
+                            </div>
+
+                            <div style="
+                                padding:6px 8px;
+                                border-bottom:1px solid #000;
+                            ">
+                                Incluir información de pagos dentro al Sistema físico y digital de Información de la Compañía.
+                            </div>
+
+                            <div style="
+                                padding:6px 8px;
+                                border-bottom:1px solid #000;
+                            ">
+                                Utilizar la imagen del titular de la información (reproducción videográfica – foto impresión)
+                                dentro de las campañas corporativas y los procesos internos de <strong>DIACO S.A.</strong>
+                            </div>
+
+                            <div style="
+                                padding:6px 8px;
+                                border-bottom:1px solid #000;
+                            ">
+                                Gestionar solicitudes, quejas o reclamos promovidos por el Titular de la Información
+                                o por autoridades judiciales mediante orden judicial.
+                            </div>
+
+                            <div style="
+                                padding:6px 8px;
+                            ">
+                                Compartir, en caso de ser necesario, sus datos personales, incluyendo en este punto,
+                                la transferencia y transmisión de sus datos personales a terceros países con aliados
+                                estratégicos para los fines relacionados con la transacción comercial.
+                            </div>
+
+                        </div>
+
+                        <!-- TEXTO LEGAL -->
+                        <div style="
+                            width:760px;
+                            margin-left:10px;
+                            margin-top:16px;
+                            font-size:10px;
+                            line-height:1.45;
+                        ">
+
+                            <strong>3.</strong>
+                            &nbsp;
+                            Que la Política de Datos Personales y Privacidad de <strong>DIACO S.A.</strong>,
+                            puede ser consultada en la página web
+
+                            <br><br>
+
+                            <strong>4.</strong>
+                            &nbsp;
+                            Es de carácter facultativo o voluntario responder pregunta que versen sobre Datos Sensibles
+                            o sobre menores de edad.
+
+                            <br><br>
+
+                            <strong>5.</strong>
+                            &nbsp;
+                            Mis derechos como titular de los datos son los previstos en la Constitución y la ley,
+                            especialmente el derecho a conocer, actualizar, rectificar y suprimir mi información personal,
+                            así como el derecho a revocar el consentimiento otorgado para el tratamiento de datos personales.
+
+                            <br><br>
+
+                            <strong>6.</strong>
+                            &nbsp;
+                            Los derechos mencionados anteriormente, pueden ser ejercidos a través de petición enviada al correo
+                            electrónico de <strong>DIACO S.A.</strong>,
+                            <a href="mailto:diaco@diaco.com.co"
+                                style="color:#00a2ff; text-decoration:underline;">
+                                diaco@diaco.com.co
+                            </a>
+                            y observando la Política de Tratamiento de Datos Personales de <strong>DIACO S.A.</strong>
+
+                            <br><br>
+
+                            <strong>7.</strong>
+                            &nbsp;
+                            Mediante el correo electrónico de <strong>DIACO S.A.</strong>,
+                            <a href="mailto:diaco@diaco.com.co"
+                                style="color:#00a2ff; text-decoration:underline;">
+                                diaco@diaco.com.co
+                            </a>
+                            podré radicar cualquier tipo de requerimiento relacionado con el tratamiento de mis datos personales.
+
+                            <br><br>
+
+                            <strong>8.</strong>
+                            &nbsp;
+                            <strong>DIACO S.A.</strong>
+                            garantizará la confidencialidad, libertad, seguridad, veracidad, transparencia,
+                            acceso y circulación restringida de mis datos y se reservará el derecho de modificar
+                            su Política de Tratamiento de Datos Personales en cualquier momento. Cualquier cambio
+                            será informado y publicado oportunamente en la página web.
+
+                            <br><br>
+
+                            <strong>9.</strong>
+                            &nbsp;
+                            Teniendo en cuenta lo anterior, autorizo de manera voluntaria, previa, explícita,
+                            informada e inequívoca a <strong>DIACO S.A.</strong>,
+                            para tratar mis datos personales de acuerdo con su Política de Tratamiento de Datos Personales
+                            para los fines relacionados con su objeto y en especial para fines legales, contractuales,
+                            misionales descritos en la Política de Tratamiento de Datos Personales de <strong>DIACO S.A.</strong>
+
+                            <br><br>
+
+                            <strong>10.</strong>
+                            &nbsp;
+                            La información obtenida para el Tratamiento de mis datos personales la he suministrado
+                            de forma voluntaria y es verídica.
+
+                        </div>
+
+                        <!-- TABLA FIRMA -->
+                        <div class="form-outer" style="margin-top:24px;">
+
+                            <!-- NOMBRE -->
+                            <div class="row">
+
+                                <div class="cell" style="width:38%;">
+                                    <strong>
+                                        Nombre del Representante legal o Persona Titular de los datos
+                                    </strong>
+                                </div>
+
+                                <div class="cell" style="width:62%;"></div>
+
+                            </div>
+
+                            <!-- FIRMA -->
+                            <div class="row" style="min-height:95px;">
+
+                                <div class="cell cell-full">
+                                    <strong>Firma:</strong>
+                                </div>
+
+                            </div>
+
+                            <!-- DOCUMENTO -->
+                            <div class="row">
+
+                                <div class="cell" style="width:55%;">
+
+                                    <strong>Documento de Identificación:</strong>
+
+                                    <strong>
+                                    &nbsp;
+                                    C.C. <input type="checkbox">
+
+                                    &nbsp;
+                                    C.E. <input type="checkbox">
+
+                                    &nbsp;
+                                    T.I <input type="checkbox">
+
+                                    &nbsp;
+                                    R.C. <input type="checkbox">
+                                    </strong>
+
+                                </div>
+
+                                <div class="cell" style="width:45%;">
+                                    <strong>No. De Documento:</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </body>
+                    </html>
+                `;
+
+                const contentBlocks = [htmlPagina1, htmlPagina2, htmlPagina3];
 
                 // ── PDF ───────────────────────────────────────────────────────
                 const existingPdfBytes = await fetch("pdf/plantillaDatosPersonales.pdf")
@@ -894,7 +1171,8 @@ sap.ui.define([
                 const { width, height } = templatePage.getSize();
                 const templatePageImage = await pdfDoc.embedPage(templatePage);
 
-                for (const blockHtml of contentBlocks) {
+                for (let pageIndex = 0; pageIndex < contentBlocks.length; pageIndex++) {
+                    const blockHtml = contentBlocks[pageIndex];
                     const div = document.createElement("div");
                     div.style.width           = "794px";
                     div.style.height          = "1400px";
@@ -922,11 +1200,46 @@ sap.ui.define([
                     const imgHeight = (img.height * imgWidth) / img.width;
 
                     newPage.drawImage(img, {
-                        x: (width - imgWidth) / 2 -10,
-                        y: height - imgHeight - 130,
-                        width: imgWidth,
-                        height: imgHeight
+                    x: (width - imgWidth) / 2 -10,
+                    y: height - imgHeight - 130,
+                    width: imgWidth,
+                    height: imgHeight
+                });
+
+                if (pageIndex === 2) {
+
+                    const linkUrl = "https://www.diaco.com.co/";
+
+                    // Texto real para poner el enlace
+                    newPage.drawText("https://www.diaco.com.co/", {
+                        x: 373,
+                        y: 511,
+                        size: 7,
+                        color: PDFLibRef.rgb(0, 0.64, 1)
                     });
+
+                    // LINK REAL
+                    const linkAnnotation = pdfDoc.context.register(
+                        pdfDoc.context.obj({
+                            Type: 'Annot',
+                            Subtype: 'Link',
+                            Rect: [355, 312, 515, 325],
+                            Border: [0, 0, 0],
+                            A: pdfDoc.context.obj({
+                                S: 'URI',
+                                URI: PDFLibRef.PDFString.of(linkUrl)
+                            })
+                        })
+                    );
+
+                    const annots = pdfDoc.context.obj([linkAnnotation]);
+
+                    newPage.node.set(
+                        PDFLibRef.PDFName.of('Annots'),
+                        annots
+                    );
+                }
+
                 }
                 pdfDoc.removePage(0);
                 const pdfBytes = await pdfDoc.save();
