@@ -203,8 +203,10 @@ sap.ui.define([
                             </div>
                             <div class="cell cell-55" style="min-height:62px;">
                                 <strong>Documento de Identificación</strong>
+                                <strong>
                                 &nbsp; C.C. <input type="checkbox">
                                 &nbsp; C.E. <input type="checkbox">
+                                </strong>
                                 <br>
                                 <strong>No.</strong>
                                 <br>
@@ -302,20 +304,24 @@ sap.ui.define([
                             <div class="cell cell-50 h-dep" style="padding:6px 7px;">
                                 <strong>Tipo de vínculo:</strong>
                                 <br><br>
+                                <strong>
                                 Cónyuge <input type="checkbox">
                                 Hijo <input type="checkbox">
                                 Padre <input type="checkbox">
                                 Madre <input type="checkbox">
                                 Otro <input type="checkbox">
+                                </strong>
                                 <br><br>
                                 <strong>Cual:</strong>
                             </div>
                             <div class="cell cell-50 h-dep" style="padding:6px 7px;">
                                 <strong>Documento de Identificación C.C.</strong>
                                 <input type="checkbox">
+                                <strong>
                                 C.E. <input type="checkbox">
                                 TI <input type="checkbox">
                                 RC <input type="checkbox">
+                                </strong>
                                 <br><br>
                                 <strong>No.</strong>
                                 <br><br>
@@ -338,20 +344,24 @@ sap.ui.define([
                             <div class="cell cell-50 h-dep" style="padding:6px 7px;">
                                 <strong>Tipo de vínculo:</strong>
                                 <br><br>
+                                <strong>
                                 Cónyuge <input type="checkbox">
                                 Hijo <input type="checkbox">
                                 Padre <input type="checkbox">
                                 Madre <input type="checkbox">
                                 Otro <input type="checkbox">
+                                </strong>
                                 <br><br>
                                 <strong>Cual:</strong>
                             </div>
                             <div class="cell cell-50 h-dep" style="padding:6px 7px;">
                                 <strong>Documento de Identificación C.C.</strong>
                                 <input type="checkbox">
+                                <strong>
                                 C.E. <input type="checkbox">
                                 TI <input type="checkbox">
                                 RC <input type="checkbox">
+                                </strong>
                                 <br><br>
                                 <strong>No.</strong>
                                 <br><br>
@@ -374,20 +384,24 @@ sap.ui.define([
                             <div class="cell cell-50 h-dep" style="padding:6px 7px;">
                                 <strong>Tipo de vínculo:</strong>
                                 <br><br>
+                                <strong>
                                 Cónyuge <input type="checkbox">
                                 Hijo <input type="checkbox">
                                 Padre <input type="checkbox">
                                 Madre <input type="checkbox">
                                 Otro <input type="checkbox">
+                                </strong>
                                 <br><br>
                                 <strong>Cual:</strong>
                             </div>
                             <div class="cell cell-50 h-dep" style="padding:6px 7px;">
                                 <strong>Documento de Identificación C.C.</strong>
                                 <input type="checkbox">
+                                <strong>
                                 C.E. <input type="checkbox">
                                 TI <input type="checkbox">
                                 RC <input type="checkbox">
+                                </strong>
                                 <br><br>
                                 <strong>No.</strong>
                                 <br><br>
@@ -412,10 +426,12 @@ sap.ui.define([
                             </div>
                             <div class="cell cell-50" style="padding:6px 7px; min-height:26px;">
                                 <strong>Documento de Identificación C.C.</strong>
+                                <strong>
                                 <input type="checkbox">
                                 C.E. <input type="checkbox">
                                 TI <input type="checkbox">
                                 RC <input type="checkbox">
+                                </strong>
                             </div>
                         </div>
 
@@ -425,7 +441,449 @@ sap.ui.define([
                     </html>
                 `;
 
-                const contentBlocks = [htmlPagina1];
+                const htmlPagina2 = `
+                    <!DOCTYPE html>
+                    <html lang="es">
+                    <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+                    <style>
+                        * {
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                            font-family: Arial, Helvetica, sans-serif;
+                            color: #000;
+                        }
+
+                        body {
+                            background: #fff;
+                            padding: 12px;
+                        }
+
+                        .form-outer {
+                            width: 760px;
+                            margin-left: 10px;
+                            margin-right: auto;
+                            border: 2px solid #000;
+                        }
+
+                        .row {
+                            display: flex;
+                            border-top: 1px solid #000;
+                            min-height: 26px;
+                        }
+
+                        .row:first-child {
+                            border-top: none;
+                        }
+
+                        .cell {
+                            padding: 4px 7px;
+                            font-size: 10px;
+                            line-height: 1.45;
+                            vertical-align: top;
+                            flex-shrink: 0;
+                        }
+
+                        .cell + .cell {
+                            border-left: 1px solid #000;
+                        }
+
+                        .cell-full { width: 100%; }
+                        .cell-50   { width: 50%; }
+                        .cell-35   { width: 35%; }
+                        .cell-65   { width: 65%; }
+
+                        .section-header {
+                            background: #0070a8;
+                            color: #fff;
+                            text-align: center;
+                            font-weight: bold;
+                            font-size: 10.5px;
+                            padding: 4px 8px;
+                            border-top: 1px solid #000;
+                            line-height: 1.4;
+                        }
+
+                        .section-header span {
+                            display: block;
+                            font-weight: normal;
+                            font-size: 12px;
+                            color: #fff;
+                        }
+
+                        strong {
+                            font-weight: bold;
+                        }
+
+                        .underline {
+                            border-bottom: 1px solid #000;
+                            display: block;
+                            min-height: 14px;
+                            margin-top: 3px;
+                        }
+
+                        input[type="checkbox"] {
+                            -webkit-appearance: none;
+                            appearance: none;
+                            width: 10px;
+                            height: 10px;
+                            border: 1px solid #000;
+                            background: #fff;
+                            display: inline-block;
+                            vertical-align: middle;
+                            margin: 0 1px;
+                            flex-shrink: 0;
+                        }
+
+                        input[type="checkbox"]:checked {
+                            background: #000;
+                        }
+
+                        .h-dep {
+                            min-height: 70px;
+                        }
+                    </style>
+                    </head>
+
+                    <body>
+
+                    <div class="form-outer">
+
+                        <!-- RESTO DEPENDIENTE 4 -->
+                        <!-- CONTINUACIÓN DEPENDIENTE 4 -->
+                        <div class="row" style="border-top:none;">
+
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>
+                                Cónyuge <input type="checkbox">
+                                Hijo <input type="checkbox">
+                                Padre <input type="checkbox">
+                                Madre <input type="checkbox">
+                                Otro <input type="checkbox">
+                                </strong>
+
+                                <br><br>
+
+                                <strong>Cual:</strong>
+
+                            </div>
+
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+
+                                <strong>No.</strong>
+
+                                <br><br>
+
+                                <strong>Fecha de expedición del documento:</strong>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="cell cell-50">
+                                <strong>Fecha de nacimiento:</strong>
+                            </div>
+
+                            <div class="cell cell-50">
+                                <strong>Teléfono de contacto</strong>
+                            </div>
+                        </div>
+
+                        <!-- DEPENDIENTE 5 -->
+                        <div class="row">
+                            <div class="cell cell-full" style="padding:4px 7px; min-height:32px;">
+                                <strong>Nombre y Apellidos:</strong>
+                                <span class="underline" style="margin-top:6px;"></span>
+                            </div>
+                        </div>
+
+                        <div class="row" style="border-top:none;">
+
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Tipo de vínculo:</strong>
+
+                                <br><br>
+                                <strong>
+                                Cónyuge <input type="checkbox">
+                                Hijo <input type="checkbox">
+                                Padre <input type="checkbox">
+                                Madre <input type="checkbox">
+                                Otro <input type="checkbox">
+                                </strong>
+
+                                <br><br>
+
+                                <strong>Cual:</strong>
+                            </div>
+
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Documento de Identificación C.C.</strong>
+
+                                <input type="checkbox">
+                                <strong>
+                                C.E. <input type="checkbox">
+                                TI <input type="checkbox">
+                                RC <input type="checkbox">
+                                </strong>
+
+                                <br><br>
+
+                                <strong>No.</strong>
+
+                                <br><br>
+
+                                <strong>Fecha de expedición del documento:</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="cell cell-50">
+                                <strong>Fecha de nacimiento:</strong>
+                            </div>
+
+                            <div class="cell cell-50">
+                                <strong>Teléfono de contacto</strong>
+                            </div>
+                        </div>
+
+                        <!-- DEPENDIENTE 6 -->
+                        <div class="row">
+                            <div class="cell cell-full" style="padding:4px 7px; min-height:32px;">
+                                <strong>Nombre y Apellidos:</strong>
+                                <span class="underline" style="margin-top:6px;"></span>
+                            </div>
+                        </div>
+
+                        <div class="row" style="border-top:none;">
+
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Tipo de vínculo:</strong>
+
+                                <br><br>
+                                <strong>
+                                Cónyuge <input type="checkbox">
+                                Hijo <input type="checkbox">
+                                Padre <input type="checkbox">
+                                Madre <input type="checkbox">
+                                Otro <input type="checkbox">
+                                </strong>
+
+                                <br><br>
+
+                                <strong>Cual:</strong>
+                            </div>
+
+                            <div class="cell cell-50 h-dep" style="padding:6px 7px;">
+                                <strong>Documento de Identificación C.C.</strong>
+
+                                <input type="checkbox">
+                                <strong>
+                                C.E. <input type="checkbox">
+                                TI <input type="checkbox">
+                                RC <input type="checkbox">
+                                </strong>
+                                
+                                <br><br>
+
+                                <strong>No.</strong>
+
+                                <br><br>
+
+                                <strong>Fecha de expedición del documento:</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="cell cell-50">
+                                <strong>Fecha de nacimiento:</strong>
+                            </div>
+
+                            <div class="cell cell-50">
+                                <strong>Teléfono de contacto</strong>
+                            </div>
+                        </div>
+
+                        </div> <!-- ← CIERRE FORM-OUTER -->
+
+
+                        <!-- TEXTO SUELTO -->
+                        <div style="
+                            font-size:12px;
+                            margin-top:20px;
+                            margin-bottom:12px;
+                            font-weight:bold;
+                            margin-left:10px;
+                        ">
+                            Si tiene más dependientes, por favor allegue la información solicitada en hoja aparte.
+                        </div>
+
+
+                        <!-- NUEVA TABLA -->
+                        <div class="form-outer">
+
+                            <!-- INFORMACIÓN DE PAGOS -->
+                            <div class="section-header">
+                                INFORMACIÓN DE PAGOS
+                            </div>
+
+                            <div class="row">
+
+                                <div class="cell" style="width:55%;">
+                                    <strong>Entidad Bancaria:</strong>
+                                </div>
+
+                            <div class="cell" style="width:45%;">
+
+                                <div style="
+                                    display:flex;
+                                    align-items:center;
+                                    gap:35px;
+                                ">
+
+                                    <div>
+                                        <strong>Ahorros</strong>
+                                        <input type="checkbox">
+                                    </div>
+
+                                    <div>
+                                        <strong>Corriente</strong>
+                                        <input type="checkbox">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="cell cell-full">
+                                <strong>No. De Cuenta:</strong>
+                            </div>
+                        </div>
+
+                        <!-- INFORMACIÓN DE HUELLA -->
+
+                        <div class="section-header">
+                            INFORMACIÓN DE HUELLA
+                        </div>
+
+                        <div class="row" style="min-height:150px;">
+
+                            <div class="cell" style="
+                                width:22%;
+                                display:flex;
+                                align-items:center;
+                                font-weight:bold;
+                                padding-right:0;
+                            ">
+                                Huella Dactilar:
+                            </div>
+
+                            <div class="cell" style="
+                                width:78%;
+                                border-left:none;
+                                display:flex;
+                                flex-direction:column;
+                                align-items:flex-start;
+                                justify-content:center;
+                                padding-left:0;
+                            ">
+
+                                <div style="
+                                    width:95px;
+                                    height:95px;
+                                    border:1.5px solid #f4a460;
+                                    margin-bottom:8px;
+                                "></div>
+
+                                <strong style="margin-left:6px;">
+                                    Índice Derecho
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        </div> <!-- ← SOLO ESTE cierre de form-outer -->
+
+                        <!-- TEXTO LEGAL -->
+                        <div style="
+                            width:760px;
+                            margin-left:10px;
+                            margin-top:20px;
+                            margin-bottom:12px;
+                            font-size:10px;
+                            font-weight:normal;
+                        ">
+
+                            Dando cumplimiento a lo dispuesto en la Ley 1582 de 2012,
+                            "Por la cual se dictan disposiciones generales para la protección
+                            de datos personales" y de conformidad con lo señalado en el
+                            Decreto 1377 de 2013 y demás normas aplicables al Régimen de
+                            protección de datos personales en Colombia, con la firma de este
+                            documento manifiesto que he sido informado por <strong>DIACO S.A.</strong>, de lo siguiente:
+
+                            <br><br>
+
+                            <strong>1.</strong>
+                            &nbsp;
+                            <strong>DIACO S.A.</strong> actuará como responsable del Tratamiento de datos personales
+                            de los cuales soy titular y que, conjunta o separadamente podrá recolectar,
+                            usar y tratar mis datos personales conforme a la Política de Tratamiento de
+                            Datos Personales de <strong>DIACO S.A.</strong> disponible en la página web de la Compañía.
+
+                            <br><br>
+
+                            <strong>2.</strong>
+                            &nbsp;
+                            Que me ha sido informada la(s) finalidad(es) de la recolección de los datos personales,
+                            en razón al proceso de selección y/o la relación laboral, las cuales son las siguientes:
+
+                        </div>
+
+                        <!-- CAJA FINAL -->
+                        <div style="
+                            width:730px;
+                            margin-left:28px;
+                            margin-top:10px;
+                            border:1px solid #000;
+                            font-size:10px;
+                            line-height:1.45;
+                        ">
+
+                            <!-- FILA 1 -->
+                            <div style="
+                                padding:6px 8px;
+                                border-bottom:1px solid #000;
+                            ">
+                                Efectuar todas las gestiones necesarias para el desarrollo del objeto Social de <strong>DIACO S.A.</strong>,
+                                en todo lo relacionado con el cumplimiento del objeto del contrato celebrado entre la Compañía
+                                y el Titular de la información.
+                            </div>
+
+                            <!-- FILA 2 -->
+                            <div style="
+                                padding:6px 8px;
+                            ">
+                                Incluir la información del colaborador al Sistema físico y digital de Información de la Compañía.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    </body>
+                    </html>
+                `;
+
+                const contentBlocks = [htmlPagina1, htmlPagina2];
 
                 // ── PDF ───────────────────────────────────────────────────────
                 const existingPdfBytes = await fetch("pdf/plantillaDatosPersonales.pdf")
