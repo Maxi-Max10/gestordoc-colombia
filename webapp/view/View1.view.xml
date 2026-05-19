@@ -193,7 +193,7 @@
 
                         <!-- 5. MANIFESTACIÓN DE NO DECLARANTE  ── color: pink -->
                         <CustomListItem
-                            id="itemNoDeclarante"
+                            id="customListItemNoDeclarante"
                             class="customListItem card-horizontal card-pink"
                             type="Active"
                             press="onNoDeclarantePress"

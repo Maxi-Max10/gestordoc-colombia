@@ -18,11 +18,12 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/solicitudDeduccionesRetencion",
   "gestordoccolombia/controller/functions/compromisoEtica",
   "gestordoccolombia/controller/functions/autorizacionDescuento",
-  "gestordoccolombia/controller/functions/datosPersonales"
+  "gestordoccolombia/controller/functions/datosPersonales",
+  "gestordoccolombia/controller/functions/noDeclarante"
 
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica, autorizacionDescuento, datosPersonales) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante ) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -821,6 +822,7 @@ sap.ui.define([
           var oButtonCompromisoEtica = that.byId("customListItemCompromisoEtica");
           var oButtonAutorizacionDescuento = that.byId("customListItemAutorizacionDescuento");
           var oButtonDatosPersonales = that.byId("customListItemDatosPersonales");
+          var oButtonNoDeclarante = that.byId("customListItemNoDeclarante");
 
           //Configuracion de visibilidad segun los permisos
           if (permisos === "admin") {
@@ -834,6 +836,7 @@ sap.ui.define([
               oButtonCompromisoEtica?.setVisible(true);
               oButtonAutorizacionDescuento?.setVisible(true);
               oButtonDatosPersonales?.setVisible(true);
+              oButtonNoDeclarante?.setVisible(true);
           } else if (permisos === "usuario") {
               oButtonKitRetiro?.setVisible(false);
               oButtonOtroSiRodamiento?.setVisible(false);
@@ -845,6 +848,7 @@ sap.ui.define([
               oButtonCompromisoEtica?.setVisible(false);
               oButtonAutorizacionDescuento?.setVisible(false);
               oButtonDatosPersonales?.setVisible(false);
+              oButtonNoDeclarante?.setVisible(false);
           }
 
           that._hideInitialPreloader();
@@ -1077,6 +1081,7 @@ sap.ui.define([
         case "Compromiso con la Ética":
         case "Autorización de Descuento":
         case "Datos Personales":
+        case "No Declarante":
         default:
           // Solo Administrativos
           aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
@@ -1363,6 +1368,9 @@ sap.ui.define([
             case "Datos Personales":
                 this.onDownloadPDFDatosPersonales(sButtonId);
                 break;
+            case "No Declarante":
+                this.onDownloadPDFNoDeclarante(sButtonId);
+                break;
             default:
                 sap.m.MessageToast.show("No hay función definida para este documento.");
                 break;
@@ -1407,7 +1415,8 @@ sap.ui.define([
         { id: "customListItemSolicitudDeduccionesRetencion", title: "Solicitud Deducciones Retencion", desc: "Gestionar solicitud de deducciones y retenciones" },
         { id: "customListItemCompromisoEtica", title: "Compromiso con la Ética", desc: "Declaración de principios éticos" },
         { id: "customListItemAutorizacionDescuento", title: "Autorización de Descuento", desc: "Gestionar autorización de descuento" },
-        { id: "customListItemDatosPersonales", title: "Datos Personales", desc: "Actualizar datos personales" }
+        { id: "customListItemDatosPersonales", title: "Datos Personales", desc: "Actualizar datos personales" },
+        { id: "customListItemNoDeclarante", title: "No Declarante", desc: "Certificado de no declarante" }
       ];
     },
 
@@ -1605,6 +1614,18 @@ sap.ui.define([
             });
     },
 
+    onNoDeclarantePress: function () {
+        const sTitle = "No Declarante";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "noDeclarante";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de No Declarante:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });
+    },
+
 
     _openManualDateDialog: function () { //---------------------------NO SE SI DEJAR ESTA FUNCION
       const oView = this.getView();
@@ -1753,6 +1774,11 @@ sap.ui.define([
     onDownloadPDFDatosPersonales: async function (sButtonId) {
         datosPersonales.onDownloadPDFDatosPersonales(this, sButtonId);  
     },
+
+    //Archivo: NO DECLARANTE
+    onDownloadPDFNoDeclarante: async function (sButtonId) {
+        noDeclarante.onDownloadPDFNoDeclarante(this, sButtonId);   
+    },   
 
 
   });
