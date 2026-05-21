@@ -20,11 +20,12 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/autorizacionDescuento",
   "gestordoccolombia/controller/functions/datosPersonales",
   "gestordoccolombia/controller/functions/noDeclarante",
-  "gestordoccolombia/controller/functions/protocoloRecibo"
+  "gestordoccolombia/controller/functions/protocoloRecibo",
+  "gestordoccolombia/controller/functions/contratoIndefIntegral"
 
 ], 
 
-(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante, protocoloRecibo ) => {
+(Controller, JSONModel, MessageToast, LibraryLoader, pdfGenerator,wordGenerator, uiHelpers, formatHelpers, kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11, otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion, compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante, protocoloRecibo, contratoIndefIntegral ) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -825,6 +826,7 @@ sap.ui.define([
           var oButtonDatosPersonales = that.byId("customListItemDatosPersonales");
           var oButtonNoDeclarante = that.byId("customListItemNoDeclarante");
           var oButtonProtocoloRecibo = that.byId("customListItemProtocoloRecibo");
+          var oButtonContratoIndefIntegral = that.byId("customListItemContratoIndefIntegral");
 
           //Configuracion de visibilidad segun los permisos
           if (permisos === "admin") {
@@ -840,6 +842,7 @@ sap.ui.define([
               oButtonDatosPersonales?.setVisible(true);
               oButtonNoDeclarante?.setVisible(true);
               oButtonProtocoloRecibo?.setVisible(true);
+              oButtonContratoIndefIntegral?.setVisible(true);
           } else if (permisos === "usuario") {
               oButtonKitRetiro?.setVisible(false);
               oButtonOtroSiRodamiento?.setVisible(false);
@@ -853,6 +856,7 @@ sap.ui.define([
               oButtonDatosPersonales?.setVisible(false);
               oButtonNoDeclarante?.setVisible(false);
               oButtonProtocoloRecibo?.setVisible(false);
+              oButtonContratoIndefIntegral?.setVisible(false);
           }
 
           that._hideInitialPreloader();
@@ -1087,6 +1091,7 @@ sap.ui.define([
         case "Datos Personales":
         case "No Declarante":
         case "Protocolo de Recibo":
+        case "Contrato Indefinido Integral":
         default:
           // Solo Administrativos
           aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
@@ -1379,6 +1384,9 @@ sap.ui.define([
             case "Protocolo de Recibo":
                 this.onDownloadPDFProtocoloRecibo(sButtonId);
                 break;
+            case "Contrato Indefinido Integral":
+                this.onDownloadPDFContratoIndefIntegral(sButtonId);
+                break;
             default:
                 sap.m.MessageToast.show("No hay función definida para este documento.");
                 break;
@@ -1425,7 +1433,8 @@ sap.ui.define([
         { id: "customListItemAutorizacionDescuento", title: "Autorización de Descuento", desc: "Gestionar autorización de descuento" },
         { id: "customListItemDatosPersonales", title: "Datos Personales", desc: "Actualizar datos personales" },
         { id: "customListItemNoDeclarante", title: "No Declarante", desc: "Certificado de no declarante" },
-        { id: "customListItemProtocoloRecibo", title: "Protocolo de Recibo", desc: "Generar protocolo de recibo" }
+        { id: "customListItemProtocoloRecibo", title: "Protocolo de Recibo", desc: "Generar protocolo de recibo" },
+        { id: "customListItemContratoIndefIntegral", title: "Contrato Indefinido Integral", desc: "Generar contrato indefinido integral" }
       ];
     },
 
@@ -1647,6 +1656,18 @@ sap.ui.define([
             });     
     },
 
+    onContratoIntegralPress: function () {
+        const sTitle = "Contrato Indefinido Integral";
+        this.sSelectedContract = sTitle;
+        this._currentCategory  = "contratoIndefIntegral";
+ 
+        this._handleTileSelection(sTitle)
+            .catch(oError => {
+                console.error("Error al preparar datos de Contrato Indefinido Integral:", oError);
+                sap.m.MessageToast.show("Error cargando los datos.");
+            });     
+    },
+
 
     _openManualDateDialog: function () { //---------------------------NO SE SI DEJAR ESTA FUNCION
       const oView = this.getView();
@@ -1804,6 +1825,11 @@ sap.ui.define([
     //Archivo: PROTOCOLO DE RECIBO
     onDownloadPDFProtocoloRecibo: async function (sButtonId) {
         protocoloRecibo.onDownloadPDFProtocoloRecibo(this, sButtonId);  
+    },
+
+    //Archivo: CONTRATO INDEFINIDO INTEGRAL
+    onDownloadPDFContratoIndefIntegral: async function (sButtonId) {
+        contratoIndefIntegral.onDownloadPDFContratoIndefIntegral(this, sButtonId);  
     },
 
 
