@@ -79,7 +79,7 @@ sap.ui.define([
 
                 function _tituloContrato(numero, titulo, texto) {
                     return `
-                        <div style="display:flex;align-items:flex-start;margin:10px 0 8px 0;">
+                        <div style="display:flex;align-items:flex-start;margin:18px 0 12px 0;">
 
                             <div style="width:28px;font-weight:bold;padding-top:1px;">
                                 ${numero}
@@ -95,16 +95,11 @@ sap.ui.define([
 
                 function _paragrafoContrato(titulo, texto) {
                     return `
-                        <div style="display:flex;align-items:flex-start;margin:8px 0;">
-
-                            <div style="width:24px;font-weight:bold;padding-top:1px;">
-                                &nbsp;
-                            </div>
-
-                            <div style="flex:1;text-align:justify;">
-                                <strong>${titulo}</strong> ${texto}
-                            </div>
-
+                        <div style="
+                            text-align:justify;
+                            margin:14px 0 10px 0;
+                        ">
+                            <strong>${titulo}</strong> ${texto}
                         </div>
                     `;
                 }
@@ -112,25 +107,10 @@ sap.ui.define([
                 function _bloqueContrato(contenido) {
                     return `
                         <div style="
-                            display:flex;
-                            align-items:flex-start;
-                            margin:0 0 8px 0;
+                            text-align:justify;
+                            margin:0 0 14px 0;
                         ">
-
-                            <div style="
-                                width:24px;
-                                flex-shrink:0;
-                            ">
-                                &nbsp;
-                            </div>
-
-                            <div style="
-                                flex:1;
-                                text-align:justify;
-                            ">
-                                ${contenido}
-                            </div>
-
+                            ${contenido}
                         </div>
                     `;
                 }
@@ -435,17 +415,15 @@ sap.ui.define([
                         15 de la ley 50 de 1990, debido a que se debe a mera liberalidad de la compañía.
                     `)}
 
-                    ${_bloqueContrato(
-                        "PARÁGRAFO:",
-                        `
+                    ${_bloqueContrato(`
+                        <strong>PARÁGRAFO:</strong>
                         Por tratarse de un beneficio extralegal, unilateral y de mera liberalidad
                         por parte del empleador, <strong>EL EMPLEADOR</strong> podrá eliminar,
                         suspender, ajustar y/o modificar el valor y condiciones para su
                         reconocimiento también de manera unilateral y en cualquier momento,
                         bastando únicamente la previa comunicación que de ello haga a
-                        <strong>EL TRABAJADOR</strong>.
-                        `
-                    )}
+                        EL TRABAJADOR.
+                    `)}
 
                 </div>`;
 
@@ -484,8 +462,8 @@ sap.ui.define([
                         `
                         Los dos primeros meses del presente contrato, contados desde la fecha
                         en que se comienzan las labores, se consideran como
-                        <strong>PERÍODO DE PRUEBA</strong> en el que
-                        <strong>EL EMPLEADOR</strong> podrá apreciar las aptitudes de
+                        PERÍODO DE PRUEBA en el que
+                        EL EMPLEADOR podrá apreciar las aptitudes de
                         <strong>EL TRABAJADOR</strong> y éste la conveniencia de las condiciones
                         de trabajo. Por lo tanto, durante este período, el contrato puede darse
                         por terminado unilateralmente en cualquier momento, sin previo aviso
@@ -527,19 +505,11 @@ sap.ui.define([
                     </p>
 
                     <!-- Continuación hacia página 6 -->
-                    <div style="display:flex;align-items:flex-start;margin:0 0 8px 0;">
-
-                        <div style="width:24px;font-weight:bold;padding-top:1px;">
-                            &nbsp;
-                        </div>
-
-                        <div style="flex:1;text-align:justify;">
-                            De la misma forma, <strong>EL TRABAJADOR</strong> reconoce y acepta
-                            la posibilidad de desarrollar sus funciones directamente para
-                            <strong>EL EMPLEADOR</strong> o para cualquier otra empresa o sociedad que
-                        </div>
-
-                    </div>
+                    ${_bloqueContrato(`
+                        De la misma forma, <strong>EL TRABAJADOR</strong> reconoce y acepta
+                        la posibilidad de desarrollar sus funciones directamente para
+                        <strong>EL EMPLEADOR</strong> o para cualquier otra empresa o sociedad que
+                    `)}
 
                 </div>`;
 
