@@ -49,21 +49,19 @@ sap.ui.define([
                 // Estructura según PDF de referencia
                 // ══════════════════════════════════════════════════════════════
 
-                const STYLE = `font-family:Arial,sans-serif;font-size:8.5.5pt;line-height:1.6;color:#000;`;
+                const STYLE = `font-family:Arial,sans-serif;font-size:10pt;line-height:1.2;padding:25px 38px 20px 38px;color:#000;`;
                 const PJUST = `style="${STYLE}text-align:justify;margin:0 0 10px 0;"`;
-                const PTIT  = `style="${STYLE}font-weight:bold;text-align:center;margin:0 0 6px 0;"`;
-                const PBOLD = `style="${STYLE}font-weight:bold;margin:10px 0 6px 0;"`;
                 const HEADER = `
                     <div style="
                         width:100%;
                         text-align:center;
                         font-weight:bold;
                         line-height:1.2;
-                        margin-bottom:10px;
+                        margin-bottom:30px;
                     ">
 
-                        <div style="font-size:13pt;">
-                            CONTRATO DE TRABAJO A TÉRMINO FIJO
+                        <div style="font-size:16pt;">
+                            CONTRATO A TÉRMINO FIJO
                         </div>
 
                     </div>
@@ -73,13 +71,27 @@ sap.ui.define([
                 // ── Helpers de estructura jurídica ─────────────────────────────
                 function _itemContrato(letra, texto) {
                     return `
-                        <div style="display:flex;align-items:flex-start;margin:0 0 8px 0;">
+                        <div style="
+                            display:flex;
+                            align-items:flex-start;
+                            margin:0 0 3px 0;
+                            font-size:9pt;
+                            line-height:1.25;
+                        ">
 
-                            <div style="width:38px;font-weight:bold;padding-top:1px;">
+                            <div style="
+                                width:28px;
+                                font-weight:bold;
+                                padding-top:1px;
+                                flex-shrink:0;
+                            ">
                                 ${letra}
                             </div>
 
-                            <div style="flex:1;text-align:justify;">
+                            <div style="
+                                flex:1;
+                                text-align:justify;
+                            ">
                                 ${texto}
                             </div>
 
@@ -179,12 +191,12 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">QUINCENAL</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sHireDate}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;"></td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Un (1) mes</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO FIJO</td></tr>
                     </table>
 
-                    <p ${PJUST}>
+                    ${_bloqueContrato(`
                         Entre los suscritos a saber: <strong>DIACO S.A.</strong>, sociedad legalmente constituida,
                         con domicilio en Bogotá, representada en este contrato por
                         <strong>LAURA CRISTINA CERÓN MUÑOZ</strong>, identificada con la cédula de ciudadanía
@@ -193,9 +205,9 @@ sap.ui.define([
                         identificado(a) con la cédula de ciudadanía número <strong>${sCedula}</strong>
                         expedida en XXXXXXXXXXXXXX, domiciliada en XXXXXXXXXXXXXX obrando en nombre
                         propio y quien para efectos del presente contrato se denominará
-                        <strong>EL TRABAJADOR</strong>, hemos celebrado un contrato de trabajo según las
-                        siguientes cláusulas:
-                    </p>
+                        <strong>EL TRABAJADOR</strong>, hemos celebrado un contrato de trabajo según las siguientes cláusulas:
+                    `)}
+
 
                     ${_tituloContrato(
                         "1.",
@@ -944,6 +956,7 @@ sap.ui.define([
                     `)}
 
                     ${_bloqueContrato(`
+
                         Lo mismo es aplicable a la información, concepto dato y/o documentación verbal o
                         escrita que, aunque no haya sido adquirida directamente de
                         <strong>EL EMPLEADOR</strong>, fuera obtenida en ejecución del presente contrato.
@@ -1295,6 +1308,7 @@ sap.ui.define([
                     `)}
 
                     ${_bloqueContrato(`
+                        
                         Si en cualquier momento se constata que estas declaraciones no son válidas o se niegan a declarar
                         sobre nuevas conductas ilícitas, la PARTE cumplida podrá rescindir el contrato unilateralmente y sin
                     `)}
@@ -1423,18 +1437,19 @@ sap.ui.define([
                         `
                     )}
 
-                    <p ${PJUST} style="margin-top:24px;">
+                    ${_bloqueContrato(`
                         Del presente documento se han extendido dos ejemplares del mismo contenido,
                         uno para <strong>EL EMPLEADOR</strong> y otro para
                         <strong>EL TRABAJADOR</strong>, los cuales firmamos ante testigos en la ciudad
                         de <strong>BOGOTÁ</strong> el día <strong>20 DE ABRIL DE 2026</strong>.
-                    </p>
+                    `)}
+
 
                     <!-- Firmas -->
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:50px;
+                        margin-top:25px;
                         padding:0 20px;
                     ">
 
@@ -1443,7 +1458,7 @@ sap.ui.define([
 
                             <div style="
                                 font-weight:bold;
-                                margin-bottom:70px;
+                                margin-bottom:45px;
                             ">
                                 EMPLEADOR
                             </div>
@@ -1471,7 +1486,7 @@ sap.ui.define([
 
                             <div style="
                                 font-weight:bold;
-                                margin-bottom:70px;
+                                margin-bottom:45px;
                             ">
                                 TRABAJADOR
                             </div>
@@ -1500,7 +1515,7 @@ sap.ui.define([
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:70px;
+                        margin-top:40px;
                         padding:0 20px;
                     ">
 
@@ -1508,7 +1523,7 @@ sap.ui.define([
 
                             <div style="
                                 font-weight:bold;
-                                margin-bottom:70px;
+                                margin-bottom:45px;
                             ">
                                 TESTIGO
                             </div>
@@ -1527,7 +1542,7 @@ sap.ui.define([
 
                             <div style="
                                 font-weight:bold;
-                                margin-bottom:70px;
+                                margin-bottom:45px;
                             ">
                                 TESTIGO
                             </div>

@@ -51,8 +51,6 @@ sap.ui.define([
 
                 const STYLE = `font-family:Arial,sans-serif;font-size:10pt;line-height:1.2;padding:25px 38px 20px 38px;color:#000;`;
                 const PJUST = `style="${STYLE}text-align:justify;margin:0 0 10px 0;"`;
-                const PTIT  = `style="${STYLE}font-weight:bold;text-align:center;margin:0 0 6px 0;"`;
-                const PBOLD = `style="${STYLE}font-weight:bold;margin:10px 0 6px 0;"`;
                 const HEADER = `
                     <div style="
                         width:100%;
@@ -165,17 +163,6 @@ sap.ui.define([
                     `;
                 }
 
-                function _continuacionItemContrato(texto) {
-                    return `
-                        <div style="
-                            margin-left:38px;
-                            text-align:justify;
-                            margin:0 0 14px 38px;
-                        ">
-                            ${texto}
-                        </div>
-                    `;
-                }
 
 
                 // ── PÁGINA 1 — Título + Tabla de datos + inicio cláusula 1 ────
