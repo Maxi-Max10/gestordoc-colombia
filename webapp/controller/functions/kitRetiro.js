@@ -300,7 +300,7 @@ sap.ui.define([
                 pdfDoc.removePage(0);
 
                 const pdfBytes = await pdfDoc.save();
-                const fileName = `${user.firstName}_${user.lastName}_Kit_Retiro`;
+                const fileName = `${user.firstName}_${user.lastName}_Kit_Retiro.pdf`;
 
                 const blob = new Blob([pdfBytes], { type: "application/pdf" });
                 const link = document.createElement("a");

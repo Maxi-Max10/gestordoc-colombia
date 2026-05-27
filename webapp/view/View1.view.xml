@@ -281,10 +281,10 @@
 
                         <!-- 9. CONTRATO A TÉRMINO FIJO  ── color: green -->
                         <CustomListItem
-                            id="itemContratoFijo"
+                            id="customListItemContratoTerminoFijo"
                             class="customListItem card-horizontal card-green"
                             type="Active"
-                            press="onContratoFijoPress"
+                            press="onContratoTerminoFijoPress"
                             visible="true"
                         >
                             <HBox width="100%" height="100%" class="card-hbox">
@@ -380,7 +380,7 @@
                                     <core:Icon src="sap-icon://customer-financial-detail" class="card-icon" />
                                 </VBox>
                                 <VBox width="auto" height="100%" class="card-content-box">
-                                    <Text text="Contrato Indefinido Integral -- FALTA" class="card-title" />
+                                    <Text text="Contrato Indefinido Integral" class="card-title" />
                                     <Text text="Documentación contrato integral" class="card-desc" />
                                 </VBox>
                                 <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">

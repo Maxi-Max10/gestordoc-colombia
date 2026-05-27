@@ -3,26 +3,6 @@ sap.ui.define([], function () {
 
     return {
 
-        // =====================================================================================
-        // Mapea el título seleccionado en la vista al nombre del archivo .docx correspondiente.
-        // =====================================================================================
-        mapTitleToFile: function (sTitle) {
-            var oMapping = {
-                "Contrato De Trabajo": "Contrato_Trabajo_Administrador",
-                "Confidencialidad": "Confidencialidad",
-                "Carta Desahucio": "Carta_Desahucio"
-            };
-
-            // Obtiene el nombre base del archivo según el título
-            var sBaseName = oMapping[sTitle] || null;
-
-            // Si existe, devuelve el nombre con extensión .docx
-            if (sBaseName) {
-                return sBaseName + ".docx";
-            }
-
-            return null; // Si no existe, no devolver nada
-        },
 
         // =====================================================================================
         // Convierte un número (salario) a palabras siguiendo formato dominicano.
