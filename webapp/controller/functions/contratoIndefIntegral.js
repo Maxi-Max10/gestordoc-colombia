@@ -49,29 +49,21 @@ sap.ui.define([
                 // Estructura según PDF de referencia
                 // ══════════════════════════════════════════════════════════════
 
-                const STYLE = `font-family:Arial,sans-serif;font-size:8.5.5pt;line-height:1.6;color:#000;`;
+                const STYLE = `font-family:Arial,sans-serif;font-size:10pt;line-height:1.2;padding:25px 38px 20px 38px;color:#000;`;
                 const PJUST = `style="${STYLE}text-align:justify;margin:0 0 10px 0;"`;
                 const PTIT  = `style="${STYLE}font-weight:bold;text-align:center;margin:0 0 6px 0;"`;
                 const PBOLD = `style="${STYLE}font-weight:bold;margin:10px 0 6px 0;"`;
                 const HEADER = `
                     <div style="
-                        height:85px;
                         width:100%;
                         text-align:center;
                         font-weight:bold;
-                        display:flex;
-                        flex-direction:column;
-                        justify-content:center;
-                        line-height:1.35;
-                        margin-bottom:10px;
+                        line-height:1.2;
+                        margin-bottom:30px;
                     ">
 
-                        <div style="font-size:14pt;">
-                            CONTRATO DE TRABAJO A TÉRMINO INDEFINIDO
-                        </div>
-
-                        <div style="font-size:12pt;">
-                            (EMPLEADOS DE DIRECCIÓN, CONFIANZA Y MANEJO CON SALARIO INTEGRAL)
+                        <div style="font-size:16pt;">
+                            CONTRATO A INDEFINIDO INTEGRAL
                         </div>
 
                     </div>
@@ -81,13 +73,27 @@ sap.ui.define([
                 // ── Helpers de estructura jurídica ─────────────────────────────
                 function _itemContrato(letra, texto) {
                     return `
-                        <div style="display:flex;align-items:flex-start;margin:0 0 8px 0;">
+                        <div style="
+                            display:flex;
+                            align-items:flex-start;
+                            margin:0 0 3px 0;
+                            font-size:9pt;
+                            line-height:1.25;
+                        ">
 
-                            <div style="width:38px;font-weight:bold;padding-top:1px;">
+                            <div style="
+                                width:28px;
+                                font-weight:bold;
+                                padding-top:1px;
+                                flex-shrink:0;
+                            ">
                                 ${letra}
                             </div>
 
-                            <div style="flex:1;text-align:justify;">
+                            <div style="
+                                flex:1;
+                                text-align:justify;
+                            ">
                                 ${texto}
                             </div>
 
@@ -155,6 +161,18 @@ sap.ui.define([
                                 ${texto}
                             </div>
 
+                        </div>
+                    `;
+                }
+
+                function _continuacionItemContrato(texto) {
+                    return `
+                        <div style="
+                            margin-left:38px;
+                            text-align:justify;
+                            margin:0 0 14px 38px;
+                        ">
+                            ${texto}
                         </div>
                     `;
                 }
@@ -378,14 +396,15 @@ sap.ui.define([
                         - Intereses a la Cesantía: 1% mensual.
                     </div>
 
-                    <p ${PJUST}>
+
+                    ${_bloqueContrato(`
                         La remuneración mensual ha sido pactada entre las partes como
                         <strong>SALARIO INTEGRAL</strong>, de conformidad con el artículo 18
                         de la Ley 50 de 1990 y dentro del mismo quedan comprendidos el pago
                         de auxilio de cesantías, los intereses sobre las cesantías, las primas
                         de servicio, el recargo por trabajo nocturno, el trabajo en dominicales
                         y festivos, recargo de
-                    </p>
+                    `)}
 
                 </div>`;
 
@@ -482,15 +501,19 @@ sap.ui.define([
                         `
                     )}
 
-                    <p ${PJUST}>
-                        <strong>PARÁGRAFO:</strong>
+
+                    ${_tituloContrato(
+                        "",
+                        "PARÁGRAFO:",
+                        `
                         En cumplimiento del deber general de las partes de ejecutar el contrato
                         de trabajo de buena fe, <strong>EL TRABAJADOR</strong> entiende que
                         en caso de dar por terminado de manera unilateral el contrato de trabajo
                         actualmente vigente, debe dar previo aviso a <strong>EL EMPLEADOR</strong>
                         sobre dicha decisión, con una antelación no inferior a treinta (30)
                         días calendario a la fecha de terminación del contrato.
-                    </p>
+                        `
+                    )}
 
                     ${_tituloContrato(
                         "5.",
@@ -521,7 +544,8 @@ sap.ui.define([
                         `
                     )}
 
-                    <p ${PJUST}>
+                    ${_bloqueContrato(
+                        `
                         Queda expresamente previsto que la característica de la estructura
                         de cargos de la empresa es la polifuncionalidad en virtud de la cual
                         el trabajador puede ser asignado a las tareas que, según el plan de
@@ -529,16 +553,19 @@ sap.ui.define([
                         del nivel que le corresponde y en la medida en que se requiera deberá
                         realizar las labores afines, conexas, anexas o complementarias a
                         aquellas inicialmente acordadas.
-                    </p>
+                        `
+                    )}
 
-                    <p ${PJUST}>
+                    ${_bloqueContrato(
+                        `
                         <strong>EL TRABAJADOR</strong> reconoce y acepta que la característica
                         de la estructura de cargos de la empresa es la poliasignación, en virtud
                         de la cual el trabajador puede ser asignado a las tareas que el empleador
                         determine según el plan de trabajo y los objetivos empresariales y de acuerdo
                         con el nivel funcional que le corresponde a
                         <strong>EL TRABAJADOR</strong>.
-                    </p>
+                        `
+                    )}
 
                     <!-- Continuación hacia página 6 -->
                     ${_bloqueContrato(`
