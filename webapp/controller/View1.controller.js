@@ -20,13 +20,14 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/noDeclarante",
   "gestordoccolombia/controller/functions/protocoloRecibo",
   "gestordoccolombia/controller/functions/contratoIndefIntegral",
-  "gestordoccolombia/controller/functions/contratoTerminoFijo"
+  "gestordoccolombia/controller/functions/contratoTerminoFijo",
+  "gestordoccolombia/controller/functions/contratoTerminoIndef"
 
 ], (Controller, JSONModel, MessageToast, LibraryLoader, uiHelpers, formatHelpers,
     kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11,
     otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion,
     compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante,
-    protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo) => {
+    protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo, contratoTerminoIndef) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -554,7 +555,8 @@ sap.ui.define([
             "customListItemNoDeclarante",
             "customListItemProtocoloRecibo",
             "customListItemContratoIndefIntegral",
-            "customListItemContratoTerminoFijo"
+            "customListItemContratoTerminoFijo",
+            "customListItemContratoTerminoIndef"
           ];
 
           // Admins ven todo, usuarios no ven nada
@@ -1236,6 +1238,14 @@ sap.ui.define([
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
+    onContratoIndefinidoPress: function () {
+      this.sSelectedContract = "Contrato a Término Indefinido";
+      this._currentCategory  = "contratoTerminoIndef";
+      this._handleTileSelection(this.sSelectedContract)
+        .catch(() => MessageToast.show("Error cargando los datos."));
+    },
+
+
 
     // ═══════════════════════════════════════════════════════════════════
     // SELECCIÓN DE EMPLEADOS EN LA TABLA
@@ -1316,6 +1326,7 @@ sap.ui.define([
         case "Protocolo de Recibo":            this.onDownloadPDFProtocoloRecibo(sButtonId);        break;
         case "Contrato Indefinido Integral":   this.onDownloadPDFContratoIndefIntegral(sButtonId);  break;
         case "Contrato a Término Fijo":        this.onDownloadPDFContratoTerminoFijo(sButtonId);  break;
+        case "Contrato a Término Indefinido": this.onDownloadPDFContratoTerminoIndef(sButtonId);  break;
         default:
           MessageToast.show("No hay función definida para este documento.");
       }
@@ -1336,7 +1347,8 @@ sap.ui.define([
     onDownloadPDFNoDeclarante:           async function (sButtonId) { noDeclarante.onDownloadPDFNoDeclarante(this, sButtonId); },
     onDownloadPDFProtocoloRecibo:        async function (sButtonId) { protocoloRecibo.onDownloadPDFProtocoloRecibo(this, sButtonId); },
     onDownloadPDFContratoIndefIntegral:  async function (sButtonId) { contratoIndefIntegral.onDownloadPDFContratoIndefIntegral(this, sButtonId); },
-    onDownloadPDFContratoTerminoFijo:    async function (sButtonId) { contratoTerminoFijo.onDownloadPDFContratoTerminoFijo(this, sButtonId); }
+    onDownloadPDFContratoTerminoFijo:    async function (sButtonId) { contratoTerminoFijo.onDownloadPDFContratoTerminoFijo(this, sButtonId); },
+    onDownloadPDFContratoTerminoIndef:   async function (sButtonId) { contratoTerminoIndef.onDownloadPDFContratoTerminoIndef(this, sButtonId); }
 
   });
 });

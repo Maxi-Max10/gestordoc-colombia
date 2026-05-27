@@ -292,7 +292,7 @@
                                     <core:Icon src="sap-icon://business-card" class="card-icon" />
                                 </VBox>
                                 <VBox width="auto" height="100%" class="card-content-box">
-                                    <Text text="Contrato Término Fijo -- FALTA" class="card-title" />
+                                    <Text text="Contrato Término Fijo" class="card-title" />
                                     <Text text="Documentación contrato fijo" class="card-desc" />
                                 </VBox>
                                 <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
@@ -303,7 +303,7 @@
 
                         <!-- 10. CONTRATO A TÉRMINO INDEFINIDO  ── color: brown -->
                         <CustomListItem
-                            id="itemContratoIndefinido"
+                            id="customListItemContratoTerminoIndef"
                             class="customListItem card-horizontal card-brown"
                             type="Active"
                             press="onContratoIndefinidoPress"
@@ -314,7 +314,7 @@
                                     <core:Icon src="sap-icon://hr-approval" class="card-icon" />
                                 </VBox>
                                 <VBox width="auto" height="100%" class="card-content-box">
-                                    <Text text="Contrato Término Indefinido -- FALTA" class="card-title" />
+                                    <Text text="Contrato Término Indefinido" class="card-title" />
                                     <Text text="Documentación contrato indefinido" class="card-desc" />
                                 </VBox>
                                 <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
