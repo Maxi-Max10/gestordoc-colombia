@@ -165,7 +165,7 @@ sap.ui.define([
                         </tr>
                     </table>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 24px 0;">
+                    <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 40px 0;">
                         Declaró que comprendí la información contenida en esta comunicación y en señal a lo anterior
                         firmo de recibido y enterado.
                     </p>
@@ -262,21 +262,30 @@ sap.ui.define([
                 for (const blockHtml of contentBlocks) {
                     const div = document.createElement("div");
                     div.style.width           = "794px";
-                    div.style.height          = "760px";
                     div.style.padding         = "40px";
                     div.style.backgroundColor = "transparent";
                     div.style.background      = "none";
                     div.style.fontSize        = "12px";
+                    div.style.color           = "#000000";
+                    div.style.webkitFontSmoothing = "antialiased";
+                    div.style.textRendering   = "geometricPrecision";
                     div.style.boxSizing       = "border-box";
                     div.style.position        = "absolute";
                     div.style.top             = "-9999px";
+                    div.style.left            = "-9999px";   // ← agregar esto también
                     div.innerHTML             = blockHtml;
                     document.body.appendChild(div);
 
+                    // ✅ Leer la altura real DESPUÉS de que el browser haga el layout
+                    const realHeight = div.scrollHeight;
+
                     const canvas = await html2canvasRef(div, {
-                        scale: 2,
+                        scale: 4,
                         useCORS: true,
-                        backgroundColor: null
+                        backgroundColor: null,
+                        logging: false,
+                        height: realHeight,          // ✅ capturar todo
+                        windowHeight: realHeight     // ✅ evitar clipping
                     });
                     const imgData = canvas.toDataURL("image/png");
 
@@ -286,14 +295,20 @@ sap.ui.define([
                     const newPage = pdfDoc.addPage([width, height]);
                     newPage.drawPage(templatePageImage);
 
-                    const imgWidth  = width * 0.9;
-                    const imgHeight = (img.height * imgWidth) / img.width;
+                    const maxH = height - 100;
+                    let imgW = width * 0.95;
+                    let imgH = (img.height * imgW) / img.width;
+
+                    if (imgH > maxH) {
+                        imgH = maxH;
+                        imgW = (img.width * imgH) / img.height;
+                    }
 
                     newPage.drawImage(img, {
-                        x:      (width - imgWidth) / 2,
-                        y:      height - imgHeight - 130,
-                        width:  imgWidth,
-                        height: imgHeight
+                        x:      (width - imgW) / 2,
+                        y:      height - imgH - 120,
+                        width:  imgW,
+                        height: imgH
                     });
                 }
 
