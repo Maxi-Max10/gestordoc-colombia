@@ -325,10 +325,10 @@
 
                         <!-- 11. APRENDIZAJE ETAPA LECTIVA  ── color: lime -->
                         <CustomListItem
-                            id="itemAprendizajeLectiva"
+                            id="customListItemContratoAprendizajeLectivo"
                             class="customListItem card-horizontal card-lime"
                             type="Active"
-                            press="onAprendizajeLectivaPress"
+                            press="onContratoAprendizajeLectivoPress"
                             visible="true"
                         >
                             <HBox width="100%" height="100%" class="card-hbox">
@@ -336,7 +336,7 @@
                                     <core:Icon src="sap-icon://education" class="card-icon" />
                                 </VBox>
                                 <VBox width="auto" height="100%" class="card-content-box">
-                                    <Text text="Aprendizaje Etapa Lectiva -- FALTA" class="card-title" />
+                                    <Text text="Aprendizaje Etapa Lectiva" class="card-title" />
                                     <Text text="Contrato de aprendizaje lectivo" class="card-desc" />
                                 </VBox>
                                 <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">

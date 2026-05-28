@@ -21,13 +21,14 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/protocoloRecibo",
   "gestordoccolombia/controller/functions/contratoIndefIntegral",
   "gestordoccolombia/controller/functions/contratoTerminoFijo",
-  "gestordoccolombia/controller/functions/contratoTerminoIndef"
+  "gestordoccolombia/controller/functions/contratoTerminoIndef",
+  "gestordoccolombia/controller/functions/contratoAprendizajeLectivo"
 
 ], (Controller, JSONModel, MessageToast, LibraryLoader, uiHelpers, formatHelpers,
     kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11,
     otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion,
     compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante,
-    protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo, contratoTerminoIndef) => {
+    protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo, contratoTerminoIndef, contratoAprendizajeLectivo) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -556,7 +557,8 @@ sap.ui.define([
             "customListItemProtocoloRecibo",
             "customListItemContratoIndefIntegral",
             "customListItemContratoTerminoFijo",
-            "customListItemContratoTerminoIndef"
+            "customListItemContratoTerminoIndef",
+            "customListItemContratoAprendizajeLectivo"
           ];
 
           // Admins ven todo, usuarios no ven nada
@@ -1059,7 +1061,9 @@ sap.ui.define([
         { id: "customListItemNoDeclarante",                title: "No Declarante",                    desc: "Certificado de no declarante" },
         { id: "customListItemProtocoloRecibo",             title: "Protocolo de Recibo",              desc: "Generar protocolo de recibo" },
         { id: "customListItemContratoIndefIntegral",       title: "Contrato Indefinido Integral",     desc: "Generar contrato indefinido integral" },
-        { id: "customListItemContratoTerminoFijo",         title: "Contrato a Término Fijo",          desc: "Generar contrato a término fijo" }
+        { id: "customListItemContratoTerminoFijo",         title: "Contrato a Término Fijo",          desc: "Generar contrato a término fijo" },
+        { id: "customListItemContratoTerminoIndef",       title: "Contrato a Término Indefinido",    desc: "Generar contrato a término indefinido" },
+        { id: "customListItemContratoAprendizajeLectivo", title: "Contrato Aprendizaje Lectivo",      desc: "Generar contrato de aprendizaje lectivo" }
       ];
     },
 
@@ -1245,6 +1249,13 @@ sap.ui.define([
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
+      onContratoAprendizajeLectivoPress: function () {
+      this.sSelectedContract = "Contrato Aprendizaje Lectivo";
+      this._currentCategory  = "contratoAprendizajeLectivo";
+      this._handleTileSelection(this.sSelectedContract)
+        .catch(() => MessageToast.show("Error cargando los datos."));
+    },
+
 
 
     // ═══════════════════════════════════════════════════════════════════
@@ -1327,6 +1338,7 @@ sap.ui.define([
         case "Contrato Indefinido Integral":   this.onDownloadPDFContratoIndefIntegral(sButtonId);  break;
         case "Contrato a Término Fijo":        this.onDownloadPDFContratoTerminoFijo(sButtonId);  break;
         case "Contrato a Término Indefinido": this.onDownloadPDFContratoTerminoIndef(sButtonId);  break;
+        case "Contrato Aprendizaje Lectivo": this.onDownloadPDFContratoAprendizajeLectivo(sButtonId); break;
         default:
           MessageToast.show("No hay función definida para este documento.");
       }
@@ -1348,7 +1360,8 @@ sap.ui.define([
     onDownloadPDFProtocoloRecibo:        async function (sButtonId) { protocoloRecibo.onDownloadPDFProtocoloRecibo(this, sButtonId); },
     onDownloadPDFContratoIndefIntegral:  async function (sButtonId) { contratoIndefIntegral.onDownloadPDFContratoIndefIntegral(this, sButtonId); },
     onDownloadPDFContratoTerminoFijo:    async function (sButtonId) { contratoTerminoFijo.onDownloadPDFContratoTerminoFijo(this, sButtonId); },
-    onDownloadPDFContratoTerminoIndef:   async function (sButtonId) { contratoTerminoIndef.onDownloadPDFContratoTerminoIndef(this, sButtonId); }
+    onDownloadPDFContratoTerminoIndef:   async function (sButtonId) { contratoTerminoIndef.onDownloadPDFContratoTerminoIndef(this, sButtonId); },
+    onDownloadPDFContratoAprendizajeLectivo: async function (sButtonId) { contratoAprendizajeLectivo.onDownloadPDFContratoAprendizajeLectivo(this, sButtonId); }
 
   });
 });
