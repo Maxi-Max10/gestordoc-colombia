@@ -74,7 +74,7 @@ sap.ui.define([
                         <div style="
                             display:flex;
                             align-items:flex-start;
-                            margin:0 0 3px 0;
+                            margin:0 0 9px 0;
                             font-size:9pt;
                             line-height:1.25;
                         ">
@@ -924,7 +924,7 @@ sap.ui.define([
 
                     ${HEADER}
 
-                    ${_paragrafoContrato(`
+                    ${_bloqueContrato(`
                         Ninguna de <strong>LAS PARTES</strong> comunicará o divulgará con respecto a los
                         términos de este contrato a ningún tercero sin el consentimiento expreso por escrito
                         de la otra parte, excepto si:
@@ -1441,7 +1441,7 @@ sap.ui.define([
                         Del presente documento se han extendido dos ejemplares del mismo contenido,
                         uno para <strong>EL EMPLEADOR</strong> y otro para
                         <strong>EL TRABAJADOR</strong>, los cuales firmamos ante testigos en la ciudad
-                        de <strong>BOGOTÁ</strong> el día <strong>20 DE ABRIL DE 2026</strong>.
+                        de <strong>Cota</strong> el día <strong>20 DE ABRIL DE 2026</strong>.
                     `)}
 
 
@@ -1449,19 +1449,12 @@ sap.ui.define([
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:25px;
+                        margin-top:50px;
                         padding:0 20px;
                     ">
 
                         <!-- EMPLEADOR -->
                         <div style="width:40%;">
-
-                            <div style="
-                                font-weight:bold;
-                                margin-bottom:45px;
-                            ">
-                                EMPLEADOR
-                            </div>
 
                             <div style="
                                 border-top:1px solid #000;
@@ -1471,12 +1464,8 @@ sap.ui.define([
                                 LAURA CRISTINA CERÓN MUÑOZ
                             </div>
 
-                            <div style="margin-top:2px;">
-                                XXXXXXXXXXXXXXXXXXXXXXX
-                            </div>
-
                             <div style="margin-top:2px;font-weight:bold;">
-                                C.C. No. 52.705.312
+                                C.C 52.705.312
                             </div>
 
                         </div>
@@ -1485,26 +1474,15 @@ sap.ui.define([
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:45px;
-                            ">
-                                TRABAJADOR
-                            </div>
-
-                            <div style="
                                 border-top:1px solid #000;
                                 padding-top:6px;
                                 min-height:18px;
                             ">
-                                &nbsp;
-                            </div>
-
-                            <div style="margin-top:2px;">
-                                &nbsp;
+                                XXXXXXXXXXXXXXXXX
                             </div>
 
                             <div style="margin-top:2px;font-weight:bold;">
-                                C.C. No. XXXXXXXXXXXXXXX
+                                C.C XXXXXXXXXXXX
                             </div>
 
                         </div>
@@ -1515,25 +1493,22 @@ sap.ui.define([
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:40px;
+                        margin-top:45px;
                         padding:0 20px;
                     ">
 
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:45px;
-                            ">
-                                TESTIGO
-                            </div>
+                                border-top:1px solid #000;
+                                height:18px;
+                            "></div>
 
                             <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                                min-height:18px;
+                                margin-top:6px;
+                                font-weight:bold;
                             ">
-                                &nbsp;
+                                TESTIGO
                             </div>
 
                         </div>
@@ -1541,25 +1516,20 @@ sap.ui.define([
                         <div style="width:40%;">
 
                             <div style="
+                                border-top:1px solid #000;
+                                height:18px;
+                            "></div>
+
+                            <div style="
+                                margin-top:6px;
                                 font-weight:bold;
-                                margin-bottom:45px;
                             ">
                                 TESTIGO
                             </div>
 
-                            <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                                min-height:18px;
-                            ">
-                                &nbsp;
-                            </div>
-
                         </div>
 
-                    </div>
-
-                </div>`;
+                    </div>`;
 
 
                 // ── Array final — página 19 es la única en blanco ─────────────

@@ -48,7 +48,7 @@ sap.ui.define([
                 // PÁGINAS HTML — CONTRATO APRENDIZAJE LECTIVO
                 // Estructura según PDF de referencia
                 // ══════════════════════════════════════════════════════════════
-                const STYLE = `font-family:Arial,sans-serif;font-size:9.5pt;line-height:1.2;padding:25px 24px 20px 24px;color:#000;`;
+                const STYLE = `font-family:Arial,sans-serif;font-size:9pt;line-height:1.2;padding:25px 24px 20px 24px;color:#000;`;
                 const HEADER = `
                     <div style="
                         width:100%;
@@ -69,9 +69,11 @@ sap.ui.define([
                         <div style="
                             display:flex;
                             align-items:flex-start;
-                            margin:0 0 8px 0;
+                            margin:0 0 9px 0;
+                            font-size:9pt;
                             line-height:1.25;
                         ">
+
                             <div style="
                                 width:28px;
                                 font-weight:bold;
@@ -87,6 +89,7 @@ sap.ui.define([
                             ">
                                 ${texto}
                             </div>
+
                         </div>
                     `;
                 }
@@ -685,8 +688,6 @@ sap.ui.define([
                     `)}
 
                     ${_bloqueContrato(`
-
-
                         El <strong>APRENDIZ</strong> reconoce como de propiedad exclusiva de la <strong>EMPRESA</strong>; de sus clientes y/o demás
                         personas con las cuales la <strong>EMPRESA</strong> tiene relaciones comerciales <strong>LA INFORMACION CONFIDENCIAL</strong> a
                         que se refiere el literal anterior, y en consecuencia se obliga a: 1.1. Mantenerla en estricta
@@ -1252,19 +1253,64 @@ sap.ui.define([
                         Para efectos de lo anterior, firman el veinticuatro (24) de septiembre de 2025,
                     `)}
 
-                    <div style="display:flex;justify-content:space-between;margin-top:50px;padding:0 20px;">
+                    <!-- Firmas -->
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        margin-top:70px;
+                        padding:0 20px;
+                    ">
 
+                        <!-- EMPLEADOR -->
                         <div style="width:40%;">
-                            <div style="border-top:1px solid #000;padding-top:6px;font-weight:bold;">
-                                LAURA CRISTINA CERÓN MUÑOZ
+
+                            <div style="
+                                border-top:1px solid #000;
+                                padding-top:6px;
+                            ">
+
+                                <div style="
+                                    font-weight:bold;
+                                    min-height:18px;
+                                ">
+                                    LAURA CRISTINA CERÓN MUÑOZ
+                                </div>
+
+                                <div style="
+                                    margin-top:2px;
+                                    font-weight:bold;
+                                ">
+                                    C.C.No. 52.705.312
+                                </div>
+
                             </div>
-                            <div style="margin-top:2px;font-weight:bold;">C.C 52.705.312</div>
+
                         </div>
 
+                        <!-- TRABAJADOR -->
                         <div style="width:40%;">
-                            <div style="border-top:1px solid #000;padding-top:6px;min-height:18px;">&nbsp;</div>
-                            <div style="margin-top:2px;">&nbsp;</div>
-                            <div style="margin-top:2px;font-weight:bold;">C.C. XXXXXXXXXXXXXXX</div>
+
+                            <div style="
+                                border-top:1px solid #000;
+                                padding-top:6px;
+                            ">
+
+                                <div style="
+                                    font-weight:bold;
+                                    min-height:18px;
+                                ">
+                                    XXXXXXXXXXXXX
+                                </div>
+
+                                <div style="
+                                    margin-top:2px;
+                                    font-weight:bold;
+                                ">
+                                    CC.XXXXXXXXXXXXX
+                                </div>
+
+                            </div>
+
                         </div>
 
                     </div>

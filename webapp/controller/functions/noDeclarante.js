@@ -153,8 +153,8 @@ sap.ui.define([
     // ─── Word con JSZip + plantilla Manifestacion_No_Declarante.docx ──────────────────
     async function _generateWord(data) {
         const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/_No_Declarante.docx").then(res => {
-        if (!res.ok) throw new Error(`No se pudo cargar _No_Declarante.docx (${res.status})`);
+        const templateBytes = await fetch("pdf/Manifestación_No_Declarante.docx").then(res => {
+        if (!res.ok) throw new Error(`No se pudo cargar Manifestación_No_Declarant.docx (${res.status})`);
             return res.arrayBuffer();
         });
         const zip = await JSZip.loadAsync(templateBytes);
@@ -193,7 +193,7 @@ sap.ui.define([
         const blob = await zip.generateAsync({ type: "blob" });
         const link = document.createElement("a");
         link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_No_Declarante.docx`;
+        link.download = `${data.firstName}_${data.lastName}_Manifestacion_No_Declarante.docx`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

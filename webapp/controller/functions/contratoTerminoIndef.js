@@ -76,7 +76,7 @@ sap.ui.define([
                         <div style="
                             display:flex;
                             align-items:flex-start;
-                            margin:0 0 3px 0;
+                            margin:0 0 9px 0;
                             font-size:9pt;
                             line-height:1.25;
                         ">
@@ -193,7 +193,7 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">QUINCENAL</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sHireDate}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;"></td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO INDEFINIDO</td></tr>
                     </table>
@@ -354,7 +354,7 @@ sap.ui.define([
                         "RENUMERACION:",
                         `
                         Por los servicios que preste <strong>EL TRABAJADOR</strong>, <strong>EL EMPLEADOR</strong> reconocerá una
-                        remuneración mensual de <strong>$$$$$$$$ (VALOR EN LETRAS PESSO M/CTE)</strong> pagadera por quincenas vencidas, y
+                        remuneración mensual de <strong>$$$$$$$$ (VALOR EN LETRAS PESO M/CTE)</strong> pagadera por quincenas vencidas, y
                         en el lugar donde presta sus servicios. Dentro de este pago se encuentra incluida la remuneración de
                         los descansos dominicales y festivos de que tratan los capítulos I y II del título VII del Código
                         Sustantivo del Trabajo.
@@ -544,8 +544,7 @@ sap.ui.define([
                     `)}
 
                     ${_itemContrato("iii.", `
-                        Pelear, insultar, calumniar o indisponer con falsedades o exageraciones a los compañeros de
-                        trabajo, o a quienes tengan en la Empresa las funciones de supervisores o jefes.
+                        Pelear, insultar, calumniar o indisponer con falsedades a los compañeros de trabajo, o a quienes tengan en la Empresa las funciones de supervisores o jefes.
                     `)}
 
                     ${_itemContrato("iv.", `
@@ -929,7 +928,7 @@ sap.ui.define([
                         del presente.
                     `)}
 
-                    ${_paragrafoContrato(`
+                    ${_bloqueContrato(`
                         Ninguna de <strong>LAS PARTES</strong> comunicará o divulgará con respecto a los
                         términos de este contrato a ningún tercero sin el consentimiento expreso por escrito
                         de la otra parte, excepto si:
@@ -1432,7 +1431,7 @@ sap.ui.define([
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:50px;
+                        margin-top:70px;
                         padding:0 20px;
                     ">
 
@@ -1440,26 +1439,24 @@ sap.ui.define([
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:70px;
-                            ">
-                                EMPLEADOR
-                            </div>
-
-                            <div style="
                                 border-top:1px solid #000;
                                 padding-top:6px;
-                                font-weight:bold;
                             ">
-                                LAURA CRISTINA CERÓN MUÑOZ
-                            </div>
 
-                            <div style="margin-top:2px;">
-                                XXXXXXXXXXXXXXXXXXXXXXX
-                            </div>
+                                <div style="
+                                    font-weight:bold;
+                                    min-height:18px;
+                                ">
+                                    LAURA CRISTINA CERÓN MUÑOZ
+                                </div>
 
-                            <div style="margin-top:2px;font-weight:bold;">
-                                C.C. No. 52.705.312
+                                <div style="
+                                    margin-top:2px;
+                                    font-weight:bold;
+                                ">
+                                    C.C.No. 52.705.312
+                                </div>
+
                             </div>
 
                         </div>
@@ -1468,26 +1465,24 @@ sap.ui.define([
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:70px;
-                            ">
-                                TRABAJADOR
-                            </div>
-
-                            <div style="
                                 border-top:1px solid #000;
                                 padding-top:6px;
-                                min-height:18px;
                             ">
-                                &nbsp;
-                            </div>
 
-                            <div style="margin-top:2px;">
-                                &nbsp;
-                            </div>
+                                <div style="
+                                    font-weight:bold;
+                                    min-height:18px;
+                                ">
+                                    XXXXXXXXXXXXX
+                                </div>
 
-                            <div style="margin-top:2px;font-weight:bold;">
-                                C.C. No. XXXXXXXXXXXXXXX
+                                <div style="
+                                    margin-top:2px;
+                                    font-weight:bold;
+                                ">
+                                    CC.XXXXXXXXXXXXX
+                                </div>
+
                             </div>
 
                         </div>
@@ -1498,25 +1493,22 @@ sap.ui.define([
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:70px;
+                        margin-top:90px;
                         padding:0 20px;
                     ">
 
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:70px;
-                            ">
-                                TESTIGO
-                            </div>
+                                border-top:1px solid #000;
+                                height:18px;
+                            "></div>
 
                             <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                                min-height:18px;
+                                margin-top:6px;
+                                font-weight:bold;
                             ">
-                                &nbsp;
+                                TESTIGO
                             </div>
 
                         </div>
@@ -1524,18 +1516,15 @@ sap.ui.define([
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:70px;
-                            ">
-                                TESTIGO
-                            </div>
+                                border-top:1px solid #000;
+                                height:18px;
+                            "></div>
 
                             <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                                min-height:18px;
+                                margin-top:6px;
+                                font-weight:bold;
                             ">
-                                &nbsp;
+                                TESTIGO
                             </div>
 
                         </div>

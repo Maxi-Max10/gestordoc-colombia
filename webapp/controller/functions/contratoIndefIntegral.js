@@ -1589,7 +1589,7 @@ sap.ui.define([
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:50px;
+                        margin-top:70px;
                         padding:0 20px;
                     ">
 
@@ -1597,26 +1597,24 @@ sap.ui.define([
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:70px;
-                            ">
-                                EMPLEADOR
-                            </div>
-
-                            <div style="
                                 border-top:1px solid #000;
                                 padding-top:6px;
-                                font-weight:bold;
                             ">
-                                LAURA CRISTINA CERÓN MUÑOZ
-                            </div>
 
-                            <div style="margin-top:2px;">
-                                XXXXXXXXXXXXXXXXXXXXXXX
-                            </div>
+                                <div style="
+                                    font-weight:bold;
+                                    min-height:18px;
+                                ">
+                                    LAURA CRISTINA CERÓN MUÑOZ
+                                </div>
 
-                            <div style="margin-top:2px;font-weight:bold;">
-                                C.C. No. 52.705.312
+                                <div style="
+                                    margin-top:2px;
+                                    font-weight:bold;
+                                ">
+                                    C.C.No. 52.705.312
+                                </div>
+
                             </div>
 
                         </div>
@@ -1625,26 +1623,24 @@ sap.ui.define([
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:70px;
-                            ">
-                                TRABAJADOR
-                            </div>
-
-                            <div style="
                                 border-top:1px solid #000;
                                 padding-top:6px;
-                                min-height:18px;
                             ">
-                                &nbsp;
-                            </div>
 
-                            <div style="margin-top:2px;">
-                                &nbsp;
-                            </div>
+                                <div style="
+                                    font-weight:bold;
+                                    min-height:18px;
+                                ">
+                                    XXXXXXXXXXXXX
+                                </div>
 
-                            <div style="margin-top:2px;font-weight:bold;">
-                                C.C. No. XXXXXXXXXXXXXXX
+                                <div style="
+                                    margin-top:2px;
+                                    font-weight:bold;
+                                ">
+                                    CC.XXXXXXXXXXXXX
+                                </div>
+
                             </div>
 
                         </div>
@@ -1655,25 +1651,22 @@ sap.ui.define([
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:70px;
+                        margin-top:90px;
                         padding:0 20px;
                     ">
 
                         <div style="width:40%;">
 
                             <div style="
-                                font-weight:bold;
-                                margin-bottom:70px;
-                            ">
-                                TESTIGO
-                            </div>
+                                border-top:1px solid #000;
+                                height:18px;
+                            "></div>
 
                             <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                                min-height:18px;
+                                margin-top:6px;
+                                font-weight:bold;
                             ">
-                                &nbsp;
+                                TESTIGO
                             </div>
 
                         </div>
@@ -1681,25 +1674,20 @@ sap.ui.define([
                         <div style="width:40%;">
 
                             <div style="
+                                border-top:1px solid #000;
+                                height:18px;
+                            "></div>
+
+                            <div style="
+                                margin-top:6px;
                                 font-weight:bold;
-                                margin-bottom:70px;
                             ">
                                 TESTIGO
                             </div>
 
-                            <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                                min-height:18px;
-                            ">
-                                &nbsp;
-                            </div>
-
                         </div>
 
-                    </div>
-
-                </div>`;
+                    </div>`;
 
                 // ── PÁGINA 10 ─────────────────────────────────────────────────
                 const htmlBlanco = `<div style="${STYLE}width:100%;box-sizing:border-box;"><p style="margin:0;">&nbsp;</p></div>`;

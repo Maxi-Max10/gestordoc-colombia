@@ -418,7 +418,10 @@ sap.ui.define([
 
     function _formatDate(date) {
         const d = new Date(date);
-        d.setDate(d.getDate() + 1);
+        // Solo corregir timezone si el input es un string ISO (hireDate, empEndDate)
+        if (typeof date === "string") {
+            d.setDate(d.getDate() + 1);
+        }
         const months = ["enero","febrero","marzo","abril","mayo","junio",
                         "julio","agosto","septiembre","octubre","noviembre","diciembre"];
         return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
