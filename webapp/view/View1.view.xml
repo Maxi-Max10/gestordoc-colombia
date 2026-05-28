@@ -347,10 +347,10 @@
 
                         <!-- 12. APRENDIZAJE ETAPA PRODUCTIVA  ── color: blue -->
                         <CustomListItem
-                            id="itemAprendizajeProductiva"
+                            id="customListItemContratoAprendizajeProductivo"
                             class="customListItem card-horizontal card-cyan"
                             type="Active"
-                            press="onAprendizajeProductivaPress"
+                            press="onContratoAprendizajeProductivoPress"
                             visible="true"
                         >
                             <HBox width="100%" height="100%" class="card-hbox">
@@ -358,7 +358,7 @@
                                     <core:Icon src="sap-icon://work-history" class="card-icon" />
                                 </VBox>
                                 <VBox width="auto" height="100%" class="card-content-box">
-                                    <Text text="Aprendizaje Etapa Productiva -- FALTA" class="card-title" />
+                                    <Text text="Aprendizaje Etapa Productiva" class="card-title" />
                                     <Text text="Contrato de aprendizaje productivo" class="card-desc" />
                                 </VBox>
                                 <VBox width="24px" height="100%" justifyContent="Center" alignItems="End" class="card-arrow-box">
