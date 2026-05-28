@@ -49,7 +49,7 @@ sap.ui.define([
                 // Estructura según PDF de referencia
                 // ══════════════════════════════════════════════════════════════
 
-                const STYLE = `font-family:Arial,sans-serif;font-size:10pt;line-height:1.2;padding:25px 38px 20px 38px;color:#000;`;
+                const STYLE = `font-family:Arial,sans-serif;font-size:9.5pt;line-height:1.2;padding:25px 24px 20px 24px;color:#000;`;
                 const PJUST = `style="${STYLE}text-align:justify;margin:0 0 10px 0;"`;
                 const HEADER = `
                     <div style="

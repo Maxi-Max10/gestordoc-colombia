@@ -45,7 +45,7 @@ sap.ui.define([
                 }
 
                 // ══════════════════════════════════════════════════════════════
-                // PÁGINAS HTML — CONTRATO A TÉRMINO FIJO
+                // PÁGINAS HTML — CONTRATO APRENDIZAJE LECTIVO
                 // Estructura según PDF de referencia
                 // ══════════════════════════════════════════════════════════════
                 const STYLE = `font-family:Arial,sans-serif;font-size:9.5pt;line-height:1.2;padding:25px 24px 20px 24px;color:#000;`;
