@@ -43,11 +43,12 @@ sap.ui.define([
 
                 // Ciudad: buscar el campo correcto de SSFF
                 const sCity = user.location || user.city || user.addressLine1 || "";
+                const STYLE = `font-family:Arial,sans-serif;font-size:9pt;line-height:1.2;padding:0px 60px 20px 80px;color:#000;`;
 
-                const htmlRaw = `
+                const htmlPagina1 = `
+                <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                    <!-- ═══════════════════ PÁGINA 1 — Lista de documentos ═══════════════════ -->
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
 
                     <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor(a):</p>
                     <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
@@ -77,9 +78,11 @@ sap.ui.define([
                         Gestión Personas
                     </p>
 
-                    <!--PAGEBREAK-->
+                </div>`;
 
-                    <!-- ═══════════════════ PÁGINA 2 — Aprobación y datos de notificación ═══════════════════ -->
+                const htmlPagina2 = `
+                <div style="${STYLE}width:100%;box-sizing:border-box;">
+
                     <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 4px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
 
                     <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor:</p>
@@ -176,9 +179,11 @@ sap.ui.define([
                         <strong>C.C. ${sCedula}</strong>
                     </p>
 
-                    <!--PAGEBREAK-->
+                </div>`;
 
-                    <!-- ═══════════════════ PÁGINA 3 — Certificación laboral ═══════════════════ -->
+                const htmlPagina3 = `
+                <div style="${STYLE}width:100%;box-sizing:border-box;">
+
                     <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;
                     text-align:center;letter-spacing:1px;margin:0 0 28px 0;">
                         EL ÁREA DE GESTIÓN DE PERSONAS
@@ -223,13 +228,7 @@ sap.ui.define([
                             <strong>Gestión Personas</strong>
                         </p>
                     </div>
-
-                    <!--PAGEBREAK-->
-
-                    <!-- ═══════════════════ PÁGINA 4 — En blanco (solo membrete) ═══════════════════ -->
-                    <p style="margin:0;">&nbsp;</p>
-
-                `;
+                </div>`;
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -251,7 +250,10 @@ sap.ui.define([
                 }
 
                 // ── PDF ───────────────────────────────────────────────────────
-                const contentBlocks = htmlRaw.split("<!--PAGEBREAK-->");
+                // ── Array final — página 19 es la única en blanco ─────────────
+                const contentBlocks = [
+                    htmlPagina1, htmlPagina2, htmlPagina3,
+                ];
 
                 const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf").then(res => res.arrayBuffer());
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
@@ -259,10 +261,12 @@ sap.ui.define([
                 const { width, height } = templatePage.getSize();
                 const templatePageImage = await pdfDoc.embedPage(templatePage);
 
-                for (const blockHtml of contentBlocks) {
+                for (let pageIndex = 0; pageIndex < contentBlocks.length; pageIndex++) {
+                    const blockHtml = contentBlocks[pageIndex];
                     const div = document.createElement("div");
                     div.style.width           = "794px";
-                    div.style.padding         = "40px";
+                    div.style.padding         = "0px";
+                    div.style.marginTop       = "-40px";
                     div.style.backgroundColor = "transparent";
                     div.style.background      = "none";
                     div.style.fontSize        = "12px";
@@ -276,7 +280,7 @@ sap.ui.define([
                     div.innerHTML             = blockHtml;
                     document.body.appendChild(div);
 
-                    // ✅ Leer la altura real DESPUÉS de que el browser haga el layout
+                    // Leer la altura real DESPUÉS de que el browser haga el layout
                     const realHeight = div.scrollHeight;
 
                     const canvas = await html2canvasRef(div, {
@@ -284,8 +288,8 @@ sap.ui.define([
                         useCORS: true,
                         backgroundColor: null,
                         logging: false,
-                        height: realHeight,          // ✅ capturar todo
-                        windowHeight: realHeight     // ✅ evitar clipping
+                        height: realHeight,          //  capturar todo
+                        windowHeight: realHeight     //  evitar clipping
                     });
                     const imgData = canvas.toDataURL("image/png");
 
@@ -306,7 +310,7 @@ sap.ui.define([
 
                     newPage.drawImage(img, {
                         x:      (width - imgW) / 2,
-                        y:      height - imgH - 120,
+                        y:      height - imgH - 100,
                         width:  imgW,
                         height: imgH
                     });

@@ -175,6 +175,19 @@ sap.ui.define([
                     `;
                 }
 
+                function _versionContrato() {
+                    return `
+                        <div style="
+                            position:absolute;
+                            bottom:10px;
+                            left:24px;
+                            font-size:6pt;
+                        ">
+                            Versión: 28 de julio de 2025
+                        </div>
+                    `;
+                }
+
 
                 // ── PÁGINA 1 — Título + Tabla de datos + inicio cláusula 1 ────
                 const htmlPagina1 = `
@@ -183,17 +196,17 @@ sap.ui.define([
                     ${HEADER}
 
                     <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:14px 0 16px 0;">
-                        <tr><td style="border:1px solid #000;padding:1px 5px;width:45%;font-weight:bold;background-color:#DCEEFF;">EMPLEADOR</td><td style="border:1px solid #000;padding:1px 5px;">DIACO S.A.</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;"></td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">QUINCENAL</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;"></td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Un (1) mes</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO FIJO</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;width:45%;font-weight:bold;">EMPLEADOR</td><td style="border:1px solid #000;padding:1px 5px;">DIACO S.A.</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;"></td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">QUINCENAL</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;"></td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Un (1) mes</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO FIJO</td></tr>
                     </table>
 
                     ${_bloqueContrato(`
@@ -235,6 +248,8 @@ sap.ui.define([
                         pero se obliga a aceptar cualquier otro empleo, cargo u oficio a donde lo
                         promueva <strong>EL EMPLEADOR</strong> bajo su dependencia, y que sea capaz de desempeñar,
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -313,6 +328,8 @@ sap.ui.define([
                         Prestar la colaboración posible en caso de siniestro o de riesgos inminentes que amenacen
                         las personas y las cosas de <strong>EL EMPLEADOR</strong>;
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -409,6 +426,8 @@ sap.ui.define([
                         `
                     )}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
 
@@ -485,6 +504,8 @@ sap.ui.define([
                         funciones directamente para <strong>EL EMPLEADOR</strong> o para cualquier otra empresa o sociedad
                         que aquel designe de
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -580,6 +601,8 @@ sap.ui.define([
                     ${_itemContrato("xii.", `
                         Entrar en sitios prohibidos sin autorización.
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -677,6 +700,8 @@ sap.ui.define([
                         <strong>EL EMPLEADOR</strong> para garantizar un manejo apropiado y seguro de la información personal y los datos
                     `)}
 
+                    ${_versionContrato()}
+
 
                 </div>`;
 
@@ -760,6 +785,8 @@ sap.ui.define([
                         `
                     )}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 8 ──────────────────────────────────────────────────
@@ -840,6 +867,8 @@ sap.ui.define([
                         `
                     )}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 9 ──────────────────────────────────────────────────
@@ -916,6 +945,8 @@ sap.ui.define([
                         del presente.
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 10 ──────────────────────────────────────────────────
@@ -987,6 +1018,8 @@ sap.ui.define([
                         ser entregados a terceros por parte de <strong>EL TRABAJADOR</strong> previa
                         autorización otorgada por la Junta Directiva.
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1082,6 +1115,8 @@ sap.ui.define([
                         Efectuar todas las gestiones necesarias para el desarrollo del objeto Social
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
                 
                 // ── PÁGINA 12 ──────────────────────────────────────────────────
@@ -1168,6 +1203,8 @@ sap.ui.define([
                         `
                     )}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 13 ──────────────────────────────────────────────────
@@ -1241,6 +1278,8 @@ sap.ui.define([
                         ni participarán en actividades que busquen obtener ventajas ilícitas.
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 14 ──────────────────────────────────────────────────
@@ -1313,6 +1352,8 @@ sap.ui.define([
                         sobre nuevas conductas ilícitas, la PARTE cumplida podrá rescindir el contrato unilateralmente y sin
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 15 ──────────────────────────────────────────────────
@@ -1382,6 +1423,8 @@ sap.ui.define([
                         manual del sistema de autocontrol y gestión del riesgo integral de LA/FT/FPADM.
                         `
                     )}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1529,6 +1572,10 @@ sap.ui.define([
 
                         </div>
 
+                    </div>
+
+                    <div style="${STYLE}width:100%;box-sizing:border-box;">
+                        ${_versionContrato()}
                     </div>`;
 
 
