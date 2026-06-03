@@ -60,8 +60,9 @@ sap.ui.define([
                         margin-bottom:30px;
                     ">
 
-                        <div style="font-size:16pt;">
-                            CONTRATO A INDEFINIDO INTEGRAL
+                        <div style="font-size:13pt;">
+                            CONTRATO DE TRABAJO A TÉRMINO INDEFINIDO (EMPLEADOS DE DIRECCIÓN, CONFIANZA Y MANEJO CON SALARIO INTEGRAL)
+
                         </div>
 
                     </div>
@@ -163,6 +164,19 @@ sap.ui.define([
                     `;
                 }
 
+                function _versionContrato() {
+                    return `
+                        <div style="
+                            position:absolute;
+                            bottom:10px;
+                            left:24px;
+                            font-size:6pt;
+                        ">
+                            Versión: 23 de julio de 2025
+                        </div>
+                    `;
+                }
+
 
 
                 // ── PÁGINA 1 — Título + Tabla de datos + inicio cláusula 1 ────
@@ -223,6 +237,8 @@ sap.ui.define([
                         donde <strong>EL EMPLEADOR</strong> tiene o tuviere sus actividades, pero se obliga
                         a aceptar cualquier otro
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -299,6 +315,8 @@ sap.ui.define([
                         Comunicar oportunamente a <strong>EL EMPLEADOR</strong> las observaciones que estime
                         conducentes a evitarle daños y perjuicios;
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -393,6 +411,8 @@ sap.ui.define([
                         y festivos, recargo de
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
 
@@ -466,6 +486,8 @@ sap.ui.define([
                         bastando únicamente la previa comunicación que de ello haga a
                         EL TRABAJADOR.
                     `)}
+                    
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -561,6 +583,8 @@ sap.ui.define([
                         <strong>EL EMPLEADOR</strong> o para cualquier otra empresa o sociedad que
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 6 ──────────────────────────────────────────────────
@@ -650,6 +674,8 @@ sap.ui.define([
                         o bajo el efecto de sustancias enervantes o alucinógenas, ingerirlas
                         o encontrarse en ese estado dentro de ella.
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -749,6 +775,8 @@ sap.ui.define([
                         literal a, numeral 6° del CST.
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 8 ──────────────────────────────────────────────────
@@ -835,6 +863,8 @@ sap.ui.define([
                         conflicto entre sus intereses personales y los
                         `
                     )}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -923,6 +953,8 @@ sap.ui.define([
                         `
                     )}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 10 ─────────────────────────────────────────────────
@@ -1010,6 +1042,8 @@ sap.ui.define([
                         ejecución o desarrollo del presente Contrato.
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 11 ─────────────────────────────────────────────────
@@ -1080,6 +1114,8 @@ sap.ui.define([
                         exclusivamente a aquellas personas que, en virtud de dicha obligación,
                         deban recibirla, en cuyo caso la información confidencial deberá ser
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
                 
@@ -1172,6 +1208,8 @@ sap.ui.define([
                         `
                     )}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 13 ──────────────────────────────────────────────────
@@ -1260,6 +1298,8 @@ sap.ui.define([
                         Consulta y reporte a centrales de riesgo, según sea el caso y las
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 14 ──────────────────────────────────────────────────
@@ -1326,6 +1366,8 @@ sap.ui.define([
                     ${_bloqueContrato(`
                         Así mismo, <strong>EL TRABAJADOR</strong> se compromete a cumplir con la Política de Tratamiento de
                     `)}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1403,6 +1445,8 @@ sap.ui.define([
                         condena, ni sancionados por corrupción o actividades ilícitas.
                     `)}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 16 ──────────────────────────────────────────────────
@@ -1474,6 +1518,8 @@ sap.ui.define([
                         `
                     )}
 
+                    ${_versionContrato()}
+
                 </div>`;
 
                 // ── PÁGINA 17 ──────────────────────────────────────────────────
@@ -1537,6 +1583,8 @@ sap.ui.define([
                         y todas las demás políticas internas de la compañía.
                         `
                     )}
+
+                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1687,12 +1735,13 @@ sap.ui.define([
 
                         </div>
 
+                    </div>
+
+                    <div style="${STYLE}width:100%;box-sizing:border-box;">
+                        ${_versionContrato()}
                     </div>`;
 
-                // ── PÁGINA 10 ─────────────────────────────────────────────────
-                const htmlBlanco = `<div style="${STYLE}width:100%;box-sizing:border-box;"><p style="margin:0;">&nbsp;</p></div>`;
-
-
+            
                 // ── Array final — página 19 es la única en blanco ─────────────
                 const contentBlocks = [
                     htmlPagina1, 
@@ -1713,7 +1762,6 @@ sap.ui.define([
                     htmlPagina16,
                     htmlPagina17, 
                     htmlPagina18,
-                    htmlBlanco    //página en blanco
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────

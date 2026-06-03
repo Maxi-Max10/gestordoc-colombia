@@ -41,9 +41,11 @@ sap.ui.define([
                     continue;
                 }
 
+                const STYLE = `font-family:Arial,sans-serif;font-size:10pt;line-height:1.6;color:#000;width:100%;box-sizing:border-box;`;
+
                 // ── PDF — sin plantilla de fondo ──────────────────────────────
                 const htmlPagina1 = `
-                    <div style="font-family:Arial,sans-serif;font-size:12pt;line-height:1.6;color:#000;width:100%;box-sizing:border-box;">
+                    <div style="${STYLE}">
                         <p style="text-align:center;font-weight:bold;font-size:11pt;margin:0 0 16px 0;">
                             SOLICITUD PARA DEDUCCIONES DE RETENCIÓN EN LA FUENTE Y CONDICION DE<br>DECLARANTE DE RENTA
                         </p>
@@ -92,15 +94,11 @@ sap.ui.define([
                         <p style="margin:0 0 4px 0;">
                             &nbsp;&nbsp;&nbsp;&nbsp;c) &nbsp;<strong>Dependientes</strong> &nbsp;&nbsp;&nbsp;___
                         </p>
-                        <p style="margin:0 20px;text-align:justify;">
+                        <p style="margin:0 20px 12px 20px;text-align:justify;">
                             Certifico que soy la única persona que está solicitando la deducción por los dependientes aquí relacionados
                         </p>
-                    </div>`;
 
-                    const htmlPagina2 = `
-                    <div style="font-family:Arial,sans-serif;font-size:12pt;line-height:1.6;color:#000;width:100%;box-sizing:border-box;">
-
-                        <!-- Tabla dependientes -->
+                    <!-- Tabla dependientes -->
                         <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-bottom:8px;">
                             <thead>
                                 <tr>
@@ -146,7 +144,10 @@ sap.ui.define([
                         <p style="font-size:8.5pt;margin:0 0 12px 0;">
                             *UN: NUIP - TI: tarjeta de identidad – CC: Cédula de Ciudadanía – CE: Cédula Extranjería
                         </p>
+                    </div>`;
 
+                    const htmlPagina2 = `
+                    <div style="${STYLE}">
                         <p style="margin:0 0 2px 0;text-align:justify;">
                             &#10148; El beneficio por dependientes no es acumulable, es decir, es igual el beneficio
                             obtenido por uno o varios dependientes.
@@ -168,7 +169,7 @@ sap.ui.define([
                             Si selecciona que es declarante del impuesto de renta puede (si así lo desea) solicitar un valor
                             adicional de retención en la fuente al calculado por el sistema de nómina:
                         </p>
-                        <p style="margin:0 0 20px 0;">Valor <strong>adicional Mensual</strong> solicitado: $____________</p>
+                        <p style="margin:0 0 20px 0; text-align:center">Valor <strong>adicional Mensual</strong> solicitado: $____________</p>
 
                         <p style="text-align:justify;margin:0 0 40px 0;">
                             <strong>3.</strong> Me comprometo a comunicar cualquier cambio que pueda modificar los beneficios obtenidos.
