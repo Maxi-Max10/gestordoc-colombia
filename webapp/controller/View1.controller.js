@@ -267,6 +267,8 @@ sap.ui.define([
         FilteredUsers:     [], // Lista que se muestra en la tabla (resultado de búsqueda/fecha)
         SelectedUsers:     [], // Usuarios marcados en la tabla (uso interno)
         DialogTitle:       "",
+        DialogIcon:        "sap-icon://document-text",
+        ShowDocuSignButton: false,
         IsDarkMode:        bDarkMode,
         ThemeToggleText:   bDarkMode ? "☾" : "☀",
         ThemeToggleTooltip: bDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
@@ -276,6 +278,7 @@ sap.ui.define([
 
       // Aplica el tema guardado en localStorage
       this._applyThemeMode(bDarkMode);
+      this._enableThemeTransitionsAfterInitialRender();
 
       // Variables internas de control
       this.aSelectedEmployees       = [];    // Empleados seleccionados en la tabla
@@ -339,6 +342,24 @@ sap.ui.define([
         window.localStorage.setItem("gestordoccolombia-theme", bDarkMode ? "dark" : "light");
       } catch (oError) {
         console.warn("No se pudo guardar la preferencia de tema:", oError);
+      }
+    },
+
+    // Activa las transiciones solo después de aplicar el tema inicial guardado.
+    _enableThemeTransitionsAfterInitialRender: function () {
+      const fnEnableTransitions = function () {
+        document.documentElement.classList.add("gdThemeTransitionReady");
+        if (document.body) {
+          document.body.classList.add("gdThemeTransitionReady");
+        }
+      };
+
+      if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(function () {
+          window.requestAnimationFrame(fnEnableTransitions);
+        });
+      } else {
+        window.setTimeout(fnEnableTransitions, 0);
       }
     },
 
@@ -549,14 +570,14 @@ sap.ui.define([
             "customListItemOtroSiAlimentacion15",
             "customListItemOtroSiAlimentacion11",
             "customListItemOtroSiAlimentacion10",
-            "customListItemBeneficiosExtralegales",
+            "customListItemBeneficios",
             "customListItemSolicitudDeduccionesRetencion",
             "customListItemCompromisoEtica",
             "customListItemAutorizacionDescuento",
             "customListItemDatosPersonales",
             "customListItemNoDeclarante",
             "customListItemProtocoloRecibo",
-            "customListItemContratoIndefIntegral",
+            "customListItemContratoIntegral",
             "customListItemContratoTerminoFijo",
             "customListItemContratoTerminoIndef",
             "customListItemContratoAprendizajeLectivo",
@@ -834,6 +855,8 @@ sap.ui.define([
       oViewStateModel.setProperty("/BaseUsers",     aFilteredUsers);
       oViewStateModel.setProperty("/FilteredUsers", aFilteredUsers);
       oViewStateModel.setProperty("/DialogTitle",   sTitle);
+      oViewStateModel.setProperty("/ShowDocuSignButton", this._shouldShowDocuSignButton());
+      this._applyDialogPresentation();
 
       if (oDialog) {
         oView.byId("idUserTable").setModel(oViewStateModel, "view");
@@ -848,8 +871,70 @@ sap.ui.define([
     },
 
 
+    _shouldShowDocuSignButton: function () {
+      return [
+        "contratoTerminoFijo",
+        "contratoTerminoIndef",
+        "contratoAprendizajeLectivo",
+        "contratoAprendizajeProductivo",
+        "contratoIndefIntegral",
+        "otroSiAlimentacion10",
+        "otroSiAlimentacion11",
+        "otroSiAlimentacion15",
+        "otroSiRodamiento"
+      ].indexOf(this._currentCategory) > -1;
+    },
+
+    _getDocumentPresentation: function () {
+      const mPresentation = {
+        kitRetiro: { icon: "sap-icon://employee-rejections", cardClass: "card-red" },
+        otroSiRodamiento: { icon: "sap-icon://car-rental", cardClass: "card-sky" },
+        otroSiAlimentacion15: { icon: "sap-icon://fridge", cardClass: "card-emerald" },
+        otroSiAlimentacion11: { icon: "sap-icon://basket", cardClass: "card-rose" },
+        otroSiAlimentacion10: { icon: "sap-icon://meal", cardClass: "card-amber" },
+        beneficiosExtralegales: { icon: "sap-icon://collections-insight", cardClass: "card-orange" },
+        solicitudDeduccionesRetencion: { icon: "sap-icon://expense-report", cardClass: "card-indigo" },
+        compromisoEtica: { icon: "sap-icon://signature", cardClass: "card-blue" },
+        autorizacionDescuento: { icon: "sap-icon://money-bills", cardClass: "card-purple" },
+        datosPersonales: { icon: "sap-icon://private", cardClass: "card-teal" },
+        noDeclarante: { icon: "sap-icon://survey", cardClass: "card-pink" },
+        protocoloRecibo: { icon: "sap-icon://official-service", cardClass: "card-gray" },
+        contratoIndefIntegral: { icon: "sap-icon://documents", cardClass: "card-violet" },
+        contratoTerminoFijo: { icon: "sap-icon://business-card", cardClass: "card-green" },
+        contratoTerminoIndef: { icon: "sap-icon://hr-approval", cardClass: "card-brown" },
+        contratoAprendizajeLectivo: { icon: "sap-icon://education", cardClass: "card-lime" },
+        contratoAprendizajeProductivo: { icon: "sap-icon://work-history", cardClass: "card-cyan" }
+      };
+
+      return mPresentation[this._currentCategory] || {
+        icon: "sap-icon://document-text",
+        cardClass: "card-blue"
+      };
+    },
+
+    _applyDialogPresentation: function () {
+      const oPresentation = this._getDocumentPresentation();
+      const oViewModel = this.getView().getModel("view");
+      const oBadge = this.byId("employeeDialogIconBadge");
+      const aCardClasses = [
+        "card-red", "card-blue", "card-teal", "card-gray", "card-pink",
+        "card-purple", "card-indigo", "card-orange", "card-green", "card-brown",
+        "card-lime", "card-cyan", "card-violet", "card-amber", "card-rose",
+        "card-emerald", "card-sky"
+      ];
+
+      oViewModel?.setProperty("/DialogIcon", oPresentation.icon);
+
+      if (oBadge) {
+        aCardClasses.forEach(sClass => oBadge.removeStyleClass(sClass));
+        oBadge.addStyleClass(oPresentation.cardClass);
+      }
+    },
+
+
     // ═══════════════════════════════════════════════════════════════════
     // CICLO DE VIDA DEL DIÁLOGO
+
     // ═══════════════════════════════════════════════════════════════════
 
     // Antes de abrir: aplica blur al fondo y limpia filtros anteriores.
@@ -888,6 +973,7 @@ sap.ui.define([
 
       oViewStateModel?.setProperty("/BaseUsers",     []);
       oViewStateModel?.setProperty("/FilteredUsers", []);
+      oViewStateModel?.setProperty("/ShowDocuSignButton", false);
       oBinding.filter([]);
       oTable.removeSelections();
       this.aSelectedEmployees = [];
@@ -1050,23 +1136,23 @@ sap.ui.define([
     // Cada entrada tiene: id del control, título y descripción para búsqueda.
     _getDocumentSearchCards: function () {
       return [
-        { id: "customListItemKitRetiro",                   title: "Kit De Retiro",                    desc: "Gestionar kit de retiro" },
-        { id: "customListItemOtroSiRodamiento",            title: "Otro Sí - Rodamiento",             desc: "Auxilio de rodamiento" },
-        { id: "customListItemOtroSiAlimentacion15",        title: "Otro Sí - Alimentación 15",        desc: "Auxilio de alimentación 15" },
-        { id: "customListItemOtroSiAlimentacion11",        title: "Otro Sí - Alimentación 11",        desc: "Auxilio de alimentación 11" },
-        { id: "customListItemOtroSiAlimentacion10",        title: "Otro Sí - Alimentación 10",        desc: "Auxilio de alimentación 10" },
-        { id: "customListItemBeneficiosExtralegales",      title: "Beneficios Extralegales",          desc: "Gestionar beneficios extralegales" },
-        { id: "customListItemSolicitudDeduccionesRetencion", title: "Solicitud Deducciones Retencion", desc: "Gestionar solicitud de deducciones y retenciones" },
-        { id: "customListItemCompromisoEtica",             title: "Compromiso con la Ética",          desc: "Declaración de principios éticos" },
-        { id: "customListItemAutorizacionDescuento",       title: "Autorización de Descuento",        desc: "Gestionar autorización de descuento" },
-        { id: "customListItemDatosPersonales",             title: "Datos Personales",                 desc: "Actualizar datos personales" },
-        { id: "customListItemNoDeclarante",                title: "No Declarante",                    desc: "Certificado de no declarante" },
-        { id: "customListItemProtocoloRecibo",             title: "Protocolo de Recibo",              desc: "Generar protocolo de recibo" },
-        { id: "customListItemContratoIndefIntegral",       title: "Contrato Indefinido Integral",     desc: "Generar contrato indefinido integral" },
-        { id: "customListItemContratoTerminoFijo",         title: "Contrato a Término Fijo",          desc: "Generar contrato a término fijo" },
-        { id: "customListItemContratoTerminoIndef",       title: "Contrato a Término Indefinido",    desc: "Generar contrato a término indefinido" },
-        { id: "customListItemContratoAprendizajeLectivo", title: "Contrato Aprendizaje Lectivo",      desc: "Generar contrato de aprendizaje lectivo" },
-        { id: "customListItemContratoAprendizajeProductivo", title: "Contrato Aprendizaje Productivo", desc: "Generar contrato de aprendizaje productivo" }
+        { id: "customListItemKitRetiro", title: "Kit de Retiro", desc: "Gestionar documentos de retiro", aliases: "retiro kit ex colaborador" },
+        { id: "customListItemCompromisoEtica", title: "Compromiso con la Ética", desc: "Declaración de principios éticos", aliases: "compromiso etica declaracion principios" },
+        { id: "customListItemDatosPersonales", title: "Autorización Datos Personales", desc: "Gestión de política de datos", aliases: "autorizacion datos personales politica privacidad" },
+        { id: "customListItemProtocoloRecibo", title: "Protocolo Reglamento Interno", desc: "Recibo de reglamento interno", aliases: "protocolo recibo reglamento interno" },
+        { id: "customListItemNoDeclarante", title: "Manifestación No Declarante", desc: "Declaración tributaria", aliases: "manifestacion no declarante declaracion tributaria" },
+        { id: "customListItemAutorizacionDescuento", title: "Autorización de Descuento", desc: "Gestión de deducciones", aliases: "autorizacion descuento deduccion deducciones" },
+        { id: "customListItemSolicitudDeduccionesRetencion", title: "Deducciones de Retención", desc: "Solicitud de retenciones", aliases: "solicitud deducciones retencion retenciones fuente" },
+        { id: "customListItemBeneficios", title: "Beneficios Extralegales", desc: "Declaración política de beneficios", aliases: "beneficios extralegales politica" },
+        { id: "customListItemContratoTerminoFijo", title: "Contrato Término Fijo", desc: "Documentación contrato fijo", aliases: "contrato a termino fijo documentacion" },
+        { id: "customListItemContratoTerminoIndef", title: "Contrato Término Indefinido", desc: "Documentación contrato indefinido", aliases: "contrato a termino indefinido documentacion" },
+        { id: "customListItemContratoAprendizajeLectivo", title: "Aprendizaje Etapa Lectiva", desc: "Contrato de aprendizaje lectivo", aliases: "contrato aprendizaje etapa lectiva" },
+        { id: "customListItemContratoAprendizajeProductivo", title: "Aprendizaje Etapa Productiva", desc: "Contrato de aprendizaje productivo", aliases: "contrato aprendizaje etapa productiva" },
+        { id: "customListItemContratoIntegral", title: "Contrato Indefinido Integral", desc: "Documentación contrato integral", aliases: "contrato indefinido integral documentacion" },
+        { id: "customListItemOtroSiAlimentacion10", title: "Otro Sí - Alim. 10.000", desc: "Modificación contrato alimentación", aliases: "otro si alimentacion auxilio contrato 10000 diez mil 10 000" },
+        { id: "customListItemOtroSiAlimentacion11", title: "Otro Sí - Alim. 11.500", desc: "Modificación contrato alimentación", aliases: "otro si alimentacion auxilio contrato 11500 once mil quinientos 11 500" },
+        { id: "customListItemOtroSiAlimentacion15", title: "Otro Sí - Alim. 15.000", desc: "Modificación contrato alimentación", aliases: "otro si alimentacion auxilio contrato 15000 quince mil 15 000" },
+        { id: "customListItemOtroSiRodamiento", title: "Otro Sí - Rodamiento", desc: "Auxilio de rodamiento", aliases: "otro si contrato trabajo auxilio rodamiento" }
       ];
     },
 
@@ -1130,7 +1216,7 @@ sap.ui.define([
         const oState = this._documentSearchBaseState?.[oCard.id];
         if (!oItem || !oState?.inGrid || !oState.visible) return;
 
-        const sSearchText = this._normalizeSearchText(`${oCard.title} ${oCard.desc}`);
+        const sSearchText = this._normalizeSearchText([oCard.title, oCard.desc, oCard.aliases].join(" "));
         if (sSearchText.includes(sQuery)) {
           oItem.setVisible(true);
           oGrid.addContent(oItem);
@@ -1148,7 +1234,7 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     onKitRetiroPress: function () {
-      this.sSelectedContract = "Kit De Retiro";
+      this.sSelectedContract = "Kit de Retiro";
       this._currentCategory  = "kitRetiro";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
@@ -1162,21 +1248,21 @@ sap.ui.define([
     },
 
     onOtroSiAlimentacion15Press: function () {
-      this.sSelectedContract = "Otro Sí - Alimentación 15";
+      this.sSelectedContract = "Otro Sí - Alim. $15.000";
       this._currentCategory  = "otroSiAlimentacion15";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
     onOtroSiAlimentacion11Press: function () {
-      this.sSelectedContract = "Otro Sí - Alimentación 11";
+      this.sSelectedContract = "Otro Sí - Alim. $11.500";
       this._currentCategory  = "otroSiAlimentacion11";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
     onOtroSiAlimentacion10Press: function () {
-      this.sSelectedContract = "Otro Sí - Alimentación 10";
+      this.sSelectedContract = "Otro Sí - Alim. $10.000";
       this._currentCategory  = "otroSiAlimentacion10";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
@@ -1190,7 +1276,7 @@ sap.ui.define([
     },
 
     onDeduccionesPress: function () {
-      this.sSelectedContract = "Solicitud Deducciones Retencion";
+      this.sSelectedContract = "Deducciones de Retención";
       this._currentCategory  = "solicitudDeduccionesRetencion";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
@@ -1211,21 +1297,21 @@ sap.ui.define([
     },
 
     onDatosPersonalesPress: function () {
-      this.sSelectedContract = "Datos Personales";
+      this.sSelectedContract = "Autorización Datos Personales";
       this._currentCategory  = "datosPersonales";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
     onNoDeclarantePress: function () {
-      this.sSelectedContract = "No Declarante";
+      this.sSelectedContract = "Manifestación No Declarante";
       this._currentCategory  = "noDeclarante";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
     onProtocoloReciboPress: function () {
-      this.sSelectedContract = "Protocolo de Recibo";
+      this.sSelectedContract = "Protocolo Reglamento Interno";
       this._currentCategory  = "protocoloRecibo";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
@@ -1239,28 +1325,28 @@ sap.ui.define([
     },
 
       onContratoTerminoFijoPress: function () {
-      this.sSelectedContract = "Contrato a Término Fijo";
+      this.sSelectedContract = "Contrato Término Fijo";
       this._currentCategory  = "contratoTerminoFijo";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
     onContratoIndefinidoPress: function () {
-      this.sSelectedContract = "Contrato a Término Indefinido";
+      this.sSelectedContract = "Contrato Término Indefinido";
       this._currentCategory  = "contratoTerminoIndef";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
       onContratoAprendizajeLectivoPress: function () {
-      this.sSelectedContract = "Contrato Aprendizaje Lectivo";
+      this.sSelectedContract = "Aprendizaje Etapa Lectiva";
       this._currentCategory  = "contratoAprendizajeLectivo";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
       onContratoAprendizajeProductivoPress: function () {
-      this.sSelectedContract = "Contrato Aprendizaje Productivo";
+      this.sSelectedContract = "Aprendizaje Etapa Productiva";
       this._currentCategory  = "contratoAprendizajeProductivo";
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
@@ -1319,7 +1405,7 @@ sap.ui.define([
     // DESCARGA DE DOCUMENTOS
     // ═══════════════════════════════════════════════════════════════════
     // onDownloadPDF() es el handler principal del botón de descarga.
-    // Despacha al método específico según el documento activo (sSelectedContract).
+    // Despacha al método específico según la categoría interna activa.
     //
     // Cada documento tiene su propia lógica en:
     //   gestordoccolombia/controller/functions/[nombreDocumento].js
@@ -1329,27 +1415,27 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     onDownloadPDF: function (oEvent) {
-      const sTitle    = this.sSelectedContract;
+      const sCategory = this._currentCategory;
       const sButtonId = oEvent.getSource().getId();
 
-      switch (sTitle) {
-        case "Kit De Retiro":                  this.onDownloadPDFKitRetiro(sButtonId);              break;
-        case "Otro Sí - Rodamiento":           this.onDownloadPDFOtroSiRodamiento(sButtonId);       break;
-        case "Otro Sí - Alimentación 15":      this.onDownloadPDFOtroSiAlimentacion15(sButtonId);   break;
-        case "Otro Sí - Alimentación 11":      this.onDownloadPDFOtroSiAlimentacion11(sButtonId);   break;
-        case "Otro Sí - Alimentación 10":      this.onDownloadPDFOtroSiAlimentacion10(sButtonId);   break;
-        case "Beneficios Extralegales":        this.onDownloadPDFBeneficiosExtralegales(sButtonId); break;
-        case "Solicitud Deducciones Retencion": this.onDownloadPDFRetencionFuente(sButtonId);       break;
-        case "Compromiso con la Ética":        this.onDownloadPDFCompromisoEtica(sButtonId);        break;
-        case "Autorización de Descuento":      this.onDownloadPDFAutorizacionDescuento(sButtonId);  break;
-        case "Datos Personales":               this.onDownloadPDFDatosPersonales(sButtonId);        break;
-        case "No Declarante":                  this.onDownloadPDFNoDeclarante(sButtonId);           break;
-        case "Protocolo de Recibo":            this.onDownloadPDFProtocoloRecibo(sButtonId);        break;
-        case "Contrato Indefinido Integral":   this.onDownloadPDFContratoIndefIntegral(sButtonId);  break;
-        case "Contrato a Término Fijo":        this.onDownloadPDFContratoTerminoFijo(sButtonId);  break;
-        case "Contrato a Término Indefinido": this.onDownloadPDFContratoTerminoIndef(sButtonId);  break;
-        case "Contrato Aprendizaje Lectivo": this.onDownloadPDFContratoAprendizajeLectivo(sButtonId); break;
-        case "Contrato Aprendizaje Productivo": this.onDownloadPDFContratoAprendizajeProductivo(sButtonId); break;
+      switch (sCategory) {
+        case "kitRetiro": this.onDownloadPDFKitRetiro(sButtonId); break;
+        case "otroSiRodamiento": this.onDownloadPDFOtroSiRodamiento(sButtonId); break;
+        case "otroSiAlimentacion15": this.onDownloadPDFOtroSiAlimentacion15(sButtonId); break;
+        case "otroSiAlimentacion11": this.onDownloadPDFOtroSiAlimentacion11(sButtonId); break;
+        case "otroSiAlimentacion10": this.onDownloadPDFOtroSiAlimentacion10(sButtonId); break;
+        case "beneficiosExtralegales": this.onDownloadPDFBeneficiosExtralegales(sButtonId); break;
+        case "solicitudDeduccionesRetencion": this.onDownloadPDFRetencionFuente(sButtonId); break;
+        case "compromisoEtica": this.onDownloadPDFCompromisoEtica(sButtonId); break;
+        case "autorizacionDescuento": this.onDownloadPDFAutorizacionDescuento(sButtonId); break;
+        case "datosPersonales": this.onDownloadPDFDatosPersonales(sButtonId); break;
+        case "noDeclarante": this.onDownloadPDFNoDeclarante(sButtonId); break;
+        case "protocoloRecibo": this.onDownloadPDFProtocoloRecibo(sButtonId); break;
+        case "contratoIndefIntegral": this.onDownloadPDFContratoIndefIntegral(sButtonId); break;
+        case "contratoTerminoFijo": this.onDownloadPDFContratoTerminoFijo(sButtonId); break;
+        case "contratoTerminoIndef": this.onDownloadPDFContratoTerminoIndef(sButtonId); break;
+        case "contratoAprendizajeLectivo": this.onDownloadPDFContratoAprendizajeLectivo(sButtonId); break;
+        case "contratoAprendizajeProductivo": this.onDownloadPDFContratoAprendizajeProductivo(sButtonId); break;
         default:
           MessageToast.show("No hay función definida para este documento.");
       }

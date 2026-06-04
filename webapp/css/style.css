@@ -10,6 +10,8 @@ html,
   --app-font-family: "72", "72full", Arial, Helvetica, sans-serif;
   --sapFontFamily: "72", "72full", Arial, Helvetica, sans-serif;
   --sapContent_FocusColor: transparent;
+  --gd-theme-transition-fast: 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  --gd-theme-transition-slow: 560ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body,
@@ -134,11 +136,11 @@ html,
 .documentsHeader {
   width: auto !important;
   display: flex !important;
-  margin: 2rem calc(var(--page-gutter) + 0.5rem) 2.5rem calc(var(--page-gutter) + 0.5rem) !important;
+  margin: 2rem calc(var(--page-gutter) + 0.5rem) 2.25rem calc(var(--page-gutter) + 0.5rem) !important;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   box-sizing: border-box;
-  align-items: center;
+  align-items: center !important;
 }
 
 .sectionTitle {
@@ -146,21 +148,25 @@ html,
   font-family: var(--app-font-family) !important;
   color: #07192f !important;
   font-weight: 700 !important;
+  line-height: 1.75rem !important;
   letter-spacing: 0 !important;
 }
 
 .documentSearchField {
   display: block !important;
-  width: 2.55rem !important;
-  min-width: 2.55rem !important;
-  max-width: min(21rem, calc(100vw - 2rem));
-  height: 2.55rem !important;
+  width: min(18rem, calc(100vw - 2rem)) !important;
+  min-width: min(18rem, calc(100vw - 2rem)) !important;
+  max-width: min(18rem, calc(100vw - 2rem));
+  height: 1.75rem !important;
+  min-height: 1.75rem !important;
+  margin-top: 0 !important;
+  margin-left: auto !important;
   position: relative;
   overflow: visible;
   border: 0 !important;
   outline: 0 !important;
   box-shadow: none !important;
-  transition: width 500ms cubic-bezier(0, 0.11, 0.35, 2), transform 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .documentSearchField::before,
@@ -173,34 +179,38 @@ html,
 }
 
 .documentSearchField::before {
-  top: 50%;
+  top: 0.45rem;
   right: 0.84rem;
   width: 0.58rem;
   height: 0.58rem;
-  border: 2px solid #ffffff;
+  border: 2px solid #123766;
   border-radius: 50%;
-  transform: translateY(-58%);
+  transform: none;
 }
 
 .documentSearchField::after {
-  top: 1.52rem;
-  right: 0.65rem;
+  top: 1.1rem;
+  right: 0.64rem;
   width: 0.42rem;
   height: 2px;
   border-radius: 999px;
-  background-color: #ffffff;
+  background-color: #123766;
   transform: rotate(45deg);
   transform-origin: left center;
 }
 
 .documentSearchField .sapMSFF {
   width: 100% !important;
-  height: 2.55rem !important;
-  border: 0 !important;
+  height: 1.75rem !important;
+  min-height: 1.75rem !important;
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 2px solid #123766 !important;
+  border-left: 0 !important;
   outline: 0 !important;
-  border-radius: 999px !important;
-  background: #123766 !important;
-  box-shadow: 0 7px 16px rgba(18, 55, 102, 0.28);
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   overflow: hidden;
   transition: border-radius 500ms cubic-bezier(0, 0.11, 0.35, 2), background-color 0.25s ease, box-shadow 0.25s ease;
 }
@@ -219,12 +229,21 @@ html,
 }
 
 .documentSearchField:hover .sapMSFF {
-  box-shadow: 0 9px 20px rgba(18, 55, 102, 0.34);
+  border-bottom-color: #0a6ed1 !important;
+  box-shadow: none !important;
+}
+
+.documentSearchField:hover::before {
+  border-color: #0a6ed1;
+}
+
+.documentSearchField:hover::after {
+  background-color: #0a6ed1;
 }
 
 .documentSearchField:focus-within,
 .documentSearchField.documentSearchFieldActive {
-  width: 21rem !important;
+  width: 18rem !important;
   transform: translateY(-1px);
 }
 
@@ -267,12 +286,13 @@ html,
 .documentSearchField .sapMSFI {
   font-family: var(--app-font-family) !important;
   font-size: 0.88rem !important;
-  color: transparent !important;
+  color: #18304f !important;
   height: 100% !important;
-  padding: 0 2.45rem 0 0.85rem !important;
+  line-height: 1.75rem !important;
+  padding: 0 2.35rem 0 0.85rem !important;
   background: transparent !important;
   caret-color: #123766 !important;
-  opacity: 0;
+  opacity: 1;
   transition: color 0.18s ease, opacity 0.18s ease;
 }
 
@@ -292,7 +312,7 @@ html,
 .documentSearchField .sapMSFI::placeholder {
   color: rgba(24, 48, 79, 0.62) !important;
   font-style: italic;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.18s ease;
 }
 
@@ -304,8 +324,9 @@ html,
 .documentSearchField .sapMSFB,
 .documentSearchField .sapMSFS,
 .documentSearchField .sapMSFR {
-  width: 2.55rem !important;
-  height: 2.55rem !important;
+  width: 2.2rem !important;
+  height: 1.75rem !important;
+  line-height: 1.75rem !important;
   margin: 0 !important;
   border-radius: 999px !important;
   color: transparent !important;
@@ -379,6 +400,15 @@ html,
   .bannerDateText {
     font-size: 0.76rem !important;
     line-height: 1.2 !important;
+  }
+
+  .documentsHeader {
+    flex-wrap: wrap;
+    align-items: flex-start !important;
+  }
+
+  .documentSearchField {
+    margin-left: 0 !important;
   }
 
   .documentSearchField:focus-within,
@@ -542,8 +572,9 @@ html,
   height: 2rem !important;
   min-width: 2rem !important;
   border-radius: 5px;
-  background: #0a6ed1;
-  box-shadow: 0 5px 12px rgba(10, 110, 209, 0.2);
+  background-color: var(--card-color, #0a6ed1) !important;
+  background-image: linear-gradient(135deg, var(--card-color, #0a6ed1), var(--card-color-strong, var(--card-color, #0a6ed1))) !important;
+  box-shadow: 0 5px 12px rgba(18, 39, 68, 0.18);
 }
 
 .employeeDialogHeaderIcon {
@@ -575,13 +606,24 @@ html,
 .employeeDialogCloseButton .sapMBtnInner {
   border: 0 !important;
   background: transparent !important;
-  color: #1d385f !important;
+  color: #d93636 !important;
   min-width: 2.25rem !important;
 }
 
+.employeeDialogCloseButton:hover .sapMBtnInner,
+.employeeDialogCloseButton:focus .sapMBtnInner {
+  background: rgba(217, 54, 54, 0.1) !important;
+  color: #b92727 !important;
+}
+
 .employeeDialogCloseButton .sapMBtnIcon {
-  color: #1d385f !important;
+  color: #d93636 !important;
   font-size: 1.05rem !important;
+}
+
+.employeeDialogCloseButton:hover .sapMBtnIcon,
+.employeeDialogCloseButton:focus .sapMBtnIcon {
+  color: #b92727 !important;
 }
 
 .employeeDialog .dialogContainer {
@@ -751,7 +793,7 @@ html,
 
 .wordButtonCustom .sapMBtnInner,
 .pdfButtonCustom .sapMBtnInner,
-.dialogCancelButton .sapMBtnInner {
+.docusignButtonCustom .sapMBtnInner {
   height: 2rem !important;
   min-width: 7.4rem !important;
   border-radius: 5px !important;
@@ -784,19 +826,24 @@ html,
   color: #ffffff !important;
 }
 
-.dialogCancelButton .sapMBtnInner {
-  border-color: #c62828 !important;
-  background: #c62828 !important;
+.docusignButtonCustom .sapMBtnInner {
+  min-width: 9.8rem !important;
+  border-color: #4c00ff !important;
+  background: #4c00ff !important;
   color: #ffffff !important;
 }
 
-.dialogCancelButton:hover .sapMBtnInner {
-  border-color: #a61f1f !important;
-  background: #a61f1f !important;
+.docusignButtonCustom:hover .sapMBtnInner,
+.docusignButtonCustom:focus .sapMBtnInner,
+.docusignButtonCustom:active .sapMBtnInner {
+  border-color: #130032 !important;
+  background: #130032 !important;
+  color: #ffffff !important;
 }
 
 .wordButtonCustom .sapMBtnIcon,
-.pdfButtonCustom .sapMBtnIcon {
+.pdfButtonCustom .sapMBtnIcon,
+.docusignButtonCustom .sapMBtnIcon {
   color: #ffffff !important;
   display: inline-block !important;
   opacity: 1 !important;
@@ -806,23 +853,50 @@ html,
 
 .wordButtonCustom .sapMBtnContent,
 .pdfButtonCustom .sapMBtnContent,
+.docusignButtonCustom .sapMBtnContent,
 .wordButtonCustom:hover .sapMBtnContent,
 .pdfButtonCustom:hover .sapMBtnContent,
+.docusignButtonCustom:hover .sapMBtnContent,
 .wordButtonCustom:focus .sapMBtnContent,
 .pdfButtonCustom:focus .sapMBtnContent,
+.docusignButtonCustom:focus .sapMBtnContent,
 .wordButtonCustom:active .sapMBtnContent,
 .pdfButtonCustom:active .sapMBtnContent,
+.docusignButtonCustom:active .sapMBtnContent,
 .wordButtonCustom:hover .sapMBtnIcon,
 .pdfButtonCustom:hover .sapMBtnIcon,
+.docusignButtonCustom:hover .sapMBtnIcon,
 .wordButtonCustom:focus .sapMBtnIcon,
 .pdfButtonCustom:focus .sapMBtnIcon,
+.docusignButtonCustom:focus .sapMBtnIcon,
 .wordButtonCustom:active .sapMBtnIcon,
-.pdfButtonCustom:active .sapMBtnIcon {
+.pdfButtonCustom:active .sapMBtnIcon,
+.docusignButtonCustom:active .sapMBtnIcon {
   color: #ffffff !important;
 }
 
-.dialogCancelButton .sapMBtnIcon {
+.pdfButtonCustom.sapMBtn:hover .sapMBtnInner,
+.pdfButtonCustom.sapMBtn:focus .sapMBtnInner,
+.pdfButtonCustom.sapMBtn:active .sapMBtnInner,
+.pdfButtonCustom .sapMBtnInner:hover,
+.pdfButtonCustom .sapMBtnInner:hover .sapMBtnContent,
+.pdfButtonCustom .sapMBtnInner:hover .sapMBtnIcon,
+.pdfButtonCustom .sapMBtnInner:hover * {
   color: #ffffff !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.docusignButtonCustom.sapMBtn:hover .sapMBtnInner,
+.docusignButtonCustom.sapMBtn:focus .sapMBtnInner,
+.docusignButtonCustom.sapMBtn:active .sapMBtnInner,
+.docusignButtonCustom .sapMBtnInner:hover,
+.docusignButtonCustom .sapMBtnInner:hover .sapMBtnContent,
+.docusignButtonCustom .sapMBtnInner:hover .sapMBtnIcon,
+.docusignButtonCustom .sapMBtnInner:hover * {
+  color: #ffffff !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
 }
 
 @media (max-width: 700px) {
@@ -1056,6 +1130,7 @@ html,
     align-items: center !important;
     justify-content: center !important;
     gap: 0.25rem;
+    flex-wrap: wrap !important;
     width: 100% !important;
   }
 
@@ -1064,8 +1139,7 @@ html,
   }
 
   .wordButtonCustom .sapMBtnInner,
-  .pdfButtonCustom .sapMBtnInner,
-  .dialogCancelButton .sapMBtnInner {
+  .pdfButtonCustom .sapMBtnInner {
     height: 1.9rem !important;
     min-width: 5.85rem !important;
     max-width: 5.85rem !important;
@@ -1074,9 +1148,18 @@ html,
     padding-left: 0.38rem !important;
   }
 
+  .docusignButtonCustom .sapMBtnInner {
+    height: 1.9rem !important;
+    min-width: 8.25rem !important;
+    max-width: 8.25rem !important;
+    font-size: 0.66rem !important;
+    padding-right: 0.38rem !important;
+    padding-left: 0.38rem !important;
+  }
+
   .wordButtonCustom .sapMBtnIcon,
   .pdfButtonCustom .sapMBtnIcon,
-  .dialogCancelButton .sapMBtnIcon {
+  .docusignButtonCustom .sapMBtnIcon {
     font-size: 0.78rem !important;
     margin-right: 0.18rem !important;
   }
@@ -1361,16 +1444,22 @@ html.gdDarkMode .sapUiBody,
 }
 
 .gdDarkMode .documentSearchField .sapMSFF {
-  background: #172235 !important;
-  box-shadow: 0 7px 16px rgba(0, 0, 0, 0.26);
+  border-bottom-color: #74b8ff !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .gdDarkMode .documentSearchField::before {
-  border-color: #e7f1ff;
+  border-color: #8ec7ff;
 }
 
 .gdDarkMode .documentSearchField::after {
-  background-color: #e7f1ff;
+  background-color: #8ec7ff;
+}
+
+.gdDarkMode .documentSearchField:hover .sapMSFF {
+  border-bottom-color: #8ec7ff !important;
+  box-shadow: none !important;
 }
 
 .gdDarkMode .documentSearchField:focus-within .sapMSFF,
@@ -1474,8 +1563,23 @@ html.gdDarkMode .sapUiBody,
   color: #a8b9cf !important;
 }
 
+.gdDarkMode .employeeDialogCloseButton .sapMBtnInner {
+  color: #ff5f5f !important;
+}
+
+.gdDarkMode .employeeDialogCloseButton:hover .sapMBtnInner,
+.gdDarkMode .employeeDialogCloseButton:focus .sapMBtnInner {
+  background: rgba(255, 95, 95, 0.14) !important;
+  color: #ff7b7b !important;
+}
+
 .gdDarkMode .employeeDialogCloseButton .sapMBtnIcon {
-  color: #dce8f8 !important;
+  color: #ff5f5f !important;
+}
+
+.gdDarkMode .employeeDialogCloseButton:hover .sapMBtnIcon,
+.gdDarkMode .employeeDialogCloseButton:focus .sapMBtnIcon {
+  color: #ff7b7b !important;
 }
 
 .gdDarkMode .employeeSearchField .sapMSFF,
@@ -1531,6 +1635,34 @@ html.gdDarkMode .sapUiBody,
   border-radius: 999px;
 }
 
+.gdDarkMode .employeeDialog,
+.gdDarkMode .employeeDialog * {
+  scrollbar-color: rgba(206, 225, 246, 0.72) #111b2e;
+}
+
+.gdDarkMode .employeeDialog::-webkit-scrollbar,
+.gdDarkMode .employeeDialog *::-webkit-scrollbar {
+  width: 0.7rem;
+  height: 0.7rem;
+}
+
+.gdDarkMode .employeeDialog::-webkit-scrollbar-track,
+.gdDarkMode .employeeDialog *::-webkit-scrollbar-track {
+  background: #111b2e;
+}
+
+.gdDarkMode .employeeDialog::-webkit-scrollbar-thumb,
+.gdDarkMode .employeeDialog *::-webkit-scrollbar-thumb {
+  background: rgba(206, 225, 246, 0.72);
+  border: 2px solid #111b2e;
+  border-radius: 999px;
+}
+
+.gdDarkMode .employeeDialog::-webkit-scrollbar-corner,
+.gdDarkMode .employeeDialog *::-webkit-scrollbar-corner {
+  background: #111b2e;
+}
+
 .gdDarkMode .employeeDialog .customTable th,
 .gdDarkMode .employeeDialog .customTable .sapMListTblHeaderCell {
   background: #19263b !important;
@@ -1584,21 +1716,6 @@ html.gdDarkMode .sapUiBody,
 .gdDarkMode .employeeDialog .sapMCbBg {
   border-color: #6aa8e8 !important;
   background: #172235 !important;
-}
-
-.gdDarkMode .dialogCancelButton .sapMBtnInner {
-  border-color: #d93636 !important;
-  background: #d93636 !important;
-  color: #ffffff !important;
-}
-
-.gdDarkMode .dialogCancelButton:hover .sapMBtnInner {
-  border-color: #b92727 !important;
-  background: #b92727 !important;
-}
-
-.gdDarkMode .dialogCancelButton .sapMBtnIcon {
-  color: #ffffff !important;
 }
 
 /* ── BASE DE LA CARD ─────────────────────────────────────────────── */
@@ -1695,3 +1812,167 @@ html.gdDarkMode .sapUiBody,
 .card-rose    { --card-color: #dc4a65; --card-color-strong: #ba304c; }
 .card-emerald { --card-color: #1d9b73; --card-color-strong: #147957; }
 .card-sky     { --card-color: #2384bf; --card-color-strong: #176598; }
+
+
+/* --- Smooth theme transitions --- */
+.imageContainer,
+.gdDarkMode .imageContainer {
+  background-image: none !important;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.imageContainer::before,
+.imageContainer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-size: 100% 100%, cover;
+  background-position: left center, center center;
+  background-repeat: no-repeat;
+  opacity: 1;
+}
+
+.imageContainer::before {
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.96) 24%, rgba(255,255,255,0.78) 40%, rgba(255,255,255,0.45) 56%, rgba(255,255,255,0.16) 72%, rgba(255,255,255,0) 86%),
+    url("../img/portada.jpg");
+}
+
+.imageContainer::after {
+  background-image:
+    linear-gradient(90deg, rgba(15, 23, 36, 0.98) 0%, rgba(15, 23, 36, 0.95) 24%, rgba(15, 23, 36, 0.78) 42%, rgba(15, 23, 36, 0.46) 60%, rgba(15, 23, 36, 0.18) 78%, rgba(15, 23, 36, 0.04) 92%),
+    url("../img/portada.jpg");
+  opacity: 0;
+}
+
+.imageContainer > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gdDarkMode .imageContainer::before {
+  opacity: 0;
+}
+
+.gdDarkMode .imageContainer::after {
+  opacity: 1;
+}
+
+html.gdThemeTransitionReady,
+html.gdThemeTransitionReady body,
+html.gdThemeTransitionReady body.sapUiBody,
+html.gdThemeTransitionReady .sapUiBody,
+html.gdThemeTransitionReady .sapMShell,
+html.gdThemeTransitionReady .sapMShellBG,
+html.gdThemeTransitionReady .sapMShellGlobalOuterBackground,
+html.gdThemeTransitionReady .sapMPage,
+html.gdThemeTransitionReady .sapMPageBgStandard,
+html.gdThemeTransitionReady .sapMPageEnableScrolling,
+html.gdThemeTransitionReady .sapMPageContent,
+html.gdThemeTransitionReady .sapMScrollCont,
+html.gdThemeTransitionReady [id$="contentContainer"],
+html.gdThemeTransitionReady [id$="contentContainer-cont"],
+html.gdThemeTransitionReady [id$="contentContainer-scroll"],
+html.gdThemeTransitionReady #contentContainer,
+html.gdThemeTransitionReady .customToolHeader,
+html.gdThemeTransitionReady .headerNav,
+html.gdThemeTransitionReady .headerNav .sapMITB,
+html.gdThemeTransitionReady .headerNav .sapMITBHead,
+html.gdThemeTransitionReady .headerNav .sapMITBFilter,
+html.gdThemeTransitionReady .headerNav .sapMITBText,
+html.gdThemeTransitionReady .headerNav .sapMITBFilterText,
+html.gdThemeTransitionReady .themeToggleButton .sapMBtnInner,
+html.gdThemeTransitionReady .themeToggleButton .sapMBtnContent,
+html.gdThemeTransitionReady .imageContainer,
+html.gdThemeTransitionReady .greetingText,
+html.gdThemeTransitionReady .sectionTitle,
+html.gdThemeTransitionReady .bannerSubtitle,
+html.gdThemeTransitionReady .bannerDateText,
+html.gdThemeTransitionReady .bannerDateIcon,
+html.gdThemeTransitionReady .card-hbox,
+html.gdThemeTransitionReady .card-content-box,
+html.gdThemeTransitionReady .card-arrow-box,
+html.gdThemeTransitionReady .card-title,
+html.gdThemeTransitionReady .card-desc,
+html.gdThemeTransitionReady .card-arrow,
+html.gdThemeTransitionReady .employeeDialog.sapMDialog,
+html.gdThemeTransitionReady .employeeDialog .sapMDialogSection,
+html.gdThemeTransitionReady .employeeDialog .sapMDialogScroll,
+html.gdThemeTransitionReady .employeeDialog .sapMDialogScrollCont,
+html.gdThemeTransitionReady .employeeDialogHeader.sapMTB,
+html.gdThemeTransitionReady .employeeDialog .dialogContainer,
+html.gdThemeTransitionReady .employeeFilterBar,
+html.gdThemeTransitionReady .employeeDialog .sapMDialogFooter,
+html.gdThemeTransitionReady .employeeDialog .sapMDialogFooter .sapMBar,
+html.gdThemeTransitionReady .employeeDialogTitle,
+html.gdThemeTransitionReady .employeeDialogSubtitle,
+html.gdThemeTransitionReady .employeeDialogCloseButton .sapMBtnIcon,
+html.gdThemeTransitionReady .employeeSearchField .sapMSFF,
+html.gdThemeTransitionReady .employeeDateRange .sapMInputBaseContentWrapper,
+html.gdThemeTransitionReady .employeeSearchField .sapMSFI,
+html.gdThemeTransitionReady .employeeDateRange .sapMInputBaseInner,
+html.gdThemeTransitionReady .employeeSearchField .sapMSFB,
+html.gdThemeTransitionReady .employeeSearchField .sapMSFR,
+html.gdThemeTransitionReady .employeeDateRange .sapMInputBaseIcon,
+html.gdThemeTransitionReady .employeeDialog .customTable,
+html.gdThemeTransitionReady .employeeDialog .customTable th,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMListTblHeaderCell,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMText,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMListTblRow,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMListTblSubRow,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMListTblCell,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMGrowingList,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMGrowingListTrigger,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMGrowingListTriggerText,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMGrowingListDescription,
+html.gdThemeTransitionReady .employeeDialog .customTable .sapMGrowingList .sapMLnk,
+html.gdThemeTransitionReady .employeeDialog .sapMCbBg {
+  transition:
+    background-color var(--gd-theme-transition-slow),
+    color var(--gd-theme-transition-fast),
+    border-color var(--gd-theme-transition-slow),
+    border-top-color var(--gd-theme-transition-slow),
+    border-right-color var(--gd-theme-transition-slow),
+    border-bottom-color var(--gd-theme-transition-slow),
+    border-left-color var(--gd-theme-transition-slow),
+    box-shadow var(--gd-theme-transition-slow),
+    opacity var(--gd-theme-transition-fast);
+}
+
+html.gdThemeTransitionReady .imageContainer::before,
+html.gdThemeTransitionReady .imageContainer::after {
+  transition: opacity var(--gd-theme-transition-slow);
+}
+
+html.gdThemeTransitionReady .documentSearchField .sapMSFF {
+  transition:
+    border-radius 500ms cubic-bezier(0, 0.11, 0.35, 2),
+    background-color var(--gd-theme-transition-slow),
+    border-color var(--gd-theme-transition-slow),
+    box-shadow var(--gd-theme-transition-slow);
+}
+
+html.gdThemeTransitionReady .documentSearchField .sapMSFI {
+  transition: color var(--gd-theme-transition-fast), opacity 0.18s ease;
+}
+
+html.gdThemeTransitionReady .customListItem.card-horizontal,
+html.gdThemeTransitionReady .card-horizontal {
+  transition:
+    background-color var(--gd-theme-transition-slow),
+    border-color var(--gd-theme-transition-slow),
+    box-shadow 0.2s ease,
+    transform 0.15s ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.gdThemeTransitionReady,
+  html.gdThemeTransitionReady *,
+  html.gdThemeTransitionReady *::before,
+  html.gdThemeTransitionReady *::after {
+    transition-duration: 1ms !important;
+  }
+}

@@ -496,8 +496,8 @@
                     <customHeader>
                         <Toolbar class="employeeDialogHeader">
                             <HBox alignItems="Center" class="employeeDialogHeaderInfo">
-                                <VBox alignItems="Center" justifyContent="Center" class="employeeDialogIconBadge">
-                                    <core:Icon src="sap-icon://document-text" class="employeeDialogHeaderIcon" />
+                                <VBox id="employeeDialogIconBadge" alignItems="Center" justifyContent="Center" class="employeeDialogIconBadge">
+                                    <core:Icon src="{view>/DialogIcon}" class="employeeDialogHeaderIcon" />
                                 </VBox>
                                 <VBox justifyContent="Center" class="employeeDialogTitleBlock">
                                     <Title
@@ -603,12 +603,13 @@
                             type="Accept"
                         />
                         <Button
-                            id="_IDGenButton2"
-                            text="Cancelar"
-                            icon="sap-icon://decline"
-                            press="onCloseDialog"
-                            class="dialogCancelButton"
-                            type="Default"
+                            id="docusignDataInfo"
+                            text="Enviar a Docusign"
+                            icon="sap-icon://signature"
+                            visible="{view>/ShowDocuSignButton}"
+                            tooltip="Disponible próximamente"
+                            class="docusignButtonCustom"
+                            type="Transparent"
                         />
                     </buttons>
                 </Dialog>
