@@ -135,6 +135,53 @@ sap.ui.define([], function () {
         },
 
         // =====================================================================================
+        // Ciudad de trabajo: custom10 tiene la ciudad, con fallback a state
+        // =====================================================================================
+        getCiudadWork: function (user) {
+            return user.custom10 || user.state || "";
+        },
+
+        // =====================================================================================
+        // Fecha actual formateada: "4 de junio del año 2026"
+        // =====================================================================================
+        getLocalDate: function () {
+            const d = new Date();
+            const months = ["enero","febrero","marzo","abril","mayo","junio",
+                            "julio","agosto","septiembre","octubre","noviembre","diciembre"];
+            return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
+        },
+
+        // =====================================================================================
+        // Fecha desde string ISO: "2024-01-15" → "15 de enero del año 2024"
+        // Agrega T12:00:00 para evitar desfase de timezone
+        // =====================================================================================
+        formatDateRaw: function (dateStr) {
+            if (!dateStr) return "";
+            const d = new Date(dateStr + "T12:00:00");
+            const months = ["enero","febrero","marzo","abril","mayo","junio",
+                            "julio","agosto","septiembre","octubre","noviembre","diciembre"];
+            return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
+        },
+
+        // =====================================================================================
+        // Salario formateado: 4853000 → "$ 4.853.000"
+        // =====================================================================================
+        formatSalary: function (value) {
+            if (!value) return "";
+            return "$ " + Number(value).toLocaleString("es-CO");
+        },
+
+        // =====================================================================================
+        // Resuelve género en texto con placeholder {A}
+        // Ejemplo: "PENSIONADO{A}" → "PENSIONADA" (mujer) o "PENSIONADO" (hombre)
+        // =====================================================================================
+        resolveGender: function (text, gender) {
+            if (!text) return "";
+            const isFemale = gender === "F";
+            return text.replace(/\{A\}/g, isFemale ? "A" : "").trim();
+        },
+
+        // =====================================================================================
         // Obtiene los usuarios seleccionados en la tabla idUserTable y devuelve
         // un array de objetos con todos los datos necesarios para los documentos.
         // =====================================================================================
@@ -207,5 +254,7 @@ sap.ui.define([], function () {
                 };
             });
         }
+
+
     };
 });

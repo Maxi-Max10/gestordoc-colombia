@@ -41,13 +41,14 @@ sap.ui.define([
 
                 const sNombre     = `${user.firstName} ${user.lastName}`;
                 const sCedula     = user.nationalId || "";
-                const sCargo      = resolveGender(user.title || "");
-                const sCiudadWork = user.custom10 || user.state || "";
-                const sSalario    = _formatSalary(user.paycompvalue || user.paycompValue);
-                const sIngreso = user.hireDatesimpl ? _formatDate(new Date(user.hireDatesimpl)) : "XXXX";
-                console.log("endDate:", user.endDate, "hireDateExt:", user.hireDateExt, "empEndDate:", user.empEndDate);
-                const sSalida = user.endDate ? _formatDate(new Date(user.endDate + "T12:00:00")) : "XXXX";
+                const sCargo      = oController.resolveGender(user.title || "", user.gender);
+                const sCiudadWork = oController.getCiudadWork(user);
+                const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sIngreso = user.hireDatesimpl ? oController.formatDateToSpanish(user.hireDatesimpl) : "XXXX";
+                const sSalida = user.endDate ? oController.formatDateToSpanish(user.endDate + "T12:00:00") : "XXXX";
                 const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
+                const localDate   = oController.getLocalDate();
+
 
                 // Ciudad: buscar el campo correcto de SSFF
                 const sCity = user.location || user.city || user.addressLine1 || "";

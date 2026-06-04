@@ -1013,6 +1013,16 @@ sap.ui.define([
     formatFechaFormal:    function (fechaInput)  { return formatHelpers.formatFechaFormal(fechaInput); },
     convertNumberToWords: function (num)         { return formatHelpers.convertNumberToWords(num); },
     formatDateToWords:    function (date)        { return formatHelpers.formatDateToWords(date); },
+    formatDateToSpanish:  function (sDate)      { return formatHelpers.formatDateToSpanish(sDate); },
+    formatFechaCorta:     function (fecha)       { return formatHelpers.formatFechaCorta(fecha); },
+    formatFechaFormal:    function (fechaInput)  { return formatHelpers.formatFechaFormal(fechaInput); },
+    convertNumberToWords: function (num)         { return formatHelpers.convertNumberToWords(num); },
+    formatDateToWords:    function (date)        { return formatHelpers.formatDateToWords(date); },
+    resolveGender:        function (text, gender){ return formatHelpers.resolveGender(text, gender); },
+    getCiudadWork:        function (user)        { return formatHelpers.getCiudadWork(user); },
+    getLocalDate:         function ()            { return formatHelpers.getLocalDate(); },
+    formatDateRaw:        function (dateStr)     { return formatHelpers.formatDateRaw(dateStr); },
+    formatSalary:         function (value)       { return formatHelpers.formatSalary(value); },
 
     // Devuelve un array con los datos completos de los empleados seleccionados en la tabla.
     // Cada elemento incluye todos los campos necesarios para rellenar las plantillas de documentos.
