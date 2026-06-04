@@ -157,7 +157,7 @@ sap.ui.define([], function () {
         // =====================================================================================
         formatDateRaw: function (dateStr) {
             if (!dateStr) return "";
-            const d = new Date(dateStr + "T12:00:00");
+            const d = dateStr instanceof Date ? dateStr : new Date(dateStr + "T12:00:00");
             const months = ["enero","febrero","marzo","abril","mayo","junio",
                             "julio","agosto","septiembre","octubre","noviembre","diciembre"];
             return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
