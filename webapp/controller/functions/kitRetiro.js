@@ -32,13 +32,21 @@ sap.ui.define([
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
+                // Ahora sí, user ya existe cuando se define resolveGender
+                const resolveGender = (text) => {
+                    if (!text) return "";
+                    const isFemale = user.gender === "F";
+                    return text.replace(/\{A\}/g, isFemale ? "A" : "").trim();
+                };
+
                 const sNombre     = `${user.firstName} ${user.lastName}`;
                 const sCedula     = user.nationalId || "";
-                const sCargo      = user.title || "";
-                const sCiudadWork = user.division || "";
-                const sSalario    = _formatSalary(user.paycompValue);
-                const sIngreso    = user.hireDate   ? _formatDate(new Date(user.hireDate))   : "XXXX";
-                const sSalida     = user.empEndDate ? _formatDate(new Date(user.empEndDate)) : "XXXX";
+                const sCargo      = resolveGender(user.title || "");
+                const sCiudadWork = user.custom10 || user.state || "";
+                const sSalario    = _formatSalary(user.paycompvalue || user.paycompValue);
+                const sIngreso = user.hireDatesimpl ? _formatDate(new Date(user.hireDatesimpl)) : "XXXX";
+                console.log("endDate:", user.endDate, "hireDateExt:", user.hireDateExt, "empEndDate:", user.empEndDate);
+                const sSalida = user.endDate ? _formatDate(new Date(user.endDate + "T12:00:00")) : "XXXX";
                 const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
 
                 // Ciudad: buscar el campo correcto de SSFF
@@ -48,7 +56,7 @@ sap.ui.define([
                 const htmlPagina1 = `
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
+                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
 
                     <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor(a):</p>
                     <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
@@ -83,11 +91,12 @@ sap.ui.define([
                 const htmlPagina2 = `
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 4px 0;">${sCity ? sCity + ", " : ""}${localDate}</p>
+                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 4px 0;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
 
                     <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor:</p>
                     <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
                     <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">Ciudad</p>
+                    <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sCiudadWork}</p>
 
                     <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 14px 0;">
                         Pensando en su comodidad, tenemos disponible para usted las siguientes opciones (Marque X):
@@ -212,7 +221,7 @@ sap.ui.define([
                         </tr>
                         <tr>
                             <td style="padding:4px 0;font-weight:bold;">Salario:</td>
-                            <td style="padding:4px 0;text-align:right;">${sSalario}</td>
+                            <td style="padding:4px 0;">${sSalario}</td>
                         </tr>
                     </table>
 
