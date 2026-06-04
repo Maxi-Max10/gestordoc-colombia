@@ -617,8 +617,11 @@ sap.ui.define([
         "empInfo/personNav/personalInfoNav/secondLastName",
         "empInfo/personNav/nationalIdNav/nationalId",
         "empInfo/personNav/nationalIdNav/cardType",
-        "empInfo/personNav/nationalIdNav/country"
-      ].join(",");
+        "empInfo/personNav/nationalIdNav/country",
+        "empInfo/personNav/personalInfoNav/maritalStatus",
+        "empInfo/personNav/personalInfoNav/secondLastName",
+        "empInfo/personNav/personalInfoNav/customString10",
+            ].join(",");
 
       const sExpand = [
         "manager",
@@ -1023,6 +1026,13 @@ sap.ui.define([
     getLocalDate:         function ()            { return formatHelpers.getLocalDate(); },
     formatDateRaw:        function (dateStr)     { return formatHelpers.formatDateRaw(dateStr); },
     formatSalary:         function (value)       { return formatHelpers.formatSalary(value); },
+    getTelefono:    function (user) { return formatHelpers.getTelefono(user); },
+    getEmail:       function (user) { return formatHelpers.getEmail(user); },
+    getNacionalidad: function (user) { return formatHelpers.getNacionalidad(user); },
+    getSexo:        function (user) { return formatHelpers.getSexo(user); },
+    getPaisName: function (code) { return formatHelpers.getPaisName(code); },
+    getEstadoCivil:    function (user) { return formatHelpers.getEstadoCivil(user); },
+    getGrupoSanguineo: function (user) { return formatHelpers.getGrupoSanguineo(user); },
 
     // Devuelve un array con los datos completos de los empleados seleccionados en la tabla.
     // Cada elemento incluye todos los campos necesarios para rellenar las plantillas de documentos.

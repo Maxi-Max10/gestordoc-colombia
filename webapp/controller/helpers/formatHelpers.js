@@ -181,6 +181,50 @@ sap.ui.define([], function () {
             return text.replace(/\{A\}/g, isFemale ? "A" : "").trim();
         },
 
+        //Helper para obtener el nombre del país a partir del código, con un mapa predefinido
+        getPaisName: function (countryCode) {
+            const PAISES = {
+                "COL": "Colombia",
+                "VEN": "Venezuela",
+                "ECU": "Ecuador",
+                "PER": "Perú",
+                "MEX": "México",
+                "ARG": "Argentina",
+                "CHL": "Chile",
+                "USA": "Estados Unidos",
+                "ESP": "España"
+                // agregás los que necesites
+            };
+            return PAISES[countryCode] || countryCode || "";
+        },
+
+        // =====================================================================================
+        // Obtiene el teléfono de trabajo, con fallback a cadena vacía si no existe
+        // =====================================================================================
+        getTelefono: function (user) {
+            return user.businessPhone || "";
+        },
+
+        getEmail: function (user) {
+            return user.email || "";
+        },
+
+        getNacionalidad: function (user) {
+            return user.nationality || "";
+        },
+
+        getSexo: function (user) {
+            return user.gender === "F" ? "Femenino" : "Masculino";
+        },
+
+        getEstadoCivil: function (user) {
+            return user.maritalStatus || "";
+        },
+
+        getGrupoSanguineo: function (user) {
+            return user.bloodType || "";
+        },
+
         // =====================================================================================
         // Obtiene los usuarios seleccionados en la tabla idUserTable y devuelve
         // un array de objetos con todos los datos necesarios para los documentos.
@@ -216,6 +260,11 @@ sap.ui.define([], function () {
                 const countryCode = getProp("empInfo/personNav/nationalIdNav/results/0/country");
                 const gentilicio = GENTILICIOS[countryCode] || countryCode;
 
+                console.log(
+                    "customString10:", getProp("empInfo/personNav/personalInfoNav/results/0/customString10"),
+                    "personalInfoNav/0:", getProp("empInfo/personNav/personalInfoNav/results/0")
+                );
+
                 // Devuelve todos los datos listos para insertarse en las plantillas .docx
                 return {
                     userId: getProp("userId"),
@@ -250,7 +299,10 @@ sap.ui.define([], function () {
                     position: (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),
                     positionSup: (getProp("manager/jobCode") || "").replace(/\s*\(\d+\)$/, ""),
                     TelefonoSup: (getProp("manager/businessPhone") || "").replace(/(.*)x(.*)/, "($2) $1"),
-                    CorreoTrabajoSup: getProp("manager/email")
+                    CorreoTrabajoSup: getProp("manager/email"),
+                    gender:    getProp("gender"),
+                    address:   getProp("custom03") || "",
+                    bloodType: getProp("empInfo/personNav/personalInfoNav/results/0/customString10") || "",
                 };
             });
         }

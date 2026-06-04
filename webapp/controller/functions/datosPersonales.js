@@ -22,13 +22,38 @@ sap.ui.define([
 
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
+                console.log(
+                    "country:", user.country,
+                    "email:", user.email,
+                    "custom03:", user.custom03,
+                    "addressLine1:", user.addressLine1,
+                    "custom10:", user.custom10,
+                    "businessPhone:", user.businessPhone
+                );
 
                 if (aUsers.length > 1) {
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                const sNombre = `${user.firstName} ${user.lastName}`;
-                const sCedula = user.nationalId || "";
+                const sNombre      = `${user.firstName} ${user.lastName}`;
+                const sCedula      = user.nationalId || "";
+                const sCiudadWork  = oController.getCiudadWork(user);
+                const localDate    = oController.getLocalDate();
+                const sCargo      = oController.resolveGender(user.title || "", user.gender);
+                const sSalario    = oController.formatSalary(user.paycompvalue);
+                console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
+                const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
+                const sPais = oController.getPaisName(user.country);
+                const sTelefono   = oController.getTelefono(user);
+                const sEmail      = oController.getEmail(user);
+                const sNacional   = oController.getNacionalidad(user);
+                const sSexo       = oController.getSexo(user);
+                const sEstadoCivil = oController.getEstadoCivil(user);
+                const sGrupoSangre = oController.getGrupoSanguineo(user);
+                console.log(
+                    "gender:", user.gender,
+                    "address:", user.address
+                );
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -187,7 +212,7 @@ sap.ui.define([
                         <!-- Fecha -->
                         <div class="row h-auto" style="border-top:none;">
                             <div class="cell cell-full" style="min-height:28px;">
-                                <strong>Fecha de diligenciamiento:</strong>
+                                <strong>Fecha de diligenciamiento: ${localDate}</strong>
                             </div>
                         </div>
 
@@ -197,7 +222,7 @@ sap.ui.define([
                         <!-- Nombre + Documento -->
                         <div class="row">
                             <div class="cell cell-45" style="min-height:62px;">
-                                <strong>Nombre Completo:</strong>
+                                <strong>Nombre Completo: ${sNombre}</strong>
                                 <span class="underline" style="margin-top:10px;"></span>
                                 <span class="underline" style="margin-top:10px;"></span>
                             </div>
@@ -208,7 +233,7 @@ sap.ui.define([
                                 &nbsp; C.E. <input type="checkbox">
                                 </strong>
                                 <br>
-                                <strong>No.</strong>
+                                <strong>No. ${sCedula}</strong>
                                 <br>
                                 <div style="display:flex; align-items:center; gap:4px; margin-top:4px;">
                                     <strong style="white-space:nowrap; font-size:10px;">Fecha de expedición del documento:</strong>
@@ -220,7 +245,7 @@ sap.ui.define([
                         <!-- Cargo -->
                         <div class="row h-tall">
                             <div class="cell cell-full">
-                                <strong>Cargo desempeñado dentro de la Compañía:</strong>
+                                <strong>Cargo desempeñado dentro de la Compañía: ${sCargo}</strong>
                                 <span class="underline" style="margin-top:16px;"></span>
                             </div>
                         </div>
@@ -229,8 +254,8 @@ sap.ui.define([
                         <div class="row">
                             <div class="cell cell-45" style="padding:0;">
                                 <div class="sub-row" style="min-height:26px;">
-                                    <div class="sub-cell" style="width:62%; padding:4px 7px;"><strong>Ciudad</strong></div>
-                                    <div class="sub-cell" style="width:38%; padding:4px 7px;"><strong>País</strong></div>
+                                    <div class="sub-cell" style="width:62%; padding:4px 7px;"><strong>Ciudad: ${sCiudadWork}</strong></div>
+                                    <div class="sub-cell" style="width:38%; padding:4px 7px;"><strong>País: ${sPais}</strong></div>
                                 </div>
                             </div>
                             <div class="cell cell-55">
@@ -246,31 +271,31 @@ sap.ui.define([
 
                         <!-- Teléfono -->
                         <div class="row">
-                            <div class="cell cell-45"><strong>Teléfono:</strong></div>
+                            <div class="cell cell-45"><strong>Teléfono: ${sTelefono}</strong></div>
                             <div class="cell cell-55"></div>
                         </div>
 
                         <!-- Correo -->
                         <div class="row">
-                            <div class="cell cell-45"><strong>Correo Electrónico:</strong></div>
+                            <div class="cell cell-45"><strong>Correo Electrónico: ${sEmail}</strong></div>
                             <div class="cell cell-55"></div>
                         </div>
 
                         <!-- Fecha nacimiento + Estado Civil -->
                         <div class="row">
                             <div class="cell cell-45"><strong>Fecha de nacimiento:</strong></div>
-                            <div class="cell cell-55"><strong>Estado Civil:</strong></div>
+                            <div class="cell cell-55"><strong>Estado Civil: ${sEstadoCivil}</strong></div>
                         </div>
 
                         <!-- Nacionalidad + RH -->
                         <div class="row">
-                            <div class="cell cell-45"><strong>Nacionalidad:</strong></div>
-                            <div class="cell cell-55"><strong>RH y grupo sanguíneo:</strong></div>
+                            <div class="cell cell-45"><strong>Nacionalidad: ${sNacional}</strong></div>
+                            <div class="cell cell-55"><strong>RH y grupo sanguíneo: ${sGrupoSangre}</strong></div>
                         </div>
 
                         <!-- Sexo + Dependientes -->
                         <div class="row">
-                            <div class="cell cell-45"><strong>Sexo:</strong></div>
+                            <div class="cell cell-45"><strong>Sexo: ${sSexo}</strong></div>
                             <div class="cell cell-55" style="padding:0;">
                                 <div class="sub-row" style="align-items:center; min-height:26px;">
                                     <div class="sub-cell" style="width:40%; padding:4px 7px; white-space:nowrap;">
