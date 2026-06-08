@@ -50,10 +50,9 @@ sap.ui.define([
                 const sSexo       = oController.getSexo(user);
                 const sEstadoCivil = oController.getEstadoCivil(user);
                 const sGrupoSangre = oController.getGrupoSanguineo(user);
-                console.log(
-                    "gender:", user.gender,
-                    "address:", user.address
-                );
+                const sFechaNacimiento = user.dateOfBirth 
+                    ? oController.formatDateRaw(user.dateOfBirth) 
+                    : "";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -212,7 +211,7 @@ sap.ui.define([
                         <!-- Fecha -->
                         <div class="row h-auto" style="border-top:none;">
                             <div class="cell cell-full" style="min-height:28px;">
-                                <strong>Fecha de diligenciamiento: ${localDate}</strong>
+                                <strong>Fecha de diligenciamiento:</strong> ${localDate}
                             </div>
                         </div>
 
@@ -222,7 +221,7 @@ sap.ui.define([
                         <!-- Nombre + Documento -->
                         <div class="row">
                             <div class="cell cell-45" style="min-height:62px;">
-                                <strong>Nombre Completo: ${sNombre}</strong>
+                                <strong>Nombre Completo:</strong> ${sNombre}
                                 <span class="underline" style="margin-top:10px;"></span>
                                 <span class="underline" style="margin-top:10px;"></span>
                             </div>
@@ -233,7 +232,7 @@ sap.ui.define([
                                 &nbsp; C.E. <input type="checkbox">
                                 </strong>
                                 <br>
-                                <strong>No. ${sCedula}</strong>
+                                <strong>No.</strong> ${sCedula}
                                 <br>
                                 <div style="display:flex; align-items:center; gap:4px; margin-top:4px;">
                                     <strong style="white-space:nowrap; font-size:10px;">Fecha de expedición del documento:</strong>
@@ -245,7 +244,7 @@ sap.ui.define([
                         <!-- Cargo -->
                         <div class="row h-tall">
                             <div class="cell cell-full">
-                                <strong>Cargo desempeñado dentro de la Compañía: ${sCargo}</strong>
+                                <strong>Cargo desempeñado dentro de la Compañía:</strong> ${sCargo}
                                 <span class="underline" style="margin-top:16px;"></span>
                             </div>
                         </div>
@@ -254,8 +253,8 @@ sap.ui.define([
                         <div class="row">
                             <div class="cell cell-45" style="padding:0;">
                                 <div class="sub-row" style="min-height:26px;">
-                                    <div class="sub-cell" style="width:62%; padding:4px 7px;"><strong>Ciudad: ${sCiudadWork}</strong></div>
-                                    <div class="sub-cell" style="width:38%; padding:4px 7px;"><strong>País: ${sPais}</strong></div>
+                                    <div class="sub-cell" style="width:62%; padding:4px 7px;"><strong>Ciudad:</strong> ${sCiudadWork}</div>
+                                    <div class="sub-cell" style="width:38%; padding:4px 7px;"><strong>País:</strong> ${sPais}</div>
                                 </div>
                             </div>
                             <div class="cell cell-55">
@@ -263,39 +262,54 @@ sap.ui.define([
                             </div>
                         </div>
 
-                        <!-- Dirección + Planta -->
-                        <div class="row">
-                            <div class="cell cell-45"><strong>Dirección de residencia:</strong></div>
-                            <div class="cell cell-55"><strong>Planta a la que pertenece:</strong></div>
-                        </div>
+                        <div style="display:flex; border-top:1px solid #000;">
+    
+                            <!-- Columna izquierda -->
+                            <div style="width:45%;">
+                                <div class="row">
+                                    <div class="cell cell-full">
+                                        <strong>Dirección de residencia:</strong>
+                                    </div>
+                                </div>
 
-                        <!-- Teléfono -->
-                        <div class="row">
-                            <div class="cell cell-45"><strong>Teléfono: ${sTelefono}</strong></div>
-                            <div class="cell cell-55"></div>
-                        </div>
+                                <div class="row">
+                                    <div class="cell cell-full">
+                                        <strong>Teléfono:</strong> ${sTelefono}
+                                    </div>
+                                </div>
 
-                        <!-- Correo -->
-                        <div class="row">
-                            <div class="cell cell-45"><strong>Correo Electrónico: ${sEmail}</strong></div>
-                            <div class="cell cell-55"></div>
+                                <div class="row">
+                                    <div class="cell cell-full">
+                                        <strong>Correo Electrónico:</strong> ${sEmail}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Columna derecha -->
+                            <div class="cell" style="
+                                width:55%;
+                                border-left:1px solid #000;
+                            ">
+                                <strong>Planta a la que pertenece:</strong>
+                            </div>
+
                         </div>
 
                         <!-- Fecha nacimiento + Estado Civil -->
                         <div class="row">
-                            <div class="cell cell-45"><strong>Fecha de nacimiento:</strong></div>
-                            <div class="cell cell-55"><strong>Estado Civil: ${sEstadoCivil}</strong></div>
+                            <div class="cell cell-45"><strong>Fecha de nacimiento:</strong> ${sFechaNacimiento}</div>
+                            <div class="cell cell-55"><strong>Estado Civil:</strong> ${sEstadoCivil}</div>
                         </div>
 
                         <!-- Nacionalidad + RH -->
                         <div class="row">
-                            <div class="cell cell-45"><strong>Nacionalidad: ${sNacional}</strong></div>
-                            <div class="cell cell-55"><strong>RH y grupo sanguíneo: ${sGrupoSangre}</strong></div>
+                            <div class="cell cell-45"><strong>Nacionalidad:</strong> ${sNacional}</div>
+                            <div class="cell cell-55"><strong>RH y grupo sanguíneo:</strong> ${sGrupoSangre}</div>
                         </div>
 
                         <!-- Sexo + Dependientes -->
                         <div class="row">
-                            <div class="cell cell-45"><strong>Sexo: ${sSexo}</strong></div>
+                            <div class="cell cell-45"><strong>Sexo:</strong> ${sSexo}</div>
                             <div class="cell cell-55" style="padding:0;">
                                 <div class="sub-row" style="align-items:center; min-height:26px;">
                                     <div class="sub-cell" style="width:40%; padding:4px 7px; white-space:nowrap;">
@@ -1132,12 +1146,10 @@ sap.ui.define([
                             <div class="row">
 
                                 <div class="cell" style="width:38%;">
-                                    <strong>
-                                        Nombre del Representante legal o Persona Titular de los datos
-                                    </strong>
+                                        <strong>Nombre del Representante legal o Persona Titular de los datos:</strong>
                                 </div>
 
-                                <div class="cell" style="width:62%;"></div>
+                                <div class="cell" style="width:62%;"> ${sNombre}</div>
 
                             </div>
 
@@ -1154,19 +1166,14 @@ sap.ui.define([
                             <div class="row">
 
                                 <div class="cell" style="width:55%;">
-
                                     <strong>Documento de Identificación:</strong>
-
                                     <strong>
                                     &nbsp;
                                     C.C. <input type="checkbox">
-
                                     &nbsp;
                                     C.E. <input type="checkbox">
-
                                     &nbsp;
                                     T.I <input type="checkbox">
-
                                     &nbsp;
                                     R.C. <input type="checkbox">
                                     </strong>
@@ -1174,7 +1181,7 @@ sap.ui.define([
                                 </div>
 
                                 <div class="cell" style="width:45%;">
-                                    <strong>No. De Documento:</strong>
+                                    <strong>No. De Documento:</strong> ${sCedula}
                                 </div>
 
                             </div>
