@@ -638,7 +638,19 @@ sap.ui.define([
         "empInfo/personNav/personalInfoNav/secondLastName",
         "empInfo/personNav/nationalIdNav/nationalId",
         "empInfo/personNav/nationalIdNav/cardType",
-        "empInfo/personNav/nationalIdNav/country"
+        "empInfo/personNav/nationalIdNav/country",
+        "empInfo/personNav/nationalIdNav/customDate1",
+        "empInfo/personNav/personalInfoNav/maritalStatus",
+        "empInfo/personNav/personalInfoNav/secondLastName",
+        "empInfo/personNav/personalInfoNav/customString10",
+        "empInfo/personNav/personalInfoNav/customString10",
+        "custom05",
+        "custom05Nav/id",
+        "custom05Nav/externalCode",
+        "custom05Nav/localeLabel",
+        "dateOfBirth",
+        "addressLine1",
+        "custom15",   // dependientes (check sí/no)
       ].join(",");
 
       const sExpand = [
@@ -646,7 +658,8 @@ sap.ui.define([
         "empInfo/compInfoNav/empPayCompRecurringNav",
         "empInfo/jobInfoNav",
         "empInfo/personNav/personalInfoNav",
-        "empInfo/personNav/nationalIdNav"
+        "empInfo/personNav/nationalIdNav",
+        "custom05Nav",
       ].join(",");
 
       const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
@@ -667,7 +680,16 @@ sap.ui.define([
 
           // Cédula (solo documentos tipo CC - Cédula de Ciudadanía)
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          user.nationalId = nationalIdResults.find(i => i.cardType === "CC")?.nationalId ?? "";
+          const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
+          //console.log("ccEntry:", ccEntry); // ← verificar que customDate1 está ahí
+          user.nationalId         = ccEntry?.nationalId ?? "";
+          user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
+          user.docExpeditionDate  = ccEntry?.customDate1 || null;   // ← agregá
+          user.bloodType          = user.custom05Nav?.localeLabel || "";
+          user.addressLine1       = user.addressLine1 || "";
+          user.hasDependents      = user.custom15 || "";
+          user.dateOfBirth        = user.dateOfBirth || null;
+
 
           // Tratamiento (salut)
           user.salut = user.salutation === "3526" ? "Sra."
@@ -711,6 +733,8 @@ sap.ui.define([
         if (this._activeEmployeesRequest === pFetch) this._activeEmployeesRequest = null;
       });
       return pFetch;
+
+      
     },
 
 
@@ -742,7 +766,15 @@ sap.ui.define([
         "empInfo/personNav/personalInfoNav/secondLastName",
         "empInfo/personNav/nationalIdNav/nationalId",
         "empInfo/personNav/nationalIdNav/cardType",
-        "empInfo/personNav/nationalIdNav/country"
+        "empInfo/personNav/nationalIdNav/country",
+        "empInfo/personNav/nationalIdNav/customDate1",  // ← para docExpeditionDate
+        "dateOfBirth",
+        "addressLine1",
+        "custom15",   // dependientes (check sí/no)
+        "custom05",
+        "custom05Nav/id",
+        "custom05Nav/externalCode",
+        "custom05Nav/localeLabel",
       ].join(",");
 
       const sExpand = [
@@ -750,7 +782,8 @@ sap.ui.define([
         "empInfo/compInfoNav/empPayCompRecurringNav",
         "empInfo/jobInfoNav",
         "empInfo/personNav/personalInfoNav",
-        "empInfo/personNav/nationalIdNav"
+        "empInfo/personNav/nationalIdNav",
+        "custom05Nav",
       ].join(",");
 
       const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
@@ -789,7 +822,13 @@ sap.ui.define([
           user.marriageStatus = statusMap[user.marriageStatusId] || "";
 
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          user.nationalId = nationalIdResults.find(i => i.cardType === "CC")?.nationalId ?? "";
+          const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
+          user.nationalId         = ccEntry?.nationalId ?? "";
+          user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
+          user.docExpeditionDate  = ccEntry?.customDate1 || null;   // ← agregá
+          user.addressLine1       = user.addressLine1 || "";
+          user.hasDependents      = user.custom15 || "";
+          user.dateOfBirth        = user.dateOfBirth || null;
 
           aUsers.push(user);
         });
@@ -1099,6 +1138,23 @@ sap.ui.define([
     formatFechaFormal:    function (fechaInput)  { return formatHelpers.formatFechaFormal(fechaInput); },
     convertNumberToWords: function (num)         { return formatHelpers.convertNumberToWords(num); },
     formatDateToWords:    function (date)        { return formatHelpers.formatDateToWords(date); },
+    formatDateToSpanish:  function (sDate)      { return formatHelpers.formatDateToSpanish(sDate); },
+    formatFechaCorta:     function (fecha)       { return formatHelpers.formatFechaCorta(fecha); },
+    formatFechaFormal:    function (fechaInput)  { return formatHelpers.formatFechaFormal(fechaInput); },
+    convertNumberToWords: function (num)         { return formatHelpers.convertNumberToWords(num); },
+    formatDateToWords:    function (date)        { return formatHelpers.formatDateToWords(date); },
+    resolveGender:        function (text, gender){ return formatHelpers.resolveGender(text, gender); },
+    getCiudadWork:        function (user)        { return formatHelpers.getCiudadWork(user); },
+    getLocalDate:         function ()            { return formatHelpers.getLocalDate(); },
+    formatDateRaw:        function (dateStr)     { return formatHelpers.formatDateRaw(dateStr); },
+    formatSalary:         function (value)       { return formatHelpers.formatSalary(value); },
+    getTelefono:    function (user) { return formatHelpers.getTelefono(user); },
+    getEmail:       function (user) { return formatHelpers.getEmail(user); },
+    getNacionalidad: function (user) { return formatHelpers.getNacionalidad(user); },
+    getSexo:        function (user) { return formatHelpers.getSexo(user); },
+    getPaisName: function (code) { return formatHelpers.getPaisName(code); },
+    getEstadoCivil:    function (user) { return formatHelpers.getEstadoCivil(user); },
+    getGrupoSanguineo: function (user) { return formatHelpers.getGrupoSanguineo(user); },
 
     // Devuelve un array con los datos completos de los empleados seleccionados en la tabla.
     // Cada elemento incluye todos los campos necesarios para rellenar las plantillas de documentos.
@@ -1459,7 +1515,19 @@ sap.ui.define([
     onDownloadPDFContratoTerminoFijo:    async function (sButtonId) { contratoTerminoFijo.onDownloadPDFContratoTerminoFijo(this, sButtonId); },
     onDownloadPDFContratoTerminoIndef:   async function (sButtonId) { contratoTerminoIndef.onDownloadPDFContratoTerminoIndef(this, sButtonId); },
     onDownloadPDFContratoAprendizajeLectivo: async function (sButtonId) { contratoAprendizajeLectivo.onDownloadPDFContratoAprendizajeLectivo(this, sButtonId); },
-    onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); }
+    onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); },
+
+    _debugCountryCodes: function () {
+      const oModel = this.getOwnerComponent().getModel();
+      oModel.read("/Country", {
+        success: function (oData) {
+          console.table(oData.results);
+        },
+        error: function (e) { console.error(e); }
+      });
+    }
+
+    
 
   });
 });

@@ -27,8 +27,10 @@ sap.ui.define([
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                const sNombre = `${user.firstName} ${user.lastName}`;
-                const sCedula = user.nationalId || "";
+                const sNombre      = `${user.firstName} ${user.lastName}`;
+                const sCedula      = user.nationalId || "";
+                const sCiudadWork  = oController.getCiudadWork(user);
+                const localDate    = oController.getLocalDate();
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -50,7 +52,7 @@ sap.ui.define([
                             SOLICITUD PARA DEDUCCIONES DE RETENCIÓN EN LA FUENTE Y CONDICION DE<br>DECLARANTE DE RENTA
                         </p>
 
-                        <p style="margin:0 0 8px 0;">Ciudad y Fecha: ________________________</p>
+                        <p style="margin:0 0 8px 0;">Ciudad y Fecha: ${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
                         <p style="margin:0;">Señores:</p>
                         <p style="margin:0;">Sección Nómina</p>
                         <p style="margin:0;">DIACO S.A.</p>
@@ -176,8 +178,8 @@ sap.ui.define([
                         </p>
 
                         <p style="margin:0 0 6px 20px;">Firma: ____________________________________</p>
-                        <p style="margin:0 0 6px 20px;">Nombre: __________________________________</p>
-                        <p style="margin:0 0 0 20px;">C.C.:______________________________________</p>
+                        <p style="margin:0 0 6px 20px;">Nombre: ${sNombre}</p>
+                        <p style="margin:0 0 0 20px;">C.C.:${sCedula}</p>
                     </div>`;
 
                 // Crear PDF en blanco y renderizar cada página

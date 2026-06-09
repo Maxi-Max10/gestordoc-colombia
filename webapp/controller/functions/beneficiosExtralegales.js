@@ -29,10 +29,14 @@ sap.ui.define([
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                const sNombre       = `${user.firstName} ${user.lastName}`;
-                const sCedula       = user.nationalId || "";
-                const sIdentificado = (user.gender === "F") ? "identificada" : "identificado";
-                const sCiudadFirma  = user.location || user.city || "Bucaramanga";
+                const sNombre     = `${user.firstName} ${user.lastName}`;
+                const sCedula     = user.nationalId || "";
+                const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
+                const localDate   = oController.getLocalDate();
+
+
+                // Ciudad: buscar el campo correcto de SSFF
+                const sCity = user.location || user.city || user.addressLine1 || "";
 
                 // ── Word ──────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -41,8 +45,7 @@ sap.ui.define([
                         lastName:    user.lastName,
                         sNombre,
                         sCedula,
-                        sIdentificado,
-                        sCiudadFirma,
+                        sIdentif,
                         localDate
                     });
                     continue;
@@ -50,14 +53,23 @@ sap.ui.define([
 
                 // ── PDF ───────────────────────────────────────────────────────
                 const htmlRaw = `
-                    <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+                    <div style="
+                        font-family:Arial,sans-serif;
+                        font-size:11pt;
+                        line-height:1.5;
+                        color:#000;
+                        width:100%;
+                        box-sizing:border-box;
+                        border:1px solid #666;
+                        padding:15px;
+                    ">
 
-                        <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;">
+                        <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 20px 0;">
                             CONOCIMIENTO Y DECLARACIÓN PLAN DE BENEFICIOS EXTRALEGALES
                         </p>
 
                         <p style="text-align:justify;margin:0 0 16px 0;">
-                            El suscrito <strong>${sNombre}</strong> ${sIdentificado} como <strong>${sCedula}</strong> 
+                            El suscrito <strong>${sNombre}</strong> ${sIdentif} como <strong>${sCedula}</strong> 
                             aparece al pie de mi firma, por medio del presente escrito me permito manifestar lo siguiente:
                         </p>
 
@@ -137,10 +149,6 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 8px 0;">
-                            En constancia se firma en la ciudad de ${sCiudadFirma}, a los ${localDate}.
-                        </p>
-
                         <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 60px 0;">Cordialmente,</p>
 
                         <div style="border-top:1.5px solid #000;width:260px;padding-top:6px;margin-bottom:40px;">
@@ -163,7 +171,7 @@ sap.ui.define([
                 div.style.top             = "-9999px";
                 div.style.left            = "-9999px";
                 div.style.width           = "794px";
-                div.style.padding         = "60px 56px";
+                div.style.padding         = "10px";
                 div.style.backgroundColor = "#ffffff";
                 div.style.boxSizing       = "border-box";
                 div.innerHTML             = htmlRaw;
@@ -243,7 +251,6 @@ sap.ui.define([
             "[[Nombre]]":       data.sNombre,
             "[[Cedula]]":       data.sCedula,
             "[[Identificado]]": data.sIdentificado,
-            "[[CiudadFirma]]":  data.sCiudadFirma,
             "[[Fecha]]":        data.localDate
         };
 
@@ -320,51 +327,6 @@ sap.ui.define([
             "treinta y uno"
         ];
         return words[day] || String(day);
-    }
-
-    function _formatSalary(value) {
-        if (!value) return "$ 0";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _salaryToWords(value) {
-        const n = Math.round(Number(value) || 0);
-        if (n === 0) return "CERO PESOS M/CTE";
-
-        const unidades = ["","UN","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE",
-                          "DIEZ","ONCE","DOCE","TRECE","CATORCE","QUINCE","DIECISÉIS",
-                          "DIECISIETE","DIECIOCHO","DIECINUEVE"];
-        const decenas  = ["","","VEINTE","TREINTA","CUARENTA","CINCUENTA",
-                          "SESENTA","SETENTA","OCHENTA","NOVENTA"];
-        const centenas = ["","CIENTO","DOSCIENTOS","TRESCIENTOS","CUATROCIENTOS","QUINIENTOS",
-                          "SEISCIENTOS","SETECIENTOS","OCHOCIENTOS","NOVECIENTOS"];
-
-        function grupo(n) {
-            let s = "";
-            const c = Math.floor(n / 100);
-            const r = n % 100;
-            if (c > 0) { s += (c === 1 && r === 0) ? "CIEN" : centenas[c]; if (r > 0) s += " "; }
-            if (r > 0) {
-                if (r < 20) { s += unidades[r]; }
-                else {
-                    const d = Math.floor(r / 10), u = r % 10;
-                    if (r >= 21 && r <= 29) {
-                        s += ["","VEINTIÚN","VEINTIDÓS","VEINTITRÉS","VEINTICUATRO","VEINTICINCO",
-                              "VEINTISÉIS","VEINTISIETE","VEINTIOCHO","VEINTINUEVE"][u];
-                    } else { s += decenas[d]; if (u > 0) s += " Y " + unidades[u]; }
-                }
-            }
-            return s;
-        }
-
-        const millones = Math.floor(n / 1000000);
-        const miles    = Math.floor((n % 1000000) / 1000);
-        const resto    = n % 1000;
-        let resultado  = "";
-        if (millones > 0) { resultado += (millones === 1) ? "UN MILLÓN" : grupo(millones) + " MILLONES"; if (miles > 0 || resto > 0) resultado += " "; }
-        if (miles > 0)    { resultado += (miles === 1)    ? "MIL"       : grupo(miles)    + " MIL";      if (resto > 0)              resultado += " "; }
-        if (resto > 0)    { resultado += grupo(resto); }
-        return resultado + " PESOS M/CTE";
     }
 
     return { onDownloadPDFBeneficiosExtralegales };
