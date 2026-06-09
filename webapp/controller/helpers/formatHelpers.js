@@ -3,11 +3,8 @@ sap.ui.define([], function () {
 
     return {
 
-
-        // =====================================================================================
         // Convierte un número (salario) a palabras siguiendo formato dominicano.
         // Ejemplo: 1234.56 → "MIL DOSCIENTOS TREINTA Y CUATRO PESOS DOMINICANOS CON 56/100"
-        // =====================================================================================
         convertNumberToWords: function (num) {
             if (isNaN(num) || num < 0) return "CERO PESOS DOMINICANOS CON 00/100";
 
@@ -47,10 +44,8 @@ sap.ui.define([], function () {
             return `${numToWords(pesos)} PESOS DOMINICANOS CON ${centavosTexto}/100`;
         },
 
-        // =====================================================================================
         // Convierte una fecha a un formato extendido:
         // Ejemplo: "2024-01-15" → "quince (15) días del mes de enero del año dos mil veinticuatro (2024)"
-        // =====================================================================================
         formatDateToWords: function (date) {
             if (!date) return "";
 
@@ -535,9 +530,14 @@ sap.ui.define([], function () {
                     dateOfBirth: getProp("dateOfBirth") || null,
                     addressLine1:       getProp("addressLine1") || "",
                     docExpeditionDate:  this.formatDateRaw(getProp("docExpeditionDate")),
+                    managerName:  getProp("managerName")  || "",
+                    managerEmail: getProp("managerEmail") || "",
+                    managerNav:   getProp("managerUserNav"),
+                    docCardType: getProp("docCardType") || "",
                     getCiudadWork: function (user) {
                         return user.custom10 || user.state || user.country || "";
                     },
+                    
                 };
             });
         }

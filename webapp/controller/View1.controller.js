@@ -618,7 +618,6 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     loadEmployees: function () {
-      // Si ya hay una carga en curso, devuelve esa promesa (evita duplicados)
       if (this._activeEmployeesRequest) return this._activeEmployeesRequest;
 
       const oComponentModel = this.getOwnerComponent().getModel();
@@ -640,9 +639,6 @@ sap.ui.define([
         "empInfo/personNav/nationalIdNav/cardType",
         "empInfo/personNav/nationalIdNav/country",
         "empInfo/personNav/nationalIdNav/customDate1",
-        "empInfo/personNav/personalInfoNav/maritalStatus",
-        "empInfo/personNav/personalInfoNav/secondLastName",
-        "empInfo/personNav/personalInfoNav/customString10",
         "empInfo/personNav/personalInfoNav/customString10",
         "custom05",
         "custom05Nav/id",
@@ -650,7 +646,7 @@ sap.ui.define([
         "custom05Nav/localeLabel",
         "dateOfBirth",
         "addressLine1",
-        "custom15",   // dependientes (check sí/no)
+        "custom15"
       ].join(",");
 
       const sExpand = [
@@ -659,7 +655,7 @@ sap.ui.define([
         "empInfo/jobInfoNav",
         "empInfo/personNav/personalInfoNav",
         "empInfo/personNav/nationalIdNav",
-        "custom05Nav",
+        "custom05Nav"
       ].join(",");
 
       const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
@@ -668,53 +664,100 @@ sap.ui.define([
           "$filter": `status eq 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`,
           "$expand": sExpand
         }
-      })).then(oUsers => {
+      })).then(async oUsers => {
         const aUsers = Array.isArray(oUsers?.results) ? oUsers.results : [];
 
         const enrichedUsers = aUsers.map(user => {
-          // Salario
           const salaryRaw = user?.empInfo?.compInfoNav?.results?.[0]
                               ?.empPayCompRecurringNav?.results?.[0]?.paycompvalue;
           user.paycompvalue = salaryRaw || 0;
           user.paycompValue = salaryRaw || 0;
 
-          // Cédula (solo documentos tipo CC - Cédula de Ciudadanía)
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
           const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
-          //console.log("ccEntry:", ccEntry); // ← verificar que customDate1 está ahí
           user.nationalId         = ccEntry?.nationalId ?? "";
+          user.docCardType       = nationalIdResults[0]?.cardType ?? "";  // ← para documento de identificacion
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
-          user.docExpeditionDate  = ccEntry?.customDate1 || null;   // ← agregá
+          user.docExpeditionDate  = ccEntry?.customDate1 || null;
           user.bloodType          = user.custom05Nav?.localeLabel || "";
           user.addressLine1       = user.addressLine1 || "";
           user.hasDependents      = user.custom15 || "";
           user.dateOfBirth        = user.dateOfBirth || null;
 
+          // Inicializar campos de manager vacíos hasta que llegue EmpJob
+          user.managerName    = "";
+          user.managerEmail   = "";
+          user.managerJobCode = "";
+          user.managerId      = "";
 
-          // Tratamiento (salut)
           user.salut = user.salutation === "3526" ? "Sra."
-                     : user.salutation === "3525" ? "Sr."
-                     : "Srta.";
+                    : user.salutation === "3525" ? "Sr."
+                    : "Srta.";
 
-          // Campo personalizado
           user.customLong1 = user.empInfo?.personNav?.customLong1 || "";
 
-          // Estado civil en texto, adaptado al género
           const marriageStatusId = user.empInfo?.personNav?.personalInfoNav?.results?.[0]?.maritalStatus;
           user.marriageStatusId  = marriageStatusId;
           const isFemale         = user.gender === "F";
           const statusMap        = {
-            "3528": isFemale ? "divorciada"   : "divorciado",
-            "3530": isFemale ? "casada"        : "casado",
-            "3529": isFemale ? "separada"      : "separado",
-            "3531": isFemale ? "soltera"       : "soltero",
-            "3532": isFemale ? "viuda"         : "viudo",
+            "3528": isFemale ? "divorciada" : "divorciado",
+            "3530": isFemale ? "casada"     : "casado",
+            "3529": isFemale ? "separada"   : "separado",
+            "3531": isFemale ? "soltera"    : "soltero",
+            "3532": isFemale ? "viuda"      : "viudo",
             "3533": "unión libre"
           };
           user.marriageStatus = statusMap[marriageStatusId] || "";
 
           return user;
         });
+
+        // ── Segunda llamada: manager desde EmpJob ──────────────────────
+        try {
+          const userIds  = enrichedUsers.map(u => u.userId).filter(Boolean);
+          const chunkSize = 50;
+          const managerMap = {};
+
+          for (let i = 0; i < userIds.length; i += chunkSize) {
+            const chunk     = userIds.slice(i, i + chunkSize);
+            const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
+
+            const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
+              urlParameters: {
+                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/defaultFullName,managerUserNav/email,managerUserNav/jobCode",
+                "$filter": `(${filterIds})`,
+                "$expand": "managerUserNav"
+              }
+            });
+
+            const empJobResults = Array.isArray(empJobData?.results) ? empJobData.results : [];
+            empJobResults.forEach(job => {
+              if (job.userId) {
+                managerMap[job.userId] = {
+                  managerId:      job.managerId                          || "",
+                  managerName: (job.managerUserNav?.defaultFullName || "")
+                    .replace(/\b\d+\b/g, "")
+                    .replace(/\s{2,}/g, " ")
+                    .trim(),
+                  managerEmail:   job.managerUserNav?.email              || "",
+                  managerJobCode: (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, "")
+                };
+              }
+            });
+          }
+
+          enrichedUsers.forEach(user => {
+            const mgr = managerMap[user.userId] || {};
+            user.managerId      = mgr.managerId      || "";
+            user.managerName    = mgr.managerName    || "";
+            user.managerEmail   = mgr.managerEmail   || "";
+            user.managerJobCode = mgr.managerJobCode || "";
+          });
+
+        } catch (e) {
+          console.warn("No se pudieron cargar los managers desde EmpJob:", e);
+        }
+        // ──────────────────────────────────────────────────────────────
 
         this.getView().setModel(new JSONModel({ User: enrichedUsers }));
         this._activeEmployeesLoaded = true;
@@ -733,18 +776,8 @@ sap.ui.define([
         if (this._activeEmployeesRequest === pFetch) this._activeEmployeesRequest = null;
       });
       return pFetch;
-
-      
     },
 
-
-    // ═══════════════════════════════════════════════════════════════════
-    // CARGA DE EMPLEADOS INACTIVOS
-    // ═══════════════════════════════════════════════════════════════════
-    // Similar a loadEmployees() pero con filtro status !== 't'.
-    // Usado para documentos de excolaboradores (si se agregan en el futuro).
-    // Los datos se guardan en el modelo con nombre "inactive".
-    // ═══════════════════════════════════════════════════════════════════
 
     loadEmployeesBkp: function () {
       if (this._inactiveEmployeesRequest) return this._inactiveEmployeesRequest;
@@ -767,14 +800,15 @@ sap.ui.define([
         "empInfo/personNav/nationalIdNav/nationalId",
         "empInfo/personNav/nationalIdNav/cardType",
         "empInfo/personNav/nationalIdNav/country",
-        "empInfo/personNav/nationalIdNav/customDate1",  // ← para docExpeditionDate
+        "empInfo/personNav/nationalIdNav/customDate1",
+        "empInfo/personNav/personalInfoNav/customString10",
         "dateOfBirth",
         "addressLine1",
-        "custom15",   // dependientes (check sí/no)
+        "custom15",
         "custom05",
         "custom05Nav/id",
         "custom05Nav/externalCode",
-        "custom05Nav/localeLabel",
+        "custom05Nav/localeLabel"
       ].join(",");
 
       const sExpand = [
@@ -783,7 +817,7 @@ sap.ui.define([
         "empInfo/jobInfoNav",
         "empInfo/personNav/personalInfoNav",
         "empInfo/personNav/nationalIdNav",
-        "custom05Nav",
+        "custom05Nav"
       ].join(",");
 
       const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
@@ -792,7 +826,7 @@ sap.ui.define([
           "$filter": `status ne 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`,
           "$expand": sExpand
         }
-      })).then(oData => {
+      })).then(async oData => {
         const aUsers   = [];
         const aResults = Array.isArray(oData?.results) ? oData.results : [];
 
@@ -807,8 +841,8 @@ sap.ui.define([
           user.customLong1      = user?.empInfo?.personNav?.customLong1 || "";
 
           user.salut = user.salutation === "3526" ? "Sra."
-                     : user.salutation === "3525" ? "Sr."
-                     : "Srta.";
+                    : user.salutation === "3525" ? "Sr."
+                    : "Srta.";
 
           const isFemale  = user.gender === "F";
           const statusMap = {
@@ -824,14 +858,65 @@ sap.ui.define([
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
           const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
           user.nationalId         = ccEntry?.nationalId ?? "";
+          user.docCardType       = nationalIdResults[0]?.cardType ?? "";  // ← para documento de identificacion
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
-          user.docExpeditionDate  = ccEntry?.customDate1 || null;   // ← agregá
+          user.docExpeditionDate  = ccEntry?.customDate1 || null;
           user.addressLine1       = user.addressLine1 || "";
           user.hasDependents      = user.custom15 || "";
           user.dateOfBirth        = user.dateOfBirth || null;
 
+          // Inicializar campos de manager vacíos hasta que llegue EmpJob
+          user.managerName    = "";
+          user.managerEmail   = "";
+          user.managerJobCode = "";
+          user.managerId      = "";
+
           aUsers.push(user);
         });
+
+        // ── Segunda llamada: manager desde EmpJob ──────────────────────
+        try {
+          const userIds   = aUsers.map(u => u.userId).filter(Boolean);
+          const chunkSize = 50;
+          const managerMap = {};
+
+          for (let i = 0; i < userIds.length; i += chunkSize) {
+            const chunk     = userIds.slice(i, i + chunkSize);
+            const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
+
+            const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
+              urlParameters: {
+                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/defaultFullName,managerUserNav/email,managerUserNav/jobCode",
+                "$filter": `(${filterIds})`,
+                "$expand": "managerUserNav"
+              }
+            });
+
+            const empJobResults = Array.isArray(empJobData?.results) ? empJobData.results : [];
+            empJobResults.forEach(job => {
+              if (job.userId) {
+                managerMap[job.userId] = {
+                  managerId:      job.managerId                          || "",
+                  managerName:    job.managerUserNav?.defaultFullName    || "",
+                  managerEmail:   job.managerUserNav?.email              || "",
+                  managerJobCode: (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, "")
+                };
+              }
+            });
+          }
+
+          aUsers.forEach(user => {
+            const mgr = managerMap[user.userId] || {};
+            user.managerId      = mgr.managerId      || "";
+            user.managerName    = mgr.managerName    || "";
+            user.managerEmail   = mgr.managerEmail   || "";
+            user.managerJobCode = mgr.managerJobCode || "";
+          });
+
+        } catch (e) {
+          console.warn("No se pudieron cargar los managers desde EmpJob (inactivos):", e);
+        }
+        // ──────────────────────────────────────────────────────────────
 
         this.getView().setModel(new JSONModel({ InactiveUsers: aUsers }), "inactive");
         this._inactiveEmployeesLoaded = true;

@@ -22,6 +22,8 @@ sap.ui.define([
 
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
+
+                /* DEBUG: revisar datos del usuario antes de generar documento
                 console.log(
                     "country:", user.country,
                     "email:", user.email,
@@ -30,6 +32,7 @@ sap.ui.define([
                     "custom10:", user.custom10,
                     "businessPhone:", user.businessPhone
                 );
+                */
 
                 if (aUsers.length > 1) {
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
@@ -40,9 +43,6 @@ sap.ui.define([
                 const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
-                const sSalario    = oController.formatSalary(user.paycompvalue);
-                console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
-                const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
                 const sPais = oController.getPaisName(user.country);
                 const sTelefono   = oController.getTelefono(user);
                 const sEmail      = oController.getEmail(user);
@@ -52,6 +52,8 @@ sap.ui.define([
                 const sGrupoSangre = oController.getGrupoSanguineo(user);
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sFechaExpedicion = user.docExpeditionDate || "";
+                const sJefeNombre = user.managerName || "";
+                const sDocCardType = user.docCardType || "";
                 const sFechaNacimiento = user.dateOfBirth 
                     ? oController.formatDateRaw(user.dateOfBirth) 
                     : "";
@@ -230,8 +232,8 @@ sap.ui.define([
                             <div class="cell cell-55" style="min-height:62px;">
                                 <strong>Documento de Identificación</strong>
                                 <strong>
-                                &nbsp; C.C. <input type="checkbox">
-                                &nbsp; C.E. <input type="checkbox">
+                                    &nbsp; C.C. <input type="checkbox" ${sDocCardType === "CC" ? "checked" : ""}>
+                                    &nbsp; C.E. <input type="checkbox" ${sDocCardType === "CE" ? "checked" : ""}>
                                 </strong>
                                 <br>
                                 <strong>No.</strong> ${sCedula}
@@ -259,7 +261,7 @@ sap.ui.define([
                                 </div>
                             </div>
                             <div class="cell cell-55">
-                                <strong>Nombre del jefe inmediato:</strong>
+                                <strong>Nombre del jefe inmediato:</strong> ${sJefeNombre}
                             </div>
                         </div>
 
@@ -1169,14 +1171,14 @@ sap.ui.define([
                                 <div class="cell" style="width:55%;">
                                     <strong>Documento de Identificación:</strong>
                                     <strong>
-                                    &nbsp;
-                                    C.C. <input type="checkbox">
-                                    &nbsp;
-                                    C.E. <input type="checkbox">
-                                    &nbsp;
-                                    T.I <input type="checkbox">
-                                    &nbsp;
-                                    R.C. <input type="checkbox">
+                                        &nbsp;
+                                        C.C. <input type="checkbox" ${sDocCardType === "CC" ? "checked" : ""}>
+                                        &nbsp;
+                                        C.E. <input type="checkbox" ${sDocCardType === "CE" ? "checked" : ""}>
+                                        &nbsp;
+                                        T.I  <input type="checkbox" ${sDocCardType === "TI" ? "checked" : ""}>
+                                        &nbsp;
+                                        R.C. <input type="checkbox" ${sDocCardType === "RC" ? "checked" : ""}>
                                     </strong>
 
                                 </div>
