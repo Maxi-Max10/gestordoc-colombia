@@ -609,6 +609,7 @@ sap.ui.define([
         "defaultFullName", "gender",
         "manager/jobCode", "manager/businessPhone", "manager/email",
         "empInfo/customDate1", "empInfo/startDate", "empInfo/endDate",
+        "empInfo/originalStartDate",
         "empInfo/compInfoNav/empPayCompRecurringNav/paycompvalue",
         "empInfo/jobInfoNav/eventReason", "empInfo/jobInfoNav/company",
         "empInfo/personNav/customLong1",
@@ -656,6 +657,7 @@ sap.ui.define([
           const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
           user.nationalId         = ccEntry?.nationalId ?? "";
           user.docCardType       = nationalIdResults[0]?.cardType ?? "";  // ← para documento de identificacion
+          user.originalStartDate = user.empInfo?.originalStartDate || null; // ← fecha de ingreso original (sin cambios por reingresos)
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
           user.docExpeditionDate  = ccEntry?.customDate1 || null;
           user.bloodType          = user.custom05Nav?.localeLabel || "";
@@ -771,6 +773,7 @@ sap.ui.define([
         "defaultFullName", "gender",
         "manager/jobCode", "manager/businessPhone", "manager/email",
         "empInfo/customDate1", "empInfo/startDate", "empInfo/endDate",
+        "empInfo/originalStartDate",
         "empInfo/compInfoNav/empPayCompRecurringNav/paycompvalue",
         "empInfo/jobInfoNav/eventReason", "empInfo/jobInfoNav/company",
         "empInfo/personNav/customLong1",
@@ -838,6 +841,7 @@ sap.ui.define([
           const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
           user.nationalId         = ccEntry?.nationalId ?? "";
           user.docCardType       = nationalIdResults[0]?.cardType ?? "";  // ← para documento de identificacion
+          user.originalStartDate = user.empInfo?.originalStartDate || null; // ← fecha de ingreso original (sin cambios por reingresos)
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
           user.docExpeditionDate  = ccEntry?.customDate1 || null;
           user.addressLine1       = user.addressLine1 || "";

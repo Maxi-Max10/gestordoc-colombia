@@ -3,26 +3,20 @@ sap.ui.define([], function () {
 
     return {
 
-        // Convierte un número (salario) a palabras siguiendo formato dominicano.
-        // Ejemplo: 1234.56 → "MIL DOSCIENTOS TREINTA Y CUATRO PESOS DOMINICANOS CON 56/100"
+        // Convierte un número (salario) a palabras en formato colombiano.
+        // Ejemplo: 1234.56 → "MIL DOSCIENTOS TREINTA Y CUATRO PESOS COLOMBIANOS CON 56/100"
         convertNumberToWords: function (num) {
-            if (isNaN(num) || num < 0) return "CERO PESOS DOMINICANOS CON 00/100";
+            
+           num = Math.round(Number(num) * 100) / 100; // redondear a 2 decimales antes de separar
+                if (isNaN(num) || num < 0) return "CERO PESOS COLOMBIANOS CON 00/100";
 
-            // Formateador para valores en moneda
-            const formatter = new Intl.NumberFormat("es-ES", {
-                style: "currency",
-                currency: "DOP",
-                minimumFractionDigits: 2,
-            });
-
-            // Conversión recursiva de números a palabras
             const numToWords = (n) => {
                 const unidades = ["", "UN", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
-                const decenas = ["DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
+                const decenas  = ["DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
                 const centenas = ["CIENTO", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
 
                 if (n === 0) return "CERO";
-                if (n < 10) return unidades[n];
+                if (n < 10)  return unidades[n];
                 if (n < 100)
                     return decenas[Math.floor(n / 10) - 1] +
                         (n % 10 !== 0 ? " Y " + unidades[n % 10] : "");
@@ -30,18 +24,18 @@ sap.ui.define([], function () {
                     return centenas[Math.floor(n / 100) - 1] +
                         (n % 100 !== 0 ? " " + numToWords(n % 100) : "");
                 if (n < 1000000)
-                    return numToWords(Math.floor(n / 1000)) + " MIL " +
-                        (n % 1000 !== 0 ? numToWords(n % 1000) : "");
-
-                return formatter.format(n).toUpperCase(); // para números muy grandes
+                    return numToWords(Math.floor(n / 1000)) + " MIL" +
+                        (n % 1000 !== 0 ? " " + numToWords(n % 1000) : "");
+                // Millones — soporte para salarios integrales altos
+                return numToWords(Math.floor(n / 1000000)) + " MILLONES" +
+                    (n % 1000000 !== 0 ? " " + numToWords(n % 1000000) : "");
             };
 
-            // Separa pesos y centavos
-            let pesos = Math.floor(num);
-            let centavos = Math.round((num - pesos) * 100);
-            let centavosTexto = centavos < 10 ? `0${centavos}` : centavos;
+            const pesos        = Math.floor(num);
+            const centavos     = Math.round((num - pesos) * 100);
+            const centavosTexto = centavos < 10 ? `0${centavos}` : `${centavos}`;
 
-            return `${numToWords(pesos)} PESOS DOMINICANOS CON ${centavosTexto}/100`;
+            return `${numToWords(pesos)} PESOS COLOMBIANOS CON ${centavosTexto}/100`;
         },
 
         // Convierte una fecha a un formato extendido:
@@ -509,6 +503,8 @@ sap.ui.define([], function () {
                     hireDatesimpl: getProp("hireDate"),
                     hireDateRaw: getProp("empInfo/startDate"),
                     HireDatePost: getProp("HireDatePost"),
+                    originalStartDate: getProp("empInfo/originalStartDate"),
+                    originalStartDateFormatted: this.formatDateToWords(getProp("empInfo/originalStartDate")),
                     hireDateExt: this.formatDateToWords(getProp("empInfo/endDate")),
                     paycompvalue: getProp("paycompValue"),
                     payCompValueWord: this.convertNumberToWords(getProp("paycompValue")),

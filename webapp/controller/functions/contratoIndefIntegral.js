@@ -32,7 +32,25 @@ sap.ui.define([
                 const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
+
                 const sSalario    = oController.formatSalary(user.paycompvalue);
+                const salarioIntegral = Number(user.paycompvalue) || 0; // En contratos a término indefinido integral, el salario base es el salario integral
+
+                const componenteRemunerativo = Math.round((salarioIntegral / 1.3) * 100) / 100;
+                const factorPrestacional     = Math.round((salarioIntegral - componenteRemunerativo) * 100) / 100;
+
+                const sCompRemunerativo = oController.formatSalary(componenteRemunerativo); // El componente remunerativo se muestra como el salario base en el contrato
+                const sFactorPrestacional = oController.formatSalary(factorPrestacional);
+
+                const sCompRemunerativoLetras =
+                    oController.convertNumberToWords(componenteRemunerativo);
+
+                const sFactorPrestacionalLetras =
+                    oController.convertNumberToWords(factorPrestacional);
+
+
+                const fechaContratacion = oController.formatDateRaw(user.originalStartDate); //Pendiente a confirmar
+                const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
                 const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
                 // ── Word ─────────────────────────────────────────────────────
@@ -40,7 +58,7 @@ sap.ui.define([
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre, sCedula, sCiudadWork, localDate, sCargo, sSalario, sHireDate
+                        sNombre, sCedula, sCiudadWork, localDate, sCargo, sSalario, sHireDate, sDireccion
                     });
                     continue;
                 }
@@ -206,7 +224,7 @@ sap.ui.define([
                         número <strong>52.705.312</strong> y quien para todos los efectos del presente contrato
                         de trabajo se denominará <strong>EL EMPLEADOR</strong>, y <strong>${sNombre}</strong>,
                         identificado(a) con la cédula de ciudadanía número <strong>${sCedula}</strong>
-                        expedida en XXXXXXXXXXXXXX, domiciliada en XXXXXXXXXXXXXX obrando en nombre
+                        expedida en <strong>${sCiudadWork}</strong>, domiciliada en <strong>${sDireccion}</strong> obrando en nombre
                         propio y quien para efectos del presente contrato se denominará
                         <strong>EL TRABAJADOR</strong>, hemos celebrado un contrato de trabajo según las
                         siguientes cláusulas:
@@ -375,13 +393,13 @@ sap.ui.define([
 
                     <div style="margin-left:28px;margin-bottom:6px;text-align:justify;">
                         - Un componente remunerativo por la suma de
-                        <strong>VALOR EN LETRAS M/CTE ($$$$$$)</strong>
+                        <strong>${sCompRemunerativoLetras} (${sCompRemunerativo})</strong>
                         que corresponde a la remuneración ordinaria.
                     </div>
 
                     <div style="margin-left:28px;margin-bottom:8px;text-align:justify;">
                         - Un componente o factor prestacional del 30%, es decir la suma de
-                        <strong>VALOR EN LETRAS M/CTE ($$$$$$$$$$$$)</strong>.
+                        <strong>${sFactorPrestacionalLetras} (${sFactorPrestacional})</strong>
                         Este segundo componente compensa de antemano los siguientes derechos:
                     </div>
 
@@ -1686,7 +1704,7 @@ sap.ui.define([
                                     margin-top:2px;
                                     font-weight:bold;
                                 ">
-                                    ${sCedula}
+                                    C.C.No. ${sCedula}
                                 </div>
 
                             </div>
