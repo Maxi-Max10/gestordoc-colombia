@@ -618,6 +618,7 @@ sap.ui.define([
         "empInfo/personNav/nationalIdNav/nationalId",
         "empInfo/personNav/nationalIdNav/cardType",
         "empInfo/personNav/nationalIdNav/country",
+        "empInfo/personNav/nationalIdNav/customDate1",
         "empInfo/personNav/personalInfoNav/maritalStatus",
         "empInfo/personNav/personalInfoNav/secondLastName",
         "empInfo/personNav/personalInfoNav/customString10",
@@ -627,6 +628,8 @@ sap.ui.define([
         "custom05Nav/externalCode",
         "custom05Nav/localeLabel",
         "dateOfBirth",
+        "addressLine1",
+        "custom15",   // dependientes (check sí/no)
       ].join(",");
 
       const sExpand = [
@@ -656,10 +659,16 @@ sap.ui.define([
 
           // Cédula (solo documentos tipo CC - Cédula de Ciudadanía)
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          user.nationalId = nationalIdResults.find(i => i.cardType === "CC")?.nationalId ?? "";
-          user.nationalityCode = nationalIdResults.find(i => i.country)?.country ?? "";
-          user.bloodType = user.custom05Nav?.localeLabel || "";
-          user.dateOfBirth = user.dateOfBirth || null;
+          const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
+          //console.log("ccEntry:", ccEntry); // ← verificar que customDate1 está ahí
+          user.nationalId         = ccEntry?.nationalId ?? "";
+          user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
+          user.docExpeditionDate  = ccEntry?.customDate1 || null;   // ← agregá
+          user.bloodType          = user.custom05Nav?.localeLabel || "";
+          user.addressLine1       = user.addressLine1 || "";
+          user.hasDependents      = user.custom15 || "";
+          user.dateOfBirth        = user.dateOfBirth || null;
+
 
           // Tratamiento (salut)
           user.salut = user.salutation === "3526" ? "Sra."
@@ -685,16 +694,6 @@ sap.ui.define([
 
           return user;
         });
-
-        // En loadEmployees, dentro del .then(), después de construir enrichedUsers:
-        const countryNums = new Set();
-        enrichedUsers.forEach(user => {
-            const results = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-            results.forEach(id => {
-                if (id.country) countryNums.add(id.country);
-            });
-        });
-        console.log("Códigos numéricos únicos:", [...countryNums].sort());
 
         this.getView().setModel(new JSONModel({ User: enrichedUsers }));
         this._activeEmployeesLoaded = true;
@@ -747,7 +746,14 @@ sap.ui.define([
         "empInfo/personNav/nationalIdNav/nationalId",
         "empInfo/personNav/nationalIdNav/cardType",
         "empInfo/personNav/nationalIdNav/country",
+        "empInfo/personNav/nationalIdNav/customDate1",  // ← para docExpeditionDate
         "dateOfBirth",
+        "addressLine1",
+        "custom15",   // dependientes (check sí/no)
+        "custom05",
+        "custom05Nav/id",
+        "custom05Nav/externalCode",
+        "custom05Nav/localeLabel",
       ].join(",");
 
       const sExpand = [
@@ -755,7 +761,8 @@ sap.ui.define([
         "empInfo/compInfoNav/empPayCompRecurringNav",
         "empInfo/jobInfoNav",
         "empInfo/personNav/personalInfoNav",
-        "empInfo/personNav/nationalIdNav"
+        "empInfo/personNav/nationalIdNav",
+        "custom05Nav",
       ].join(",");
 
       const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
@@ -794,8 +801,13 @@ sap.ui.define([
           user.marriageStatus = statusMap[user.marriageStatusId] || "";
 
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          user.nationalId = nationalIdResults.find(i => i.cardType === "CC")?.nationalId ?? "";
-          user.nationalityCode = nationalIdResults.find(i => i.country)?.country ?? "";
+          const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
+          user.nationalId         = ccEntry?.nationalId ?? "";
+          user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
+          user.docExpeditionDate  = ccEntry?.customDate1 || null;   // ← agregá
+          user.addressLine1       = user.addressLine1 || "";
+          user.hasDependents      = user.custom15 || "";
+          user.dateOfBirth        = user.dateOfBirth || null;
 
           aUsers.push(user);
         });

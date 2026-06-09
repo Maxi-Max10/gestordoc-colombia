@@ -59,40 +59,77 @@ sap.ui.define([], function () {
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
             ];
 
-            // Texto en palabras para días
             const numbersToWords = {
-                1: "un", 2: "dos", 3: "tres", 4: "cuatro", 5: "cinco",
-                6: "seis", 7: "siete", 8: "ocho", 9: "nueve", 10: "diez",
-                11: "once", 12: "doce", 13: "trece", 14: "catorce", 15: "quince",
-                16: "dieciséis", 17: "diecisiete", 18: "dieciocho", 19: "diecinueve",
-                20: "veinte", 21: "veintiún", 22: "veintidós", 23: "veintitrés", 
-                24: "veinticuatro", 25: "veinticinco", 26: "veintiséis",
-                27: "veintisiete", 28: "veintiocho", 29: "veintinueve",
-                30: "treinta", 31: "treinta y un"
+                1:"un", 2:"dos", 3:"tres", 4:"cuatro", 5:"cinco",
+                6:"seis", 7:"siete", 8:"ocho", 9:"nueve", 10:"diez",
+                11:"once", 12:"doce", 13:"trece", 14:"catorce", 15:"quince",
+                16:"dieciséis", 17:"diecisiete", 18:"dieciocho", 19:"diecinueve",
+                20:"veinte", 21:"veintiún", 22:"veintidós", 23:"veintitrés",
+                24:"veinticuatro", 25:"veinticinco", 26:"veintiséis",
+                27:"veintisiete", 28:"veintiocho", 29:"veintinueve",
+                30:"treinta", 31:"treinta y un"
             };
 
-            // Palabras para años
-            const yearWords = {
-                2020: "dos mil veinte", 2021: "dos mil veintiuno", 2022: "dos mil veintidós",
-                2023: "dos mil veintitrés", 2024: "dos mil veinticuatro",
-                2025: "dos mil veinticinco", 2026: "dos mil veintiséis",
-                2028: "dos mil veintiocho", 2029: "dos mil veintinueve"
+            // Convierte cualquier año a palabras sin depender de un mapa fijo
+            const yearToWords = (y) => {
+                const miles    = Math.floor(y / 1000);
+                const centenas = Math.floor((y % 1000) / 100);
+                const decenas  = y % 100;
+
+                const unidades = ["","un","dos","tres","cuatro","cinco","seis","siete","ocho","nueve"];
+                const decMap   = {
+                    10:"diez", 11:"once", 12:"doce", 13:"trece", 14:"catorce",
+                    15:"quince", 16:"dieciséis", 17:"diecisiete", 18:"dieciocho", 19:"diecinueve",
+                    20:"veinte", 21:"veintiún", 22:"veintidós", 23:"veintitrés", 24:"veinticuatro",
+                    25:"veinticinco", 26:"veintiséis", 27:"veintisiete", 28:"veintiocho", 29:"veintinueve",
+                    30:"treinta", 40:"cuarenta", 50:"cincuenta", 60:"sesenta",
+                    70:"setenta", 80:"ochenta", 90:"noventa"
+                };
+                const centMap  = {
+                    1:"ciento", 2:"doscientos", 3:"trescientos", 4:"cuatrocientos",
+                    5:"quinientos", 6:"seiscientos", 7:"setecientos", 8:"ochocientos", 9:"novecientos"
+                };
+
+                const decToWords = (n) => {
+                    if (n === 0) return "";
+                    if (decMap[n]) return decMap[n];
+                    const d = Math.floor(n / 10) * 10;
+                    const u = n % 10;
+                    return decMap[d] + (u ? " y " + unidades[u] : "");
+                };
+
+                let parts = [];
+                if (miles > 1)      parts.push(unidades[miles] + " mil");
+                else if (miles === 1) parts.push("mil");
+
+                if (centenas > 0)   parts.push(centMap[centenas]);
+                if (decenas > 0)    parts.push(decToWords(decenas));
+
+                return parts.join(" ");
             };
 
-            let oDate = new Date(date);
-            let day = oDate.getDate();
-            let month = months[oDate.getMonth()];
-            let year = oDate.getFullYear();
+            // Acepta Date de SAP (objeto) o string ISO
+            let oDate;
+            if (date instanceof Date) {
+                oDate = date;
+                const day   = oDate.getUTCDate();
+                const month = months[oDate.getUTCMonth()];
+                const year  = oDate.getUTCFullYear();
+                const dayText  = numbersToWords[day] || day;
+                const yearText = yearToWords(year);
+                return `${dayText} (${day}) días del mes de ${month} del año ${yearText} (${year})`;
+            }
 
-            let dayText = numbersToWords[day] || day;
-            let yearText = yearWords[year] || year;
-
+            oDate = new Date(date + "T12:00:00");
+            const day   = oDate.getDate();
+            const month = months[oDate.getMonth()];
+            const year  = oDate.getFullYear();
+            const dayText  = numbersToWords[day] || day;
+            const yearText = yearToWords(year);
             return `${dayText} (${day}) días del mes de ${month} del año ${yearText} (${year})`;
         },
 
-        // =====================================================================================
         // Convierte una fecha al formato: "15 de enero de 2024"
-        // =====================================================================================
         formatDateToSpanish: function (sDate) {
             const oDate = new Date(sDate);
             const meses = [
@@ -103,47 +140,56 @@ sap.ui.define([], function () {
             return `${oDate.getDate()} de ${meses[oDate.getMonth()]} de ${oDate.getFullYear()}`;
         },
 
-        // =====================================================================================
         // Formato corto DD/MM/YYYY
-        // Se corrige desfase sumando 1 día (tema común en SAP)
-        // =====================================================================================
+        // Usa UTC para evitar desfase de timezone con fechas de SAP
         formatFechaCorta: function (fecha) {
             if (!fecha) return null;
-            const d = new Date(fecha);
-            d.setDate(d.getDate() + 1);
+            if (fecha instanceof Date) {
+                return `${String(fecha.getUTCDate()).padStart(2, '0')}/${String(fecha.getUTCMonth() + 1).padStart(2, '0')}/${fecha.getUTCFullYear()}`;
+            }
+            const d = new Date(fecha + "T12:00:00");
             return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
         },
 
-        // =====================================================================================
         // Formato formal: "15 de Enero del año 2024"
-        // =====================================================================================
+        // Usa UTC para evitar desfase de timezone con fechas de SAP
         formatFechaFormal: function (fechaInput) {
             const meses = [
                 "enero", "febrero", "marzo", "abril", "mayo", "junio",
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
             ];
 
-            let fecha = !fechaInput ? new Date() :
-                        typeof fechaInput === "string" ? new Date(fechaInput) :
-                        fechaInput;
+            if (!fechaInput) {
+                // Fecha actual: usar hora local (es la hora del usuario)
+                const hoy = new Date();
+                const dia  = hoy.getDate().toString().padStart(2, '0');
+                const mes  = meses[hoy.getMonth()];
+                const anio = hoy.getFullYear();
+                return `${dia} de ${mes.charAt(0).toUpperCase() + mes.slice(1)} del año ${anio}`;
+            }
 
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            const mes = meses[fecha.getMonth()];
-            const anio = fecha.getFullYear();
+            if (fechaInput instanceof Date) {
+                const dia  = fechaInput.getUTCDate().toString().padStart(2, '0');
+                const mes  = meses[fechaInput.getUTCMonth()];
+                const anio = fechaInput.getUTCFullYear();
+                return `${dia} de ${mes.charAt(0).toUpperCase() + mes.slice(1)} del año ${anio}`;
+            }
 
+            // String ISO "YYYY-MM-DD": anclar al mediodía para neutralizar timezone
+            const d = new Date(fechaInput + "T12:00:00");
+            const dia  = d.getDate().toString().padStart(2, '0');
+            const mes  = meses[d.getMonth()];
+            const anio = d.getFullYear();
             return `${dia} de ${mes.charAt(0).toUpperCase() + mes.slice(1)} del año ${anio}`;
         },
 
-        // =====================================================================================
         // Ciudad de trabajo: custom10 tiene la ciudad, con fallback a state
-        // =====================================================================================
         getCiudadWork: function (user) {
             return user.custom10 || user.state || "";
         },
 
-        // =====================================================================================
         // Fecha actual formateada: "4 de junio del año 2026"
-        // =====================================================================================
+        // Usa hora local porque es la fecha del documento (no viene de SAP)
         getLocalDate: function () {
             const d = new Date();
             const months = ["enero","febrero","marzo","abril","mayo","junio",
@@ -151,30 +197,28 @@ sap.ui.define([], function () {
             return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
         },
 
-        // =====================================================================================
-        // Fecha desde string ISO: "2024-01-15" → "15 de enero del año 2024"
-        // Agrega T12:00:00 para evitar desfase de timezone
-        // =====================================================================================
+        // Fecha desde string ISO o Date de SAP: "2024-01-15" → "15 de enero del año 2024"
+        // - Date de SAP  → getUTC* (ya está desplazada por timezone)
+        // - String ISO   → anclar a T12:00:00 para neutralizar timezone
         formatDateRaw: function (dateStr) {
             if (!dateStr) return "";
-            const d = dateStr instanceof Date ? dateStr : new Date(dateStr + "T12:00:00");
             const months = ["enero","febrero","marzo","abril","mayo","junio",
                             "julio","agosto","septiembre","octubre","noviembre","diciembre"];
+            if (dateStr instanceof Date) {
+                return `${dateStr.getUTCDate()} de ${months[dateStr.getUTCMonth()]} del año ${dateStr.getUTCFullYear()}`;
+            }
+            const d = new Date(dateStr + "T12:00:00");
             return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
         },
 
-        // =====================================================================================
         // Salario formateado: 4853000 → "$ 4.853.000"
-        // =====================================================================================
         formatSalary: function (value) {
             if (!value) return "";
             return "$ " + Number(value).toLocaleString("es-CO");
         },
 
-        // =====================================================================================
         // Resuelve género en texto con placeholder {A}
         // Ejemplo: "PENSIONADO{A}" → "PENSIONADA" (mujer) o "PENSIONADO" (hombre)
-        // =====================================================================================
         resolveGender: function (text, gender) {
             if (!text) return "";
             const isFemale = gender === "F";
@@ -389,9 +433,7 @@ sap.ui.define([], function () {
             return SAP_CODES[String(countryCode)] || PAISES_ISO[countryCode] || countryCode || "";
         },
 
-        // =====================================================================================
         // Obtiene el teléfono de trabajo, con fallback a cadena vacía si no existe
-        // =====================================================================================
         getTelefono: function (user) {
             return user.businessPhone || "";
         },
@@ -450,8 +492,7 @@ sap.ui.define([], function () {
                 // Obtener nacionalidad/gentilicio
                 const countryCode = getProp("nationalityCode");
                 const gentilicio = GENTILICIOS[countryCode] || countryCode;
-
-                console.log("country raw value:", getProp("country"));
+                
 
                 // Devuelve todos los datos listos para insertarse en las plantillas .docx
                 return {
@@ -492,6 +533,11 @@ sap.ui.define([], function () {
                     address:   getProp("custom03") || "",
                     bloodType: getProp("bloodType") || "",
                     dateOfBirth: getProp("dateOfBirth") || null,
+                    addressLine1:       getProp("addressLine1") || "",
+                    docExpeditionDate:  this.formatDateRaw(getProp("docExpeditionDate")),
+                    getCiudadWork: function (user) {
+                        return user.custom10 || user.state || user.country || "";
+                    },
                 };
             });
         }

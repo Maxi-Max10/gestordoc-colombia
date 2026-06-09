@@ -50,6 +50,8 @@ sap.ui.define([
                 const sSexo       = oController.getSexo(user);
                 const sEstadoCivil = oController.getEstadoCivil(user);
                 const sGrupoSangre = oController.getGrupoSanguineo(user);
+                const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                const sFechaExpedicion = user.docExpeditionDate || "";
                 const sFechaNacimiento = user.dateOfBirth 
                     ? oController.formatDateRaw(user.dateOfBirth) 
                     : "";
@@ -235,8 +237,7 @@ sap.ui.define([
                                 <strong>No.</strong> ${sCedula}
                                 <br>
                                 <div style="display:flex; align-items:center; gap:4px; margin-top:4px;">
-                                    <strong style="white-space:nowrap; font-size:10px;">Fecha de expedición del documento:</strong>
-                                    <span class="underline" style="flex:1; margin-top:0;"></span>
+                                    <strong style="white-space:nowrap; font-size:10px;">Fecha de expedición del documento:</strong> ${sFechaExpedicion}
                                 </div>
                             </div>
                         </div>
@@ -268,7 +269,7 @@ sap.ui.define([
                             <div style="width:45%;">
                                 <div class="row">
                                     <div class="cell cell-full">
-                                        <strong>Dirección de residencia:</strong>
+                                        <strong>Dirección de residencia:</strong> ${sDireccion}
                                     </div>
                                 </div>
 
