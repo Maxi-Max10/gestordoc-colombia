@@ -530,6 +530,7 @@ sap.ui.define([], function () {
                     managerEmail: getProp("managerEmail") || "",
                     managerNav:   getProp("managerUserNav"),
                     docCardType: getProp("docCardType") || "",
+                    paymentFrequency: getProp("paymentFrequency") || "",
                     getCiudadWork: function (user) {
                         return user.custom10 || user.state || user.country || "";
                     },
