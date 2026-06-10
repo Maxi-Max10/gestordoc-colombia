@@ -370,6 +370,52 @@ sap.ui.define([
       this._applyThemeMode(bDarkMode);
     },
 
+    _scrollToHome: function () {
+      const oPage = this.byId("contentContainer");
+      const oPageDom = oPage && oPage.getDomRef && oPage.getDomRef();
+      const oScrollDom = oPageDom && (oPageDom.querySelector(".sapMPageEnableScrolling") || oPageDom.querySelector(".sapMPageScroll") || oPageDom);
+
+      if (oScrollDom && typeof oScrollDom.scrollTo === "function") {
+        oScrollDom.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (window.scrollTo) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    },
+
+    onSelectHeader: function (oEvent) {
+      const sKey = oEvent && oEvent.getParameter && oEvent.getParameter("selectedKey");
+      if (!sKey || sKey === "1") {
+        this._scrollToHome();
+      }
+    },
+
+    onOpenMobileHeaderMenu: function (oEvent) {
+      const oPopover = this.byId("mobileHeaderMenuPopover");
+      if (oPopover) {
+        oPopover.openBy(oEvent.getSource());
+      }
+    },
+
+    _closeMobileHeaderMenu: function () {
+      const oPopover = this.byId("mobileHeaderMenuPopover");
+      if (oPopover && oPopover.isOpen()) {
+        oPopover.close();
+      }
+    },
+
+    onMobileHeaderHomePress: function () {
+      this._closeMobileHeaderMenu();
+      this._scrollToHome();
+    },
+
+    onMobileToggleTheme: function () {
+      this.onToggleTheme();
+      this._closeMobileHeaderMenu();
+    },
+
 
     // ═══════════════════════════════════════════════════════════════════
     // PRELOADER INICIAL
