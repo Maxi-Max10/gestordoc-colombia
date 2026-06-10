@@ -59,7 +59,14 @@ sap.ui.define([
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre, sCedula, sCiudadWork, localDate, sCargo, sSalario, sHireDate, sDireccion
+                        sNombre, sCedula, sCiudadWork, localDate, sCargo,
+                        sSalario, sHireDate, sDireccion,
+                        sCompRemunerativo,
+                        sFactorPrestacional,
+                        sCompRemunerativoLetras,
+                        sFactorPrestacionalLetras,
+                        fechaContratacion,
+                        sPeriodoPago
                     });
                     continue;
                 }
@@ -1867,12 +1874,20 @@ sap.ui.define([
         const zip = await JSZip.loadAsync(templateBytes);
 
         const variables = {
-            "[[Nombre]]":     data.sNombre,
-            "[[Cedula]]":     data.sCedula,
-            "[[Cargo]]":      data.sCargo,
-            "[[Ciudad]]":     data.sCiudadWork,
-            "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate
+            "[[Nombre]]":                    data.sNombre,
+            "[[Cedula]]":                    data.sCedula,
+            "[[Cargo]]":                     data.sCargo,
+            "[[Ciudad]]":                    data.sCiudadWork,
+            "[[Fecha]]":                     data.localDate,
+            "[[Salario]]":                   data.sSalario,
+            "[[FechaInicio]]":               data.sHireDate,
+            "[[Direccion]]":                 data.sDireccion,
+            "[[ComponenteRemunerativo]]":    data.sCompRemunerativo,
+            "[[FactorPrestacional]]":        data.sFactorPrestacional,
+            "[[CompRemunerativoLetras]]":    data.sCompRemunerativoLetras,
+            "[[FactorPrestacionalLetras]]":  data.sFactorPrestacionalLetras,
+            "[[FechaContratacion]]":         data.fechaContratacion,
+            "[[PeriodoPago]]":               data.sPeriodoPago
         };
 
         const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];

@@ -28,11 +28,14 @@ sap.ui.define([
                 }
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
-                const sCedula      = user.nationalId   || "";
-                const sCargo       = user.title        || "";
-                const sCiudadWork  = user.division     || "";
-                const sSalario     = _formatSalary(user.paycompvalue);
-                const sHireDate    = _formatDateLong(user.hireDate);
+                const sCedula      = user.nationalId || "";
+                const sFechaNacimiento = user.dateOfBirth 
+                    ? oController.formatDateRaw(user.dateOfBirth) 
+                    : "";
+                const localDate    = oController.getLocalDate();
+                const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                const sTelefono   = oController.getTelefono(user);                
+                const sFechaExpedicion = user.docExpeditionDate || "";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -352,9 +355,7 @@ sap.ui.define([
                             ">
                                 CÉDULA O TARJETA IDENTIDAD
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                ${sCedula}
-                            </td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sCedula}</td>
                         </tr>
 
                         <tr>
@@ -367,7 +368,7 @@ sap.ui.define([
                             ">
                                 FECHA NACIMIENTO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaNacimiento}</td>
                         </tr>
 
                         <tr>
@@ -380,7 +381,7 @@ sap.ui.define([
                             ">
                                 DIRECCION
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sDireccion}</td>
                         </tr>
 
                         <tr>
@@ -393,7 +394,7 @@ sap.ui.define([
                             ">
                                 TELEFONO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sTelefono}</td>
                         </tr>
 
                         <tr>
@@ -1274,15 +1275,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
-                </div>`;
-
-
-                // ── PÁGINA 11 — Firmas ────────────────────────────────────────────────────────
-                const htmlPagina11 = `
-                <div style="${STYLE}width:100%;box-sizing:border-box;">
-
                     ${_bloqueContrato(`
                         Para efectos de lo anterior, firman el veinticuatro (24) de septiembre de 2025,
                     `)}
@@ -1333,14 +1325,14 @@ sap.ui.define([
                                     font-weight:bold;
                                     min-height:18px;
                                 ">
-                                    XXXXXXXXXXXXX
+                                    ${sNombre}
                                 </div>
 
                                 <div style="
                                     margin-top:2px;
                                     font-weight:bold;
                                 ">
-                                    CC.XXXXXXXXXXXXX
+                                    CC. ${sCedula}
                                 </div>
 
                             </div>
@@ -1367,7 +1359,6 @@ sap.ui.define([
                     htmlPagina8,
                     htmlPagina9,
                     htmlPagina10,
-                    htmlPagina11,
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────

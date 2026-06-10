@@ -29,9 +29,10 @@ sap.ui.define([
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                const sNombre           = `${user.firstName} ${user.lastName}`;
-                const sCedula           = user.nationalId || "";
-                const sCiudadFirma      = user.location || user.city || "Bucaramanga";
+                const sNombre      = `${user.firstName} ${user.lastName}`;
+                const sCedula      = user.nationalId || "";
+                const sCiudadWork  = oController.getCiudadWork(user);
+                const localDate    = oController.getLocalDate();
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -51,7 +52,7 @@ sap.ui.define([
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
                     <p style="margin:0 0 36px 0;">
-                        Ciudad y Fecha: ___________________________
+                        Ciudad y Fecha: ${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}
                     </p>
 
                     <p style="margin:0;">Señores</p>
@@ -80,8 +81,8 @@ sap.ui.define([
                     <p style="margin:0 0 60px 0;">Atentamente,</p>
 
                     <p style="margin:0 0 8px 0;">Firma: ___________________________</p>
-                    <p style="margin:0 0 8px 0;">Nombre: ___________________________</p>
-                    <p style="margin:0;">C.C.: ___________________________</p>
+                    <p style="margin:0 0 8px 0;">Nombre: ${sNombre}</p>
+                    <p style="margin:0;">C.C.: ${sCedula}</p>
 
                 </div>
               `;

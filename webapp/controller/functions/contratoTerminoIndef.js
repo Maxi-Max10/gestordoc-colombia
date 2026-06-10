@@ -1685,6 +1685,7 @@ sap.ui.define([
             "[[Ciudad]]":     data.sCiudadWork,
             "[[Salario]]":    data.sSalario,
             "[[FechaInicio]]":data.sHireDate
+            
         };
 
         const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
