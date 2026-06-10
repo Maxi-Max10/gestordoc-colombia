@@ -7,8 +7,8 @@ sap.ui.define([], function () {
         // Ejemplo: 1234.56 → "MIL DOSCIENTOS TREINTA Y CUATRO PESOS COLOMBIANOS CON 56/100"
         convertNumberToWords: function (num) {
             
-           num = Math.round(Number(num) * 100) / 100; // redondear a 2 decimales antes de separar
-                if (isNaN(num) || num < 0) return "CERO PESOS COLOMBIANOS CON 00/100";
+           num = Math.round(Number(num));  // redondear a entero
+            if (isNaN(num) || num < 0) return "CERO PESOS COLOMBIANOS";
 
             const numToWords = (n) => {
                 const unidades = ["", "UN", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
@@ -35,7 +35,7 @@ sap.ui.define([], function () {
             const centavos     = Math.round((num - pesos) * 100);
             const centavosTexto = centavos < 10 ? `0${centavos}` : `${centavos}`;
 
-            return `${numToWords(pesos)} PESOS COLOMBIANOS CON ${centavosTexto}/100`;
+            return `${numToWords(pesos)} PESOS COLOMBIANOS`;
         },
 
         // Convierte una fecha a un formato extendido:
@@ -203,7 +203,7 @@ sap.ui.define([], function () {
         // Salario formateado: 4853000 → "$ 4.853.000"
         formatSalary: function (value) {
             if (!value) return "";
-            return "$ " + Number(value).toLocaleString("es-CO");
+            return "$ " + Math.round(Number(value)).toLocaleString("es-CO");
         },
 
         // Resuelve género en texto con placeholder {A}

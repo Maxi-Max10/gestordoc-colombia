@@ -36,8 +36,8 @@ sap.ui.define([
                 const sSalario    = oController.formatSalary(user.paycompvalue);
                 const salarioIntegral = Number(user.paycompvalue) || 0; // En contratos a término indefinido integral, el salario base es el salario integral
 
-                const componenteRemunerativo = Math.round((salarioIntegral / 1.3) * 100) / 100;
-                const factorPrestacional     = Math.round((salarioIntegral - componenteRemunerativo) * 100) / 100;
+                const componenteRemunerativo = Math.round(salarioIntegral / 1.3);
+                const factorPrestacional     = salarioIntegral - componenteRemunerativo;
 
                 const sCompRemunerativo = oController.formatSalary(componenteRemunerativo); // El componente remunerativo se muestra como el salario base en el contrato
                 const sFactorPrestacional = oController.formatSalary(factorPrestacional);
