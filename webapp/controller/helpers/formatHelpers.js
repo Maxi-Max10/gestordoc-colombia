@@ -531,6 +531,8 @@ sap.ui.define([], function () {
                     managerNav:   getProp("managerUserNav"),
                     docCardType: getProp("docCardType") || "",
                     paymentFrequency: getProp("paymentFrequency") || "",
+                    planta: getProp("planta") || "",
+                    area:   getProp("area")   || "",
                     getCiudadWork: function (user) {
                         return user.custom10 || user.state || user.country || "";
                     },

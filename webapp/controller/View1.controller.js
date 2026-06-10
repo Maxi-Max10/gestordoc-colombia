@@ -721,15 +721,33 @@ sap.ui.define([
           const chunkSize = 50;
           const managerMap = {};
 
+          // ── Mapa de PayScaleArea ──────────────────────────────────────────
+          const payScaleAreaMap = {};
+          try {
+            const psaData = await this._readOData(oComponentModel, "/PayScaleArea", {
+              urlParameters: {
+                "$select": "code,externalName_defaultValue"
+              }
+            });
+            (psaData?.results || []).forEach(psa => {
+              if (psa.code) payScaleAreaMap[psa.code] = psa.externalName_defaultValue 
+                ? `${psa.externalName_defaultValue} (${psa.code})` 
+                : psa.code; //Para que en el Area, me traiga el nombre y el código
+            });
+          } catch (e) {
+            console.warn("No se pudo cargar PayScaleArea:", e);
+          }
+          // ─────────────────────────────────────────────────────────────────
+
           for (let i = 0; i < userIds.length; i += chunkSize) {
             const chunk     = userIds.slice(i, i + chunkSize);
             const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
 
             const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
               urlParameters: {
-                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup",
+                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,payScaleArea",
                 "$filter": `(${filterIds})`,
-                "$expand": "managerUserNav,payGroupNav"
+                "$expand": "managerUserNav,payGroupNav,locationNav"
               }
             });
 
@@ -750,7 +768,9 @@ sap.ui.define([
                     .trim(),
                   managerEmail:     job.managerUserNav?.email || "",
                   managerJobCode:   (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, ""),
-                  paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || "")
+                  paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || ""),
+                  planta:           job.locationNav?.name || job.location || "",
+                  area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || ""
                 };
               }
             });
@@ -763,6 +783,8 @@ sap.ui.define([
             user.managerEmail     = mgr.managerEmail     || "";
             user.managerJobCode   = mgr.managerJobCode   || "";
             user.paymentFrequency = mgr.paymentFrequency || "";
+            user.planta           = mgr.planta           || "";
+            user.area             = mgr.area             || ""
           });
 
         } catch (e) {
@@ -894,15 +916,33 @@ sap.ui.define([
           const chunkSize = 50;
           const managerMap = {};
 
+          // ── Mapa de PayScaleArea ──────────────────────────────────────────
+          const payScaleAreaMap = {};
+          try {
+            const psaData = await this._readOData(oComponentModel, "/PayScaleArea", {
+              urlParameters: {
+                "$select": "code,externalName_defaultValue"
+              }
+            });
+            (psaData?.results || []).forEach(psa => {
+              if (psa.code) payScaleAreaMap[psa.code] = psa.externalName_defaultValue 
+                ? `${psa.externalName_defaultValue} (${psa.code})` 
+                : psa.code; //Para que en el Area, me traiga el nombre y el código
+            });
+          } catch (e) {
+            console.warn("No se pudo cargar PayScaleArea:", e);
+          }
+          // ─────────────────────────────────────────────────────────────────
+
           for (let i = 0; i < userIds.length; i += chunkSize) {
             const chunk     = userIds.slice(i, i + chunkSize);
             const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
 
             const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
               urlParameters: {
-"                $select": "userId,managerId,managerUserNav/userId,managerUserNav/defaultFullName,managerUserNav/email,managerUserNav/jobCode,payGroup",
+                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,payScaleArea",
                 "$filter": `(${filterIds})`,
-                "$expand": "managerUserNav,payGroupNav"
+                "$expand": "managerUserNav,payGroupNav,locationNav"
               }
             });
 
@@ -921,7 +961,9 @@ sap.ui.define([
                   managerName:      job.managerUserNav?.displayName || "",
                   managerEmail:     job.managerUserNav?.email || "",
                   managerJobCode:   (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, ""),
-                  paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || "")
+                  paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || ""),
+                  planta:           job.locationNav?.name || job.location || "",
+                  area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || ""
                 };
               }
             });
@@ -934,6 +976,8 @@ sap.ui.define([
             user.managerEmail     = mgr.managerEmail     || "";
             user.managerJobCode   = mgr.managerJobCode   || "";
             user.paymentFrequency = mgr.paymentFrequency || "";
+            user.planta           = mgr.planta           || "";
+            user.area             = mgr.area             || ""
           });
 
         } catch (e) {
