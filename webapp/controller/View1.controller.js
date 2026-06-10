@@ -727,7 +727,7 @@ sap.ui.define([
 
             const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
               urlParameters: {
-                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/defaultFullName,managerUserNav/email,managerUserNav/jobCode,payGroup",
+                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup",
                 "$filter": `(${filterIds})`,
                 "$expand": "managerUserNav,payGroupNav"
               }
@@ -746,9 +746,7 @@ sap.ui.define([
               if (job.userId) {
                 managerMap[job.userId] = {
                   managerId:        job.managerId || "",
-                  managerName:      (job.managerUserNav?.defaultFullName || "")
-                    .replace(/\b\d+\b/g, "")
-                    .replace(/\s{2,}/g, " ")
+                  managerName:      (job.managerUserNav?.displayName || "")
                     .trim(),
                   managerEmail:     job.managerUserNav?.email || "",
                   managerJobCode:   (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, ""),
@@ -920,7 +918,7 @@ sap.ui.define([
               if (job.userId) {
                 managerMap[job.userId] = {
                   managerId:        job.managerId || "",
-                  managerName:      job.managerUserNav?.defaultFullName || "",
+                  managerName:      job.managerUserNav?.displayName || "",
                   managerEmail:     job.managerUserNav?.email || "",
                   managerJobCode:   (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, ""),
                   paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || "")
