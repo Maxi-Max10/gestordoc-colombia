@@ -1716,7 +1716,6 @@ sap.ui.define([
     onDownloadPDFContratoAprendizajeLectivo: async function (sButtonId) { contratoAprendizajeLectivo.onDownloadPDFContratoAprendizajeLectivo(this, sButtonId); },
     onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); },
 
-<<<<<<< HEAD
     onSendToDocusign: async function (oEvent) {
       if (this._currentCategory !== "contratoTerminoFijo" || this.sSelectedContract !== "Contrato Término Fijo") {
         MessageToast.show("Por ahora solo está disponible el envío a DocuSign para Contrato Término Fijo.");
