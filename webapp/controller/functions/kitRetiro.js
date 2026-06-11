@@ -39,6 +39,9 @@ sap.ui.define([
                 const sIngreso    = user.hireDatesimpl ? oController.formatDateToSpanish(user.hireDatesimpl) : "XXXX";
                 const sSalida     = user.endDate ? oController.formatDateToSpanish(user.endDate + "T12:00:00") : "XXXX";
                 const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
+                const sEmail      = oController.getEmail(user);
+                const sTelefono   = oController.getTelefono(user);
+                const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -46,7 +49,7 @@ sap.ui.define([
                         firstName: user.firstName,
                         lastName:  user.lastName,
                         sNombre, sCedula, sCiudadWork, localDate, sCargo,
-                        sSalario, sIngreso, sSalida, sIdentif
+                        sSalario, sIngreso, sSalida, sIdentif, sEmail, sTelefono, sDireccion
                     });
                     continue;
                 }
@@ -156,19 +159,19 @@ sap.ui.define([
                                 <table style="width:100%;border-collapse:collapse;margin-top:8px;">
                                     <tr>
                                         <td style="padding:3px 0;width:55%;">Ciudad de Residencia:</td>
-                                        <td style="border-bottom:1px solid #000;width:45%;">&nbsp;</td>
+                                        <td>&nbsp ${sCiudadWork}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding:3px 0;">Dirección (incluir el barrio/sector):</td>
-                                        <td style="border-bottom:1px solid #000;">&nbsp;</td>
+                                        <td>&nbsp ${sDireccion}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding:3px 0;">Teléfono:</td>
-                                        <td style="border-bottom:1px solid #000;">&nbsp;</td>
+                                        <td>&nbsp${sTelefono}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding:3px 0;">Correo Electrónico:</td>
-                                        <td style="border-bottom:1px solid #000;">&nbsp;</td>
+                                        <td>&nbsp${sEmail}</td>
                                     </tr>
                                 </table>
                             </td>
