@@ -29,5 +29,5 @@ server:
     - name: fiori-tools-preview
       afterMiddleware: fiori-tools-appreload
       configuration:
-        component: gestordoc
+        component: gestordoccolombia
         ui5Theme: sap_horizon

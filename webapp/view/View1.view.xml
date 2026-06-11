@@ -606,10 +606,11 @@
                         />
                         <Button
                             id="docusignDataInfo"
-                            text="Enviar a Docusign"
+                            text="Enviar a DocuSign"
                             icon="sap-icon://signature"
                             visible="{view>/ShowDocuSignButton}"
-                            tooltip="Disponible próximamente"
+                            tooltip="Enviar a DocuSign"
+                            press="onSendToDocusign"
                             class="docusignButtonCustom"
                             type="Transparent"
                         />
