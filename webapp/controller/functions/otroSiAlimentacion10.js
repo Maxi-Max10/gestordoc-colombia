@@ -31,13 +31,15 @@ sap.ui.define([
                 const sNombre           = `${user.firstName} ${user.lastName}`;
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
+                const sCiudadWork  = oController.getCiudadWork(user);
+                const localDateLong = oController.formatDateToWords(new Date());
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await _generateWord({
                         firstName:          user.firstName,
                         lastName:           user.lastName,
-                        sNombre, sCedula, localDate
+                        sNombre, sCedula, sIdentificado, sCiudadWork, localDateLong
                     });
                     continue;
                 }
@@ -51,7 +53,7 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        <mark style="background-color:#fff380;padding:0;"> En Sibate, a los 06 días del mes de enero de 2026 se reunieron por una parte <strong>${sNombre}</strong>
+                        <mark style="background-color:#fff380;padding:0;"> En ${sCiudadWork}, a los ${localDateLong} se reunieron por una parte <strong>${sNombre}</strong>
                         ${sIdentificado} con C.C. </mark><strong>${sCedula}</strong> como aparece al pie de su firma y quien actúa en su propio nombre y por la otra,
                         <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de  <strong>DIACO S.A.</strong>, 
                         con el fin de suscribir un acuerdo provisto de las siguientes cláusulas:
@@ -84,7 +86,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        <mark style="background-color:#fff380;padding:0;"> En constancia se firma en la ciudad de Sabaneta a los seis (06) días del mes de enero de dos mil veintiséis (2026).</mark>
+                    <mark style="background-color:#fff380;padding:0;">En constancia se firma en la ciudad de ${sCiudadWork} a los ${localDateLong}.</mark>
                     </p>
 
                     <div style="width:100%;display:table;">
@@ -148,6 +150,8 @@ sap.ui.define([
                 }
 
                 const pdfBytes = await pdfDoc.save();
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Otro Si Al Contrato 10.000 Alimentación`);
+
                 const fileName = `${user.firstName}_${user.lastName}_OtroSi_Alimentacion_10.000.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
                 const link     = document.createElement("a");
@@ -184,6 +188,8 @@ sap.ui.define([
             "[[Nombre]]":       data.sNombre,
             "[[Cedula]]":       data.sCedula,
             "[[Identificado]]": data.sIdentificado,
+            "[[CiudadWork]]":   data.sCiudadWork,
+            "[[FechaLarga]]": data.localDateLong
         };
 
         const targets = [

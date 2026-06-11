@@ -1279,6 +1279,8 @@ sap.ui.define([
 
                 }
                 pdfDoc.removePage(0);
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Autorización Datos Personales`);
+
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Datos_Personales.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });

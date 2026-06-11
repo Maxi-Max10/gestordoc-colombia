@@ -32,17 +32,19 @@ sap.ui.define([
                 const sFechaNacimiento = user.dateOfBirth 
                     ? oController.formatDateRaw(user.dateOfBirth) 
                     : "";
-                const localDate    = oController.getLocalDate();
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sTelefono   = oController.getTelefono(user);                
-                const sFechaExpedicion = user.docExpeditionDate || "";
+                const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
+                // ── Institución de formación ──────────────────────────────────
+                const sInstitucion = await oController._getInstitucionFormacion(user.userId);
+                const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre, sCedula, sCargo, sCiudadWork, sSalario, sHireDate
+                        sNombre, sCedula, sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sInstitucion, sCargo
                     });
                     continue;
                 }
@@ -407,7 +409,7 @@ sap.ui.define([
                             ">
                                 FECHA INICIACIÓN CONTRATO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sfechaContratacion}</td>
                         </tr>
 
                         <tr>
@@ -442,7 +444,7 @@ sap.ui.define([
                             ">
                                 INSTITUCIÓN DE FORMACION:
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sInstitucion}</td>
                         </tr>
 
                         <tr>
@@ -477,8 +479,8 @@ sap.ui.define([
                         `
                         El presente contrato tiene como objeto garantizar al <strong>APRENDIZ</strong> la formación
                         profesional metódica y requerida dentro del plan de estudios del <strong>APRENDIZ</strong> en la especialidad de
-                        XXXXXXXXXXXXXXX, la cual se impartirá en su etapa lectiva por el Centro de Formación Profesional
-                        XXXXXXXXXXXXXX mientras su etapa práctica se desarrollará en la <strong>EMPRESA</strong>, quien proporcionara los
+                        ${sCargo}, la cual se impartirá en su etapa lectiva por el Centro de Formación Profesional
+                        ${sInstitucion} mientras su etapa práctica se desarrollará en la <strong>EMPRESA</strong>, quien proporcionara los
                         medios para que el <strong>APRENDIZ</strong> adquiera formación profesional y metódica, dentro de una relación de
                         aprendizaje, la cual de ninguna manera implica subordinación laboral por parte de la <strong>EMPRESA</strong> sobre
                         el <strong>APRENDIZ</strong> pues este no es considerado para ningún efecto como un trabajador de la <strong>EMPRESA</strong> y la
@@ -1410,6 +1412,7 @@ sap.ui.define([
                 }
 
                 pdfDoc.removePage(0);
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Contrato Aprendizaje Lectivo`);
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Contrato_Aprendizaje_Lectivo.pdf`;
@@ -1447,10 +1450,11 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]":     data.sNombre,
             "[[Cedula]]":     data.sCedula,
-            "[[Cargo]]":      data.sCargo,
-            "[[Ciudad]]":     data.sCiudadWork,
-            "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate
+            "[[FechaNacimiento]]":      data.sFechaNacimiento,
+            "[[Direccion]]":     data.sDireccion,
+            "[[Telefono]]":     data.sTelefono,
+            "[[FechaContratacion]]":data.sfechaContratacion,
+            "[[Institucion]]":   data.sInstitucion
         };
 
         const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];

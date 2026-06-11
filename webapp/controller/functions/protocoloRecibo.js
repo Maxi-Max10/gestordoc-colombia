@@ -29,9 +29,7 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
-                const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
-                const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sPlanta      = user.planta || "";
                 const sArea      = user.area || "";
 
@@ -40,8 +38,7 @@ sap.ui.define([
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre,
-                        sCedula
+                        sNombre, sCedula, localDate, sPlanta, sArea
                     });
                     continue;
                 }
@@ -134,6 +131,8 @@ sap.ui.define([
                 }
 
                 pdfDoc.removePage(0);
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Protocolo Recibo`);
+
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Protocolo_Recibo.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
@@ -169,7 +168,10 @@ sap.ui.define([
 
         const variables = {
             "[[Nombre]]": data.sNombre,
-            "[[Cedula]]": data.sCedula
+            "[[Cedula]]": data.sCedula,
+            "[[Fecha]]": data.localDate,
+            "[[Planta]]": data.sPlanta,
+            "[[Area]]": data.sArea
         };
 
         const targets = [

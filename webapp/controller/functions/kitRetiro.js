@@ -60,7 +60,7 @@ sap.ui.define([
 
                     <p style="margin:0;">Señor(a):</p>
                     <p style="font-weight:bold;margin:0;">${sNombre}</p>
-                    <p style="margin:0 0 16px 0;">Ciudad</p>
+                    <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadWork}</p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         Con referencia al retiro de la empresa, a continuación, se relaciona lista documentos
@@ -94,7 +94,7 @@ sap.ui.define([
 
                     <p style="margin:0;">Señor:</p>
                     <p style="font-weight:bold;margin:0;">${sNombre}</p>
-                    <p style="margin:0 0 16px 0;">Ciudad</p>
+                    <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadWork}</p>
 
                     <p style="text-align:justify;margin:0 0 14px 0;">
                         Pensando en su comodidad, tenemos disponible para usted las siguientes opciones (Marque X):
@@ -294,14 +294,14 @@ sap.ui.define([
                 }
 
                 pdfDoc.removePage(0);
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Kit de Retiro`);
 
                 const pdfBytes = await pdfDoc.save();
-                const blob     = new Blob([pdfBytes], { type: "application/pdf" });
-                const link     = document.createElement("a");
-                link.href      = URL.createObjectURL(blob);
-                link.download  = `${user.firstName}_${user.lastName}_Kit_Retiro.pdf`;
-                link.click();
-                URL.revokeObjectURL(link.href);
+                // En vez de solo disparar la descarga, abrí en pestaña nueva
+                const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank");  // ← abre en pestaña nueva con título correcto
+                URL.revokeObjectURL(url);
             }
 
             MessageToast.show(
@@ -324,7 +324,6 @@ sap.ui.define([
         });
         const zip = await JSZip.loadAsync(templateBytes);
 
-        const sCiudadFecha = data.sCiudadWork ? `${data.sCiudadWork}, ${data.localDate}` : data.localDate;
         const sCertFecha   = data.localDate; // ya viene formateado desde oController.getLocalDate()
 
         const variables = {

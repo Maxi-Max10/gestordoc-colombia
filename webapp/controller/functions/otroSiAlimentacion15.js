@@ -20,8 +20,6 @@ sap.ui.define([
                 return;
             }
 
-            const localDate = _formatDateLong(new Date());
-
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
 
@@ -31,18 +29,16 @@ sap.ui.define([
 
                 const sNombre           = `${user.firstName} ${user.lastName}`;
                 const sCedula           = user.nationalId || "";
-                const sRodamiento       = _formatSalary(user.rodamientoValue || user.paycompValue || 0);
-                const sRodamientoLetras = _salaryToWords(user.rodamientoValue || user.paycompValue || 0);
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
-                const sCiudadFirma      = user.location || user.city || "Bucaramanga";
+                const localDateLong = oController.formatDateToWords(new Date());
+                const sCiudadWork  = oController.getCiudadWork(user);
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre,
-                        sCedula,
+                        firstName:          user.firstName,
+                        lastName:           user.lastName,
+                        sNombre, sCedula, sIdentificado, localDateLong, sCiudadWork
                     });
                     continue;
                 }
@@ -55,16 +51,7 @@ sap.ui.define([
                         OTRO SI AL CONTRATO DE TRABAJO
                     </p>
 
-                    <p style="text-align:justify;margin:0 0 16px 0;">
-                        <mark style="background-color:#ea80fc;padding:0;"> En Medellin, al ${localDate}, se reunieron por una parte </mark><strong>${sNombre}</strong>
-                        ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong>
-                        como aparece al pie de su firma y quien en adelante se denominará
-                        <strong>EL TRABAJADOR</strong>, y por la otra,
-                        <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312
-                        y quien actúa en representación de <strong>DIACO S.A.</strong>, quien en adelante
-                        se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo
-                        provisto de las siguientes cláusulas.
-                    </p>
+                    <p style="text-align:justify;margin:0 0 16px 0;"><span style="background-color:#ea80fc;">En ${sCiudadWork}, a los ${localDateLong}, se reunieron por una parte</span> <strong>${sNombre}</strong> ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong> como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de <strong>DIACO S.A.</strong>, quien en adelante se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo provisto de las siguientes cláusulas.</p>
 
                     <p style="text-align:justify;margin:0 0 10px 0;">
                         <strong>PRIMERA:</strong> El empleador de mera liberalidad y como parte de su política de bienestar otorga al trabajador un 
@@ -94,7 +81,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        <mark style="background-color:#ea80fc;padding:0;">En constancia se firma en la ciudad de Medellin a los doce (12) días del mes de diciembre de 2023.</mark>
+                        <mark style="background-color:#ea80fc;padding:0;">En constancia se firma en la ciudad de ${sCiudadWork} a los ${localDateLong}.</mark>
                     </p>
 
                     <div style="width:100%;display:table;">
@@ -165,6 +152,8 @@ sap.ui.define([
                 });
 
                 const pdfBytes = await pdfDoc.save();
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Otro Si Al Contrato 15.000 Alimentación`);
+
                 const fileName = `${user.firstName}_${user.lastName}_OtroSi_Alimentacion_15.000.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
                 const link     = document.createElement("a");
@@ -200,6 +189,9 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]": data.sNombre,
             "[[Cedula]]": data.sCedula,
+            "[[Identificado]]": data.sIdentificado,
+            "[[Fecha]]": data.localDateLong,
+            "[[CiudadWork]]": data.sCiudadWork
         };
 
         const targets = [
@@ -257,69 +249,6 @@ sap.ui.define([
             script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
             document.head.appendChild(script);
         });
-    }
-
-    function _formatDateLong(date) {
-        const d      = new Date(date);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${_dayToWords(d.getDate())} (${d.getDate()}) de ${months[d.getMonth()]} de ${d.getFullYear()}`;
-    }
-
-    function _dayToWords(day) {
-        const words = [
-            "","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez",
-            "once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho",
-            "diecinueve","veinte","veintiuno","veintidós","veintitrés","veinticuatro",
-            "veinticinco","veintiséis","veintisiete","veintiocho","veintinueve","treinta",
-            "treinta y uno"
-        ];
-        return words[day] || String(day);
-    }
-
-    function _formatSalary(value) {
-        if (!value) return "$ 0";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _salaryToWords(value) {
-        const n = Math.round(Number(value) || 0);
-        if (n === 0) return "CERO PESOS M/CTE";
-
-        const unidades = ["","UN","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE",
-                          "DIEZ","ONCE","DOCE","TRECE","CATORCE","QUINCE","DIECISÉIS",
-                          "DIECISIETE","DIECIOCHO","DIECINUEVE"];
-        const decenas  = ["","","VEINTE","TREINTA","CUARENTA","CINCUENTA",
-                          "SESENTA","SETENTA","OCHENTA","NOVENTA"];
-        const centenas = ["","CIENTO","DOSCIENTOS","TRESCIENTOS","CUATROCIENTOS","QUINIENTOS",
-                          "SEISCIENTOS","SETECIENTOS","OCHOCIENTOS","NOVECIENTOS"];
-
-        function grupo(n) {
-            let s = "";
-            const c = Math.floor(n / 100);
-            const r = n % 100;
-            if (c > 0) { s += (c === 1 && r === 0) ? "CIEN" : centenas[c]; if (r > 0) s += " "; }
-            if (r > 0) {
-                if (r < 20) { s += unidades[r]; }
-                else {
-                    const d = Math.floor(r / 10), u = r % 10;
-                    if (r >= 21 && r <= 29) {
-                        s += ["","VEINTIÚN","VEINTIDÓS","VEINTITRÉS","VEINTICUATRO","VEINTICINCO",
-                              "VEINTISÉIS","VEINTISIETE","VEINTIOCHO","VEINTINUEVE"][u];
-                    } else { s += decenas[d]; if (u > 0) s += " Y " + unidades[u]; }
-                }
-            }
-            return s;
-        }
-
-        const millones = Math.floor(n / 1000000);
-        const miles    = Math.floor((n % 1000000) / 1000);
-        const resto    = n % 1000;
-        let resultado  = "";
-        if (millones > 0) { resultado += (millones === 1) ? "UN MILLÓN" : grupo(millones) + " MILLONES"; if (miles > 0 || resto > 0) resultado += " "; }
-        if (miles > 0)    { resultado += (miles === 1)    ? "MIL"       : grupo(miles)    + " MIL";      if (resto > 0)              resultado += " "; }
-        if (resto > 0)    { resultado += grupo(resto); }
-        return resultado + " PESOS M/CTE";
     }
 
     return { onDownloadPDFOtroSiAlimentacion15 };

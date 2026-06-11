@@ -34,6 +34,8 @@ sap.ui.define([
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
                 const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sSalarioLetras  = user.payCompValueWord || "";   // ya viene mapeado
+
                 const salarioIntegral = Number(user.paycompvalue) || 0; // En contratos a término indefinido integral, el salario base es el salario integral
 
                 const componenteRemunerativo = Math.round(salarioIntegral / 1.3);
@@ -49,7 +51,7 @@ sap.ui.define([
                     oController.convertNumberToWords(factorPrestacional);
 
 
-                const fechaContratacion = oController.formatDateRaw(user.originalStartDate); //Pendiente a confirmar
+                const fechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
                 console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
@@ -66,7 +68,8 @@ sap.ui.define([
                         sCompRemunerativoLetras,
                         sFactorPrestacionalLetras,
                         fechaContratacion,
-                        sPeriodoPago
+                        sPeriodoPago,
+                        sSalarioLetras
                     });
                     continue;
                 }
@@ -218,7 +221,7 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario} (${sSalarioLetras}) </td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">20 DE ABRIL DE 2026</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
@@ -254,7 +257,7 @@ sap.ui.define([
                         reglamentos, órdenes e instrucciones que le impartan los representantes de
                         <strong>EL EMPLEADOR</strong>, todo lo cual forma parte integrante del presente
                         contrato, observando en su desempeño el cuidado y diligencia necesarios,
-                        especialmente como XXXXXXXXXXXXXX, pudiendo
+                        especialmente como ${sCargo}, pudiendo
                         <strong>EL EMPLEADOR</strong> cambiarlo de función cuando lo considere necesario.
                     `)}
 
@@ -392,7 +395,7 @@ sap.ui.define([
                         `
                         Por los servicios que preste <strong>EL TRABAJADOR</strong>,
                         <strong>EL EMPLEADOR</strong> reconocerá un salario integral básico por valor de
-                        <strong>VALOR EN LETRAS ($$$$$$$$)</strong>, pagaderos por quincenas vencidas,
+                        <strong>${sSalario} (${sSalarioLetras})</strong>, pagaderos por quincenas vencidas,
                         y en el lugar donde presta sus servicios, el cual con base en lo previsto en el
                         Artículo 132 del CST, subrogado por el Artículo 18 de la Ley 50 de 1990,
                         está compuesto de la siguiente manera:
@@ -1419,7 +1422,7 @@ sap.ui.define([
                         "FECHA DE INICIACIÓN:",
                         `
                         Se deja constancia que <strong>EL TRABAJADOR</strong> inició sus labores el día
-                        20 de abril del año 2026, fecha ésta que las partes consideran como la del
+                        ${fechaContratacion}, fecha ésta que las partes consideran como la del
                         comienzo de la vigencia del presente contrato.
                         `
                     )}
@@ -1839,6 +1842,7 @@ sap.ui.define([
                 }
 
                 pdfDoc.removePage(0);
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Contrato a Termino Indefinido Integral`);
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Contrato_Indefinido.pdf`;
@@ -1887,7 +1891,8 @@ sap.ui.define([
             "[[CompRemunerativoLetras]]":    data.sCompRemunerativoLetras,
             "[[FactorPrestacionalLetras]]":  data.sFactorPrestacionalLetras,
             "[[FechaContratacion]]":         data.fechaContratacion,
-            "[[PeriodoPago]]":               data.sPeriodoPago
+            "[[PeriodoPago]]":               data.sPeriodoPago,
+            "[[SalarioLetras]]":             data.sSalarioLetras
         };
 
         const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];

@@ -31,19 +31,21 @@ sap.ui.define([
                 const sCedula      = user.nationalId || "";
                 const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
+                const sPais = oController.getPaisName(user.country);
+                const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sSalario    = oController.formatSalary(user.paycompvalue);
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
-                const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
+                const sSalarioLetras  = user.payCompValueWord || "" 
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre, sCedula, sCargo, sCiudadWork, sSalario, sHireDate
+                        sNombre, sCedula, sCargo, sCiudadWork, sSalario, sHireDate, sSalarioLetras
                     });
                     continue;
                 }
@@ -205,7 +207,7 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario} (${sSalarioLetras})</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
@@ -219,7 +221,7 @@ sap.ui.define([
                         número <strong>52.705.312</strong> y quien para todos los efectos del presente contrato
                         de trabajo se denominará <strong>EL EMPLEADOR</strong>, y <strong>${sNombre}</strong>,
                         identificado(a) con la cédula de ciudadanía número <strong>${sCedula}</strong>
-                        expedida en XXXXXXXXXXXXXX, domiciliada en XXXXXXXXXXXXXX obrando en nombre
+                        expedida en ${sPais}, domiciliada en ${sDireccion} obrando en nombre
                         propio y quien para efectos del presente contrato se denominará
                         <strong>EL TRABAJADOR</strong>, hemos celebrado un contrato de trabajo según las
                         siguientes cláusulas:
@@ -240,7 +242,7 @@ sap.ui.define([
                         empresa metalúrgica, de conformidad con los reglamentos, órdenes e instrucciones que le
                         impartan los representantes de <strong>EL EMPLEADOR</strong>, todo lo cual forma parte integrante del presente
                         contrato, observando en su desempeño el cuidado y diligencia necesarios, especialmente como
-                        <strong>XXXXXXXXXXXX</strong>, pudiendo <strong>EL EMPLEADOR</strong> cambiarlo de función cuando lo considere necesario.
+                        <strong>${sCargo}</strong>, pudiendo <strong>EL EMPLEADOR</strong> cambiarlo de función cuando lo considere necesario.
                     `)}
 
                     ${_itemContrato("a.", `
@@ -372,7 +374,7 @@ sap.ui.define([
                         "RENUMERACION:",
                         `
                         Por los servicios que preste <strong>EL TRABAJADOR</strong>, <strong>EL EMPLEADOR</strong> reconocerá una
-                        remuneración mensual de <strong>$$$$$$$$ (VALOR EN LETRAS PESO M/CTE)</strong> pagadera por quincenas vencidas, y
+                        remuneración mensual de <strong>${sSalario} (${sSalarioLetras})</strong> pagadera por quincenas vencidas, y
                         en el lugar donde presta sus servicios. Dentro de este pago se encuentra incluida la remuneración de
                         los descansos dominicales y festivos de que tratan los capítulos I y II del título VII del Código
                         Sustantivo del Trabajo.
@@ -1214,7 +1216,7 @@ sap.ui.define([
                         "FECHA DE INICIACIÓN:",
                         `
                         Se deja constancia que <strong>EL TRABAJADOR</strong> inició sus labores el día
-                        <strong>XXXXXXXXXXXXXX</strong> fecha ésta que las partes consideran como la del comienzo de la vigencia del
+                        <strong>${sfechaContratacion}</strong> fecha ésta que las partes consideran como la del comienzo de la vigencia del
                         presente contrato
                         `
                     )}
@@ -1403,7 +1405,10 @@ sap.ui.define([
                         <strong>EL EMPLEADO</strong> se compromete a cumplir en su totalidad lo establecido
                         en el Decreto 2153 de 1992, Ley 256 de 1996, Ley 155 de 1959, Ley 1340 de 2009, y todas
                         las normas y regulaciones aplicables al régimen de protección de libre competencia.
-                        Asimismo, declara que se
+                        Asimismo, declara que se compromete a que todas las actividades que en virtud de esta
+                        relación contractual se ejecuten serán realizadas de conformidad con los más elevados
+                        estándares de transparencia, integridad, legalidad y respetando el Código de Ética,
+                        y todas las demás políticas internas de la compañía.
                         `
                     )}
 
@@ -1417,14 +1422,6 @@ sap.ui.define([
 
                     ${HEADER}
 
-                    ${_bloqueContrato(
-                        `
-                        compromete a que todas las actividades que en virtud de esta
-                        relación contractual se ejecuten serán realizadas de conformidad con los más elevados
-                        estándares de transparencia, integridad, legalidad y respetando el Código de Ética,
-                        y todas las demás políticas internas de la compañía.
-                        `
-                    )}
 
                     ${_bloqueContrato(`
                         Adicionalmente, <strong>EL EMPLEADO</strong> declara que no ha sido sancionado, ni está siendo
@@ -1462,7 +1459,7 @@ sap.ui.define([
                         Del presente documento se han extendido dos ejemplares del mismo contenido,
                         uno para <strong>EL EMPLEADOR</strong> y otro para
                         <strong>EL TRABAJADOR</strong>, los cuales firmamos ante testigos en la ciudad
-                        de <strong>BOGOTÁ</strong> el día <strong>20 DE ABRIL DE 2026</strong>.
+                        de <strong>${sCiudadWork}</strong> el día <strong>${localDate}</strong>.
                     `)}
 
 
@@ -1644,6 +1641,7 @@ sap.ui.define([
                 }
 
                 pdfDoc.removePage(0);
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Contrato a Termino Indefinido`);
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Contrato_TerminoIndefinido.pdf`;
@@ -1684,7 +1682,8 @@ sap.ui.define([
             "[[Cargo]]":      data.sCargo,
             "[[Ciudad]]":     data.sCiudadWork,
             "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate
+            "[[FechaInicio]]":data.sHireDate,
+            "[[SalarioenLetras]]":data.sSalarioLetras
             
         };
 
