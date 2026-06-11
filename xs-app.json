@@ -15,10 +15,17 @@
       "service": "sap-approuter-userapi"
     },
     {
+      "source": "^/(.*)/cpi-term-fijo(.*)$",
+      "target": "/http/term-fijo$2",
+      "destination": "CPI_DOCUSIGN_DESTINATION",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
       "source": "^/cpi-term-fijo(.*)$",
       "target": "/http/term-fijo$1",
       "destination": "CPI_DOCUSIGN_DESTINATION",
-      "authenticationType": "none",
+      "authenticationType": "xsuaa",
       "csrfProtection": false
     },
     {

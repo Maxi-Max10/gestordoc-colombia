@@ -34,6 +34,10 @@ server:
             path: /odata
             url: https://api17preview.sapsf.com
             destination: SSFF_API
+          - path: /cpi-term-fijo
+            url: https://e0980-iflmap.hcisbt.us2.hana.ondemand.com
+            destination: CPI_DOCUSIGN_DESTINATION
+            pathReplace: /http/term-fijo
     - name: sap-fe-mockserver
       beforeMiddleware: csp
       configuration:
