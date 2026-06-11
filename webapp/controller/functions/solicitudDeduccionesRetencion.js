@@ -37,8 +37,7 @@ sap.ui.define([
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre,
-                        sCedula
+                        sNombre, sCedula, sCiudadWork, localDate
                     });
                     continue;
                 }
@@ -249,8 +248,10 @@ sap.ui.define([
         const zip = await JSZip.loadAsync(templateBytes);
 
         const variables = {
-            "[[Nombre]]": data.sNombre,
-            "[[Cedula]]": data.sCedula
+            "[[Nombre]]":      data.sNombre,
+            "[[Cedula]]":      data.sCedula,
+            "[[CiudadWork]]":  data.sCiudadWork,
+            "[[CiudadFecha]]": data.sCiudadWork ? `${data.sCiudadWork}, ${data.localDate}` : data.localDate,
         };
 
         const targets = [

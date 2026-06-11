@@ -1930,19 +1930,5 @@ sap.ui.define([
             document.head.appendChild(script);
         });
     }
-
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _formatDateLong(dateInput) {
-        if (!dateInput) return "";
-        const d = new Date(dateInput);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
-    }
-
     return { onDownloadPDFContratoIndefIntegral };
 });

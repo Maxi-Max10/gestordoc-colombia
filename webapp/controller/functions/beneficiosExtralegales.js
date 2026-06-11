@@ -20,8 +20,6 @@ sap.ui.define([
                 return;
             }
 
-            const localDate = _formatDateLong(new Date());
-
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
 
@@ -34,19 +32,12 @@ sap.ui.define([
                 const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
                 const localDate   = oController.getLocalDate();
 
-
-                // Ciudad: buscar el campo correcto de SSFF
-                const sCity = user.location || user.city || user.addressLine1 || "";
-
                 // ── Word ──────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await _generateWord({
                         firstName:   user.firstName,
                         lastName:    user.lastName,
-                        sNombre,
-                        sCedula,
-                        sIdentif,
-                        localDate
+                        sNombre, sCedula, sIdentif, localDate
                     });
                     continue;
                 }
@@ -309,24 +300,6 @@ sap.ui.define([
             script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
             document.head.appendChild(script);
         });
-    }
-
-    function _formatDateLong(date) {
-        const d      = new Date(date);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${_dayToWords(d.getDate())} (${d.getDate()}) de ${months[d.getMonth()]} de ${d.getFullYear()}`;
-    }
-
-    function _dayToWords(day) {
-        const words = [
-            "","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez",
-            "once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho",
-            "diecinueve","veinte","veintiuno","veintidós","veintitrés","veinticuatro",
-            "veinticinco","veintiséis","veintisiete","veintiocho","veintinueve","treinta",
-            "treinta y uno"
-        ];
-        return words[day] || String(day);
     }
 
     return { onDownloadPDFBeneficiosExtralegales };

@@ -20,8 +20,6 @@ sap.ui.define([
                 return;
             }
 
-            const localDate = _formatDate(new Date());
-
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
 
@@ -31,6 +29,17 @@ sap.ui.define([
 
                 const sNombre = `${user.firstName} ${user.lastName}`;
                 const sCedula = user.nationalId || "";
+                const localDate    = oController.getLocalDate();
+
+                // ── Word ──────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    await _generateWord({
+                        firstName: user.firstName,
+                        lastName:  user.lastName,
+                        sNombre, sCedula, localDate
+                    });
+                    continue;
+                }
 
                 // ── HTML del bloque de firma ──────────────────────────────────
                 const htmlFirma = `
@@ -52,18 +61,6 @@ sap.ui.define([
                         </p>
                     </div>
                 `;
-
-                // ── Word ──────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre,
-                        sCedula,
-                        localDate
-                    });
-                    continue;
-                }
 
                 // ── PDF ───────────────────────────────────────────────────────
                 const existingPdfBytes = await fetch("pdf/plantillaEtica.pdf")
@@ -145,7 +142,7 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]":    data.sNombre,
             "[[Cedula]]":    data.sCedula,
-            "[[localDate]]": data.localDate
+            "[[Fecha]]":     data.localDate,
         };
 
         const targets = [

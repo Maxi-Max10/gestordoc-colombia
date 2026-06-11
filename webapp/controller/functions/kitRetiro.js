@@ -7,8 +7,8 @@ sap.ui.define([
         try {
             await oController._ensurePdfToolkit();
 
-            const PDFLibRef = window.PDFLib || oController._pdfLibRef;
-            const html2canvasRef = window.html2canvas || oController._html2canvasRef;
+            const PDFLibRef      = window.PDFLib      || oController._pdfLibRef;
+            const html2canvasRef = window.html2canvas  || oController._html2canvasRef;
 
             if (!PDFLibRef || !html2canvasRef) {
                 throw new Error("No se pudieron cargar las bibliotecas PDF/Canvas requeridas.");
@@ -20,8 +20,6 @@ sap.ui.define([
                 return;
             }
 
-            const localDate = _formatDate(new Date());
-
             // Pre-cargar el QR como base64 (una sola vez fuera del loop)
             const qrBase64 = await _loadImageAsBase64("img/qr_encuesta_retiro.png");
 
@@ -32,43 +30,44 @@ sap.ui.define([
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                // Ahora sí, user ya existe cuando se define resolveGender
-                const resolveGender = (text) => {
-                    if (!text) return "";
-                    const isFemale = user.gender === "F";
-                    return text.replace(/\{A\}/g, isFemale ? "A" : "").trim();
-                };
-
                 const sNombre     = `${user.firstName} ${user.lastName}`;
                 const sCedula     = user.nationalId || "";
-                const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sCiudadWork = oController.getCiudadWork(user);
-                const sSalario    = oController.formatSalary(user.paycompvalue);
-                const sIngreso = user.hireDatesimpl ? oController.formatDateToSpanish(user.hireDatesimpl) : "XXXX";
-                const sSalida = user.endDate ? oController.formatDateToSpanish(user.endDate + "T12:00:00") : "XXXX";
-                const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
                 const localDate   = oController.getLocalDate();
+                const sCargo      = oController.resolveGender(user.title || "", user.gender);
+                const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sIngreso    = user.hireDatesimpl ? oController.formatDateToSpanish(user.hireDatesimpl) : "XXXX";
+                const sSalida     = user.endDate ? oController.formatDateToSpanish(user.endDate + "T12:00:00") : "XXXX";
+                const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
 
+                // ── Word ─────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    await _generateWord({
+                        firstName: user.firstName,
+                        lastName:  user.lastName,
+                        sNombre, sCedula, sCiudadWork, localDate, sCargo,
+                        sSalario, sIngreso, sSalida, sIdentif
+                    });
+                    continue;
+                }
 
-                // Ciudad: buscar el campo correcto de SSFF
-                const sCity = user.location || user.city || user.addressLine1 || "";
-                const STYLE = `font-family:Arial,sans-serif;font-size:9pt;line-height:1.2;padding:0px 60px 20px 80px;color:#000;`;
+                const STYLE = `font-family:Arial,sans-serif;font-size:9.5pt;line-height:1.2;padding:0px 60px 20px 80px;color:#000;`;
 
                 const htmlPagina1 = `
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
+                    <p style="margin:0 0 16px 0;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor(a):</p>
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">Ciudad</p>
+                    <p style="margin:0;">Señor(a):</p>
+                    <p style="font-weight:bold;margin:0;">${sNombre}</p>
+                    <p style="margin:0 0 16px 0;">Ciudad</p>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 16px 0;">
+                    <p style="text-align:justify;margin:0 0 16px 0;">
                         Con referencia al retiro de la empresa, a continuación, se relaciona lista documentos
                         entregados en la fecha:
                     </p>
 
-                    <ol style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 24px 20px;line-height:1.8;">
+                    <ol style="margin:0 0 24px 20px;line-height:1.8;">
                         <li>Aprobación para envío de documentación, datos de notificación y pago de liquidación final</li>
                         <li>Certificación laboral</li>
                         <li>Comunicación plazo máximo para realización exámenes de egreso</li>
@@ -80,10 +79,9 @@ sap.ui.define([
 
                     <img src="${qrBase64}" style="width:130px;height:130px;display:block;margin:0 0 20px 0;" />
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 60px 0;">Cordialmente,</p>
+                    <p style="margin:0 0 60px 0;">Cordialmente,</p>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;
-                    border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
+                    <p style="font-weight:bold;border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
                         Gestión Personas
                     </p>
 
@@ -92,18 +90,17 @@ sap.ui.define([
                 const htmlPagina2 = `
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 4px 0;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
+                    <p style="margin:0 0 4px 0;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">Señor:</p>
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sNombre}</p>
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 16px 0;">Ciudad</p>
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;margin:0;">${sCiudadWork}</p>
+                    <p style="margin:0;">Señor:</p>
+                    <p style="font-weight:bold;margin:0;">${sNombre}</p>
+                    <p style="margin:0 0 16px 0;">Ciudad</p>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 14px 0;">
+                    <p style="text-align:justify;margin:0 0 14px 0;">
                         Pensando en su comodidad, tenemos disponible para usted las siguientes opciones (Marque X):
                     </p>
 
-                    <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
                         <tr>
                             <td style="width:24px;vertical-align:top;font-weight:bold;">1.</td>
                             <td style="text-align:justify;">
@@ -117,7 +114,7 @@ sap.ui.define([
                         </tr>
                     </table>
 
-                    <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
                         <tr>
                             <td style="width:24px;vertical-align:top;font-weight:bold;">2.</td>
                             <td style="text-align:justify;">
@@ -131,13 +128,13 @@ sap.ui.define([
                         </tr>
                     </table>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 14px 0;">
+                    <p style="text-align:justify;margin:0 0 14px 0;">
                         En caso contrario de no aceptación de los puntos 1 o 2, deberá dirigirse personalmente a las
                         instalaciones de la empresa, para recibir los documentos o reclamar el pago de su liquidación
                         de prestaciones sociales.
                     </p>
 
-                    <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
                         <tr>
                             <td style="width:24px;vertical-align:top;font-weight:bold;">3.</td>
                             <td style="text-align:justify;">
@@ -151,7 +148,7 @@ sap.ui.define([
                         </tr>
                     </table>
 
-                    <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
                         <tr>
                             <td style="width:24px;vertical-align:top;font-weight:bold;">4.</td>
                             <td>
@@ -178,13 +175,12 @@ sap.ui.define([
                         </tr>
                     </table>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 40px 0;">
+                    <p style="text-align:justify;margin:0 0 40px 0;">
                         Declaró que comprendí la información contenida en esta comunicación y en señal a lo anterior
                         firmo de recibido y enterado.
                     </p>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;
-                    border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
+                    <p style="border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
                         <strong>${sNombre}</strong><br>
                         <strong>C.C. ${sCedula}</strong>
                     </p>
@@ -194,24 +190,21 @@ sap.ui.define([
                 const htmlPagina3 = `
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;font-weight:bold;
-                    text-align:center;letter-spacing:1px;margin:0 0 28px 0;">
+                    <p style="font-weight:bold;text-align:center;letter-spacing:1px;margin:0 0 28px 0;">
                         EL ÁREA DE GESTIÓN DE PERSONAS
                     </p>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;
-                    text-align:center;letter-spacing:6px;margin:0 0 40px 0;">
+                    <p style="text-align:center;letter-spacing:6px;margin:0 0 40px 0;">
                         C E R T I F I C A
                     </p>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;
-                    line-height:1.7;margin:0 0 24px 0;">
+                    <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
                         Que, <strong>${sNombre}</strong> ${sIdentif} con cédula de ciudadanía número
                         <strong>${sCedula},</strong> trabajó en la empresa con contrato a término indefinido, desde
                         <strong>${sIngreso}</strong> hasta el <strong>${sSalida}</strong>
                     </p>
 
-                    <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:28px;">
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
                         <tr>
                             <td style="padding:4px 0;font-weight:bold;width:40%;">Ultimo cargo desempeñado:</td>
                             <td style="padding:4px 0;">${sCargo}</td>
@@ -226,44 +219,20 @@ sap.ui.define([
                         </tr>
                     </table>
 
-                    <p style="font-size:11pt;font-family:Arial,sans-serif;text-align:justify;margin:0 0 60px 0;">
-                        La anterior se expide en Ciudad de Bogotá el ${_getDayMonth()} de
-                        ${_numToWords(new Date().getFullYear())} (${new Date().getFullYear()}).
+                    <p style="text-align:justify;margin:0 0 60px 0;">
+                        La anterior se expide en Ciudad de Bogotá el ${localDate} de
                     </p>
 
                     <div style="text-align:center;">
-                        <p style="font-size:11pt;font-family:Arial,sans-serif;
-                        border-top:1.5px solid #000;width:260px;margin:0 auto;padding-top:6px;">
+                        <p style="border-top:1.5px solid #000;width:260px;margin:0 auto;padding-top:6px;">
                             <strong>${sNombre}</strong><br>
                             <strong>Gestión Personas</strong>
                         </p>
                     </div>
+
                 </div>`;
 
-                // ── Word ─────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName:   user.firstName,
-                        lastName:    user.lastName,
-                        sNombre,
-                        sCedula,
-                        sCargo,
-                        sCiudadWork,
-                        sSalario,
-                        sIngreso,
-                        sSalida,
-                        sIdentif,
-                        sCity,
-                        localDate
-                    });
-                    continue;
-                }
-
-                // ── PDF ───────────────────────────────────────────────────────
-                // ── Array final — página 19 es la única en blanco ─────────────
-                const contentBlocks = [
-                    htmlPagina1, htmlPagina2, htmlPagina3,
-                ];
+                const contentBlocks = [htmlPagina1, htmlPagina2, htmlPagina3];
 
                 const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf").then(res => res.arrayBuffer());
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
@@ -274,35 +243,33 @@ sap.ui.define([
                 for (let pageIndex = 0; pageIndex < contentBlocks.length; pageIndex++) {
                     const blockHtml = contentBlocks[pageIndex];
                     const div = document.createElement("div");
-                    div.style.width           = "794px";
-                    div.style.padding         = "0px";
-                    div.style.marginTop       = "-40px";
-                    div.style.backgroundColor = "transparent";
-                    div.style.background      = "none";
-                    div.style.fontSize        = "12px";
-                    div.style.color           = "#000000";
+                    div.style.width               = "794px";
+                    div.style.padding             = "0px";
+                    div.style.marginTop           = "-40px";
+                    div.style.backgroundColor     = "transparent";
+                    div.style.background          = "none";
+                    div.style.fontSize            = "12px";
+                    div.style.color               = "#000000";
                     div.style.webkitFontSmoothing = "antialiased";
-                    div.style.textRendering   = "geometricPrecision";
-                    div.style.boxSizing       = "border-box";
-                    div.style.position        = "absolute";
-                    div.style.top             = "-9999px";
-                    div.style.left            = "-9999px";   // ← agregar esto también
-                    div.innerHTML             = blockHtml;
+                    div.style.textRendering       = "geometricPrecision";
+                    div.style.boxSizing           = "border-box";
+                    div.style.position            = "absolute";
+                    div.style.top                 = "-9999px";
+                    div.style.left                = "-9999px";
+                    div.innerHTML                 = blockHtml;
                     document.body.appendChild(div);
 
-                    // Leer la altura real DESPUÉS de que el browser haga el layout
                     const realHeight = div.scrollHeight;
 
                     const canvas = await html2canvasRef(div, {
-                        scale: 4,
-                        useCORS: true,
+                        scale:        4,
+                        useCORS:      true,
                         backgroundColor: null,
-                        logging: false,
-                        height: realHeight,          //  capturar todo
-                        windowHeight: realHeight     //  evitar clipping
+                        logging:      false,
+                        height:       realHeight,
+                        windowHeight: realHeight
                     });
                     const imgData = canvas.toDataURL("image/png");
-
                     document.body.removeChild(div);
 
                     const img     = await pdfDoc.embedPng(imgData);
@@ -329,20 +296,19 @@ sap.ui.define([
                 pdfDoc.removePage(0);
 
                 const pdfBytes = await pdfDoc.save();
-                const fileName = `${user.firstName}_${user.lastName}_Kit_Retiro.pdf`;
-
-                const blob = new Blob([pdfBytes], { type: "application/pdf" });
-                const link = document.createElement("a");
-                link.href     = URL.createObjectURL(blob);
-                link.download = fileName;
+                const blob     = new Blob([pdfBytes], { type: "application/pdf" });
+                const link     = document.createElement("a");
+                link.href      = URL.createObjectURL(blob);
+                link.download  = `${user.firstName}_${user.lastName}_Kit_Retiro.pdf`;
                 link.click();
                 URL.revokeObjectURL(link.href);
             }
 
-            const mensaje = aUsers.length > 1
-                ? `${aUsers.length} documentos generados correctamente.`
-                : "Documento generado correctamente.";
-            MessageToast.show(mensaje);
+            MessageToast.show(
+                aUsers.length > 1
+                    ? `${aUsers.length} documentos generados correctamente.`
+                    : "Documento generado correctamente."
+            );
 
         } catch (error) {
             console.error("Error generando el Kit de Retiro:", error);
@@ -350,9 +316,6 @@ sap.ui.define([
         }
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
-
-    // ─── Word con JSZip + plantilla Kit_Retiro.docx ──────────────────────────
     async function _generateWord(data) {
         const JSZip         = await _ensureJSZip();
         const templateBytes = await fetch("pdf/Kit_Retiro.docx").then(res => {
@@ -361,29 +324,24 @@ sap.ui.define([
         });
         const zip = await JSZip.loadAsync(templateBytes);
 
-        const sCiudadFecha = data.sCity ? `${data.sCity}, ${data.localDate}` : data.localDate;
-        const sCertFecha   = `${_getDayMonth()} de ${_numToWords(new Date().getFullYear())} (${new Date().getFullYear()})`;
+        const sCiudadFecha = data.sCiudadWork ? `${data.sCiudadWork}, ${data.localDate}` : data.localDate;
+        const sCertFecha   = data.localDate; // ya viene formateado desde oController.getLocalDate()
 
         const variables = {
             "[[Nombre]]":      data.sNombre,
             "[[Cedula]]":      data.sCedula,
-            "[[Cargo]]":       data.sCargo,
             "[[CiudadWork]]":  data.sCiudadWork,
+            "[[Fecha]]":       data.localDate,
+            "[[Cargo]]":       data.sCargo,
             "[[Salario]]":     data.sSalario,
             "[[FechaIngreso]]": data.sIngreso,
             "[[FechaSalida]]": data.sSalida,
             "[[Identificado]]": data.sIdentif,
-            "[[CiudadFecha]]": sCiudadFecha,
-            "[[FechaCert]]":   sCertFecha
+            "[[CiudadFecha]]": data.sCiudadWork ? `${data.sCiudadWork}, ${data.localDate}` : data.localDate,
+            "[[FechaCert]]":   sCertFecha,
         };
 
-        const targets = [
-            "word/document.xml",
-            "word/header1.xml",
-            "word/header2.xml",
-            "word/footer1.xml",
-            "word/footer2.xml"
-        ];
+        const targets = ["word/document.xml", "word/header1.xml", "word/header2.xml", "word/footer1.xml", "word/footer2.xml"];
 
         for (const path of targets) {
             if (zip.files[path]) {
@@ -403,12 +361,13 @@ sap.ui.define([
 
         const blob = await zip.generateAsync({ type: "blob" });
         const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
+        link.href  = URL.createObjectURL(blob);
         link.download = `${data.firstName}_${data.lastName}_Kit_Retiro.docx`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
+        MessageToast.show("Documento Word generado correctamente.");
     }
 
     function _escXml(str) {
@@ -422,23 +381,12 @@ sap.ui.define([
     function _ensureJSZip() {
         if (window.JSZip) return Promise.resolve(window.JSZip);
         return new Promise((resolve, reject) => {
-            const script    = document.createElement("script");
-            script.src      = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload   = () => resolve(window.JSZip);
-            script.onerror  = () => reject(new Error("No se pudo cargar JSZip."));
+            const script   = document.createElement("script");
+            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+            script.onload  = () => resolve(window.JSZip);
+            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
             document.head.appendChild(script);
         });
-    }
-
-    function _formatDate(date) {
-        const d = new Date(date);
-        // Solo corregir timezone si el input es un string ISO (hireDate, empEndDate)
-        if (typeof date === "string") {
-            d.setDate(d.getDate() + 1);
-        }
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
     }
 
     function _loadImageAsBase64(sPath) {
@@ -453,43 +401,11 @@ sap.ui.define([
                 resolve(canvas.toDataURL("image/png"));
             };
             img.onerror = function () {
-                // Si no carga el QR, continuar sin él (no romper el documento)
                 resolve("");
             };
             img.src = sPath;
         });
     }
 
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _getDayMonth() {
-        const d = new Date();
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getDate()} de ${months[d.getMonth()]}`;
-    }
-
-    function _numToWords(year) {
-        const map = {
-            2020: "dos mil veinte",
-            2021: "dos mil veintiuno",
-            2022: "dos mil veintidós",
-            2023: "dos mil veintitrés",
-            2024: "dos mil veinticuatro",
-            2025: "dos mil veinticinco",
-            2026: "dos mil veintiséis",
-            2027: "dos mil veintisiete",
-            2028: "dos mil veintiocho",
-            2029: "dos mil veintinueve",
-            2030: "dos mil treinta"
-        };
-        return map[year] || String(year);
-    }
-
-    return {
-        onDownloadPDFKitRetiro
-    };
+    return { onDownloadPDFKitRetiro };
 });
