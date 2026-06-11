@@ -403,17 +403,98 @@ html,
   }
 
   .documentsHeader {
-    flex-wrap: wrap;
-    align-items: flex-start !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap;
+    align-items: center !important;
+    gap: 0.7rem;
+    margin: 1.55rem var(--page-gutter) 1.15rem var(--page-gutter) !important;
+    text-align: center;
   }
 
-  .documentSearchField {
-    margin-left: 0 !important;
+  .sectionTitle {
+    width: 100% !important;
+    font-size: 1.08rem !important;
+    line-height: 1.35rem !important;
+    text-align: center !important;
   }
 
+  .documentSearchField,
   .documentSearchField:focus-within,
   .documentSearchField.documentSearchFieldActive {
-    width: calc(100vw - 2rem) !important;
+    width: min(14.25rem, 100%) !important;
+    min-width: 0 !important;
+    max-width: min(14.25rem, 100%) !important;
+    height: 2rem !important;
+    min-height: 2rem !important;
+    margin-top: 0 !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    transform: none;
+  }
+
+  .documentSearchField .sapMSFF,
+  .documentSearchField:focus-within .sapMSFF,
+  .documentSearchField.documentSearchFieldActive .sapMSFF,
+  .documentSearchField.sapMFocus > .sapMSFF,
+  .documentSearchField.sapMSFVal > .sapMSFF,
+  .documentSearchField.sapMSFFocused > .sapMSFF {
+    height: 2rem !important;
+    min-height: 2rem !important;
+    border: 1px solid rgba(18, 55, 102, 0.16) !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.84) !important;
+    box-shadow: 0 4px 12px rgba(18, 55, 102, 0.08) !important;
+  }
+
+  .documentSearchField:hover {
+    transform: none;
+  }
+
+  .documentSearchField:hover .sapMSFF,
+  .documentSearchField:focus-within .sapMSFF,
+  .documentSearchField.documentSearchFieldActive .sapMSFF {
+    border-color: rgba(10, 110, 209, 0.42) !important;
+  }
+
+  .documentSearchField::before,
+  .documentSearchField:focus-within::before,
+  .documentSearchField.documentSearchFieldActive::before {
+    top: 0.62rem;
+    right: 0.78rem;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-width: 2px;
+    border-color: #123766;
+  }
+
+  .documentSearchField::after,
+  .documentSearchField:focus-within::after,
+  .documentSearchField.documentSearchFieldActive::after {
+    top: 1.12rem;
+    right: 0.66rem;
+    width: 0.34rem;
+    height: 2px;
+    background-color: #123766;
+  }
+
+  .documentSearchField .sapMSFI {
+    height: 2rem !important;
+    line-height: 2rem !important;
+    padding: 0 2rem 0 0.72rem !important;
+    font-size: 0.76rem !important;
+  }
+
+  .documentSearchField .sapMSFI::placeholder {
+    color: rgba(24, 48, 79, 0.58) !important;
+    font-style: normal;
+  }
+
+  .documentSearchField .sapMSFB,
+  .documentSearchField .sapMSFS,
+  .documentSearchField .sapMSFR {
+    width: 1.9rem !important;
+    height: 2rem !important;
+    line-height: 2rem !important;
   }
 }
 
@@ -1339,9 +1420,118 @@ html,
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.17), 0 7px 18px rgba(18, 55, 102, 0.22) !important;
 }
 
+.mobileHeaderMenuButton.sapMBtn {
+  display: none !important;
+}
+
+.mobileHeaderMenuPopover.sapMPopover {
+  border-radius: 8px !important;
+}
+
+.mobileHeaderMenuPopover .sapMPopoverCont {
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  box-shadow: 0 12px 28px rgba(18, 55, 102, 0.18) !important;
+}
+
+.mobileHeaderMenuContent {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem;
+  padding: 0.45rem !important;
+}
+
+.mobileHeaderMenuItem.sapMBtn {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.mobileHeaderMenuItem .sapMBtnInner {
+  justify-content: flex-start !important;
+  height: 2.25rem !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  color: #18304f !important;
+  text-align: left !important;
+}
+
+.mobileHeaderMenuItem .sapMBtnIcon {
+  color: #0a6ed1 !important;
+  font-size: 0.95rem !important;
+}
+
+.mobileHeaderMenuItem .sapMBtnContent {
+  color: #18304f !important;
+  font-family: var(--app-font-family) !important;
+  font-size: 0.86rem !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+}
+
+.mobileHeaderThemeRow {
+  min-height: 2.45rem;
+  padding: 0.45rem 0.55rem 0.35rem !important;
+  border-top: 1px solid rgba(18, 55, 102, 0.1);
+  box-sizing: border-box;
+}
+
+.mobileHeaderThemeLabel {
+  color: #304867 !important;
+  font-family: var(--app-font-family) !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+}
+
+.mobileThemeToggleButton.sapMBtn {
+  margin-left: 0.7rem !important;
+}
+
 @media (min-width: 701px) {
   .themeToggleButton.sapMBtn {
     margin-right: 1.20rem !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .customToolHeader {
+    height: 3rem !important;
+    padding: 0 1rem !important;
+  }
+
+  .headerLogo {
+    width: 76px !important;
+    height: 31px !important;
+  }
+
+  .headerNav,
+  .desktopThemeToggleButton.sapMBtn {
+    display: none !important;
+  }
+
+  .mobileHeaderMenuButton.sapMBtn {
+    display: inline-flex !important;
+    width: 2.25rem !important;
+    min-width: 2.25rem !important;
+    height: 2.25rem !important;
+    margin-left: auto !important;
+    padding: 0 !important;
+  }
+
+  .mobileHeaderMenuButton .sapMBtnInner {
+    width: 2.25rem !important;
+    min-width: 2.25rem !important;
+    height: 2.25rem !important;
+    padding: 0 !important;
+    border: 1px solid rgba(18, 55, 102, 0.12) !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    box-shadow: 0 5px 14px rgba(18, 55, 102, 0.13) !important;
+  }
+
+  .mobileHeaderMenuButton .sapMBtnIcon {
+    color: #123766 !important;
+    font-size: 1.05rem !important;
   }
 }
 
@@ -1419,6 +1609,39 @@ html.gdDarkMode .sapUiBody,
 
 .gdDarkMode .themeToggleButton:hover .sapMBtnInner {
   box-shadow: inset 0 0 0 1px rgba(184, 203, 225, 0.95), 0 8px 18px rgba(0, 0, 0, 0.36) !important;
+}
+
+.gdDarkMode .mobileHeaderMenuButton .sapMBtnInner {
+  border-color: rgba(142, 199, 255, 0.24) !important;
+  background: #17243a !important;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.34) !important;
+}
+
+.gdDarkMode .mobileHeaderMenuButton .sapMBtnIcon {
+  color: #d7e5f7 !important;
+}
+
+.gdDarkMode .mobileHeaderMenuPopover .sapMPopoverCont {
+  background: #111b2e !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42) !important;
+}
+
+.gdDarkMode .mobileHeaderMenuItem .sapMBtnInner {
+  background: transparent !important;
+  color: #d7e5f7 !important;
+}
+
+.gdDarkMode .mobileHeaderMenuItem .sapMBtnIcon {
+  color: #8ec7ff !important;
+}
+
+.gdDarkMode .mobileHeaderMenuItem .sapMBtnContent,
+.gdDarkMode .mobileHeaderThemeLabel {
+  color: #d7e5f7 !important;
+}
+
+.gdDarkMode .mobileHeaderThemeRow {
+  border-top-color: rgba(142, 199, 255, 0.18);
 }
 
 .gdDarkMode .imageContainer {
@@ -1974,5 +2197,295 @@ html.gdThemeTransitionReady .card-horizontal {
   html.gdThemeTransitionReady *::before,
   html.gdThemeTransitionReady *::after {
     transition-duration: 1ms !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .gdDarkMode .documentSearchField .sapMSFF,
+  .gdDarkMode .documentSearchField:focus-within .sapMSFF,
+  .gdDarkMode .documentSearchField.documentSearchFieldActive .sapMSFF,
+  .gdDarkMode .documentSearchField.sapMFocus > .sapMSFF,
+  .gdDarkMode .documentSearchField.sapMSFVal > .sapMSFF,
+  .gdDarkMode .documentSearchField.sapMSFFocused > .sapMSFF {
+    border: 1px solid rgba(142, 199, 255, 0.28) !important;
+    border-radius: 8px !important;
+    background: rgba(16, 30, 48, 0.78) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .gdDarkMode .documentSearchField:hover .sapMSFF,
+  .gdDarkMode .documentSearchField:focus-within .sapMSFF,
+  .gdDarkMode .documentSearchField.documentSearchFieldActive .sapMSFF {
+    border-color: rgba(142, 199, 255, 0.5) !important;
+  }
+
+  .gdDarkMode .documentSearchField::before,
+  .gdDarkMode .documentSearchField:focus-within::before,
+  .gdDarkMode .documentSearchField.documentSearchFieldActive::before {
+    border-color: #8ec7ff;
+  }
+
+  .gdDarkMode .documentSearchField::after,
+  .gdDarkMode .documentSearchField:focus-within::after,
+  .gdDarkMode .documentSearchField.documentSearchFieldActive::after {
+    background-color: #8ec7ff;
+  }
+}
+
+@media (max-width: 700px) {
+  .employeeDialog.sapMDialog {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+    max-height: calc(100dvh - 1rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .employeeDialogHeader.sapMTB {
+    align-items: flex-start !important;
+    min-height: calc(4.55rem + env(safe-area-inset-top, 0px)) !important;
+    padding: calc(0.9rem + env(safe-area-inset-top, 0px)) 0.72rem 0.62rem !important;
+    overflow: visible !important;
+  }
+
+  .employeeDialogHeaderInfo {
+    align-items: flex-start !important;
+    padding-top: 0.05rem !important;
+  }
+
+  .employeeDialogTitleBlock {
+    gap: 0.16rem;
+    overflow: visible !important;
+  }
+
+  .employeeDialogTitle {
+    display: block !important;
+    min-height: 1.15rem !important;
+    max-width: 100% !important;
+    font-size: 0.9rem !important;
+    line-height: 1.22 !important;
+    overflow: visible !important;
+  }
+
+  .employeeDialogSubtitle {
+    max-height: 2.05rem;
+    font-size: 0.67rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .employeeDialogCloseButton .sapMBtnInner {
+    width: 1.85rem !important;
+    min-width: 1.85rem !important;
+    height: 1.85rem !important;
+    border-radius: 7px !important;
+  }
+
+  .employeeDialogCloseButton .sapMBtnIcon {
+    font-size: 0.88rem !important;
+  }
+
+  .employeeDialog .sapMDialogScroll {
+    max-height: calc(100dvh - 6.4rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .employeeDialog .customTable {
+    max-height: calc(100dvh - 16.2rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .sapMBar {
+    min-height: 3rem !important;
+    padding: 0.42rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .sapMBarRight,
+  .employeeDialog .sapMDialogFooter .sapMBarContainer {
+    justify-content: flex-end !important;
+    gap: 0.55rem;
+    flex-wrap: nowrap !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .sapMBtn {
+    flex: 0 0 auto !important;
+  }
+
+  .wordButtonCustom.sapMBtn,
+  .pdfButtonCustom.sapMBtn,
+  .docusignButtonCustom.sapMBtn {
+    width: 2.35rem !important;
+    min-width: 2.35rem !important;
+    margin: 0 !important;
+  }
+
+  .wordButtonCustom .sapMBtnInner,
+  .pdfButtonCustom .sapMBtnInner,
+  .docusignButtonCustom .sapMBtnInner {
+    width: 2.35rem !important;
+    min-width: 2.35rem !important;
+    max-width: 2.35rem !important;
+    height: 2rem !important;
+    padding: 0 !important;
+    border-radius: 7px !important;
+  }
+
+  .wordButtonCustom .sapMBtnContent,
+  .pdfButtonCustom .sapMBtnContent,
+  .docusignButtonCustom .sapMBtnContent {
+    display: none !important;
+  }
+
+  .wordButtonCustom .sapMBtnIcon,
+  .pdfButtonCustom .sapMBtnIcon,
+  .docusignButtonCustom .sapMBtnIcon {
+    margin: 0 !important;
+    font-size: 0.86rem !important;
+    line-height: 2rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .employeeDialogHeader.sapMTB {
+    min-height: calc(4.9rem + env(safe-area-inset-top, 0px)) !important;
+  }
+
+  .employeeDialogTitle {
+    font-size: 0.86rem !important;
+  }
+
+  .employeeDialogSubtitle {
+    max-height: 2.35rem;
+  }
+
+  .employeeDialog .customTable {
+    max-height: calc(100dvh - 17.2rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .employeeDialog .sapMDialogFooter .sapMBarRight {
+    gap: 0.8rem !important;
+    padding-right: 0.15rem !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .sapMBarRight .sapMBtn + .sapMBtn,
+  .employeeDialog .sapMDialogFooter .sapMBarContainer .sapMBtn + .sapMBtn {
+    margin-left: 0.7rem !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .sapMBarRight .sapMBarChild + .sapMBarChild,
+  .employeeDialog .sapMDialogFooter .sapMBarContainer .sapMBarChild + .sapMBarChild {
+    margin-left: 0.7rem !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .employeeDialog .sapMDialogFooter .pdfButtonCustom.sapMBtn,
+  .employeeDialog .sapMDialogFooter [id$="pdfDataInfo"].sapMBtn {
+    margin-left: 0.9rem !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .docusignButtonCustom.sapMBtn,
+  .employeeDialog .sapMDialogFooter [id$="docusignDataInfo"].sapMBtn {
+    margin-left: 0.9rem !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .pdfButtonCustom .sapMBtnInner,
+  .employeeDialog .sapMDialogFooter [id$="pdfDataInfo"] .sapMBtnInner,
+  .employeeDialog .sapMDialogFooter .docusignButtonCustom .sapMBtnInner,
+  .employeeDialog .sapMDialogFooter [id$="docusignDataInfo"] .sapMBtnInner {
+    margin-left: 0 !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .mobileHeaderMenuButton .sapMBtnInner,
+  .gdDarkMode .mobileHeaderMenuButton .sapMBtnInner {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .employeeDialog .sapMDialogFooter .sapMBar {
+    min-height: 3.65rem !important;
+    padding: 0.52rem 0.95rem calc(0.88rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .sapMBarRight,
+  .employeeDialog .sapMDialogFooter .sapMBarContainer {
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.72rem !important;
+  }
+
+  .wordButtonCustom.sapMBtn,
+  .pdfButtonCustom.sapMBtn,
+  .docusignButtonCustom.sapMBtn {
+    width: 2.55rem !important;
+    min-width: 2.55rem !important;
+    height: 2.25rem !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .pdfButtonCustom.sapMBtn,
+  .employeeDialog .sapMDialogFooter [id$="pdfDataInfo"].sapMBtn,
+  .employeeDialog .sapMDialogFooter .docusignButtonCustom.sapMBtn,
+  .employeeDialog .sapMDialogFooter [id$="docusignDataInfo"].sapMBtn {
+    margin-left: 0.65rem !important;
+  }
+
+  .wordButtonCustom .sapMBtnInner,
+  .pdfButtonCustom .sapMBtnInner,
+  .docusignButtonCustom .sapMBtnInner {
+    width: 2.55rem !important;
+    min-width: 2.55rem !important;
+    max-width: 2.55rem !important;
+    height: 2.25rem !important;
+    border-radius: 9px !important;
+    box-shadow: 0 5px 12px rgba(18, 55, 102, 0.18) !important;
+  }
+
+  .wordButtonCustom .sapMBtnIcon,
+  .pdfButtonCustom .sapMBtnIcon,
+  .docusignButtonCustom .sapMBtnIcon {
+    font-size: 0.92rem !important;
+    line-height: 2.25rem !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .employeeDialog .sapMDialogFooter .wordButtonCustom.sapMBtn,
+  .employeeDialog .sapMDialogFooter [id$="wordDataInfo"].sapMBtn {
+    position: relative !important;
+    transform: translateX(-0.5rem) !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .pdfButtonCustom.sapMBtn,
+  .employeeDialog .sapMDialogFooter [id$="pdfDataInfo"].sapMBtn {
+    position: relative !important;
+    transform: translateX(0.5rem) !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .docusignButtonCustom.sapMBtn,
+  .employeeDialog .sapMDialogFooter [id$="docusignDataInfo"].sapMBtn {
+    position: relative !important;
+    transform: translateX(1.5rem) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .employeeDialog .sapMDialogFooter {
+    padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .sapMBar {
+    height: 4.75rem !important;
+    min-height: 4.75rem !important;
+    padding: 0.55rem 0.95rem calc(1.55rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .employeeDialog .sapMDialogFooter .sapMBarRight,
+  .employeeDialog .sapMDialogFooter .sapMBarContainer {
+    align-items: flex-start !important;
+    padding-bottom: calc(1.15rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 }

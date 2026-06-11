@@ -23,13 +23,14 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/contratoTerminoFijo",
   "gestordoccolombia/controller/functions/contratoTerminoIndef",
   "gestordoccolombia/controller/functions/contratoAprendizajeLectivo",
-  "gestordoccolombia/controller/functions/contratoAprendizajeProductivo"
+  "gestordoccolombia/controller/functions/contratoAprendizajeProductivo",
+  "gestordoccolombia/service/CpiService"
 
 ], (Controller, JSONModel, MessageToast, LibraryLoader, uiHelpers, formatHelpers,
     kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11,
     otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion,
     compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante,
-    protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo, contratoTerminoIndef, contratoAprendizajeLectivo, contratoAprendizajeProductivo) => {
+    protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo, contratoTerminoIndef, contratoAprendizajeLectivo, contratoAprendizajeProductivo, CpiService) => {
   "use strict";
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -368,6 +369,52 @@ sap.ui.define([
       const oViewModel = this.getOwnerComponent().getModel("view");
       const bDarkMode  = !(oViewModel && oViewModel.getProperty("/IsDarkMode"));
       this._applyThemeMode(bDarkMode);
+    },
+
+    _scrollToHome: function () {
+      const oPage = this.byId("contentContainer");
+      const oPageDom = oPage && oPage.getDomRef && oPage.getDomRef();
+      const oScrollDom = oPageDom && (oPageDom.querySelector(".sapMPageEnableScrolling") || oPageDom.querySelector(".sapMPageScroll") || oPageDom);
+
+      if (oScrollDom && typeof oScrollDom.scrollTo === "function") {
+        oScrollDom.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (window.scrollTo) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    },
+
+    onSelectHeader: function (oEvent) {
+      const sKey = oEvent && oEvent.getParameter && oEvent.getParameter("selectedKey");
+      if (!sKey || sKey === "1") {
+        this._scrollToHome();
+      }
+    },
+
+    onOpenMobileHeaderMenu: function (oEvent) {
+      const oPopover = this.byId("mobileHeaderMenuPopover");
+      if (oPopover) {
+        oPopover.openBy(oEvent.getSource());
+      }
+    },
+
+    _closeMobileHeaderMenu: function () {
+      const oPopover = this.byId("mobileHeaderMenuPopover");
+      if (oPopover && oPopover.isOpen()) {
+        oPopover.close();
+      }
+    },
+
+    onMobileHeaderHomePress: function () {
+      this._closeMobileHeaderMenu();
+      this._scrollToHome();
+    },
+
+    onMobileToggleTheme: function () {
+      this.onToggleTheme();
+      this._closeMobileHeaderMenu();
     },
 
 
@@ -1605,6 +1652,45 @@ sap.ui.define([
     onDownloadPDFContratoTerminoIndef:   async function (sButtonId) { contratoTerminoIndef.onDownloadPDFContratoTerminoIndef(this, sButtonId); },
     onDownloadPDFContratoAprendizajeLectivo: async function (sButtonId) { contratoAprendizajeLectivo.onDownloadPDFContratoAprendizajeLectivo(this, sButtonId); },
     onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); },
+
+    onSendToDocusign: async function (oEvent) {
+      if (this._currentCategory !== "contratoTerminoFijo" || this.sSelectedContract !== "Contrato Término Fijo") {
+        MessageToast.show("Por ahora solo está disponible el envío a DocuSign para Contrato Término Fijo.");
+        return;
+      }
+
+      const oButton = oEvent?.getSource?.();
+      if (oButton?.setBusy) {
+        oButton.setBusy(true);
+      }
+
+      try {
+        await this._withBusy(async () => {
+          const aDocuments = await contratoTerminoFijo.generateContratoTerminoFijoPdfDocuments(this);
+
+          if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
+            MessageToast.show("Seleccione al menos un colaborador.");
+            return;
+          }
+
+          for (let i = 0; i < aDocuments.length; i++) {
+            const oDocument = aDocuments[i];
+            const oPayload = await CpiService.buildTerminoFijoPayload(oDocument);
+            const oCpiResponse = await CpiService.sendTerminoFijoToCPI(oPayload);
+            console.log("Respuesta CPI DocuSign Contrato Término Fijo:", oCpiResponse);
+          }
+
+          MessageToast.show("Contrato enviado a DocuSign correctamente.");
+        });
+      } catch (oError) {
+        console.error("No se pudo enviar el contrato a DocuSign:", oError);
+        MessageToast.show("No se pudo enviar el contrato a DocuSign. Intentalo nuevamente.");
+      } finally {
+        if (oButton?.setBusy) {
+          oButton.setBusy(false);
+        }
+      }
+    },
 
     _debugCountryCodes: function () {
       const oModel = this.getOwnerComponent().getModel();

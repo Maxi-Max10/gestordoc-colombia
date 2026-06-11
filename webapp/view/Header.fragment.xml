@@ -4,12 +4,13 @@
     xmlns:tnt="sap.tnt">
 
     <tnt:ToolHeader id="_IDGenToolHeader1" class="customToolHeader">
-         <Image id="_IDGenImageeee"
-        alt="Logo"
-        width="120px"
-        class="headerLogo"
-    />
-      <ToolbarSpacer id="_IDGenToolbarSpacer" width="1rem" />
+        <Image
+            id="_IDGenImageeee"
+            alt="Logo"
+            width="120px"
+            class="headerLogo"
+        />
+        <ToolbarSpacer id="_IDGenToolbarSpacer" width="1rem" />
         <IconTabHeader
             id="iconTabHeader"
             selectedKey="invalidKey"
@@ -17,12 +18,12 @@
             mode="Inline"
             select="onSelectHeader"
             class="headerNav">
-            
+
             <layoutData>
                 <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData2" priority="NeverOverflow" shrinkable="true"/>
             </layoutData>
             <items>
-                <IconTabFilter id="_IDGenIconTabFilter" text="Inicio" key="1"  />
+                <IconTabFilter id="_IDGenIconTabFilter" text="Inicio" key="1" />
             </items>
         </IconTabHeader>
         <Button
@@ -31,13 +32,56 @@
             type="Transparent"
             tooltip="{view>/ThemeToggleTooltip}"
             press="onToggleTheme"
-            class="themeToggleButton"
+            class="themeToggleButton desktopThemeToggleButton"
         >
             <layoutData>
                 <OverflowToolbarLayoutData id="_IDGenThemeToggleLayoutData" priority="NeverOverflow" />
             </layoutData>
         </Button>
-
+        <Button
+            id="mobileHeaderMenuButton"
+            icon="sap-icon://menu2"
+            type="Transparent"
+            tooltip="Abrir menu"
+            press="onOpenMobileHeaderMenu"
+            class="mobileHeaderMenuButton"
+        >
+            <layoutData>
+                <OverflowToolbarLayoutData id="_IDGenMobileHeaderMenuLayoutData" priority="NeverOverflow" />
+            </layoutData>
+        </Button>
     </tnt:ToolHeader>
+
+    <Popover
+        id="mobileHeaderMenuPopover"
+        showHeader="false"
+        placement="Bottom"
+        contentWidth="12.5rem"
+        class="mobileHeaderMenuPopover">
+        <VBox class="mobileHeaderMenuContent">
+            <Button
+                id="mobileHeaderHomeButton"
+                text="Inicio"
+                icon="sap-icon://home"
+                type="Transparent"
+                press="onMobileHeaderHomePress"
+                class="mobileHeaderMenuItem"
+            />
+            <HBox
+                alignItems="Center"
+                justifyContent="SpaceBetween"
+                class="mobileHeaderThemeRow">
+                <Text text="Modo oscuro" class="mobileHeaderThemeLabel" />
+                <Button
+                    id="mobileThemeToggleButton"
+                    text="{view>/ThemeToggleText}"
+                    type="Transparent"
+                    tooltip="{view>/ThemeToggleTooltip}"
+                    press="onMobileToggleTheme"
+                    class="themeToggleButton mobileThemeToggleButton"
+                />
+            </HBox>
+        </VBox>
+    </Popover>
 
 </core:FragmentDefinition>

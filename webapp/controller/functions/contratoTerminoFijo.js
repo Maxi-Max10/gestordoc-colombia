@@ -3,7 +3,12 @@ sap.ui.define([
 ], function (MessageToast) {
     "use strict";
 
-    async function onDownloadPDFContratoTerminoFijo(oController, sButtonId) {
+    async function onDownloadPDFContratoTerminoFijo(oController, sButtonId, mOptions) {
+        const oOptions = mOptions || {};
+        const sActionButtonId = sButtonId || "";
+        const bReturnPdfDocuments = !!oOptions.returnPdfDocuments;
+        const aGeneratedPdfDocuments = [];
+
         try {
             await oController._ensurePdfToolkit();
 
@@ -16,8 +21,10 @@ sap.ui.define([
 
             const aUsers = oController.getSelectedUsers();
             if (aUsers.length === 0) {
-                MessageToast.show("Seleccione al menos un colaborador.");
-                return;
+                if (!bReturnPdfDocuments) {
+                    MessageToast.show("Seleccione al menos un colaborador.");
+                }
+                return bReturnPdfDocuments ? [] : undefined;
             }
 
             for (let i = 0; i < aUsers.length; i++) {
@@ -38,7 +45,7 @@ sap.ui.define([
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
 
                 // ── Word ─────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
+                if (sActionButtonId.includes("wordDataInfo")) {
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
@@ -1654,6 +1661,17 @@ sap.ui.define([
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Contrato_TerminoFijo.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
+
+                if (bReturnPdfDocuments) {
+                    aGeneratedPdfDocuments.push({
+                        user,
+                        fileName,
+                        blob,
+                        pdfBytes
+                    });
+                    continue;
+                }
+
                 const link     = document.createElement("a");
                 link.href      = URL.createObjectURL(blob);
                 link.download  = fileName;
@@ -1661,7 +1679,11 @@ sap.ui.define([
                 URL.revokeObjectURL(link.href);
             }
 
-            if (!sButtonId.includes("wordDataInfo")) {
+            if (bReturnPdfDocuments) {
+                return aGeneratedPdfDocuments;
+            }
+
+            if (!sActionButtonId.includes("wordDataInfo")) {
                 MessageToast.show(
                     aUsers.length > 1
                         ? `${aUsers.length} documentos generados correctamente.`
@@ -1670,9 +1692,20 @@ sap.ui.define([
             }
 
         } catch (error) {
-            console.error("Error generando Contrato Indefinido:", error);
+            console.error("Error generando Contrato Termino Fijo:", error);
+            if (oOptions.throwErrors) {
+                throw error;
+            }
             MessageToast.show("Error generando el documento: " + error.message);
+            return bReturnPdfDocuments ? [] : undefined;
         }
+    }
+
+    async function generateContratoTerminoFijoPdfDocuments(oController) {
+        return onDownloadPDFContratoTerminoFijo(oController, "pdfDataInfo", {
+            returnPdfDocuments: true,
+            throwErrors: true
+        });
     }
 
     // ─── Word ─────────────────────────────────────────────────────────────────
@@ -1747,5 +1780,8 @@ sap.ui.define([
         return `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
     }
 
-    return { onDownloadPDFContratoTerminoFijo };
+    return {
+        onDownloadPDFContratoTerminoFijo,
+        generateContratoTerminoFijoPdfDocuments
+    };
 });
