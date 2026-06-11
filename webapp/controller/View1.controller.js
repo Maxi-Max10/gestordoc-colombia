@@ -724,8 +724,8 @@ sap.ui.define([
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
           const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
           user.nationalId         = ccEntry?.nationalId ?? "";
-          user.docCardType       = nationalIdResults[0]?.cardType ?? "";  // ← para documento de identificacion
-          user.originalStartDate = user.empInfo?.originalStartDate || null; // ← fecha de ingreso original (sin cambios por reingresos)
+          user.docCardType        = nationalIdResults[0]?.cardType ?? "";
+          user.originalStartDate  = user.empInfo?.originalStartDate || null;
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
           user.docExpeditionDate  = ccEntry?.customDate1 || null;
           user.bloodType          = user.custom05Nav?.localeLabel || "";
@@ -733,11 +733,12 @@ sap.ui.define([
           user.hasDependents      = user.custom15 || "";
           user.dateOfBirth        = user.dateOfBirth || null;
 
-          // Inicializar campos de manager vacíos hasta que llegue EmpJob
-          user.managerName    = "";
-          user.managerEmail   = "";
-          user.managerJobCode = "";
-          user.managerId      = "";
+          // Inicializar campos vacíos hasta que llegue EmpJob
+          user.managerName      = "";
+          user.managerEmail     = "";
+          user.managerJobCode   = "";
+          user.managerId        = "";
+          user.paymentFrequency = ""; // se llenará desde EmpJob
 
           user.salut = user.salutation === "3526" ? "Sra."
                     : user.salutation === "3525" ? "Sr."
@@ -761,11 +762,29 @@ sap.ui.define([
           return user;
         });
 
-        // ── Segunda llamada: manager desde EmpJob ──────────────────────
+        // ── Segunda llamada: manager + paymentFrequency desde EmpJob ──────
         try {
-          const userIds  = enrichedUsers.map(u => u.userId).filter(Boolean);
+          const userIds   = enrichedUsers.map(u => u.userId).filter(Boolean);
           const chunkSize = 50;
           const managerMap = {};
+
+          // ── Mapa de PayScaleArea ──────────────────────────────────────────
+          const payScaleAreaMap = {};
+          try {
+            const psaData = await this._readOData(oComponentModel, "/PayScaleArea", {
+              urlParameters: {
+                "$select": "code,externalName_defaultValue"
+              }
+            });
+            (psaData?.results || []).forEach(psa => {
+              if (psa.code) payScaleAreaMap[psa.code] = psa.externalName_defaultValue 
+                ? `${psa.externalName_defaultValue} (${psa.code})` 
+                : psa.code; //Para que en el Area, me traiga el nombre y el código
+            });
+          } catch (e) {
+            console.warn("No se pudo cargar PayScaleArea:", e);
+          }
+          // ─────────────────────────────────────────────────────────────────
 
           for (let i = 0; i < userIds.length; i += chunkSize) {
             const chunk     = userIds.slice(i, i + chunkSize);
@@ -773,23 +792,32 @@ sap.ui.define([
 
             const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
               urlParameters: {
-                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/defaultFullName,managerUserNav/email,managerUserNav/jobCode",
+                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,payScaleArea",
                 "$filter": `(${filterIds})`,
-                "$expand": "managerUserNav"
+                "$expand": "managerUserNav,payGroupNav,locationNav"
               }
             });
 
             const empJobResults = Array.isArray(empJobData?.results) ? empJobData.results : [];
+
+            const PAY_GROUP_LABELS = {
+              "Q2": "QUINCENAL",
+              "M1": "MENSUAL",
+              "M2": "MENSUAL",
+              "S1": "SEMANAL",
+            };
+
             empJobResults.forEach(job => {
               if (job.userId) {
                 managerMap[job.userId] = {
-                  managerId:      job.managerId                          || "",
-                  managerName: (job.managerUserNav?.defaultFullName || "")
-                    .replace(/\b\d+\b/g, "")
-                    .replace(/\s{2,}/g, " ")
+                  managerId:        job.managerId || "",
+                  managerName:      (job.managerUserNav?.displayName || "")
                     .trim(),
-                  managerEmail:   job.managerUserNav?.email              || "",
-                  managerJobCode: (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, "")
+                  managerEmail:     job.managerUserNav?.email || "",
+                  managerJobCode:   (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, ""),
+                  paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || ""),
+                  planta:           job.locationNav?.name || job.location || "",
+                  area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || ""
                 };
               }
             });
@@ -797,16 +825,19 @@ sap.ui.define([
 
           enrichedUsers.forEach(user => {
             const mgr = managerMap[user.userId] || {};
-            user.managerId      = mgr.managerId      || "";
-            user.managerName    = mgr.managerName    || "";
-            user.managerEmail   = mgr.managerEmail   || "";
-            user.managerJobCode = mgr.managerJobCode || "";
+            user.managerId        = mgr.managerId        || "";
+            user.managerName      = mgr.managerName      || "";
+            user.managerEmail     = mgr.managerEmail     || "";
+            user.managerJobCode   = mgr.managerJobCode   || "";
+            user.paymentFrequency = mgr.paymentFrequency || "";
+            user.planta           = mgr.planta           || "";
+            user.area             = mgr.area             || ""
           });
 
         } catch (e) {
           console.warn("No se pudieron cargar los managers desde EmpJob:", e);
         }
-        // ──────────────────────────────────────────────────────────────
+        // ──────────────────────────────────────────────────────────────────
 
         this.getView().setModel(new JSONModel({ User: enrichedUsers }));
         this._activeEmployeesLoaded = true;
@@ -908,28 +939,47 @@ sap.ui.define([
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
           const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
           user.nationalId         = ccEntry?.nationalId ?? "";
-          user.docCardType       = nationalIdResults[0]?.cardType ?? "";  // ← para documento de identificacion
-          user.originalStartDate = user.empInfo?.originalStartDate || null; // ← fecha de ingreso original (sin cambios por reingresos)
+          user.docCardType        = nationalIdResults[0]?.cardType ?? "";
+          user.originalStartDate  = user.empInfo?.originalStartDate || null;
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
           user.docExpeditionDate  = ccEntry?.customDate1 || null;
           user.addressLine1       = user.addressLine1 || "";
           user.hasDependents      = user.custom15 || "";
           user.dateOfBirth        = user.dateOfBirth || null;
 
-          // Inicializar campos de manager vacíos hasta que llegue EmpJob
-          user.managerName    = "";
-          user.managerEmail   = "";
-          user.managerJobCode = "";
-          user.managerId      = "";
+          // Inicializar campos vacíos hasta que llegue EmpJob
+          user.managerName      = "";
+          user.managerEmail     = "";
+          user.managerJobCode   = "";
+          user.managerId        = "";
+          user.paymentFrequency = ""; // se llenará desde EmpJob
 
           aUsers.push(user);
         });
 
-        // ── Segunda llamada: manager desde EmpJob ──────────────────────
+        // ── Segunda llamada: manager + paymentFrequency desde EmpJob ──────
         try {
           const userIds   = aUsers.map(u => u.userId).filter(Boolean);
           const chunkSize = 50;
           const managerMap = {};
+
+          // ── Mapa de PayScaleArea ──────────────────────────────────────────
+          const payScaleAreaMap = {};
+          try {
+            const psaData = await this._readOData(oComponentModel, "/PayScaleArea", {
+              urlParameters: {
+                "$select": "code,externalName_defaultValue"
+              }
+            });
+            (psaData?.results || []).forEach(psa => {
+              if (psa.code) payScaleAreaMap[psa.code] = psa.externalName_defaultValue 
+                ? `${psa.externalName_defaultValue} (${psa.code})` 
+                : psa.code; //Para que en el Area, me traiga el nombre y el código
+            });
+          } catch (e) {
+            console.warn("No se pudo cargar PayScaleArea:", e);
+          }
+          // ─────────────────────────────────────────────────────────────────
 
           for (let i = 0; i < userIds.length; i += chunkSize) {
             const chunk     = userIds.slice(i, i + chunkSize);
@@ -937,20 +987,30 @@ sap.ui.define([
 
             const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
               urlParameters: {
-                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/defaultFullName,managerUserNav/email,managerUserNav/jobCode",
+                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,payScaleArea",
                 "$filter": `(${filterIds})`,
-                "$expand": "managerUserNav"
+                "$expand": "managerUserNav,payGroupNav,locationNav"
               }
             });
 
             const empJobResults = Array.isArray(empJobData?.results) ? empJobData.results : [];
+
+            const PAY_GROUP_LABELS = {
+              "Q2": "QUINCENAL",
+              "M1": "MENSUAL",
+              "S1": "SEMANAL"
+            };
+
             empJobResults.forEach(job => {
               if (job.userId) {
                 managerMap[job.userId] = {
-                  managerId:      job.managerId                          || "",
-                  managerName:    job.managerUserNav?.defaultFullName    || "",
-                  managerEmail:   job.managerUserNav?.email              || "",
-                  managerJobCode: (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, "")
+                  managerId:        job.managerId || "",
+                  managerName:      job.managerUserNav?.displayName || "",
+                  managerEmail:     job.managerUserNav?.email || "",
+                  managerJobCode:   (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, ""),
+                  paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || ""),
+                  planta:           job.locationNav?.name || job.location || "",
+                  area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || ""
                 };
               }
             });
@@ -958,16 +1018,19 @@ sap.ui.define([
 
           aUsers.forEach(user => {
             const mgr = managerMap[user.userId] || {};
-            user.managerId      = mgr.managerId      || "";
-            user.managerName    = mgr.managerName    || "";
-            user.managerEmail   = mgr.managerEmail   || "";
-            user.managerJobCode = mgr.managerJobCode || "";
+            user.managerId        = mgr.managerId        || "";
+            user.managerName      = mgr.managerName      || "";
+            user.managerEmail     = mgr.managerEmail     || "";
+            user.managerJobCode   = mgr.managerJobCode   || "";
+            user.paymentFrequency = mgr.paymentFrequency || "";
+            user.planta           = mgr.planta           || "";
+            user.area             = mgr.area             || ""
           });
 
         } catch (e) {
           console.warn("No se pudieron cargar los managers desde EmpJob (inactivos):", e);
         }
-        // ──────────────────────────────────────────────────────────────
+        // ──────────────────────────────────────────────────────────────────
 
         this.getView().setModel(new JSONModel({ InactiveUsers: aUsers }), "inactive");
         this._inactiveEmployeesLoaded = true;

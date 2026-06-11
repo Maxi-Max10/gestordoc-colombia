@@ -27,8 +27,13 @@ sap.ui.define([
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                const sNombre = `${user.firstName} ${user.lastName}`;
-                const sCedula = user.nationalId || "";
+                const sNombre      = `${user.firstName} ${user.lastName}`;
+                const sCedula      = user.nationalId || "";
+                const sCiudadWork  = oController.getCiudadWork(user);
+                const localDate    = oController.getLocalDate();
+                const sCargo      = oController.resolveGender(user.title || "", user.gender);
+                const sPlanta      = user.planta || "";
+                const sArea      = user.area || "";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -46,7 +51,7 @@ sap.ui.define([
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        Yo, <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u> identificado con documento de identidad N° <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u> declaro que he recibido la socialización del contenido del Reglamento Interno de Trabajo, Comité de convivencia Laboral y Política de Alcohol, Tabaco y Drogas.
+                        Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido la socialización del contenido del Reglamento Interno de Trabajo, Comité de convivencia Laboral y Política de Alcohol, Tabaco y Drogas.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
@@ -68,13 +73,13 @@ sap.ui.define([
                     <div style="width:100%;border:1px solid #000;border-collapse:collapse;display:table;margin-top:20px;">
                         <div style="display:table-row;">
                             <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Fecha:</strong>
+                                <strong>Fecha:</strong> ${localDate}
                             </div>
                             <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Planta:</strong>
+                                <strong>Planta:</strong> ${sPlanta}
                             </div>
                             <div style="display:table-cell;width:34%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Área:</strong>
+                                <strong>Área:</strong> ${sArea}
                             </div>
                         </div>
                     </div>

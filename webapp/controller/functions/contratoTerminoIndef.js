@@ -28,11 +28,15 @@ sap.ui.define([
                 }
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
-                const sCedula      = user.nationalId   || "";
-                const sCargo       = user.title        || "";
-                const sCiudadWork  = user.division     || "";
-                const sSalario     = _formatSalary(user.paycompvalue);
-                const sHireDate    = _formatDateLong(user.hireDate);
+                const sCedula      = user.nationalId || "";
+                const sCiudadWork  = oController.getCiudadWork(user);
+                const localDate    = oController.getLocalDate();
+                const sCargo      = oController.resolveGender(user.title || "", user.gender);
+                const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
+                const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
+                const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -199,11 +203,11 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;"></td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">QUINCENAL</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;"></td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO INDEFINIDO</td></tr>
                     </table>
@@ -1508,14 +1512,14 @@ sap.ui.define([
                                     font-weight:bold;
                                     min-height:18px;
                                 ">
-                                    XXXXXXXXXXXXX
+                                    ${sNombre}
                                 </div>
 
                                 <div style="
                                     margin-top:2px;
                                     font-weight:bold;
                                 ">
-                                    CC.XXXXXXXXXXXXX
+                                    CC. ${sCedula}
                                 </div>
 
                             </div>
@@ -1681,6 +1685,7 @@ sap.ui.define([
             "[[Ciudad]]":     data.sCiudadWork,
             "[[Salario]]":    data.sSalario,
             "[[FechaInicio]]":data.sHireDate
+            
         };
 
         const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];

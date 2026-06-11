@@ -43,6 +43,7 @@ sap.ui.define([
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sActionButtonId.includes("wordDataInfo")) {
@@ -212,7 +213,7 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">QUINCENAL</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Un (1) mes</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO FIJO</td></tr>
@@ -1530,11 +1531,11 @@ sap.ui.define([
                                 padding-top:6px;
                                 min-height:18px;
                             ">
-                                XXXXXXXXXXXXXXXXX
+                                ${sNombre}
                             </div>
 
                             <div style="margin-top:2px;font-weight:bold;">
-                                C.C XXXXXXXXXXXX
+                                C.C ${sCedula}
                             </div>
 
                         </div>

@@ -23,7 +23,7 @@ sap.ui.define([
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
 
-                /* DEBUG: revisar datos del usuario antes de generar documento
+                /* DEBUG: para revisar datos del usuario antes de generar documento
                 console.log(
                     "country:", user.country,
                     "email:", user.email,
@@ -63,8 +63,10 @@ sap.ui.define([
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre,
-                        sCedula
+                        sNombre, sCedula, sCiudadWork, localDate,
+                        sCargo, sPais, sTelefono, sEmail,
+                        sNacional, sSexo, sEstadoCivil, sGrupoSangre,
+                        sDireccion, sFechaExpedicion, sJefeNombre, sDocCardType, sFechaNacimiento
                     });
                     continue;
                 }
@@ -1311,10 +1313,24 @@ sap.ui.define([
         const zip = await JSZip.loadAsync(templateBytes);
 
         const variables = {
-            "[[Nombre]]": data.sNombre,
-            "[[Cedula]]": data.sCedula
+            "[[Nombre]]":          data.sNombre,
+            "[[Cedula]]":          data.sCedula,
+            "[[CiudadWork]]":      data.sCiudadWork,
+            "[[Fecha]]":           data.localDate,
+            "[[Cargo]]":           data.sCargo,
+            "[[Pais]]":            data.sPais,
+            "[[Telefono]]":        data.sTelefono,
+            "[[Email]]":           data.sEmail,
+            "[[Nacionalidad]]":    data.sNacional,
+            "[[Sexo]]":            data.sSexo,
+            "[[EstadoCivil]]":     data.sEstadoCivil,
+            "[[GrupoSanguineo]]":  data.sGrupoSangre,
+            "[[Direccion]]":       data.sDireccion,
+            "[[FechaExpedicion]]": data.sFechaExpedicion,
+            "[[JefeNombre]]":      data.sJefeNombre,
+            "[[DocCardType]]":     data.sDocCardType,
+            "[[FechaNacimiento]]": data.sFechaNacimiento
         };
-
         const targets = [
             "word/document.xml",
             "word/header1.xml",

@@ -36,8 +36,8 @@ sap.ui.define([
                 const sSalario    = oController.formatSalary(user.paycompvalue);
                 const salarioIntegral = Number(user.paycompvalue) || 0; // En contratos a término indefinido integral, el salario base es el salario integral
 
-                const componenteRemunerativo = Math.round((salarioIntegral / 1.3) * 100) / 100;
-                const factorPrestacional     = Math.round((salarioIntegral - componenteRemunerativo) * 100) / 100;
+                const componenteRemunerativo = Math.round(salarioIntegral / 1.3);
+                const factorPrestacional     = salarioIntegral - componenteRemunerativo;
 
                 const sCompRemunerativo = oController.formatSalary(componenteRemunerativo); // El componente remunerativo se muestra como el salario base en el contrato
                 const sFactorPrestacional = oController.formatSalary(factorPrestacional);
@@ -51,6 +51,7 @@ sap.ui.define([
 
                 const fechaContratacion = oController.formatDateRaw(user.originalStartDate); //Pendiente a confirmar
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
                 console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
                 const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
                 // ── Word ─────────────────────────────────────────────────────
@@ -58,7 +59,14 @@ sap.ui.define([
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre, sCedula, sCiudadWork, localDate, sCargo, sSalario, sHireDate, sDireccion
+                        sNombre, sCedula, sCiudadWork, localDate, sCargo,
+                        sSalario, sHireDate, sDireccion,
+                        sCompRemunerativo,
+                        sFactorPrestacional,
+                        sCompRemunerativoLetras,
+                        sFactorPrestacionalLetras,
+                        fechaContratacion,
+                        sPeriodoPago
                     });
                     continue;
                 }
@@ -211,7 +219,7 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">QUINCENAL</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">20 DE ABRIL DE 2026</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO INDEFINIDO</td></tr>
@@ -1866,12 +1874,20 @@ sap.ui.define([
         const zip = await JSZip.loadAsync(templateBytes);
 
         const variables = {
-            "[[Nombre]]":     data.sNombre,
-            "[[Cedula]]":     data.sCedula,
-            "[[Cargo]]":      data.sCargo,
-            "[[Ciudad]]":     data.sCiudadWork,
-            "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate
+            "[[Nombre]]":                    data.sNombre,
+            "[[Cedula]]":                    data.sCedula,
+            "[[Cargo]]":                     data.sCargo,
+            "[[Ciudad]]":                    data.sCiudadWork,
+            "[[Fecha]]":                     data.localDate,
+            "[[Salario]]":                   data.sSalario,
+            "[[FechaInicio]]":               data.sHireDate,
+            "[[Direccion]]":                 data.sDireccion,
+            "[[ComponenteRemunerativo]]":    data.sCompRemunerativo,
+            "[[FactorPrestacional]]":        data.sFactorPrestacional,
+            "[[CompRemunerativoLetras]]":    data.sCompRemunerativoLetras,
+            "[[FactorPrestacionalLetras]]":  data.sFactorPrestacionalLetras,
+            "[[FechaContratacion]]":         data.fechaContratacion,
+            "[[PeriodoPago]]":               data.sPeriodoPago
         };
 
         const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
@@ -1914,19 +1930,5 @@ sap.ui.define([
             document.head.appendChild(script);
         });
     }
-
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _formatDateLong(dateInput) {
-        if (!dateInput) return "";
-        const d = new Date(dateInput);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
-    }
-
     return { onDownloadPDFContratoIndefIntegral };
 });
