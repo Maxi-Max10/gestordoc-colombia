@@ -55,7 +55,7 @@ sap.ui.define([
                         <p style="margin:0;">Señores:</p>
                         <p style="margin:0;">Sección Nómina</p>
                         <p style="margin:0;">DIACO S.A.</p>
-                        <p style="margin:0 0 16px 0;">Ciudad</p>
+                        <p style="margin:0 0 16px 0;">${sCiudadWork}</p>
 
                         <p style="text-align:justify;margin:0 0 16px 0;">
                             Yo <strong>${sNombre}</strong>, con cédula número <strong>${sCedula}</strong>
@@ -215,6 +215,8 @@ sap.ui.define([
                 }
 
                 const pdfBytes = await pdfDoc.save();
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Solicitud Deducciones Retención`);
+
                 const fileName = `${user.firstName}_${user.lastName}_Solicitud_Deducciones_Retencion.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
                 const link     = document.createElement("a");

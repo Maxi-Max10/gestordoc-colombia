@@ -41,16 +41,17 @@ sap.ui.define([
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sSalario    = oController.formatSalary(user.paycompvalue);
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
-                const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
+                const sSalarioLetras  = user.payCompValueWord || "";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sActionButtonId.includes("wordDataInfo")) {
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre, sCedula, sCargo, sCiudadWork, sCargo, sSalario, sfechaContratacion, sHireDate, sDireccion
+                        sNombre, sCedula, sCiudadWork, localDate,
+                        sCargo, sSalario, sfechaContratacion, sDireccion, sPeriodoPago, sSalarioLetras
                     });
                     continue;
                 }
@@ -212,7 +213,7 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario} (${sSalarioLetras})</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Un (1) mes</td></tr>
@@ -248,7 +249,7 @@ sap.ui.define([
                         de conformidad con los reglamentos, órdenes e instrucciones que le impartan
                         los representantes de <strong>EL EMPLEADOR</strong>, todo lo cual forma parte
                         integrante del presente contrato, observando en su desempeño el cuidado y
-                        diligencia necesarios, especialmente como XXXXXXXXXXXXX, pudiendo
+                        diligencia necesarios, especialmente como ${sCargo}, pudiendo
                         <strong>EL EMPLEADOR</strong> cambiarlo de función cuando lo considere necesario.
                     `)}
 
@@ -393,7 +394,7 @@ sap.ui.define([
                         "REMUNERACIÓN:",
                         `
                         Por los servicios que preste <strong>EL TRABAJADOR</strong>, <strong>EL EMPLEADOR</strong> reconocerá una
-                        remuneración mensual de <strong>$$$$$$$$ (VALOR EN LETRASM/CTE)</strong> pagadera por quincenas vencidas, y
+                        remuneración mensual de <strong> ${sSalario} (${sSalarioLetras})</strong> pagadera por quincenas vencidas, y
                         en el lugar donde presta sus servicios. Dentro de este pago se encuentra incluida la remuneración de
                         los descansos dominicales y festivos de que tratan los capítulos I y II del título VII del Código
                         Sustantivo del Trabajo.
@@ -1251,7 +1252,7 @@ sap.ui.define([
                         "FECHA DE INICIACIÓN:",
                         `
                         Se deja constancia que <strong>EL TRABAJADOR</strong> inició sus labores el día
-                        XXXXXXXXXXX, fecha ésta que las partes consideran como la del comienzo de la vigencia del
+                        ${sfechaContratacion}, fecha ésta que las partes consideran como la del comienzo de la vigencia del
                         presente contrato.
                         `
                     )}
@@ -1530,6 +1531,7 @@ sap.ui.define([
                                 border-top:1px solid #000;
                                 padding-top:6px;
                                 min-height:18px;
+                                font-weight:bold;
                             ">
                                 ${sNombre}
                             </div>
@@ -1658,6 +1660,7 @@ sap.ui.define([
                 }
 
                 pdfDoc.removePage(0);
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Contrato a Termino Fijo`);
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Contrato_TerminoFijo.pdf`;
@@ -1721,10 +1724,14 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]":     data.sNombre,
             "[[Cedula]]":     data.sCedula,
-            "[[Cargo]]":      data.sCargo,
             "[[Ciudad]]":     data.sCiudadWork,
+            "[[Fecha]]":      data.localDate,
+            "[[Cargo]]":      data.sCargo,
             "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate
+            "[[FechaInicio]]":data.sfechaContratacion,
+            "[[Direccion]]":  data.sDireccion,
+            "[[PeriodoPago]]":data.sPeriodoPago,
+            "[[SalarioenLetras]]":data.sSalarioLetras
         };
 
         const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
@@ -1768,21 +1775,5 @@ sap.ui.define([
         });
     }
 
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _formatDateLong(dateInput) {
-        if (!dateInput) return "";
-        const d = new Date(dateInput);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
-    }
-
-    return {
-        onDownloadPDFContratoTerminoFijo,
-        generateContratoTerminoFijoPdfDocuments
-    };
+    return { onDownloadPDFContratoTerminoFijo };
 });

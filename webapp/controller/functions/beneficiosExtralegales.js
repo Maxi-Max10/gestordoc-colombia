@@ -204,6 +204,7 @@ sap.ui.define([
                     width:  drawW,
                     height: drawH
                 });
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Beneficios Extralegales`);
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Beneficios_Extralegales.pdf`;
@@ -241,7 +242,7 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]":       data.sNombre,
             "[[Cedula]]":       data.sCedula,
-            "[[Identificado]]": data.sIdentificado,
+            "[[Identificado]]": data.sIdentif,
             "[[Fecha]]":        data.localDate
         };
 

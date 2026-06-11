@@ -20,8 +20,6 @@ sap.ui.define([
                 return;
             }
 
-            const localDate = _formatDateLong(new Date());
-
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
 
@@ -39,10 +37,7 @@ sap.ui.define([
                     await _generateWord({
                         firstName:          user.firstName,
                         lastName:           user.lastName,
-                        sNombre,
-                        sCedula,
-                        sCiudadFirma,
-                        localDate
+                        sNombre, sCedula, sCiudadWork, localDate
                     });
                     continue;
                 }
@@ -58,7 +53,7 @@ sap.ui.define([
                     <p style="margin:0;">Señores</p>
                     <p style="margin:0;"><strong>RECURSOS HUMANOS</strong></p>
                     <p style="margin:0;"><strong>DIACO S.A.</strong></p>
-                    <p style="margin:0 0 36px 0;">Ciudad</p>
+                    <p style="margin:0 0 36px 0;">${sCiudadWork}</p>
 
                     <p style="margin:0 0 20px 0;text-align:justify;">
                         <strong>Asunto:</strong> Manifestación de la calidad de <strong>NO Declarante</strong> en el Impuesto de Renta.
@@ -128,6 +123,8 @@ sap.ui.define([
                 }
 
                 const pdfBytes = await pdfDoc.save();
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Manifestación No Declarante`);
+
                 const fileName = `${user.firstName}_${user.lastName}_Manifestacion_No_Declarante.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
                 const link     = document.createElement("a");
@@ -163,7 +160,7 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]":           data.sNombre,
             "[[Cedula]]":           data.sCedula,
-            "[[CiudadFirma]]":      data.sCiudadFirma,
+            "[[CiudadFirma]]":      data.sCiudadWork,
             "[[Fecha]]":            data.localDate
         };
 
@@ -223,69 +220,6 @@ sap.ui.define([
             document.head.appendChild(script);
         });
     }
-
-    function _formatDateLong(date) {
-        const d      = new Date(date);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${_dayToWords(d.getDate())} (${d.getDate()}) de ${months[d.getMonth()]} de ${d.getFullYear()}`;
-    }
-
-    function _dayToWords(day) {
-        const words = [
-            "","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez",
-            "once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho",
-            "diecinueve","veinte","veintiuno","veintidós","veintitrés","veinticuatro",
-            "veinticinco","veintiséis","veintisiete","veintiocho","veintinueve","treinta",
-            "treinta y uno"
-        ];
-        return words[day] || String(day);
-    }
-
-    function _formatSalary(value) {
-        if (!value) return "$ 0";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _salaryToWords(value) {
-        const n = Math.round(Number(value) || 0);
-        if (n === 0) return "CERO PESOS M/CTE";
-
-        const unidades = ["","UN","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE",
-                          "DIEZ","ONCE","DOCE","TRECE","CATORCE","QUINCE","DIECISÉIS",
-                          "DIECISIETE","DIECIOCHO","DIECINUEVE"];
-        const decenas  = ["","","VEINTE","TREINTA","CUARENTA","CINCUENTA",
-                          "SESENTA","SETENTA","OCHENTA","NOVENTA"];
-        const centenas = ["","CIENTO","DOSCIENTOS","TRESCIENTOS","CUATROCIENTOS","QUINIENTOS",
-                          "SEISCIENTOS","SETECIENTOS","OCHOCIENTOS","NOVECIENTOS"];
-
-        function grupo(n) {
-            let s = "";
-            const c = Math.floor(n / 100);
-            const r = n % 100;
-            if (c > 0) { s += (c === 1 && r === 0) ? "CIEN" : centenas[c]; if (r > 0) s += " "; }
-            if (r > 0) {
-                if (r < 20) { s += unidades[r]; }
-                else {
-                    const d = Math.floor(r / 10), u = r % 10;
-                    if (r >= 21 && r <= 29) {
-                        s += ["","VEINTIÚN","VEINTIDÓS","VEINTITRÉS","VEINTICUATRO","VEINTICINCO",
-                              "VEINTISÉIS","VEINTISIETE","VEINTIOCHO","VEINTINUEVE"][u];
-                    } else { s += decenas[d]; if (u > 0) s += " Y " + unidades[u]; }
-                }
-            }
-            return s;
-        }
-
-        const millones = Math.floor(n / 1000000);
-        const miles    = Math.floor((n % 1000000) / 1000);
-        const resto    = n % 1000;
-        let resultado  = "";
-        if (millones > 0) { resultado += (millones === 1) ? "UN MILLÓN" : grupo(millones) + " MILLONES"; if (miles > 0 || resto > 0) resultado += " "; }
-        if (miles > 0)    { resultado += (miles === 1)    ? "MIL"       : grupo(miles)    + " MIL";      if (resto > 0)              resultado += " "; }
-        if (resto > 0)    { resultado += grupo(resto); }
-        return resultado + " PESOS M/CTE";
-    }
-
+    
     return { onDownloadPDFNoDeclarante };
 });

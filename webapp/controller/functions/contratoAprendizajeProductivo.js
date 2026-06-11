@@ -28,18 +28,22 @@ sap.ui.define([
                 }
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
-                const sCedula      = user.nationalId   || "";
-                const sCargo       = user.title        || "";
-                const sCiudadWork  = user.division     || "";
-                const sSalario     = _formatSalary(user.paycompvalue);
-                const sHireDate    = _formatDateLong(user.hireDate);
+                const sCedula      = user.nationalId || "";
+                const sFechaNacimiento = user.dateOfBirth 
+                    ? oController.formatDateRaw(user.dateOfBirth) 
+                    : "";
+                const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                const sTelefono   = oController.getTelefono(user);                
+                const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
+                const sInstitucion = await oController._getInstitucionFormacion(user.userId);
+                const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre, sCedula, sCargo, sCiudadWork, sSalario, sHireDate
+                        sNombre, sCedula, sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sInstitucion, sCargo
                     });
                     continue;
                 }
@@ -337,9 +341,7 @@ sap.ui.define([
                             ">
                                 NOMBRE APRENDIZ
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                ${sNombre}
-                            </td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sNombre}</td>
                         </tr>
 
                         <tr>
@@ -352,9 +354,7 @@ sap.ui.define([
                             ">
                                 CÉDULA O TARJETA IDENTIDAD
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                ${sCedula}
-                            </td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sCedula}</td>
                         </tr>
 
                         <tr>
@@ -367,7 +367,7 @@ sap.ui.define([
                             ">
                                 FECHA NACIMIENTO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaNacimiento}</td>
                         </tr>
 
                         <tr>
@@ -380,7 +380,7 @@ sap.ui.define([
                             ">
                                 DIRECCION
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sDireccion}</td>
                         </tr>
 
                         <tr>
@@ -393,7 +393,7 @@ sap.ui.define([
                             ">
                                 TELEFONO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sTelefono}</td>
                         </tr>
 
                         <tr>
@@ -406,7 +406,7 @@ sap.ui.define([
                             ">
                                 FECHA INICIACIÓN CONTRATO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sfechaContratacion}</td>
                         </tr>
 
                         <tr>
@@ -441,7 +441,7 @@ sap.ui.define([
                             ">
                                 INSTITUCIÓN DE FORMACION:
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;"></td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sInstitucion}</td>
                         </tr>
 
                         <tr>
@@ -477,8 +477,8 @@ sap.ui.define([
                         El presente contrato tiene como objeto garantizar al <st
                         APRENDIZ la formación
                         profesional metódica y requerida dentro del plan de estudios del APRENDIZ en la especialidad de
-                        <strong>XXXXXXXXXXXXXXXX</strong>, la cual se desarrollara en su etapa práctica por el (IXXXXXXXXXXXXX
-                        (IXXXXXXXXX) o por la Institución Educativa donde el aprendiz adelanta sus estudios) y la <strong>EMPRESA</strong>,
+                        <strong>${sCargo}</strong>, la cual se desarrollara en su etapa práctica por el ${sInstitucion}
+                        o por la Institución Educativa donde el aprendiz adelanta sus estudios) y la <strong>EMPRESA</strong>,
                         proporcionara los medios para que el APRENDIZ adquiera formación profesional y metódica, dentro
                         de una relación de aprendizaje, la cual de ninguna manera implica subordinación laboral por parte de
                         la <strong>EMPRESA</strong> sobre el <strong>APRENDIZ</strong> pues este no es considerado para ningún efecto como un trabajador
@@ -1295,15 +1295,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
-                </div>`;
-
-
-                // ── PÁGINA 11 — Firmas ────────────────────────────────────────────────────────
-                const htmlPagina11 = `
-                <div style="${STYLE}width:100%;box-sizing:border-box;">
-
                     ${_bloqueContrato(`
                         Para efectos de lo anterior, firman el dieciséis (16) de enero del año 2026 en Tuta Boyacá
                     `)}
@@ -1354,14 +1345,14 @@ sap.ui.define([
                                     font-weight:bold;
                                     min-height:18px;
                                 ">
-                                    XXXXXXXXXXXXX
+                                    ${sNombre}
                                 </div>
 
                                 <div style="
                                     margin-top:2px;
                                     font-weight:bold;
                                 ">
-                                    CC.XXXXXXXXXXXXX
+                                    CC.No. ${sCedula}
                                 </div>
 
                             </div>
@@ -1389,7 +1380,6 @@ sap.ui.define([
                     htmlPagina8,
                     htmlPagina9,
                     htmlPagina10,
-                    htmlPagina11,
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
@@ -1441,6 +1431,7 @@ sap.ui.define([
                 }
 
                 pdfDoc.removePage(0);
+                pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Contrato Aprendizaje Productivo`);
 
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Contrato_Aprendizaje_Productivo.pdf`;
@@ -1478,10 +1469,11 @@ sap.ui.define([
         const variables = {
             "[[Nombre]]":     data.sNombre,
             "[[Cedula]]":     data.sCedula,
-            "[[Cargo]]":      data.sCargo,
-            "[[Ciudad]]":     data.sCiudadWork,
-            "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate
+            "[[FechaNacimiento]]":      data.sFechaNacimiento,
+            "[[Direccion]]":     data.sDireccion,
+            "[[Telefono]]":     data.sTelefono,
+            "[[FechaContratacion]]":data.sfechaContratacion,
+            "[[Institucion]]":   data.sInstitucion
         };
 
         const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
@@ -1523,19 +1515,6 @@ sap.ui.define([
             script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
             document.head.appendChild(script);
         });
-    }
-
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _formatDateLong(dateInput) {
-        if (!dateInput) return "";
-        const d = new Date(dateInput);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
     }
 
     return { onDownloadPDFContratoAprendizajeProductivo };

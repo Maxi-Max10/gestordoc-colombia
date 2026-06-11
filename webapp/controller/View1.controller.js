@@ -1716,6 +1716,7 @@ sap.ui.define([
     onDownloadPDFContratoAprendizajeLectivo: async function (sButtonId) { contratoAprendizajeLectivo.onDownloadPDFContratoAprendizajeLectivo(this, sButtonId); },
     onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); },
 
+<<<<<<< HEAD
     onSendToDocusign: async function (oEvent) {
       if (this._currentCategory !== "contratoTerminoFijo" || this.sSelectedContract !== "Contrato Término Fijo") {
         MessageToast.show("Por ahora solo está disponible el envío a DocuSign para Contrato Término Fijo.");
@@ -1755,6 +1756,24 @@ sap.ui.define([
       }
     },
 
+    _getInstitucionFormacion: async function (sUserId) {
+      const oComponentModel = this.getOwnerComponent().getModel();
+      try {
+          const oData = await this._readOData(oComponentModel, "/Background_Education", {
+              urlParameters: {
+                  "$select": "userId,backgroundElementId,bgOrderPos,institucion",
+                  "$filter": `userId eq '${sUserId}'`,
+                  "$orderby": "bgOrderPos desc"
+              }
+          });
+          const aResults = oData?.results || [];
+          return aResults[0]?.institucion || "";
+      } catch (e) {
+          console.warn("No se pudo cargar Background_Education para", sUserId, e);
+          return "";
+      }
+    },
+
     _debugCountryCodes: function () {
       const oModel = this.getOwnerComponent().getModel();
       oModel.read("/Country", {
@@ -1764,6 +1783,8 @@ sap.ui.define([
         error: function (e) { console.error(e); }
       });
     }
+
+
 
     
 
