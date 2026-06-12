@@ -159,11 +159,11 @@ sap.ui.define([
                                 <table style="width:100%;border-collapse:collapse;margin-top:8px;">
                                     <tr>
                                         <td style="padding:3px 0;width:55%;">Ciudad de Residencia:</td>
-                                        <td>&nbsp ${sCiudadWork}</td>
+                                        <td>&nbsp${sCiudadWork}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding:3px 0;">Dirección (incluir el barrio/sector):</td>
-                                        <td>&nbsp ${sDireccion}</td>
+                                        <td>&nbsp${sDireccion}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding:3px 0;">Teléfono:</td>
@@ -300,11 +300,16 @@ sap.ui.define([
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Kit de Retiro`);
 
                 const pdfBytes = await pdfDoc.save();
-                // En vez de solo disparar la descarga, abrí en pestaña nueva
                 const blob = new Blob([pdfBytes], { type: "application/pdf" });
-                const url = URL.createObjectURL(blob);
-                window.open(url, "_blank");  // ← abre en pestaña nueva con título correcto
-                URL.revokeObjectURL(url);
+                const fileName = `${user.firstName}_${user.lastName}_Kit_Retiro.pdf`;
+
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
             }
 
             MessageToast.show(

@@ -271,49 +271,5 @@ sap.ui.define([
             link.click();
             document.body.removeChild(link);
         },
-
-        /**
-         * Convierte un número en texto y formato monetario dominicano.
-         */
-        convertNumberToWords: function(num) {
-            if (isNaN(num) || num < 0) return "CERO PESOS DOMINICANOS CON 00/100";
-
-            const formatter = new Intl.NumberFormat("es-ES", {
-                style: "currency",
-                currency: "DOP",
-                minimumFractionDigits: 2,
-            });
-
-            const numToWords = (n) => {
-                const unidades = ["", "UN", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
-                const decenas = ["DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
-                const centenas = ["CIENTO", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
-
-                if (n === 0) return "CERO";
-                if (n < 10) return unidades[n];
-                if (n < 100) return decenas[Math.floor(n / 10) - 1] + (n % 10 !== 0 ? " Y " + unidades[n % 10] : "");
-                if (n < 1000) return centenas[Math.floor(n / 100) - 1] + (n % 100 !== 0 ? " " + numToWords(n % 100) : "");
-                if (n < 1000000) return numToWords(Math.floor(n / 1000)) + " MIL " + (n % 1000 !== 0 ? numToWords(n % 1000) : "");
-
-                return formatter.format(n).toUpperCase();
-            };
-            
-            let pesos = Math.floor(num);
-            let centavos = Math.round((num - pesos) * 100);
-            let centavosTexto = centavos < 10 ? `0${centavos}` : centavos;
-
-            return `${numToWords(pesos)} PESOS DOMINICANOS CON ${centavosTexto}/100`;
-        },
-
-        /**
-         * Convierte una fecha a formato largo (DÍA DE MES DE AÑO).
-         */
-        formatDateToWords: function(date) {
-            return new Date(date).toLocaleDateString("es-ES", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric"
-            }).toUpperCase();
-        }
     };
 });

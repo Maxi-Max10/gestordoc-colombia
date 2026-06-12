@@ -55,15 +55,14 @@ sap.ui.define([
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
                 console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
-                const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
+                
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
                         sNombre, sCedula, sCiudadWork, localDate, sCargo,
-                        sSalario, sHireDate, sDireccion,
-                        sCompRemunerativo,
+                        sSalario, sDireccion,sCompRemunerativo,
                         sFactorPrestacional,
                         sCompRemunerativoLetras,
                         sFactorPrestacionalLetras,
@@ -221,7 +220,7 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario} (${sSalarioLetras}) </td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">20 DE ABRIL DE 2026</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
@@ -1884,7 +1883,6 @@ sap.ui.define([
             "[[Ciudad]]":                    data.sCiudadWork,
             "[[Fecha]]":                     data.localDate,
             "[[Salario]]":                   data.sSalario,
-            "[[FechaInicio]]":               data.sHireDate,
             "[[Direccion]]":                 data.sDireccion,
             "[[ComponenteRemunerativo]]":    data.sCompRemunerativo,
             "[[FactorPrestacional]]":        data.sFactorPrestacional,
