@@ -36,7 +36,6 @@ sap.ui.define([
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sSalario    = oController.formatSalary(user.paycompvalue);
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
-                const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
                 const sSalarioLetras  = user.payCompValueWord || "" 
 
@@ -45,7 +44,7 @@ sap.ui.define([
                     await _generateWord({
                         firstName: user.firstName,
                         lastName:  user.lastName,
-                        sNombre, sCedula, sCargo, sCiudadWork, sSalario, sHireDate, sSalarioLetras
+                        sNombre, sCedula, sCargo, sCiudadWork, sSalario, sSalarioLetras
                     });
                     continue;
                 }
@@ -1682,7 +1681,6 @@ sap.ui.define([
             "[[Cargo]]":      data.sCargo,
             "[[Ciudad]]":     data.sCiudadWork,
             "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate,
             "[[SalarioenLetras]]":data.sSalarioLetras
             
         };

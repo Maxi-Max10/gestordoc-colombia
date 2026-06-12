@@ -542,7 +542,7 @@ sap.ui.define([
         });
       });
     },
-
+    //OBTENGO INFORMACION DEL USUARIO LOGUEADO
     // Detecta el userId del usuario logueado a través de la API de SAP BTP.
     // Una vez obtenido, encadena getUserCompany() y getDataUser().
     getUserInfo: function () {

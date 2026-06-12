@@ -346,6 +346,9 @@ sap.ui.define([
             "[[Identificado]]": data.sIdentif,
             "[[CiudadFecha]]": data.sCiudadWork ? `${data.sCiudadWork}, ${data.localDate}` : data.localDate,
             "[[FechaCert]]":   sCertFecha,
+            "[[Email]]": data.sEmail,
+            "[[Telefono]]": data.sTelefono,
+            "[[Direccion]]":data.sDireccion
         };
 
         const targets = ["word/document.xml", "word/header1.xml", "word/header2.xml", "word/footer1.xml", "word/footer2.xml"];
