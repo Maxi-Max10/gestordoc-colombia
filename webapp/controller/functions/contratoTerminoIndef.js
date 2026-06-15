@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "gestordoccolombia/controller/helpers/wordGenerator"
+], function (MessageToast, wordGenerator) {
     "use strict";
 
     async function onDownloadPDFContratoTerminoIndef(oController, sButtonId) {
@@ -35,16 +36,20 @@ sap.ui.define([
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sSalarioLetras  = user.payCompValueWord || "" 
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
-                const sSalarioLetras  = user.payCompValueWord || "" 
+                
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre, sCedula, sCargo, sCiudadWork, sSalario, sSalarioLetras
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Contrato_Termino_Indefinido.docx",
+                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
+                        data: {
+                            sNombre, sCedula, sCiudadWork, localDate, sPais, sDireccion, sCargo, sSalario, sSalarioLetras,
+                            sfechaContratacion, sPeriodoPago
+                        }
                     });
                     continue;
                 }
@@ -1665,79 +1670,5 @@ sap.ui.define([
             MessageToast.show("Error generando el documento: " + error.message);
         }
     }
-
-    // ─── Word ─────────────────────────────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Contrato_Termino_Indef.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Contrato_Termino_Indef.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":     data.sNombre,
-            "[[Cedula]]":     data.sCedula,
-            "[[Cargo]]":      data.sCargo,
-            "[[Ciudad]]":     data.sCiudadWork,
-            "[[Salario]]":    data.sSalario,
-            "[[SalarioenLetras]]":data.sSalarioLetras
-            
-        };
-
-        const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp("\\[\\[" + key.slice(2,-2).split("").map(c => c + "(?:<[^>]*>)*").join("") + "\\]\\]","g");
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Contrato_Termino_Indefinido.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
-    }
-
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _formatDateLong(dateInput) {
-        if (!dateInput) return "";
-        const d = new Date(dateInput);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
-    }
-
     return { onDownloadPDFContratoTerminoIndef };
 });

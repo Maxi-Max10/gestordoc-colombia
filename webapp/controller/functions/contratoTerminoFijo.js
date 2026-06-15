@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "gestordoccolombia/controller/helpers/wordGenerator"
+], function (MessageToast, wordGenerator) {
     "use strict";
 
     async function onDownloadPDFContratoTerminoFijo(oController, sButtonId, mOptions) {
@@ -46,12 +47,14 @@ sap.ui.define([
                 const sSalarioLetras  = user.payCompValueWord || "";
 
                 // ── Word ─────────────────────────────────────────────────────
-                if (sActionButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre, sCedula, sCiudadWork, localDate,
-                        sCargo, sSalario, sfechaContratacion, sDireccion, sPeriodoPago, sSalarioLetras
+                if (sButtonId.includes("wordDataInfo")) {
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Contrato_Termino_Fijo.docx",
+                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Fijo.docx`,
+                        data: {
+                            sNombre, sCedula, sCiudadWork, localDate, sCargo, sSalario, sSalarioLetras,
+                            sfechaContratacion, sDireccion, sPeriodoPago
+                        }
                     });
                     continue;
                 }
@@ -1703,76 +1706,6 @@ sap.ui.define([
             MessageToast.show("Error generando el documento: " + error.message);
             return bReturnPdfDocuments ? [] : undefined;
         }
-    }
-
-    async function generateContratoTerminoFijoPdfDocuments(oController) {
-        return onDownloadPDFContratoTerminoFijo(oController, "pdfDataInfo", {
-            returnPdfDocuments: true,
-            throwErrors: true
-        });
-    }
-
-    // ─── Word ─────────────────────────────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Contrato_Termino_Fijo.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Contrato_Termino_Fijo.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":     data.sNombre,
-            "[[Cedula]]":     data.sCedula,
-            "[[Ciudad]]":     data.sCiudadWork,
-            "[[Fecha]]":      data.localDate,
-            "[[Cargo]]":      data.sCargo,
-            "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sfechaContratacion,
-            "[[Direccion]]":  data.sDireccion,
-            "[[PeriodoPago]]":data.sPeriodoPago,
-            "[[SalarioenLetras]]":data.sSalarioLetras
-        };
-
-        const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp("\\[\\[" + key.slice(2,-2).split("").map(c => c + "(?:<[^>]*>)*").join("") + "\\]\\]","g");
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Contrato_Termino_Fijo.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
     }
 
     return { onDownloadPDFContratoTerminoFijo };
