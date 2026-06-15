@@ -24,6 +24,10 @@ sap.ui.define([
                 "[[Nacionalidad]]":             data.sNacional              || "",
                 "[[Pais]]":                     data.sPais                  || "",
                 "[[DocCardType]]":              data.sDocCardType           || "",
+                "[[CheckCC]]": data.sDocCardType === "CC" ? "☑" : "☐",
+                "[[CheckCE]]": data.sDocCardType === "CE" ? "☑" : "☐",
+                "[[CheckTI]]": data.sDocCardType === "TI" ? "☑" : "☐",
+                "[[CheckRC]]": data.sDocCardType === "RC" ? "☑" : "☐",
                 "[[FechaExpedicion]]":          data.sFechaExpedicion       || "",
                 "[[Identificado]]":             data.sIdentif || data.sIdentificado || "",
 

@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "gestordoccolombia/controller/helpers/wordGenerator"
+], function (MessageToast, wordGenerator) {
     "use strict";
 
     async function onDownloadPDFDatosPersonales(oController, sButtonId) {
@@ -60,13 +61,13 @@ sap.ui.define([
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre, sCedula, sCiudadWork, localDate,
-                        sCargo, sPais, sTelefono, sEmail,
-                        sNacional, sSexo, sEstadoCivil, sGrupoSangre,
-                        sDireccion, sFechaExpedicion, sJefeNombre, sDocCardType, sFechaNacimiento
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Datos_Personales.docx",
+                        fileName:     `${user.firstName}_${user.lastName}Datos_Personales.docx`,
+                        data: {
+                            sNombre, sCedula, sCiudadWork, localDate, sCargo, sPais, sTelefono, sEmail, sNacional, sSexo, sEstadoCivil,
+                            sGrupoSangre, sDireccion, sFechaExpedicion, sJefeNombre, sDocCardType, sFechaNacimiento
+                        }
                     });
                     continue;
                 }
@@ -1303,90 +1304,6 @@ sap.ui.define([
             console.error("Error generando Datos Personales:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
-    }
-
-    // ─── Word con JSZip + plantilla ──────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Datos_Personales.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Datos_Personales.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":          data.sNombre,
-            "[[Cedula]]":          data.sCedula,
-            "[[CiudadWork]]":      data.sCiudadWork,
-            "[[Fecha]]":           data.localDate,
-            "[[Cargo]]":           data.sCargo,
-            "[[Pais]]":            data.sPais,
-            "[[Telefono]]":        data.sTelefono,
-            "[[Email]]":           data.sEmail,
-            "[[Nacionalidad]]":    data.sNacional,
-            "[[Sexo]]":            data.sSexo,
-            "[[EstadoCivil]]":     data.sEstadoCivil,
-            "[[GrupoSanguineo]]":  data.sGrupoSangre,
-            "[[Direccion]]":       data.sDireccion,
-            "[[FechaExpedicion]]": data.sFechaExpedicion,
-            "[[JefeNombre]]":      data.sJefeNombre,
-            "[[DocCardType]]":     data.sDocCardType,
-            "[[FechaNacimiento]]": data.sFechaNacimiento
-        };
-        const targets = [
-            "word/document.xml",
-            "word/header1.xml",
-            "word/header2.xml",
-            "word/footer1.xml",
-            "word/footer2.xml"
-        ];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp(
-                        "\\[\\[" +
-                        key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
-                        "\\]\\]", "g"
-                    );
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Datos_Personales.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
     }
 
     return { onDownloadPDFDatosPersonales };

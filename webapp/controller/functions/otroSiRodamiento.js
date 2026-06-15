@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "gestordoccolombia/controller/helpers/wordGenerator"
+], function (MessageToast, wordGenerator) {
     "use strict";
 
     async function onDownloadPDFOtroSiRodamiento(oController, sButtonId) {
@@ -32,13 +33,17 @@ sap.ui.define([
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
                 const sCiudadWork      = user.location || user.city || "Bucaramanga";
                 const localDate   = oController.getLocalDate();
+                const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sSalarioLetras  = user.payCompValueWord || "" 
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName:          user.firstName,
-                        lastName:           user.lastName,
-                        sNombre, sCedula,sIdentificado, sCiudadWork, localDate
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Otro_Si_Rodamiento.docx",
+                        fileName:     `${user.firstName}_${user.lastName}Otro_Si_Rodamiento.docx`,
+                        data: {
+                            sNombre, sCedula, sIdentificado ,sCiudadWork, localDate, sSalario, sSalarioLetras
+                        }
                     });
                     continue;
                 }
@@ -75,7 +80,7 @@ sap.ui.define([
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         En consecuencia, de lo anterior, las partes han convenido que EL TRABAJADOR reciba
-                        un valor de <strong>UN MILLÓN CUATROCIENTOS SETENTA Y UN MIL DOCIENTOS SESENTA Y SIETE PESOS M/CTE ($1.471.267)</strong>, como monto fijo
+                        un valor de <strong>${sSalarioLetras} (${sSalario})</strong>, como monto fijo
                         mensual que será consignado a la cuenta de nómina del colaborador, con el ánimo de
                         reintegrar al trabajador el dinero que gaste en su movilización para la realización
                         del cargo que desempeña en Diaco S.A.
@@ -187,78 +192,5 @@ sap.ui.define([
         }
     }
 
-    // ─── Word con JSZip + plantilla OtroSi_Rodamiento.docx ──────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Otro_Si_Rodamiento.docx").then(res => {
-        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Rodamiento.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":           data.sNombre,
-            "[[Cedula]]":           data.sCedula,
-            "[[Identificado]]":     data.sIdentificado,
-            "[[CiudadFirma]]":      data.sCiudadWork,
-            "[[Fecha]]":            data.localDate
-        };
-
-        const targets = [
-            "word/document.xml",
-            "word/header1.xml",
-            "word/header2.xml",
-            "word/footer1.xml",
-            "word/footer2.xml"
-        ];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp(
-                        "\\[\\[" +
-                        key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
-                        "\\]\\]", "g"
-                    );
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_OtroSi_Rodamiento.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
-
-    function _escXml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script    = document.createElement("script");
-            script.src      = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload   = () => resolve(window.JSZip);
-            script.onerror  = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
-    }
     return { onDownloadPDFOtroSiRodamiento };
 });
