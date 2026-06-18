@@ -1,24 +1,24 @@
 /**
  * @file Formatter.js
- * @description Módulo utilitario de la aplicación SAP UI5 "gestordoccolombia".
+ * @description Módulo de utilidades de la app SAP UI5 "gestordoccolombia".
  *
- * Centraliza todas las funciones de formato y transformación de datos que se
- * usan al generar documentos HR (contratos PDF y Word) para empleados colombianos.
+ * Acá vive toda la lógica de formato y transformación de datos que se necesita
+ * para generar los documentos de RRHH (contratos en PDF y Word) para empleados colombianos.
  *
- * Se conecta con SAP SuccessFactors a través de OData y transforma los datos
- * crudos del sistema en textos listos para insertar en las plantillas de documentos.
+ * Se conecta con SAP SuccessFactors a través de OData y convierte los datos
+ * que vienen del sistema en textos listos para insertar en las plantillas.
  *
  * Funciones principales:
- *  - convertNumberToWords  → Salario en letras (formato colombiano)
- *  - formatDateToWords     → Fecha extendida en palabras ("quince (15) días del mes de...")
- *  - formatDateToSpanish   → Fecha en formato "15 de enero de 2024"
- *  - formatFechaCorta      → Fecha DD/MM/YYYY
- *  - formatFechaFormal     → Fecha formal "15 de Enero del año 2024"
- *  - formatDateRaw         → Fecha simple "15 de enero del año 2024"
+ *  - convertNumberToWords  → Escribe el salario en letras (ej. "UN MILLÓN DE PESOS COLOMBIANOS")
+ *  - formatDateToWords     → Fecha en formato extendido ("quince (15) días del mes de...")
+ *  - formatDateToSpanish   → Fecha simple "15 de enero de 2024"
+ *  - formatFechaCorta      → Fecha corta DD/MM/YYYY
+ *  - formatFechaFormal     → Fecha de encabezado "15 de Enero del año 2024"
+ *  - formatDateRaw         → Fecha reducida "15 de enero del año 2024"
  *  - formatSalary          → Salario con separadores "$ 4.853.000"
- *  - resolveGender         → Resolución de género en texto (ej. "PENSIONADO{A}")
- *  - getPaisName           → Nombre de país desde código SAP o ISO
- *  - getSelectedUsers      → Extrae y mapea los empleados seleccionados en la tabla
+ *  - resolveGender         → Ajusta el género gramatical en el texto (ej. "PENSIONADO" / "PENSIONADA")
+ *  - getPaisName           → Traduce el código de país de SAP o ISO al nombre completo
+ *  - getSelectedUsers      → Lee la tabla de empleados, agarra las filas seleccionadas y devuelve los datos listos para usar
  */
 sap.ui.define([], function () {
     "use strict";
@@ -27,18 +27,20 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: convertNumberToWords
-        // Convierte un número (salario) a su representación en palabras,
-        // siguiendo el formato usado en contratos colombianos.
+        //
+        // Convierte un número (el salario) a su equivalente escrito en palabras,
+        // tal como se exige en los contratos colombianos.
         //
         // Ejemplo: 1234 → "MIL DOSCIENTOS TREINTA Y CUATRO PESOS COLOMBIANOS"
         //
-        // Lógica interna:
-        //  - Se redondea el número a entero (los salarios no tienen centavos).
-        //  - La función interna `numToWords` cubre rangos de forma recursiva:
-        //      < 10      → unidades directas
-        //      < 100     → decenas + " Y " + unidades
-        //      < 1.000   → centenas + resto
-        //      < 1.000.000 → miles
+        // Cómo funciona por dentro:
+        //  - Primero se redondea al entero más cercano (los salarios no llevan centavos).
+        //  - Luego una función interna llamada `numToWords` se llama a sí misma de forma
+        //    recursiva para ir armando el texto por rangos:
+        //      < 10        → unidades ("UNO", "DOS"...)
+        //      < 100       → decenas ("VEINTE Y TRES"...)
+        //      < 1.000     → centenas ("DOSCIENTOS CINCUENTA"...)
+        //      < 1.000.000 → miles ("CUARENTA Y DOS MIL"...)
         //      ≥ 1.000.000 → millones (para salarios integrales altos)
         // ─────────────────────────────────────────────────────────────────────────
         convertNumberToWords: function (num) {
@@ -46,9 +48,9 @@ sap.ui.define([], function () {
             num = Math.round(Number(num)); // Redondear antes de convertir (sin centavos)
             if (isNaN(num) || num < 0) return "CERO PESOS COLOMBIANOS";
 
-            // Función recursiva interna: convierte un número entero a palabras
+            // Función recursiva interna: convierte un entero a palabras
             const numToWords = (n) => {
-                // Tablas de referencia para cada rango numérico
+                // Tablas con las palabras para cada rango numérico
                 const unidades = ["", "UN", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
                 const decenas  = ["DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
                 const centenas = ["CIENTO", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
@@ -66,7 +68,7 @@ sap.ui.define([], function () {
                     return centenas[Math.floor(n / 100) - 1] +
                         (n % 100 !== 0 ? " " + numToWords(n % 100) : "");
 
-                // Miles: llama a sí misma recursivamente para el grupo de miles
+                // Miles: la función se llama a sí misma para el grupo de miles
                 if (n < 1000000)
                     return numToWords(Math.floor(n / 1000)) + " MIL" +
                         (n % 1000 !== 0 ? " " + numToWords(n % 1000) : "");
@@ -80,22 +82,24 @@ sap.ui.define([], function () {
             //const centavos     = Math.round((num - pesos) * 100);
             //const centavosTexto = centavos < 10 ? `0${centavos}` : `${centavos}`;
 
-            // Retorna el texto final en formato de contrato colombiano
+            // Arma y devuelve el texto final en el formato que va en el contrato
             return `${numToWords(pesos)} PESOS COLOMBIANOS`;
         },
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: formatDateToWords
+        //
         // Convierte una fecha al formato extendido que exigen los contratos:
         // "quince (15) días del mes de enero del año dos mil veinticuatro (2024)"
         //
         // Acepta dos tipos de entrada:
-        //  - Objeto Date de SAP (usa getUTC* para evitar desfase de timezone)
-        //  - String ISO "YYYY-MM-DD" (se ancla a T12:00:00 para neutralizar timezone)
+        //  - Un objeto Date de SAP → usa métodos UTC para no correr el día por diferencia de zona horaria
+        //  - Un string ISO "YYYY-MM-DD" → se ancla a las 12:00 del mediodía para el mismo motivo
         //
-        // Internamente usa:
-        //  - `numbersToWords`: mapa fijo para días del 1 al 31
-        //  - `yearToWords`: función dinámica para convertir cualquier año a palabras
+        // Por dentro usa:
+        //  - `numbersToWords`: un mapa fijo con los días del 1 al 31 en palabras
+        //  - `yearToWords`: una función dinámica que arma cualquier año en palabras
+        //    descomponiéndolo en miles, centenas y decenas
         // ─────────────────────────────────────────────────────────────────────────
         formatDateToWords: function (date) {
             if (!date) return "";
@@ -105,7 +109,7 @@ sap.ui.define([], function () {
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
             ];
 
-            // Mapa fijo para los días del mes (1–31)
+            // Mapa fijo: días del mes del 1 al 31 escritos en palabras
             const numbersToWords = {
                 1:"un", 2:"dos", 3:"tres", 4:"cuatro", 5:"cinco",
                 6:"seis", 7:"siete", 8:"ocho", 9:"nueve", 10:"diez",
@@ -117,8 +121,8 @@ sap.ui.define([], function () {
                 30:"treinta", 31:"treinta y un"
             };
 
-            // Convierte cualquier año a palabras sin depender de un mapa fijo.
-            // Descompone el año en miles, centenas y decenas para construirlo dinámicamente.
+            // Arma cualquier año en palabras sin depender de un mapa fijo.
+            // Lo descompone en miles, centenas y decenas para construirlo pieza por pieza.
             const yearToWords = (y) => {
                 const miles    = Math.floor(y / 1000);
                 const centenas = Math.floor((y % 1000) / 100);
@@ -138,7 +142,7 @@ sap.ui.define([], function () {
                     5:"quinientos", 6:"seiscientos", 7:"setecientos", 8:"ochocientos", 9:"novecientos"
                 };
 
-                // Convierte el segmento de decenas+unidades del año
+                // Convierte el tramo de decenas y unidades del año
                 const decToWords = (n) => {
                     if (n === 0) return "";
                     if (decMap[n]) return decMap[n];
@@ -147,7 +151,7 @@ sap.ui.define([], function () {
                     return decMap[d] + (u ? " y " + unidades[u] : "");
                 };
 
-                // Construye el año parte por parte: miles → centenas → decenas
+                // Construye el año juntando cada parte: miles → centenas → decenas
                 let parts = [];
                 if (miles > 1)        parts.push(unidades[miles] + " mil");
                 else if (miles === 1) parts.push("mil");
@@ -157,7 +161,7 @@ sap.ui.define([], function () {
                 return parts.join(" ");
             };
 
-            // Rama 1: si llega un objeto Date de SAP → usa métodos UTC
+            // Caso 1: si llega un objeto Date de SAP → leer en UTC para no perder un día
             if (date instanceof Date) {
                 const day   = date.getUTCDate();
                 const month = months[date.getUTCMonth()];
@@ -167,8 +171,8 @@ sap.ui.define([], function () {
                 return `${dayText} (${day}) días del mes de ${month} del año ${yearText} (${year})`;
             }
 
-            // Rama 2: si llega un string ISO "YYYY-MM-DD"
-            // Se ancla a T12:00:00 para evitar que el timezone local cambie el día
+            // Caso 2: si llega un string ISO "YYYY-MM-DD"
+            // Se ancla a las 12:00 del mediodía para que la zona horaria local no corra el día
             const oDate = new Date(date + "T12:00:00");
             const day   = oDate.getDate();
             const month = months[oDate.getMonth()];
@@ -180,10 +184,12 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: formatDateToSpanish
-        // Formato simple para mostrar fechas en documentos generales.
+        //
+        // Formato simple para fechas en documentos generales.
         // Ejemplo: "2024-01-15" → "15 de enero de 2024"
         //
-        // Nota: usa hora local (sin anclar a UTC), apta para fechas no críticas.
+        // Nota: usa la hora local del navegador (sin corrección de zona horaria),
+        // lo cual está bien para fechas que no son críticas.
         // ─────────────────────────────────────────────────────────────────────────
         formatDateToSpanish: function (sDate) {
             const oDate = new Date(sDate);
@@ -197,19 +203,20 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: formatFechaCorta
+        //
         // Devuelve la fecha en formato DD/MM/YYYY, como se usa en encabezados
         // y pies de página de los documentos.
         //
         // Ejemplo: "2024-01-15" → "15/01/2024"
         //
-        // Manejo de timezone:
-        //  - Date de SAP → getUTC* (fecha ya está en UTC)
-        //  - String ISO  → T12:00:00 para anclar y evitar desfase de un día
+        // Manejo de zona horaria:
+        //  - Si llega un objeto Date de SAP → usa métodos UTC (la fecha ya está en UTC)
+        //  - Si llega un string ISO → se ancla a las 12:00 para evitar que el día corra un día
         // ─────────────────────────────────────────────────────────────────────────
         formatFechaCorta: function (fecha) {
             if (!fecha) return null;
 
-            // Objeto Date de SAP: leer en UTC para no perder un día por timezone
+            // Objeto Date de SAP: leer en UTC para no perder un día por zona horaria
             if (fecha instanceof Date) {
                 return `${String(fecha.getUTCDate()).padStart(2, '0')}/${String(fecha.getUTCMonth() + 1).padStart(2, '0')}/${fecha.getUTCFullYear()}`;
             }
@@ -221,14 +228,15 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: formatFechaFormal
+        //
         // Formato para encabezados de contratos y cartas oficiales.
         // Ejemplo: "2024-01-15" → "15 de Enero del año 2024"
         //
-        // Comportamiento especial:
-        //  - Sin parámetro → devuelve la fecha actual del sistema (hora local),
-        //    útil para timbrar el documento con la fecha de generación.
-        //  - Con Date de SAP → usa getUTC* para evitar desfase.
-        //  - Con string ISO → ancla a T12:00:00.
+        // Tiene un comportamiento especial:
+        //  - Sin parámetro → devuelve la fecha actual del sistema (la del día en que
+        //    se genera el documento), útil para timbrar automáticamente.
+        //  - Con objeto Date de SAP → usa UTC para evitar el desfase de zona horaria.
+        //  - Con string ISO → ancla a las 12:00 del mediodía, mismo motivo.
         // ─────────────────────────────────────────────────────────────────────────
         formatFechaFormal: function (fechaInput) {
             const meses = [
@@ -236,7 +244,7 @@ sap.ui.define([], function () {
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
             ];
 
-            // Sin parámetro: usar fecha actual del sistema
+            // Sin parámetro: usar la fecha de hoy
             if (!fechaInput) {
                 const hoy = new Date();
                 const dia  = hoy.getDate().toString().padStart(2, '0');
@@ -263,9 +271,10 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: getCiudadWork
-        // Devuelve la ciudad de trabajo del empleado.
-        // SAP almacena la ciudad en el campo custom10; si no existe, usa `state`
-        // como respaldo (campo estándar de ubicación en SuccessFactors).
+        //
+        // Devuelve la ciudad donde trabaja el empleado.
+        // SAP guarda ese dato en el campo custom10; si ese campo viene vacío,
+        // se cae al campo `state` como segunda opción.
         // ─────────────────────────────────────────────────────────────────────────
         getCiudadWork: function (user) {
             return user.custom10 || user.state || "";
@@ -273,11 +282,12 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: getLocalDate
-        // Devuelve la fecha actual en formato legible para el cuerpo del documento.
+        //
+        // Devuelve la fecha de hoy en formato legible para el cuerpo del documento.
         // Ejemplo: "4 de junio del año 2026"
         //
-        // Usa hora local porque representa la fecha en que se genera el documento,
-        // no una fecha proveniente de SAP.
+        // Usa la hora local porque representa el momento en que se genera el documento,
+        // no una fecha que viene de SAP.
         // ─────────────────────────────────────────────────────────────────────────
         getLocalDate: function () {
             const d = new Date();
@@ -288,12 +298,13 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: formatDateRaw
-        // Versión reducida del formato de fecha: "15 de enero del año 2024"
-        // (sin el texto extendido en palabras que usa formatDateToWords).
         //
-        // Mismo criterio de timezone que el resto:
-        //  - Date de SAP → getUTC*
-        //  - String ISO  → T12:00:00
+        // Versión más corta del formato de fecha: "15 de enero del año 2024"
+        // A diferencia de formatDateToWords, no incluye el día escrito en palabras.
+        //
+        // Mismo manejo de zona horaria que el resto:
+        //  - Objeto Date de SAP → métodos UTC
+        //  - String ISO → anclar a las 12:00
         // ─────────────────────────────────────────────────────────────────────────
         formatDateRaw: function (dateStr) {
             if (!dateStr) return "";
@@ -310,8 +321,9 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: formatSalary
-        // Formatea un número de salario con separadores de miles y símbolo de moneda,
-        // usando la localización colombiana ("es-CO") que usa puntos como separador.
+        //
+        // Formatea un número de salario con separadores de miles y el símbolo de moneda,
+        // usando la localización colombiana ("es-CO") que usa puntos como separador de miles.
         //
         // Ejemplo: 4853000 → "$ 4.853.000"
         // ─────────────────────────────────────────────────────────────────────────
@@ -322,36 +334,39 @@ sap.ui.define([], function () {
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: resolveGender
-        // Resuelve el género gramatical en textos de plantillas.
-        // Los placeholders usan la convención {A} para marcar la terminación femenina.
+        //
+        // Ajusta el género gramatical de un texto de plantilla.
+        // Las plantillas usan la convención {A} para marcar la terminación femenina.
         //
         // Ejemplos:
         //  "PENSIONADO{A}" + "F" → "PENSIONADA"
         //  "PENSIONADO{A}" + "M" → "PENSIONADO"
         //
-        // Permite reutilizar el mismo texto base en la plantilla para ambos géneros.
+        // Esto permite tener un solo texto base en la plantilla para ambos géneros,
+        // sin duplicar contenido.
         // ─────────────────────────────────────────────────────────────────────────
         resolveGender: function (text, gender) {
             if (!text) return "";
             const isFemale = gender === "F";
-            // Si es femenino: reemplaza {A} por "A"; si es masculino: elimina {A}
+            // Si es femenino: reemplaza {A} por "A"; si es masculino: lo elimina
             return text.replace(/\{A\}/g, isFemale ? "A" : "").trim();
         },
 
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: getPaisName
-        // Resuelve el nombre de un país a partir de su código.
+        //
+        // Traduce un código de país a su nombre completo.
         // SAP SuccessFactors puede manejar dos sistemas de códigos distintos:
         //
         //  1. SAP_CODES: códigos numéricos internos de SAP (ej. "39" → "Colombia")
-        //  2. PAISES_ISO: códigos ISO 3166-1 alpha-3 estándar (ej. "COL" → "Colombia")
+        //  2. PAISES_ISO: códigos estándar internacionales alpha-3 (ej. "COL" → "Colombia")
         //
-        // Se intenta primero el código SAP; si no coincide, se prueba el ISO.
-        // Si no encuentra ninguno, devuelve el código tal como llegó.
+        // Primero intenta con el código SAP; si no lo encuentra, prueba con el ISO.
+        // Si tampoco lo encuentra, devuelve el código tal como llegó.
         // ─────────────────────────────────────────────────────────────────────────
         getPaisName: function (countryCode) {
 
-            // Mapa de códigos numéricos internos de SAP → nombre del país
+            // Códigos numéricos internos de SAP → nombre del país
             const SAP_CODES = {
                 "1":   "Afganistán",
                 "2":   "Albania",
@@ -547,8 +562,8 @@ sap.ui.define([], function () {
                 "192": "Zimbabue"
             };
 
-            // Mapa de códigos ISO 3166-1 alpha-3 → nombre del país
-            // Cubre los países más frecuentes en la nómina colombiana
+            // Códigos ISO 3166-1 alpha-3 → nombre del país
+            // Incluye los países que aparecen con más frecuencia en la nómina colombiana
             const PAISES_ISO = {
                 "COL": "Colombia", "VEN": "Venezuela", "ECU": "Ecuador",
                 "PER": "Perú",     "MEX": "México",    "ARG": "Argentina",
@@ -558,14 +573,14 @@ sap.ui.define([], function () {
                 "CUB": "Cuba",     "DOM": "República Dominicana"
             };
 
-            // Prioridad: código SAP numérico → código ISO → valor original como fallback
+            // Orden de prioridad: código SAP numérico → código ISO → el valor original como último recurso
             return SAP_CODES[String(countryCode)] || PAISES_ISO[countryCode] || countryCode || "";
         },
 
         // ─────────────────────────────────────────────────────────────────────────
         // Helpers simples: acceso directo a campos del objeto usuario.
-        // Se usan en getSelectedUsers para estandarizar los datos antes de
-        // pasarlos a las plantillas de documentos.
+        // Se usan dentro de getSelectedUsers para estandarizar los datos antes de
+        // pasarlos a las plantillas.
         // ─────────────────────────────────────────────────────────────────────────
 
         // Teléfono de trabajo; cadena vacía si el campo no existe en SAP
@@ -601,27 +616,26 @@ sap.ui.define([], function () {
         // ─────────────────────────────────────────────────────────────────────────
         // FUNCIÓN: getSelectedUsers
         //
-        // Punto de entrada principal del módulo.
-        // Lee la tabla "idUserTable" de la vista SAP UI5, obtiene las filas
-        // marcadas por el usuario y devuelve un array de objetos con todos los
-        // datos ya formateados, listos para reemplazar los placeholders en las
-        // plantillas Word/PDF.
+        // Es la función principal del módulo y el punto de entrada para generar documentos.
+        // Lee la tabla "idUserTable" de la vista SAP UI5, toma las filas que el usuario
+        // seleccionó y devuelve un array con todos los datos ya formateados, listos para
+        // reemplazar los placeholders en las plantillas Word y PDF.
         //
-        // Flujo:
+        // El flujo es:
         //  1. Obtener la tabla de la vista.
         //  2. Leer los ítems seleccionados (puede ser uno o varios empleados).
-        //  3. Por cada fila, acceder al binding context de OData.
+        //  3. Por cada fila, acceder al contexto de datos OData.
         //  4. Extraer cada campo con getProp() y aplicar los formatters del módulo.
-        //  5. Devolver el array de objetos mapeados.
+        //  5. Devolver el array de objetos con todo listo para las plantillas.
         //
-        // Los campos custom (custom02, custom03, custom10) son campos
-        // configurables en SAP SuccessFactors que el cliente usa para datos
-        // específicos de su negocio (dirección, ciudad de trabajo, etc.).
+        // Los campos custom (custom02, custom03, custom10) son campos configurables
+        // en SAP SuccessFactors que el cliente usa para guardar datos propios de su
+        // negocio, como la dirección o la ciudad de trabajo del empleado.
         // ─────────────────────────────────────────────────────────────────────────
         getSelectedUsers: function () {
             var oTable = this.getView().byId("idUserTable");
 
-            // Verificar que la tabla existe en la vista antes de continuar
+            // Verificar que la tabla existe antes de continuar
             if (!oTable) {
                 console.error("La tabla idUserTable no fue encontrada.");
                 return [];
@@ -633,24 +647,24 @@ sap.ui.define([], function () {
 
             var aSelectedItems = oTable.getSelectedItems();
 
-            // Si no hay filas seleccionadas, devolver array vacío (sin error)
+            // Si no hay filas seleccionadas, devolver array vacío sin tirar error
             if (aSelectedItems.length === 0) {
                 return [];
             }
 
-            // Mapear cada fila seleccionada a un objeto con todos los datos del empleado
+            // Por cada fila seleccionada, armar un objeto con todos los datos del empleado
             return aSelectedItems.map(oItem => {
-                // Obtener el contexto de binding OData de la fila
+                // Obtener el contexto de datos OData de la fila
                 const oContext = oItem.getBindingContext("view");
                 if (!oContext) {
                     console.warn("No se encontró el contexto de datos para el elemento seleccionado.");
                     return null;
                 }
 
-                // Shorthand para leer propiedades del OData context sin repetir oContext.getProperty(...)
+                // Atajo para leer propiedades del contexto OData sin repetir oContext.getProperty(...)
                 const getProp = path => oContext.getProperty(path);
 
-                // Resolver gentilicio desde el código de país de nacionalidad
+                // Resolver el gentilicio desde el código de país de nacionalidad
                 const countryCode = getProp("nationalityCode");
                 const gentilicio  = GENTILICIOS[countryCode] || countryCode;
 
@@ -659,10 +673,11 @@ sap.ui.define([], function () {
                 // listos para reemplazar los placeholders [[Campo]] en
                 // las plantillas Word y PDF de los contratos HR.
                 //
-                // Algunas rutas OData usan navegación expandida, por ejemplo:
+                // Algunos campos usan navegación OData expandida, por ejemplo:
                 //   "empInfo/jobInfoNav/results/0/eventReason"
-                // que corresponde a entidades relacionadas cargadas
-                // mediante $expand en la consulta OData.
+                // Esto significa que SAP cargó entidades relacionadas mediante
+                // $expand en la consulta, y acá simplemente las recorremos
+                // para llegar al campo que necesitamos.
                 // ─────────────────────────────────────────────────────────────
                 return {
                     // Identificación básica del empleado
@@ -685,7 +700,7 @@ sap.ui.define([], function () {
                     custom10:       getProp("custom10"),            // Ciudad de trabajo (campo custom de SAP)
 
                     // Cargo y estructura organizacional
-                    title:          (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),    // Cargo sin código numérico SAP
+                    title:          (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),    // Cargo sin el código numérico SAP al final
                     position:       (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),
                     department:     (getProp("department") || "").replace(/\s*\(\d+\)$/, ""),
                     division:       (getProp("division") || "").replace(/\s?\(.*\)/, ""),
@@ -693,9 +708,9 @@ sap.ui.define([], function () {
                     area:           getProp("area")   || "",
                     eventReason:    getProp("empInfo/jobInfoNav/results/0/eventReason"),       // Razón del evento laboral
 
-                    // Fechas formateadas: se aplica formatDateToWords para el formato extendido de contratos
+                    // Fechas formateadas: formatDateToWords produce el formato extendido que va en contratos
                     hireDate:                   this.formatDateToWords(getProp("hireDate")),
-                    hireDatesimpl:              getProp("hireDate"),                            // Fecha cruda (sin formatear)
+                    hireDatesimpl:              getProp("hireDate"),                            // Fecha sin formatear (valor crudo)
                     hireDateRaw:                getProp("empInfo/startDate"),
                     HireDatePost:               getProp("HireDatePost"),
                     originalStartDate:          getProp("empInfo/originalStartDate"),
@@ -705,7 +720,7 @@ sap.ui.define([], function () {
                     endDateFormated:            this.formatDateToWords(getProp("empInfo/endDate")),
                     customDate01:               this.formatDateToWords(getProp("empInfo/customDate1")),
 
-                    // Salario: valor numérico + texto en palabras para el contrato
+                    // Salario: valor numérico para cálculos + texto en palabras para el contrato
                     paycompvalue:     getProp("paycompValue"),
                     payCompValueWord: this.convertNumberToWords(getProp("paycompValue")),
 
@@ -714,7 +729,7 @@ sap.ui.define([], function () {
                     bloodType:     getProp("bloodType") || "",
                     dateOfBirth:   getProp("dateOfBirth") || null,
 
-                    // Dirección (custom03 es el campo de dirección en este cliente SAP)
+                    // Dirección (custom03 es el campo de dirección configurado por este cliente en SAP)
                     address:      getProp("custom03") || "",
                     addressLine1: getProp("addressLine1") || "",
                     custom02:     getProp("custom02"),
@@ -735,8 +750,8 @@ sap.ui.define([], function () {
                     // Frecuencia de pago (obtenida vía $expand en OData: payGroupNav/paymentFrequencyFONav)
                     paymentFrequency: getProp("paymentFrequency") || "",
 
-                    // Helper local: resuelve la ciudad de trabajo con fallback encadenado
-                    // custom10 → state → country (en ese orden de prioridad)
+                    // Resuelve la ciudad de trabajo con fallback encadenado:
+                    // primero custom10, después state, después country
                     getCiudadWork: function (user) {
                         return user.custom10 || user.state || user.country || "";
                     },
