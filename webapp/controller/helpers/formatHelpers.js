@@ -1,45 +1,102 @@
+/**
+ * @file Formatter.js
+ * @description Módulo utilitario de la aplicación SAP UI5 "gestordoccolombia".
+ *
+ * Centraliza todas las funciones de formato y transformación de datos que se
+ * usan al generar documentos HR (contratos PDF y Word) para empleados colombianos.
+ *
+ * Se conecta con SAP SuccessFactors a través de OData y transforma los datos
+ * crudos del sistema en textos listos para insertar en las plantillas de documentos.
+ *
+ * Funciones principales:
+ *  - convertNumberToWords  → Salario en letras (formato colombiano)
+ *  - formatDateToWords     → Fecha extendida en palabras ("quince (15) días del mes de...")
+ *  - formatDateToSpanish   → Fecha en formato "15 de enero de 2024"
+ *  - formatFechaCorta      → Fecha DD/MM/YYYY
+ *  - formatFechaFormal     → Fecha formal "15 de Enero del año 2024"
+ *  - formatDateRaw         → Fecha simple "15 de enero del año 2024"
+ *  - formatSalary          → Salario con separadores "$ 4.853.000"
+ *  - resolveGender         → Resolución de género en texto (ej. "PENSIONADO{A}")
+ *  - getPaisName           → Nombre de país desde código SAP o ISO
+ *  - getSelectedUsers      → Extrae y mapea los empleados seleccionados en la tabla
+ */
 sap.ui.define([], function () {
     "use strict";
 
     return {
 
-        // Convierte un número (salario) a palabras en formato colombiano.
-        // Ejemplo: 1234.56 → "MIL DOSCIENTOS TREINTA Y CUATRO PESOS COLOMBIANOS CON 56/100"
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: convertNumberToWords
+        // Convierte un número (salario) a su representación en palabras,
+        // siguiendo el formato usado en contratos colombianos.
+        //
+        // Ejemplo: 1234 → "MIL DOSCIENTOS TREINTA Y CUATRO PESOS COLOMBIANOS"
+        //
+        // Lógica interna:
+        //  - Se redondea el número a entero (los salarios no tienen centavos).
+        //  - La función interna `numToWords` cubre rangos de forma recursiva:
+        //      < 10      → unidades directas
+        //      < 100     → decenas + " Y " + unidades
+        //      < 1.000   → centenas + resto
+        //      < 1.000.000 → miles
+        //      ≥ 1.000.000 → millones (para salarios integrales altos)
+        // ─────────────────────────────────────────────────────────────────────────
         convertNumberToWords: function (num) {
-            
-           num = Math.round(Number(num));  // redondear a entero
+
+            num = Math.round(Number(num)); // Redondear antes de convertir (sin centavos)
             if (isNaN(num) || num < 0) return "CERO PESOS COLOMBIANOS";
 
+            // Función recursiva interna: convierte un número entero a palabras
             const numToWords = (n) => {
+                // Tablas de referencia para cada rango numérico
                 const unidades = ["", "UN", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
                 const decenas  = ["DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
                 const centenas = ["CIENTO", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
 
                 if (n === 0) return "CERO";
                 if (n < 10)  return unidades[n];
+
+                // Decenas: "VEINTE Y TRES", "CINCUENTA Y SIETE", etc.
                 if (n < 100)
                     return decenas[Math.floor(n / 10) - 1] +
                         (n % 10 !== 0 ? " Y " + unidades[n % 10] : "");
+
+                // Centenas: "DOSCIENTOS CINCUENTA", etc.
                 if (n < 1000)
                     return centenas[Math.floor(n / 100) - 1] +
                         (n % 100 !== 0 ? " " + numToWords(n % 100) : "");
+
+                // Miles: llama a sí misma recursivamente para el grupo de miles
                 if (n < 1000000)
                     return numToWords(Math.floor(n / 1000)) + " MIL" +
                         (n % 1000 !== 0 ? " " + numToWords(n % 1000) : "");
-                // Millones — soporte para salarios integrales altos
+
+                // Millones: para salarios integrales altos (ej. 5.000.000)
                 return numToWords(Math.floor(n / 1000000)) + " MILLONES" +
                     (n % 1000000 !== 0 ? " " + numToWords(n % 1000000) : "");
             };
 
             const pesos        = Math.floor(num);
-            const centavos     = Math.round((num - pesos) * 100);
-            const centavosTexto = centavos < 10 ? `0${centavos}` : `${centavos}`;
+            //const centavos     = Math.round((num - pesos) * 100);
+            //const centavosTexto = centavos < 10 ? `0${centavos}` : `${centavos}`;
 
+            // Retorna el texto final en formato de contrato colombiano
             return `${numToWords(pesos)} PESOS COLOMBIANOS`;
         },
 
-        // Convierte una fecha a un formato extendido:
-        // Ejemplo: "2024-01-15" → "quince (15) días del mes de enero del año dos mil veinticuatro (2024)"
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: formatDateToWords
+        // Convierte una fecha al formato extendido que exigen los contratos:
+        // "quince (15) días del mes de enero del año dos mil veinticuatro (2024)"
+        //
+        // Acepta dos tipos de entrada:
+        //  - Objeto Date de SAP (usa getUTC* para evitar desfase de timezone)
+        //  - String ISO "YYYY-MM-DD" (se ancla a T12:00:00 para neutralizar timezone)
+        //
+        // Internamente usa:
+        //  - `numbersToWords`: mapa fijo para días del 1 al 31
+        //  - `yearToWords`: función dinámica para convertir cualquier año a palabras
+        // ─────────────────────────────────────────────────────────────────────────
         formatDateToWords: function (date) {
             if (!date) return "";
 
@@ -48,6 +105,7 @@ sap.ui.define([], function () {
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
             ];
 
+            // Mapa fijo para los días del mes (1–31)
             const numbersToWords = {
                 1:"un", 2:"dos", 3:"tres", 4:"cuatro", 5:"cinco",
                 6:"seis", 7:"siete", 8:"ocho", 9:"nueve", 10:"diez",
@@ -59,7 +117,8 @@ sap.ui.define([], function () {
                 30:"treinta", 31:"treinta y un"
             };
 
-            // Convierte cualquier año a palabras sin depender de un mapa fijo
+            // Convierte cualquier año a palabras sin depender de un mapa fijo.
+            // Descompone el año en miles, centenas y decenas para construirlo dinámicamente.
             const yearToWords = (y) => {
                 const miles    = Math.floor(y / 1000);
                 const centenas = Math.floor((y % 1000) / 100);
@@ -79,6 +138,7 @@ sap.ui.define([], function () {
                     5:"quinientos", 6:"seiscientos", 7:"setecientos", 8:"ochocientos", 9:"novecientos"
                 };
 
+                // Convierte el segmento de decenas+unidades del año
                 const decToWords = (n) => {
                     if (n === 0) return "";
                     if (decMap[n]) return decMap[n];
@@ -87,29 +147,29 @@ sap.ui.define([], function () {
                     return decMap[d] + (u ? " y " + unidades[u] : "");
                 };
 
+                // Construye el año parte por parte: miles → centenas → decenas
                 let parts = [];
-                if (miles > 1)      parts.push(unidades[miles] + " mil");
+                if (miles > 1)        parts.push(unidades[miles] + " mil");
                 else if (miles === 1) parts.push("mil");
-
-                if (centenas > 0)   parts.push(centMap[centenas]);
-                if (decenas > 0)    parts.push(decToWords(decenas));
+                if (centenas > 0)     parts.push(centMap[centenas]);
+                if (decenas > 0)      parts.push(decToWords(decenas));
 
                 return parts.join(" ");
             };
 
-            // Acepta Date de SAP (objeto) o string ISO
-            let oDate;
+            // Rama 1: si llega un objeto Date de SAP → usa métodos UTC
             if (date instanceof Date) {
-                oDate = date;
-                const day   = oDate.getUTCDate();
-                const month = months[oDate.getUTCMonth()];
-                const year  = oDate.getUTCFullYear();
+                const day   = date.getUTCDate();
+                const month = months[date.getUTCMonth()];
+                const year  = date.getUTCFullYear();
                 const dayText  = numbersToWords[day] || day;
                 const yearText = yearToWords(year);
                 return `${dayText} (${day}) días del mes de ${month} del año ${yearText} (${year})`;
             }
 
-            oDate = new Date(date + "T12:00:00");
+            // Rama 2: si llega un string ISO "YYYY-MM-DD"
+            // Se ancla a T12:00:00 para evitar que el timezone local cambie el día
+            const oDate = new Date(date + "T12:00:00");
             const day   = oDate.getDate();
             const month = months[oDate.getMonth()];
             const year  = oDate.getFullYear();
@@ -118,7 +178,13 @@ sap.ui.define([], function () {
             return `${dayText} (${day}) días del mes de ${month} del año ${yearText} (${year})`;
         },
 
-        // Convierte una fecha al formato: "15 de enero de 2024"
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: formatDateToSpanish
+        // Formato simple para mostrar fechas en documentos generales.
+        // Ejemplo: "2024-01-15" → "15 de enero de 2024"
+        //
+        // Nota: usa hora local (sin anclar a UTC), apta para fechas no críticas.
+        // ─────────────────────────────────────────────────────────────────────────
         formatDateToSpanish: function (sDate) {
             const oDate = new Date(sDate);
             const meses = [
@@ -129,27 +195,49 @@ sap.ui.define([], function () {
             return `${oDate.getDate()} de ${meses[oDate.getMonth()]} de ${oDate.getFullYear()}`;
         },
 
-        // Formato corto DD/MM/YYYY
-        // Usa UTC para evitar desfase de timezone con fechas de SAP
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: formatFechaCorta
+        // Devuelve la fecha en formato DD/MM/YYYY, como se usa en encabezados
+        // y pies de página de los documentos.
+        //
+        // Ejemplo: "2024-01-15" → "15/01/2024"
+        //
+        // Manejo de timezone:
+        //  - Date de SAP → getUTC* (fecha ya está en UTC)
+        //  - String ISO  → T12:00:00 para anclar y evitar desfase de un día
+        // ─────────────────────────────────────────────────────────────────────────
         formatFechaCorta: function (fecha) {
             if (!fecha) return null;
+
+            // Objeto Date de SAP: leer en UTC para no perder un día por timezone
             if (fecha instanceof Date) {
                 return `${String(fecha.getUTCDate()).padStart(2, '0')}/${String(fecha.getUTCMonth() + 1).padStart(2, '0')}/${fecha.getUTCFullYear()}`;
             }
+
+            // String ISO: anclar a mediodía antes de parsear
             const d = new Date(fecha + "T12:00:00");
             return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
         },
 
-        // Formato formal: "15 de Enero del año 2024"
-        // Usa UTC para evitar desfase de timezone con fechas de SAP
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: formatFechaFormal
+        // Formato para encabezados de contratos y cartas oficiales.
+        // Ejemplo: "2024-01-15" → "15 de Enero del año 2024"
+        //
+        // Comportamiento especial:
+        //  - Sin parámetro → devuelve la fecha actual del sistema (hora local),
+        //    útil para timbrar el documento con la fecha de generación.
+        //  - Con Date de SAP → usa getUTC* para evitar desfase.
+        //  - Con string ISO → ancla a T12:00:00.
+        // ─────────────────────────────────────────────────────────────────────────
         formatFechaFormal: function (fechaInput) {
             const meses = [
                 "enero", "febrero", "marzo", "abril", "mayo", "junio",
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
             ];
 
+            // Sin parámetro: usar fecha actual del sistema
             if (!fechaInput) {
-                // Fecha actual: usar hora local (es la hora del usuario)
                 const hoy = new Date();
                 const dia  = hoy.getDate().toString().padStart(2, '0');
                 const mes  = meses[hoy.getMonth()];
@@ -157,6 +245,7 @@ sap.ui.define([], function () {
                 return `${dia} de ${mes.charAt(0).toUpperCase() + mes.slice(1)} del año ${anio}`;
             }
 
+            // Objeto Date de SAP
             if (fechaInput instanceof Date) {
                 const dia  = fechaInput.getUTCDate().toString().padStart(2, '0');
                 const mes  = meses[fechaInput.getUTCMonth()];
@@ -164,7 +253,7 @@ sap.ui.define([], function () {
                 return `${dia} de ${mes.charAt(0).toUpperCase() + mes.slice(1)} del año ${anio}`;
             }
 
-            // String ISO "YYYY-MM-DD": anclar al mediodía para neutralizar timezone
+            // String ISO "YYYY-MM-DD"
             const d = new Date(fechaInput + "T12:00:00");
             const dia  = d.getDate().toString().padStart(2, '0');
             const mes  = meses[d.getMonth()];
@@ -172,13 +261,24 @@ sap.ui.define([], function () {
             return `${dia} de ${mes.charAt(0).toUpperCase() + mes.slice(1)} del año ${anio}`;
         },
 
-        // Ciudad de trabajo: custom10 tiene la ciudad, con fallback a state
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: getCiudadWork
+        // Devuelve la ciudad de trabajo del empleado.
+        // SAP almacena la ciudad en el campo custom10; si no existe, usa `state`
+        // como respaldo (campo estándar de ubicación en SuccessFactors).
+        // ─────────────────────────────────────────────────────────────────────────
         getCiudadWork: function (user) {
             return user.custom10 || user.state || "";
         },
 
-        // Fecha actual formateada: "4 de junio del año 2026"
-        // Usa hora local porque es la fecha del documento (no viene de SAP)
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: getLocalDate
+        // Devuelve la fecha actual en formato legible para el cuerpo del documento.
+        // Ejemplo: "4 de junio del año 2026"
+        //
+        // Usa hora local porque representa la fecha en que se genera el documento,
+        // no una fecha proveniente de SAP.
+        // ─────────────────────────────────────────────────────────────────────────
         getLocalDate: function () {
             const d = new Date();
             const months = ["enero","febrero","marzo","abril","mayo","junio",
@@ -186,35 +286,72 @@ sap.ui.define([], function () {
             return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
         },
 
-        // Fecha desde string ISO o Date de SAP: "2024-01-15" → "15 de enero del año 2024"
-        // - Date de SAP  → getUTC* (ya está desplazada por timezone)
-        // - String ISO   → anclar a T12:00:00 para neutralizar timezone
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: formatDateRaw
+        // Versión reducida del formato de fecha: "15 de enero del año 2024"
+        // (sin el texto extendido en palabras que usa formatDateToWords).
+        //
+        // Mismo criterio de timezone que el resto:
+        //  - Date de SAP → getUTC*
+        //  - String ISO  → T12:00:00
+        // ─────────────────────────────────────────────────────────────────────────
         formatDateRaw: function (dateStr) {
             if (!dateStr) return "";
             const months = ["enero","febrero","marzo","abril","mayo","junio",
                             "julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
             if (dateStr instanceof Date) {
                 return `${dateStr.getUTCDate()} de ${months[dateStr.getUTCMonth()]} del año ${dateStr.getUTCFullYear()}`;
             }
+
             const d = new Date(dateStr + "T12:00:00");
             return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
         },
 
-        // Salario formateado: 4853000 → "$ 4.853.000"
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: formatSalary
+        // Formatea un número de salario con separadores de miles y símbolo de moneda,
+        // usando la localización colombiana ("es-CO") que usa puntos como separador.
+        //
+        // Ejemplo: 4853000 → "$ 4.853.000"
+        // ─────────────────────────────────────────────────────────────────────────
         formatSalary: function (value) {
             if (!value) return "";
             return "$ " + Math.round(Number(value)).toLocaleString("es-CO");
         },
 
-        // Resuelve género en texto con placeholder {A}
-        // Ejemplo: "PENSIONADO{A}" → "PENSIONADA" (mujer) o "PENSIONADO" (hombre)
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: resolveGender
+        // Resuelve el género gramatical en textos de plantillas.
+        // Los placeholders usan la convención {A} para marcar la terminación femenina.
+        //
+        // Ejemplos:
+        //  "PENSIONADO{A}" + "F" → "PENSIONADA"
+        //  "PENSIONADO{A}" + "M" → "PENSIONADO"
+        //
+        // Permite reutilizar el mismo texto base en la plantilla para ambos géneros.
+        // ─────────────────────────────────────────────────────────────────────────
         resolveGender: function (text, gender) {
             if (!text) return "";
             const isFemale = gender === "F";
+            // Si es femenino: reemplaza {A} por "A"; si es masculino: elimina {A}
             return text.replace(/\{A\}/g, isFemale ? "A" : "").trim();
         },
 
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: getPaisName
+        // Resuelve el nombre de un país a partir de su código.
+        // SAP SuccessFactors puede manejar dos sistemas de códigos distintos:
+        //
+        //  1. SAP_CODES: códigos numéricos internos de SAP (ej. "39" → "Colombia")
+        //  2. PAISES_ISO: códigos ISO 3166-1 alpha-3 estándar (ej. "COL" → "Colombia")
+        //
+        // Se intenta primero el código SAP; si no coincide, se prueba el ISO.
+        // Si no encuentra ninguno, devuelve el código tal como llegó.
+        // ─────────────────────────────────────────────────────────────────────────
         getPaisName: function (countryCode) {
+
+            // Mapa de códigos numéricos internos de SAP → nombre del país
             const SAP_CODES = {
                 "1":   "Afganistán",
                 "2":   "Albania",
@@ -410,6 +547,8 @@ sap.ui.define([], function () {
                 "192": "Zimbabue"
             };
 
+            // Mapa de códigos ISO 3166-1 alpha-3 → nombre del país
+            // Cubre los países más frecuentes en la nómina colombiana
             const PAISES_ISO = {
                 "COL": "Colombia", "VEN": "Venezuela", "ECU": "Ecuador",
                 "PER": "Perú",     "MEX": "México",    "ARG": "Argentina",
@@ -419,128 +558,191 @@ sap.ui.define([], function () {
                 "CUB": "Cuba",     "DOM": "República Dominicana"
             };
 
+            // Prioridad: código SAP numérico → código ISO → valor original como fallback
             return SAP_CODES[String(countryCode)] || PAISES_ISO[countryCode] || countryCode || "";
         },
 
-        // Obtiene el teléfono de trabajo, con fallback a cadena vacía si no existe
+        // ─────────────────────────────────────────────────────────────────────────
+        // Helpers simples: acceso directo a campos del objeto usuario.
+        // Se usan en getSelectedUsers para estandarizar los datos antes de
+        // pasarlos a las plantillas de documentos.
+        // ─────────────────────────────────────────────────────────────────────────
+
+        // Teléfono de trabajo; cadena vacía si el campo no existe en SAP
         getTelefono: function (user) {
             return user.businessPhone || "";
         },
 
+        // Correo electrónico corporativo del empleado
         getEmail: function (user) {
             return user.email || "";
         },
 
+        // Código de nacionalidad tal como viene de SuccessFactors
         getNacionalidad: function (user) {
             return user.nationality || "";
         },
 
+        // Sexo en texto legible ("Femenino" / "Masculino") a partir del código SAP
         getSexo: function (user) {
             return user.gender === "F" ? "Femenino" : "Masculino";
         },
 
+        // Estado civil del empleado (campo estándar de SuccessFactors)
         getEstadoCivil: function (user) {
             return user.maritalStatus || "";
         },
 
+        // Grupo sanguíneo del empleado
         getGrupoSanguineo: function (user) {
             return user.bloodType || "";
         },
 
-        // =====================================================================================
-        // Obtiene los usuarios seleccionados en la tabla idUserTable y devuelve
-        // un array de objetos con todos los datos necesarios para los documentos.
-        // =====================================================================================
+        // ─────────────────────────────────────────────────────────────────────────
+        // FUNCIÓN: getSelectedUsers
+        //
+        // Punto de entrada principal del módulo.
+        // Lee la tabla "idUserTable" de la vista SAP UI5, obtiene las filas
+        // marcadas por el usuario y devuelve un array de objetos con todos los
+        // datos ya formateados, listos para reemplazar los placeholders en las
+        // plantillas Word/PDF.
+        //
+        // Flujo:
+        //  1. Obtener la tabla de la vista.
+        //  2. Leer los ítems seleccionados (puede ser uno o varios empleados).
+        //  3. Por cada fila, acceder al binding context de OData.
+        //  4. Extraer cada campo con getProp() y aplicar los formatters del módulo.
+        //  5. Devolver el array de objetos mapeados.
+        //
+        // Los campos custom (custom02, custom03, custom10) son campos
+        // configurables en SAP SuccessFactors que el cliente usa para datos
+        // específicos de su negocio (dirección, ciudad de trabajo, etc.).
+        // ─────────────────────────────────────────────────────────────────────────
         getSelectedUsers: function () {
             var oTable = this.getView().byId("idUserTable");
 
+            // Verificar que la tabla existe en la vista antes de continuar
             if (!oTable) {
                 console.error("La tabla idUserTable no fue encontrada.");
                 return [];
             }
 
-            // Gran mapa de gentilicios según código de país
-            const GENTILICIOS = {"ABW": "arubeña", "AFG": "afgana", "AGO": "angoleña", "AIA": "anguillana", "ALA": "alandesa", "ALB": "albanesa", "AND": "andorrana", "ANT": "antillana", "ARE": "emiratí", "ARG": "argentina", "ARM": "armenia", "ASM": "samoana", "ATA": "antártica", "ATF": "francesa", "ATG": "antiguana", "AUS": "australiana", "AUT": "austríaca", "AZE": "azerbaiyana", "BDI": "burundesa", "BEL": "belga", "BEN": "beninesa", "BFA": "burkinesa", "BGD": "bangladesí", "BGR": "búlgara", "BHR": "bareiní", "BHS": "bahamesa", "BIH": "bosnia", "BLM": "bartoleña", "BLR": "bielorrusa", "BLZ": "beliceña", "BMU": "bermudense", "BOL": "boliviana", "BRA": "brasileña", "BRB": "barbadense", "BRN": "bruneana", "BTN": "butanesa", "BVT": "bouvetina", "BWA": "botsuana", "CAF": "centroafricana", "CAN": "canadiense", "CCK": "cocosense", "CHE": "suiza", "CHL": "chilena", "CHN": "china", "CIV": "marfileña", "CMR": "camerunesa", "COD": "congoleña", "COG": "congoleña", "COK": "cookiana", "COL": "colombiana", "COM": "comorense", "CPV": "caboverdiana", "CRI": "costarricense", "CUB": "cubana", "CXR": "navideña", "CYM": "caimanesa", "CYP": "chipriota", "CZE": "checa", "DEU": "alemana", "DJI": "yibutiana", "DMA": "dominiqueña", "DNK": "danesa", "DOM": "dominicana", "DZA": "argelina", "ECU": "ecuatoriana", "EGY": "egipcia", "ERI": "eritrea", "ESH": "saharaui", "ESP": "española", "EST": "estonia", "ETH": "etíope", "FIN": "finlandesa", "FJI": "fiyiana", "FLK": "malvinense", "FRA": "francesa", "FRO": "feroense", "FSM": "micronesia", "GAB": "gabonesa", "GBR": "británica", "GEO": "georgiana", "GGY": "guerneseyana", "GHA": "ghana", "GIB": "gibraltareña", "GIN": "guineana", "GLP": "guadalupense", "GMB": "gambiana", "GNB": "bisauguineana", "GNQ": "ecuatoguineana", "GRC": "griega", "GRD": "granadina", "GRL": "groenlandesa", "GTM": "guatemalteca", "GUF": "guayanesa", "GUM": "guameña", "GUY": "guyanesa", "HKG": "hongkonesa", "HMD": "heardense", "HND": "hondureña", "HRV": "croata", "HTI": "haitiana", "HUN": "húngara", "IDN": "indonesia", "IMN": "manesa", "IND": "india", "IOT": "británica", "IRL": "irlandesa", "IRN": "iraní", "IRQ": "iraquí", "ISL": "islandesa", "ISR": "israelí", "ITA": "italiana", "JAM": "jamaicana", "JEY": "jerseyana", "JOR": "jordana", "JPN": "japonesa", "KAZ": "kazaja", "KEN": "keniana", "KGZ": "kirguisa", "KHM": "camboyana", "KIR": "kiribatiana", "KNA": "kittiana", "KOR": "coreana", "KWT": "kuwaití", "LAO": "laosiana", "LBN": "libanesa", "LBR": "liberiana", "LBY": "libia", "LCA": "santalucense", "LIE": "liechtensteiniana", "LKA": "ceilanesa", "LSO": "lesotense", "LTU": "lituana", "LUX": "luxemburguesa", "LVA": "letona", "MAC": "macaense", "MAF": "sanmartinense", "MAR": "marroquí", "MCO": "monaguesca", "MDA": "moldava", "MDG": "malgache", "MDV": "maldiva", "MEX": "mexicana", "MHL": "marshallesa", "MKD": "macedonia", "MLI": "maliense", "MLT": "maltesa", "MMR": "birmana", "MNE": "montenegrina", "MNG": "mongola", "MNP": "marianense", "MOZ": "mozambiqueña", "MRT": "mauritana", "MSR": "montserratense", "MTQ": "martiniqueña", "MUS": "mauriciana", "MWI": "malauí", "MYS": "malasia", "MYT": "mahoreña", "NAM": "namibia", "NCL": "neocaledonia", "NER": "nigerina", "NFK": "norfolkense", "NGA": "nigeriana", "NIC": "nicaragüense", "NIU": "niuana", "NLD": "neerlandesa", "NOR": "noruega", "NPL": "nepalí", "NRU": "nauruana", "NZL": "neozelandesa", "OMN": "omaní", "PAK": "paquistaní", "PAN": "panameña", "PCN": "pitcairnesa", "PER": "peruana", "PHL": "filipina", "PLW": "palauana", "PNG": "papú", "POL": "polaca", "PRI": "puertorriqueña", "PRK": "surcoreana", "PRT": "portuguesa", "PRY": "paraguaya", "PSE": "palestina", "PYF": "polinesia", "QAT": "qatarí", "REU": "reunionense", "ROU": "rumana", "RUS": "rusa", "RWA": "ruandesa", "SAU": "saudí", "SDN": "sudanesa", "SEN": "senegalesa", "SGP": "singapurense", "SGS": "surgeorgiana", "SHN": "santalenense", "SJM": "svalbardense", "SLB": "salomonense", "SLE": "sierraleonesa", "SLV": "salvadoreña", "SMR": "sanmarinense", "SOM": "somalí", "SPM": "miquelonesa", "SRB": "serbia", "STP": "santotomense", "SUR": "surinamesa", "SVK": "eslovaca", "SVN": "eslovena", "SWE": "sueca", "SWZ": "suazilandesa", "SYC": "seychellense", "SYR": "siría", "TCA": "turcocaiqueña", "TCD": "chadiana", "TGO": "iraní", "THA": "tailandesa", "TJK": "tayika", "TKL": "tokelauana", "TKM": "turcomana", "TLS": "timorense", "TON": "tongana", "TTO": "trinitense", "TUN": "tunecina", "TUR": "turca", "TUV": "tuvaluana", "TWN": "taiwanesa", "TZA": "tanzana", "UGA": "ugandesa", "UKR": "ucraniana", "UMI": "estadounidense", "URY": "uruguaya", "USA": "estadounidense", "UZB": "uzbeka", "VAT": "vaticana", "VCT": "vicentina", "VEN": "venezolana", "VGB": "británica", "VIR": "virgenense", "VNM": "vietnamita", "VUT": "vanuatuense", "WLF": "wallisiana", "WSM": "samoana", "YEM": "yemení", "ZAF": "sudafricana", "ZMB": "zambiana", "ZWE": "zimbabuense" }; 
+            // Mapa completo de gentilicios por código de país ISO 3166-1 alpha-3.
+            // Se usa para construir frases como "de nacionalidad colombiana" en los contratos.
+            const GENTILICIOS = {"ABW": "arubeña", "AFG": "afgana", "AGO": "angoleña", "AIA": "anguillana", "ALA": "alandesa", "ALB": "albanesa", "AND": "andorrana", "ANT": "antillana", "ARE": "emiratí", "ARG": "argentina", "ARM": "armenia", "ASM": "samoana", "ATA": "antártica", "ATF": "francesa", "ATG": "antiguana", "AUS": "australiana", "AUT": "austríaca", "AZE": "azerbaiyana", "BDI": "burundesa", "BEL": "belga", "BEN": "beninesa", "BFA": "burkinesa", "BGD": "bangladesí", "BGR": "búlgara", "BHR": "bareiní", "BHS": "bahamesa", "BIH": "bosnia", "BLM": "bartoleña", "BLR": "bielorrusa", "BLZ": "beliceña", "BMU": "bermudense", "BOL": "boliviana", "BRA": "brasileña", "BRB": "barbadense", "BRN": "bruneana", "BTN": "butanesa", "BVT": "bouvetina", "BWA": "botsuana", "CAF": "centroafricana", "CAN": "canadiense", "CCK": "cocosense", "CHE": "suiza", "CHL": "chilena", "CHN": "china", "CIV": "marfileña", "CMR": "camerunesa", "COD": "congoleña", "COG": "congoleña", "COK": "cookiana", "COL": "colombiana", "COM": "comorense", "CPV": "caboverdiana", "CRI": "costarricense", "CUB": "cubana", "CXR": "navideña", "CYM": "caimanesa", "CYP": "chipriota", "CZE": "checa", "DEU": "alemana", "DJI": "yibutiana", "DMA": "dominiqueña", "DNK": "danesa", "DOM": "dominicana", "DZA": "argelina", "ECU": "ecuatoriana", "EGY": "egipcia", "ERI": "eritrea", "ESH": "saharaui", "ESP": "española", "EST": "estonia", "ETH": "etíope", "FIN": "finlandesa", "FJI": "fiyiana", "FLK": "malvinense", "FRA": "francesa", "FRO": "feroense", "FSM": "micronesia", "GAB": "gabonesa", "GBR": "británica", "GEO": "georgiana", "GGY": "guerneseyana", "GHA": "ghana", "GIB": "gibraltareña", "GIN": "guineana", "GLP": "guadalupense", "GMB": "gambiana", "GNB": "bisauguineana", "GNQ": "ecuatoguineana", "GRC": "griega", "GRD": "granadina", "GRL": "groenlandesa", "GTM": "guatemalteca", "GUF": "guayanesa", "GUM": "guameña", "GUY": "guyanesa", "HKG": "hongkonesa", "HMD": "heardense", "HND": "hondureña", "HRV": "croata", "HTI": "haitiana", "HUN": "húngara", "IDN": "indonesia", "IMN": "manesa", "IND": "india", "IOT": "británica", "IRL": "irlandesa", "IRN": "iraní", "IRQ": "iraquí", "ISL": "islandesa", "ISR": "israelí", "ITA": "italiana", "JAM": "jamaicana", "JEY": "jerseyana", "JOR": "jordana", "JPN": "japonesa", "KAZ": "kazaja", "KEN": "keniana", "KGZ": "kirguisa", "KHM": "camboyana", "KIR": "kiribatiana", "KNA": "kittiana", "KOR": "coreana", "KWT": "kuwaití", "LAO": "laosiana", "LBN": "libanesa", "LBR": "liberiana", "LBY": "libia", "LCA": "santalucense", "LIE": "liechtensteiniana", "LKA": "ceilanesa", "LSO": "lesotense", "LTU": "lituana", "LUX": "luxemburguesa", "LVA": "letona", "MAC": "macaense", "MAF": "sanmartinense", "MAR": "marroquí", "MCO": "monaguesca", "MDA": "moldava", "MDG": "malgache", "MDV": "maldiva", "MEX": "mexicana", "MHL": "marshallesa", "MKD": "macedonia", "MLI": "maliense", "MLT": "maltesa", "MMR": "birmana", "MNE": "montenegrina", "MNG": "mongola", "MNP": "marianense", "MOZ": "mozambiqueña", "MRT": "mauritana", "MSR": "montserratense", "MTQ": "martiniqueña", "MUS": "mauriciana", "MWI": "malauí", "MYS": "malasia", "MYT": "mahoreña", "NAM": "namibia", "NCL": "neocaledonia", "NER": "nigerina", "NFK": "norfolkense", "NGA": "nigeriana", "NIC": "nicaragüense", "NIU": "niuana", "NLD": "neerlandesa", "NOR": "noruega", "NPL": "nepalí", "NRU": "nauruana", "NZL": "neozelandesa", "OMN": "omaní", "PAK": "paquistaní", "PAN": "panameña", "PCN": "pitcairnesa", "PER": "peruana", "PHL": "filipina", "PLW": "palauana", "PNG": "papú", "POL": "polaca", "PRI": "puertorriqueña", "PRK": "surcoreana", "PRT": "portuguesa", "PRY": "paraguaya", "PSE": "palestina", "PYF": "polinesia", "QAT": "qatarí", "REU": "reunionense", "ROU": "rumana", "RUS": "rusa", "RWA": "ruandesa", "SAU": "saudí", "SDN": "sudanesa", "SEN": "senegalesa", "SGP": "singapurense", "SGS": "surgeorgiana", "SHN": "santalenense", "SJM": "svalbardense", "SLB": "salomonense", "SLE": "sierraleonesa", "SLV": "salvadoreña", "SMR": "sanmarinense", "SOM": "somalí", "SPM": "miquelonesa", "SRB": "serbia", "STP": "santotomense", "SUR": "surinamesa", "SVK": "eslovaca", "SVN": "eslovena", "SWE": "sueca", "SWZ": "suazilandesa", "SYC": "seychellense", "SYR": "siría", "TCA": "turcocaiqueña", "TCD": "chadiana", "TGO": "iraní", "THA": "tailandesa", "TJK": "tayika", "TKL": "tokelauana", "TKM": "turcomana", "TLS": "timorense", "TON": "tongana", "TTO": "trinitense", "TUN": "tunecina", "TUR": "turca", "TUV": "tuvaluana", "TWN": "taiwanesa", "TZA": "tanzana", "UGA": "ugandesa", "UKR": "ucraniana", "UMI": "estadounidense", "URY": "uruguaya", "USA": "estadounidense", "UZB": "uzbeka", "VAT": "vaticana", "VCT": "vicentina", "VEN": "venezolana", "VGB": "británica", "VIR": "virgenense", "VNM": "vietnamita", "VUT": "vanuatuense", "WLF": "wallisiana", "WSM": "samoana", "YEM": "yemení", "ZAF": "sudafricana", "ZMB": "zambiana", "ZWE": "zimbabuense" };
 
             var aSelectedItems = oTable.getSelectedItems();
+
+            // Si no hay filas seleccionadas, devolver array vacío (sin error)
             if (aSelectedItems.length === 0) {
                 return [];
             }
 
-            // Mapear cada fila seleccionada a un objeto con información del empleado
+            // Mapear cada fila seleccionada a un objeto con todos los datos del empleado
             return aSelectedItems.map(oItem => {
+                // Obtener el contexto de binding OData de la fila
                 const oContext = oItem.getBindingContext("view");
                 if (!oContext) {
                     console.warn("No se encontró el contexto de datos para el elemento seleccionado.");
                     return null;
                 }
 
-                // Función para simplificar llamadas a oContext.getProperty
+                // Shorthand para leer propiedades del OData context sin repetir oContext.getProperty(...)
                 const getProp = path => oContext.getProperty(path);
 
-                // Obtener nacionalidad/gentilicio
+                // Resolver gentilicio desde el código de país de nacionalidad
                 const countryCode = getProp("nationalityCode");
-                const gentilicio = GENTILICIOS[countryCode] || countryCode;
-                
+                const gentilicio  = GENTILICIOS[countryCode] || countryCode;
 
-                // Devuelve todos los datos listos para insertarse en las plantillas .docx
+                // ─────────────────────────────────────────────────────────────
+                // Objeto de retorno: todos los campos ya formateados,
+                // listos para reemplazar los placeholders [[Campo]] en
+                // las plantillas Word y PDF de los contratos HR.
+                //
+                // Algunas rutas OData usan navegación expandida, por ejemplo:
+                //   "empInfo/jobInfoNav/results/0/eventReason"
+                // que corresponde a entidades relacionadas cargadas
+                // mediante $expand en la consulta OData.
+                // ─────────────────────────────────────────────────────────────
                 return {
-                    userId: getProp("userId"),
-                    firstName: getProp("firstName"),
-                    lastName: getProp("lastName"),
+                    // Identificación básica del empleado
+                    userId:         getProp("userId"),
+                    firstName:      getProp("firstName"),
+                    lastName:       getProp("lastName"),
                     secondLastName: getProp("empInfo/personNav/personalInfoNav/results/0/secondLastName") || "",
-                    email: getProp("email"),
-                    nationality: gentilicio,
-                    title: (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),
-                    custom02: getProp("custom02"),
-                    customDate01: this.formatDateToWords(getProp("empInfo/customDate1")),
-                    businessPhone: getProp("businessPhone"),
-                    state: getProp("state"),
-                    custom10: getProp("custom10"),
-                    country: this.getPaisName(getProp("country")),
-                    eventReason: getProp("empInfo/jobInfoNav/results/0/eventReason"),
-                    hireDate: this.formatDateToWords(getProp("hireDate")),
-                    hireDatesimpl: getProp("hireDate"),
-                    hireDateRaw: getProp("empInfo/startDate"),
-                    HireDatePost: getProp("HireDatePost"),
-                    originalStartDate: getProp("empInfo/originalStartDate"),
+                    nationalId:     getProp("nationalId"),          // Número de cédula
+                    salut:          getProp("salut"),               // Tratamiento (Sr./Sra.)
+                    gender:         getProp("gender"),              // Código SAP: "M" / "F"
+
+                    // Contacto
+                    email:          getProp("email"),
+                    businessPhone:  getProp("businessPhone"),
+
+                    // Nacionalidad y ubicación
+                    nationality:    gentilicio,                     // Ej: "colombiana"
+                    country:        this.getPaisName(getProp("country")),
+                    state:          getProp("state"),
+                    custom10:       getProp("custom10"),            // Ciudad de trabajo (campo custom de SAP)
+
+                    // Cargo y estructura organizacional
+                    title:          (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),    // Cargo sin código numérico SAP
+                    position:       (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),
+                    department:     (getProp("department") || "").replace(/\s*\(\d+\)$/, ""),
+                    division:       (getProp("division") || "").replace(/\s?\(.*\)/, ""),
+                    planta:         getProp("planta") || "",
+                    area:           getProp("area")   || "",
+                    eventReason:    getProp("empInfo/jobInfoNav/results/0/eventReason"),       // Razón del evento laboral
+
+                    // Fechas formateadas: se aplica formatDateToWords para el formato extendido de contratos
+                    hireDate:                   this.formatDateToWords(getProp("hireDate")),
+                    hireDatesimpl:              getProp("hireDate"),                            // Fecha cruda (sin formatear)
+                    hireDateRaw:                getProp("empInfo/startDate"),
+                    HireDatePost:               getProp("HireDatePost"),
+                    originalStartDate:          getProp("empInfo/originalStartDate"),
                     originalStartDateFormatted: this.formatDateToWords(getProp("empInfo/originalStartDate")),
-                    hireDateExt: this.formatDateToWords(getProp("empInfo/endDate")),
-                    paycompvalue: getProp("paycompValue"),
+                    hireDateExt:                this.formatDateToWords(getProp("empInfo/endDate")),
+                    endDate:                    getProp("empInfo/endDate"),
+                    endDateFormated:            this.formatDateToWords(getProp("empInfo/endDate")),
+                    customDate01:               this.formatDateToWords(getProp("empInfo/customDate1")),
+
+                    // Salario: valor numérico + texto en palabras para el contrato
+                    paycompvalue:     getProp("paycompValue"),
                     payCompValueWord: this.convertNumberToWords(getProp("paycompValue")),
-                    nationalId: getProp("nationalId"),
+
+                    // Datos personales adicionales
                     maritalStatus: getProp("marriageStatus"),
-                    salut: getProp("salut"),
-                    endDate: getProp("empInfo/endDate"),
-                    endDateFormated: this.formatDateToWords(getProp("empInfo/endDate")),
-                    department: (getProp("department") || "").replace(/\s*\(\d+\)$/, ""),
-                    division: (getProp("division") || "").replace(/\s?\(.*\)/, ""),
-                    custom03: getProp("custom03"),
-                    position: (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),
-                    positionSup: (getProp("manager/jobCode") || "").replace(/\s*\(\d+\)$/, ""),
-                    TelefonoSup: (getProp("manager/businessPhone") || "").replace(/(.*)x(.*)/, "($2) $1"),
-                    CorreoTrabajoSup: getProp("manager/email"),
-                    gender:    getProp("gender"),
-                    address:   getProp("custom03") || "",
-                    bloodType: getProp("bloodType") || "",
-                    dateOfBirth: getProp("dateOfBirth") || null,
-                    addressLine1:       getProp("addressLine1") || "",
+                    bloodType:     getProp("bloodType") || "",
+                    dateOfBirth:   getProp("dateOfBirth") || null,
+
+                    // Dirección (custom03 es el campo de dirección en este cliente SAP)
+                    address:      getProp("custom03") || "",
+                    addressLine1: getProp("addressLine1") || "",
+                    custom02:     getProp("custom02"),
+                    custom03:     getProp("custom03"),              // Dirección del empleado
+
+                    // Documento de identidad
+                    docCardType:        getProp("docCardType") || "",
                     docExpeditionDate:  this.formatDateRaw(getProp("docExpeditionDate")),
-                    managerName:  getProp("managerName")  || "",
-                    managerEmail: getProp("managerEmail") || "",
-                    managerNav:   getProp("managerUserNav"),
-                    docCardType: getProp("docCardType") || "",
+
+                    // Jefe directo (datos del manager, obtenidos por navegación OData)
+                    managerName:   getProp("managerName")  || "",
+                    managerEmail:  getProp("managerEmail") || "",
+                    managerNav:    getProp("managerUserNav"),
+                    positionSup:   (getProp("manager/jobCode") || "").replace(/\s*\(\d+\)$/, ""),
+                    TelefonoSup:   (getProp("manager/businessPhone") || "").replace(/(.*)x(.*)/, "($2) $1"),
+                    CorreoTrabajoSup: getProp("manager/email"),
+
+                    // Frecuencia de pago (obtenida vía $expand en OData: payGroupNav/paymentFrequencyFONav)
                     paymentFrequency: getProp("paymentFrequency") || "",
-                    planta: getProp("planta") || "",
-                    area:   getProp("area")   || "",
+
+                    // Helper local: resuelve la ciudad de trabajo con fallback encadenado
+                    // custom10 → state → country (en ese orden de prioridad)
                     getCiudadWork: function (user) {
                         return user.custom10 || user.state || user.country || "";
                     },
-                    
                 };
             });
         }
-
 
     };
 });

@@ -1,12 +1,13 @@
 sap.ui.define([
-  "sap/ui/core/mvc/Controller",
-  "sap/ui/model/json/JSONModel",
-  "sap/m/MessageToast",
-  "gestordoccolombia/util/LibraryLoader",
+  // ── Núcleo de SAPUI5 ──
+  "sap/ui/core/mvc/Controller",            // Clase base de la que extiende este controller
+  "sap/ui/model/json/JSONModel",           // Modelo JSON usado para "view" y "user"
+  "sap/m/MessageToast",                    // Notificaciones tipo "toast" para avisos al usuario
+  "gestordoccolombia/util/LibraryLoader",  // Carga librerías externas (pdf-lib, html2canvas) de forma lazy
   // Helpers reutilizables
   "gestordoccolombia/controller/helpers/uiHelpers",
   "gestordoccolombia/controller/helpers/formatHelpers",
-  // Lógica específica por documento
+  // Lógica específica por documento (un módulo por cada tipo de documento a generar)
   "gestordoccolombia/controller/functions/kitRetiro",
   "gestordoccolombia/controller/functions/otroSiRodamiento",
   "gestordoccolombia/controller/functions/otroSiAlimentacion15",
@@ -24,8 +25,10 @@ sap.ui.define([
   "gestordoccolombia/controller/functions/contratoTerminoIndef",
   "gestordoccolombia/controller/functions/contratoAprendizajeLectivo",
   "gestordoccolombia/controller/functions/contratoAprendizajeProductivo",
-  "gestordoccolombia/service/CpiService"
+  "gestordoccolombia/service/CpiService" // Servicio que envía documentos a SAP CPI (integración DocuSign)
 
+// El segundo argumento de sap.ui.define es la "factory function": recibe, en el
+// mismo orden que el array de arriba, cada módulo ya cargado y listo para usar.
 ], (Controller, JSONModel, MessageToast, LibraryLoader, uiHelpers, formatHelpers,
     kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11,
     otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion,
@@ -33,6 +36,8 @@ sap.ui.define([
     protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo, contratoTerminoIndef, contratoAprendizajeLectivo, contratoAprendizajeProductivo, CpiService) => {
   "use strict";
 
+  // Extiende el Controller base de SAPUI5 y devuelve la clase de este controller,
+  // identificada con el nombre completo "gestordoccolombia.controller.View1"
   return Controller.extend("gestordoccolombia.controller.View1", {
 
     // ═══════════════════════════════════════════════════════════════════
@@ -131,17 +136,17 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     _beginBusy: function () {
-      if (!this.oGlobalBusyDialog) return;
-      this._busyCounter = (this._busyCounter || 0) + 1;
-      if (this._busyCounter === 1) {
+      if (!this.oGlobalBusyDialog) return;                       // Si no existe el diálogo, no hace nada (protección)
+      this._busyCounter = (this._busyCounter || 0) + 1;           // Suma 1 al contador de operaciones en curso
+      if (this._busyCounter === 1) {                              // Solo abre el diálogo cuando pasa de 0 a 1
         this.oGlobalBusyDialog.open();
       }
     },
 
     _endBusy: function () {
       if (!this.oGlobalBusyDialog) return;
-      this._busyCounter = Math.max((this._busyCounter || 1) - 1, 0);
-      if (this._busyCounter === 0) {
+      this._busyCounter = Math.max((this._busyCounter || 1) - 1, 0); // Resta 1, nunca deja el contador negativo
+      if (this._busyCounter === 0) {                                 // Solo cierra cuando ya no quedan operaciones pendientes
         this.oGlobalBusyDialog.close();
       }
     },
@@ -149,10 +154,10 @@ sap.ui.define([
     // Envuelve una función async mostrando el busy dialog durante su ejecución.
     // Uso: this._withBusy(() => this._readOData(...))
     _withBusy: function (fn) {
-      this._beginBusy();
+      this._beginBusy();                  // Muestra (o mantiene) el busy dialog antes de ejecutar fn
       return Promise.resolve()
-        .then(fn)
-        .finally(() => this._endBusy());
+        .then(fn)                         // Ejecuta la función recibida (puede ser async)
+        .finally(() => this._endBusy());  // Pase lo que pase (éxito o error), libera el contador
     },
 
 
@@ -166,25 +171,26 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     _ensurePdfToolkit: function () {
-      if (!this._pdfToolkitPromise) {
+      if (!this._pdfToolkitPromise) {                     // Solo arranca la carga la primera vez que se pide
         this._pdfToolkitPromise = Promise.all([
-          LibraryLoader.ensureLibrary("pdf-lib", {
+          LibraryLoader.ensureLibrary("pdf-lib", {         // Carga la librería pdf-lib desde un CDN
             url: "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js",
-            globalName: "PDFLib",
-            validator: lib => !!lib && typeof lib.PDFDocument === "function"
+            globalName: "PDFLib",                          // Nombre de la variable global que crea el script
+            validator: lib => !!lib && typeof lib.PDFDocument === "function" // Verifica que cargó bien
           }),
-          LibraryLoader.ensureLibrary("html2canvas", {
+          LibraryLoader.ensureLibrary("html2canvas", {     // Carga html2canvas (convierte HTML a imagen)
             url: "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
             globalName: "html2canvas",
             validator: fn => typeof fn === "function"
           })
         ]).then(() => {
+          // Una vez cargadas ambas, guarda referencias directas para uso rápido
           this._pdfLibRef = window.PDFLib;
           this._html2canvasRef = window.html2canvas;
           return { PDFLib: this._pdfLibRef, html2canvas: this._html2canvasRef };
         });
       }
-      return this._pdfToolkitPromise;
+      return this._pdfToolkitPromise; // Devuelve siempre la misma promesa (cacheada)
     },
 
 
@@ -198,8 +204,8 @@ sap.ui.define([
     _readOData: function (oModel, sPath, mParameters) {
       return new Promise((resolve, reject) => {
         oModel.read(sPath, Object.assign({}, mParameters, {
-          success: resolve,
-          error: reject
+          success: resolve,  // Si la lectura OData tiene éxito, resuelve la promesa con los datos
+          error: reject       // Si falla, rechaza la promesa con el error
         }));
       });
     },
@@ -218,26 +224,26 @@ sap.ui.define([
     _ensureDataForTitle: function (sTitle) {
       // Por ahora todos los documentos Colombia usan empleados activos.
       // Si en el futuro se agregan documentos de excolaboradores,
-      // agregar la lógica de needsInactive aquí según sTitle.
-      const needsActive   = true;
-      const needsInactive = false;
+      // agregar la lógica de needsInactive acá según sTitle.
+      const needsActive   = true;          // Siempre se necesitan los activos hoy en día
+      const needsInactive = false;         // Reservado para futuros documentos de excolaboradores
       const aPromises     = [];
 
-      if (needsActive && !this._activeEmployeesLoaded) {
+      if (needsActive && !this._activeEmployeesLoaded) {     // Solo carga si todavía no se cargó en esta sesión
         aPromises.push(this.loadEmployees());
       }
       if (needsInactive && !this._inactiveEmployeesLoaded) {
         aPromises.push(this.loadEmployeesBkp());
       }
 
-      return aPromises.length ? Promise.all(aPromises) : Promise.resolve();
+      return aPromises.length ? Promise.all(aPromises) : Promise.resolve(); // Espera todas las cargas pendientes
     },
 
     // Punto de entrada cuando el usuario hace click en un tile/documento.
     // Primero garantiza que los datos estén cargados, luego abre el diálogo.
     _handleTileSelection: function (sTitle) {
       return this._ensureDataForTitle(sTitle).then(() => {
-        this._openDialogForTitle(sTitle);
+        this._openDialogForTitle(sTitle); // Recién acá se abre el diálogo, con los datos ya disponibles
       });
     },
 
@@ -256,11 +262,11 @@ sap.ui.define([
 
     onInit: function () {
       const oView     = this.getView();
-      const bDarkMode = this._readStoredThemeMode();
+      const bDarkMode = this._readStoredThemeMode();      // Lee de localStorage si el usuario venía en modo oscuro
 
       // Busy dialog global: se reutiliza durante toda la sesión
-      this.oGlobalBusyDialog = new sap.m.BusyDialog();
-      this._busyCounter      = 0;
+      this.oGlobalBusyDialog = new sap.m.BusyDialog();    // Crea UNA sola instancia del spinner de carga
+      this._busyCounter      = 0;                          // Contador en 0: ninguna operación corriendo todavía
 
       // Modelo "view": controla el estado de la UI (usuarios filtrados, título del diálogo, tema, etc.)
       const oViewModel = new JSONModel({
@@ -275,11 +281,11 @@ sap.ui.define([
         ThemeToggleTooltip: bDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
       });
       oViewModel.setSizeLimit(999999); // Sin límite práctico para empresas con muchos empleados
-      this.getOwnerComponent().setModel(oViewModel, "view");
+      this.getOwnerComponent().setModel(oViewModel, "view"); // Registra el modelo "view" a nivel de Component (visible en toda la app)
 
       // Aplica el tema guardado en localStorage
-      this._applyThemeMode(bDarkMode);
-      this._enableThemeTransitionsAfterInitialRender();
+      this._applyThemeMode(bDarkMode);                       // Pone las clases CSS correctas en el DOM
+      this._enableThemeTransitionsAfterInitialRender();      // Habilita animaciones de transición solo después del primer render
 
       // Variables internas de control
       this.aSelectedEmployees       = [];    // Empleados seleccionados en la tabla
@@ -293,13 +299,13 @@ sap.ui.define([
       this._activeDateFilter        = null;  // Rango de fechas activo
 
       // Carga info del usuario (empresa, permisos, nombre para el saludo)
-      this.getUserInfo();
-      this.updateGreeting();
+      this.getUserInfo();      // Dispara el flujo: userId -> empresa -> permisos/grupo
+      this.updateGreeting();   // Muestra un saludo provisional (se actualiza de nuevo cuando llega el nombre real)
 
       // Carga el logo desde la carpeta img del proyecto
       const oImage = this.byId("_IDGenImageeee");
       if (oImage) {
-        oImage.setSrc(sap.ui.require.toUrl("gestordoccolombia/img/logo.png"));
+        oImage.setSrc(sap.ui.require.toUrl("gestordoccolombia/img/logo.png")); // Resuelve la URL del logo según el namespace del módulo
       }
 
       // Registra los eventos de los tiles (press handlers)
@@ -317,9 +323,9 @@ sap.ui.define([
     // Lee el tema guardado. Devuelve true si es dark, false si es light.
     _readStoredThemeMode: function () {
       try {
-        return window.localStorage.getItem("gestordoccolombia-theme") === "dark";
+        return window.localStorage.getItem("gestordoccolombia-theme") === "dark"; // true solo si el valor guardado es exactamente "dark"
       } catch (oError) {
-        return false;
+        return false; // Si localStorage no está disponible (ej: modo privado), arranca en claro
       }
     },
 
@@ -328,19 +334,19 @@ sap.ui.define([
       const sThemeClass = "gdDarkMode";
       const oViewModel  = this.getOwnerComponent().getModel("view");
 
-      document.documentElement.classList.toggle(sThemeClass, bDarkMode);
+      document.documentElement.classList.toggle(sThemeClass, bDarkMode); // Agrega/quita la clase en <html>
       if (document.body) {
-        document.body.classList.toggle(sThemeClass, bDarkMode);
+        document.body.classList.toggle(sThemeClass, bDarkMode);          // Y también en <body>, por si el CSS la necesita ahí
       }
 
       if (oViewModel) {
         oViewModel.setProperty("/IsDarkMode",        bDarkMode);
-        oViewModel.setProperty("/ThemeToggleText",   bDarkMode ? "☾" : "☀");
-        oViewModel.setProperty("/ThemeToggleTooltip", bDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+        oViewModel.setProperty("/ThemeToggleText",   bDarkMode ? "☾" : "☀");          // Ícono del botón de toggle
+        oViewModel.setProperty("/ThemeToggleTooltip", bDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); // Tooltip dice la acción contraria al estado actual
       }
 
       try {
-        window.localStorage.setItem("gestordoccolombia-theme", bDarkMode ? "dark" : "light");
+        window.localStorage.setItem("gestordoccolombia-theme", bDarkMode ? "dark" : "light"); // Persiste la preferencia
       } catch (oError) {
         console.warn("No se pudo guardar la preferencia de tema:", oError);
       }
@@ -349,31 +355,35 @@ sap.ui.define([
     // Activa las transiciones solo después de aplicar el tema inicial guardado.
     _enableThemeTransitionsAfterInitialRender: function () {
       const fnEnableTransitions = function () {
-        document.documentElement.classList.add("gdThemeTransitionReady");
+        document.documentElement.classList.add("gdThemeTransitionReady"); // Esta clase es la que habilita el "transition" en CSS
         if (document.body) {
           document.body.classList.add("gdThemeTransitionReady");
         }
       };
 
+      // Espera 2 frames de animación antes de habilitar transiciones,
+      // para que el cambio de tema inicial no se vea "animado" (parpadeo feo al cargar)
       if (window.requestAnimationFrame) {
         window.requestAnimationFrame(function () {
           window.requestAnimationFrame(fnEnableTransitions);
         });
       } else {
-        window.setTimeout(fnEnableTransitions, 0);
+        window.setTimeout(fnEnableTransitions, 0); // Fallback para navegadores muy viejos
       }
     },
 
     // Handler del botón de toggle de tema en la barra superior.
     onToggleTheme: function () {
       const oViewModel = this.getOwnerComponent().getModel("view");
-      const bDarkMode  = !(oViewModel && oViewModel.getProperty("/IsDarkMode"));
+      const bDarkMode  = !(oViewModel && oViewModel.getProperty("/IsDarkMode")); // Invierte el estado actual
       this._applyThemeMode(bDarkMode);
     },
 
+    // Hace scroll suave hacia arriba del contenedor principal (o de la ventana si no encuentra el contenedor)
     _scrollToHome: function () {
       const oPage = this.byId("contentContainer");
       const oPageDom = oPage && oPage.getDomRef && oPage.getDomRef();
+      // Busca el elemento DOM real que tiene el scroll dentro del control sap.m.Page
       const oScrollDom = oPageDom && (oPageDom.querySelector(".sapMPageEnableScrolling") || oPageDom.querySelector(".sapMPageScroll") || oPageDom);
 
       if (oScrollDom && typeof oScrollDom.scrollTo === "function") {
@@ -382,10 +392,11 @@ sap.ui.define([
       }
 
       if (window.scrollTo) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: "smooth" }); // Fallback: scrollea la ventana completa
       }
     },
 
+    // Handler de selección en el IconTabBar superior: si vuelve al tab "1" (home), hace scroll arriba
     onSelectHeader: function (oEvent) {
       const sKey = oEvent && oEvent.getParameter && oEvent.getParameter("selectedKey");
       if (!sKey || sKey === "1") {
@@ -393,6 +404,7 @@ sap.ui.define([
       }
     },
 
+    // Abre el menú (Popover) del header en vista mobile
     onOpenMobileHeaderMenu: function (oEvent) {
       const oPopover = this.byId("mobileHeaderMenuPopover");
       if (oPopover) {
@@ -407,11 +419,13 @@ sap.ui.define([
       }
     },
 
+    // Desde el menú mobile: cierra el menú y vuelve al inicio
     onMobileHeaderHomePress: function () {
       this._closeMobileHeaderMenu();
       this._scrollToHome();
     },
 
+    // Desde el menú mobile: cambia el tema y cierra el menú
     onMobileToggleTheme: function () {
       this.onToggleTheme();
       this._closeMobileHeaderMenu();
@@ -427,33 +441,35 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     _hideInitialPreloader: function () {
-      if (this._initialPreloaderHideRequested) return;
+      if (this._initialPreloaderHideRequested) return;  // Evita ejecutar esto más de una vez
       this._initialPreloaderHideRequested = true;
 
       const fnHide = () => {
-        if (typeof window.gmaHideAppPreloader === "function") {
+        if (typeof window.gmaHideAppPreloader === "function") { // Función global definida en el index.html
           window.gmaHideAppPreloader();
         }
       };
 
-      this._waitForInitialLayoutReady().then(fnHide).catch(fnHide);
+      this._waitForInitialLayoutReady().then(fnHide).catch(fnHide); // Pase lo que pase (resuelve o falla), oculta el preloader
     },
 
     // Espera a que el grid de tiles tenga posiciones estables durante
     // iRequiredStableFrames frames consecutivos antes de resolver.
     _waitForInitialLayoutReady: function () {
-      const iMinWait             = 2400;
-      const iMaxWait             = 6500;
-      const iRequiredStableFrames = 12;
+      const iMinWait             = 2400;   // Tiempo mínimo de espera (ms), aunque el layout ya esté listo
+      const iMaxWait             = 6500;   // Tiempo máximo: si nunca se estabiliza, se libera igual
+      const iRequiredStableFrames = 12;    // Cantidad de frames seguidos con el mismo layout para considerarlo "estable"
       const iStartedAt           = Date.now();
-      const fnNextFrame          = window.requestAnimationFrame || (fn => window.setTimeout(fn, 16));
+      const fnNextFrame          = window.requestAnimationFrame || (fn => window.setTimeout(fn, 16)); // Fallback ~60fps
 
-      try { sap.ui.getCore().applyChanges(); } catch (e) {}
+      try { sap.ui.getCore().applyChanges(); } catch (e) {} // Fuerza un render inmediato de UI5 antes de medir
 
       return new Promise((resolve) => {
-        let sLastSignature = "";
-        let iStableFrames  = 0;
+        let sLastSignature = ""; // "Huella" del layout anterior, para comparar entre frames
+        let iStableFrames  = 0;  // Cuántos frames seguidos llevamos con la misma huella
 
+        // Genera una cadena que representa la posición/tamaño de cada tile visible.
+        // Si dos frames generan la misma cadena, el layout no cambió.
         const fnGetLayoutSignature = () => {
           const oGrid      = this.byId("gridItems");
           const oGridDomRef = oGrid?.getDomRef();
@@ -463,11 +479,12 @@ sap.ui.define([
 
           const oGridRect    = oGridDomRef.getBoundingClientRect();
           const aVisibleRects = aContent
-            .filter(oItem => oItem.getVisible && oItem.getVisible())
+            .filter(oItem => oItem.getVisible && oItem.getVisible())       // Solo tiles visibles
             .map(oItem => oItem.getDomRef && oItem.getDomRef())
             .filter(Boolean)
             .map(oDomRef => {
               const r = oDomRef.getBoundingClientRect();
+              // Redondea posición y tamaño relativos al grid, para evitar diferencias de subpíxel
               return [
                 Math.round(r.left - oGridRect.left),
                 Math.round(r.top  - oGridRect.top),
@@ -479,22 +496,24 @@ sap.ui.define([
           return aVisibleRects.length ? aVisibleRects.join("|") : "";
         };
 
+        // Se ejecuta en cada frame de animación: compara la huella actual con la anterior
         const fnCheck = () => {
           const iElapsed  = Date.now() - iStartedAt;
           const sSignature = fnGetLayoutSignature();
 
           if (sSignature && sSignature === sLastSignature) {
-            iStableFrames += 1;
+            iStableFrames += 1;       // El layout no cambió: suma un frame estable más
           } else {
-            sLastSignature = sSignature;
+            sLastSignature = sSignature; // El layout cambió: reinicia el conteo
             iStableFrames  = 0;
           }
 
+          // Resuelve si: ya pasó el mínimo Y el layout está estable, O ya se llegó al máximo de espera
           if ((iElapsed >= iMinWait && iStableFrames >= iRequiredStableFrames) || iElapsed >= iMaxWait) {
             resolve();
             return;
           }
-          fnNextFrame(fnCheck);
+          fnNextFrame(fnCheck); // Si no, programa la siguiente revisión
         };
 
         fnNextFrame(fnCheck);
@@ -516,62 +535,64 @@ sap.ui.define([
 
     // Obtiene la URL base del módulo para llamadas a APIs internas de SAP BTP.
     getBaseURL: function () {
-      const appId      = this.getOwnerComponent().getManifestEntry("/sap.app/id");
-      const appPath    = appId.replaceAll(".", "/");
-      return jQuery.sap.getModulePath(appPath);
+      const appId      = this.getOwnerComponent().getManifestEntry("/sap.app/id"); // Lee el "id" declarado en manifest.json
+      const appPath    = appId.replaceAll(".", "/");                               // Convierte "namespace.app" en "namespace/app"
+      return jQuery.sap.getModulePath(appPath);                                    // UI5 resuelve esto a la URL real donde corre la app
     },
 
     // Consulta la empresa del userId en SuccessFactors.
     // Si falla, usa "CO10" como empresa por defecto.
     getUserCompany: function (userId) {
-      const oModel = this.getOwnerComponent().getModel();
+      const oModel = this.getOwnerComponent().getModel(); // Modelo OData principal (conexión a SuccessFactors)
       return new Promise((resolve) => {
         oModel.read("/User('" + userId + "')", {
           urlParameters: {
-            "$select": "userId,empInfo/jobInfoNav/company",
-            "$expand": "empInfo/jobInfoNav"
+            "$select": "userId,empInfo/jobInfoNav/company",  // Solo pide el campo "company" para no traer info de más
+            "$expand": "empInfo/jobInfoNav"                  // Necesario para poder navegar a jobInfoNav/company
           },
           success: function (oData) {
-            const sCompany = oData?.empInfo?.jobInfoNav?.results?.[0]?.company || "CO10";
+            const sCompany = oData?.empInfo?.jobInfoNav?.results?.[0]?.company || "CO10"; // Si no viene, usa CO10
             resolve(sCompany);
           },
           error: function () {
             console.warn("No se pudo obtener la empresa, usando CO10 por defecto.");
-            resolve("CO10");
+            resolve("CO10"); // Importante: resuelve igual (no rechaza) para no romper el flujo de login
           }
         });
       });
     },
+    
     //OBTENGO INFORMACION DEL USUARIO LOGUEADO
     // Detecta el userId del usuario logueado a través de la API de SAP BTP.
     // Una vez obtenido, encadena getUserCompany() y getDataUser().
     getUserInfo: function () {
       const that = this;
-      const url  = this.getBaseURL() + "/user-api/currentUser";
+      const url  = this.getBaseURL() + "/user-api/currentUser"; // Endpoint estándar de SAP BTP que devuelve el usuario logueado
       const UseroModel = new JSONModel();
-      UseroModel.loadData(url);
+      UseroModel.loadData(url); // Dispara la petición; los datos llegan vía evento (no es una promesa)
 
       UseroModel.attachRequestCompleted(function () {
         // Fallback para testing local: si no hay email válido, usa usuario de prueba
         let userId = (!UseroModel.getData().email ||
                       UseroModel.getData().email === "rodrigo.lopez@agprodservicios.com")
-          ? "excagp"
-          : UseroModel.getData().name;
+          ? "excagp"                          // Usuario de prueba fijo (para desarrollo local)
+          : UseroModel.getData().name;        // En producción: usa el "name" devuelto por la API
 
         UseroModel.setProperty("/firstname", userId);
-        that.getOwnerComponent().setModel(UseroModel, "user");
+        that.getOwnerComponent().setModel(UseroModel, "user"); // Registra el modelo "user", visible en toda la app
 
         that.getUserCompany(userId).then(function (sCompany) {
           UseroModel.setProperty("/company", sCompany);
-          that.getDataUser(userId);
+          that.getDataUser(userId); // Sigue la cadena: ahora busca permisos/grupo del usuario
         }).catch(function () {
           MessageToast.show("Error al obtener información de la empresa.");
           that.oGlobalBusyDialog.close();
-          that._hideInitialPreloader();
+          that._hideInitialPreloader(); // Aunque falle, hay que ocultar el splash de carga igual
         });
       });
 
       UseroModel.attachRequestFailed(function () {
+        // Si ni siquiera se pudo obtener el usuario logueado, libera la UI igual
         that.oGlobalBusyDialog.close();
         that._hideInitialPreloader();
       });
@@ -585,16 +606,16 @@ sap.ui.define([
     //   - "ninguno" → sin acceso
     getDataUser: function (user) {
       const that             = this;
-      const readUrlModelGroup = "/cust_GD_mantenedorGrupos('" + user + "')";
+      const readUrlModelGroup = "/cust_GD_mantenedorGrupos('" + user + "')"; // Entidad custom de SuccessFactors con permisos
 
       this.getView().getModel().read(readUrlModelGroup, {
         success: function (oData) {
           const userModel  = that.getOwnerComponent().getModel("user");
-          const cleanData  = JSON.parse(JSON.stringify(oData));
+          const cleanData  = JSON.parse(JSON.stringify(oData)); // Clona el objeto para evitar referencias internas de OData
 
           userModel.setProperty("/datos",       cleanData);
           userModel.setProperty("/displayName", cleanData.displayName);
-          that.updateGreeting();
+          that.updateGreeting(); // Ahora sí, actualiza el saludo con el nombre real (ya no el provisional)
 
           // Género para tratamiento gramatical en documentos
           userModel.setProperty("/gender",
@@ -605,7 +626,7 @@ sap.ui.define([
           const grupo = cleanData.cust_grupo;
           userModel.setProperty("/grupo", grupo);
 
-          let permisos = "ninguno";
+          let permisos = "ninguno"; // Por defecto, sin acceso
           if (grupo === "Gestor Documental - Administradores") permisos = "admin";
           else if (grupo === "Gestor Documental - Usuarios")   permisos = "usuario";
           userModel.setProperty("/permisos", permisos);
@@ -634,10 +655,10 @@ sap.ui.define([
           // Admins ven todo, usuarios no ven nada
           const bVisible = (permisos === "admin");
           aTileIds.forEach(sId => {
-            that.byId(sId)?.setVisible(bVisible);
+            that.byId(sId)?.setVisible(bVisible); // El "?." protege si algún tile no existe en la vista
           });
 
-          that._hideInitialPreloader();
+          that._hideInitialPreloader(); // Ya se sabe qué mostrar: ahora sí se puede ocultar el splash
         },
 
         error: function (oError) {
@@ -665,11 +686,12 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     loadEmployees: function () {
-      if (this._activeEmployeesRequest) return this._activeEmployeesRequest;
+      if (this._activeEmployeesRequest) return this._activeEmployeesRequest; // Si ya hay una carga en curso, reutiliza esa misma promesa (evita pedidos duplicados)
 
       const oComponentModel = this.getOwnerComponent().getModel();
       const sUserCompany    = this.getOwnerComponent().getModel("user").getProperty("/company") || "CO10";
 
+      // Campos a pedir del endpoint /User (OData $select)
       const sSelect = [
         "userId", "status", "firstName", "lastName", "email", "nationality",
         "jobCode", "title", "custom02", "custom03", "businessPhone", "state",
@@ -697,6 +719,7 @@ sap.ui.define([
         "custom15"
       ].join(",");
 
+      // Navegaciones que hay que expandir para poder leer los campos anidados de arriba (OData $expand)
       const sExpand = [
         "manager",
         "empInfo/compInfoNav/empPayCompRecurringNav",
@@ -706,29 +729,32 @@ sap.ui.define([
         "custom05Nav"
       ].join(",");
 
+      // ── Primera llamada: trae todos los empleados activos de la empresa del usuario ──
       const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
-          "$filter": `status eq 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`,
+          "$filter": `status eq 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`, // status='t' = activo
           "$expand": sExpand
         }
       })).then(async oUsers => {
         const aUsers = Array.isArray(oUsers?.results) ? oUsers.results : [];
 
+        // Recorre cada usuario crudo y le agrega campos calculados/aplanados,
+        // más fáciles de usar luego en las plantillas de documentos
         const enrichedUsers = aUsers.map(user => {
           const salaryRaw = user?.empInfo?.compInfoNav?.results?.[0]
-                              ?.empPayCompRecurringNav?.results?.[0]?.paycompvalue;
+                              ?.empPayCompRecurringNav?.results?.[0]?.paycompvalue; // Salario, viene anidado en 2 niveles
           user.paycompvalue = salaryRaw || 0;
-          user.paycompValue = salaryRaw || 0;
+          user.paycompValue = salaryRaw || 0; // Se guarda con las dos variantes de mayúscula por compatibilidad
 
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
+          const ccEntry           = nationalIdResults.find(i => i.cardType === "CC"); // Busca el documento tipo Cédula de Ciudadanía
           user.nationalId         = ccEntry?.nationalId ?? "";
           user.docCardType        = nationalIdResults[0]?.cardType ?? "";
           user.originalStartDate  = user.empInfo?.originalStartDate || null;
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
-          user.docExpeditionDate  = ccEntry?.customDate1 || null;
-          user.bloodType          = user.custom05Nav?.localeLabel || "";
+          user.docExpeditionDate  = ccEntry?.customDate1 || null; // Fecha de expedición del documento
+          user.bloodType          = user.custom05Nav?.localeLabel || ""; // Grupo sanguíneo (campo custom de SF)
           user.addressLine1       = user.addressLine1 || "";
           user.hasDependents      = user.custom15 || "";
           user.dateOfBirth        = user.dateOfBirth || null;
@@ -740,12 +766,14 @@ sap.ui.define([
           user.managerId        = "";
           user.paymentFrequency = ""; // se llenará desde EmpJob
 
+          // Tratamiento (Sr./Sra./Srta.) según código de salutation de SuccessFactors
           user.salut = user.salutation === "3526" ? "Sra."
                     : user.salutation === "3525" ? "Sr."
                     : "Srta.";
 
           user.customLong1 = user.empInfo?.personNav?.customLong1 || "";
 
+          // Estado civil: traduce el código numérico a texto, adaptado al género
           const marriageStatusId = user.empInfo?.personNav?.personalInfoNav?.results?.[0]?.maritalStatus;
           user.marriageStatusId  = marriageStatusId;
           const isFemale         = user.gender === "F";
