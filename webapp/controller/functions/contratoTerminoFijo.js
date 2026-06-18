@@ -1775,5 +1775,8 @@ sap.ui.define([
         });
     }
 
-    return { onDownloadPDFContratoTerminoFijo };
+    return {
+        onDownloadPDFContratoTerminoFijo,
+        generateContratoTerminoFijoPdfDocuments
+    };
 });
