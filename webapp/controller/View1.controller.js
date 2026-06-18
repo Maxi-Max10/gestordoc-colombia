@@ -697,12 +697,12 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     loadEmployees: function () {
-      if (this._activeEmployeesRequest) return this._activeEmployeesRequest; // Si ya hay una carga en curso, reutiliza esa promesa
+      if (this._activeEmployeesRequest) return this._activeEmployeesRequest;
 
       const oComponentModel = this.getOwnerComponent().getModel();
       const sUserCompany    = this.getOwnerComponent().getModel("user").getProperty("/company") || "CO10";
+      const oViewStateModel = this.getOwnerComponent().getModel("view");
 
-      // Campos a traer del endpoint /User
       const sSelect = [
         "userId", "status", "firstName", "lastName", "email", "nationality",
         "jobCode", "title", "custom02", "custom03", "businessPhone", "state",
@@ -730,7 +730,6 @@ sap.ui.define([
         "custom15"
       ].join(",");
 
-      // Navegaciones que hay que expandir para poder leer los campos anidados de arriba
       const sExpand = [
         "manager",
         "empInfo/compInfoNav/empPayCompRecurringNav",
@@ -740,51 +739,48 @@ sap.ui.define([
         "custom05Nav"
       ].join(",");
 
-      // ── Primera llamada: trae todos los empleados activos de la empresa del usuario ──
+      // Bloquea el botón Descargar hasta que EmpJob termine
+      oViewStateModel.setProperty("/EmpJobLoaded", false);
+
       const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
-          "$filter": `status eq 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`, // 't' = activo
+          "$filter": `status eq 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`,
           "$expand": sExpand
         }
       })).then(async oUsers => {
         const aUsers = Array.isArray(oUsers?.results) ? oUsers.results : [];
 
-        // Por cada usuario crudo, agrega los campos calculados que se usan en las plantillas
         const enrichedUsers = aUsers.map(user => {
-          // El salario viene anidado en dos niveles de navegación
           const salaryRaw = user?.empInfo?.compInfoNav?.results?.[0]
                               ?.empPayCompRecurringNav?.results?.[0]?.paycompvalue;
           user.paycompvalue = salaryRaw || 0;
-          user.paycompValue = salaryRaw || 0; // Dos variantes de mayúscula para compatibilidad con distintas plantillas
+          user.paycompValue = salaryRaw || 0;
 
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
-          const ccEntry           = nationalIdResults.find(i => i.cardType === "CC"); // Busca la Cédula de Ciudadanía
+          const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
           user.nationalId         = ccEntry?.nationalId ?? "";
           user.docCardType        = nationalIdResults[0]?.cardType ?? "";
           user.originalStartDate  = user.empInfo?.originalStartDate || null;
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
           user.docExpeditionDate  = ccEntry?.customDate1 || null;
-          user.bloodType          = user.custom05Nav?.localeLabel || ""; // Grupo sanguíneo (campo custom de SF)
+          user.bloodType          = user.custom05Nav?.localeLabel || "";
           user.addressLine1       = user.addressLine1 || "";
           user.hasDependents      = user.custom15 || "";
           user.dateOfBirth        = user.dateOfBirth || null;
 
-          // Se inicializan vacíos; se llenan desde EmpJob en la segunda llamada
           user.managerName      = "";
           user.managerEmail     = "";
           user.managerJobCode   = "";
           user.managerId        = "";
           user.paymentFrequency = "";
 
-          // Tratamiento según el código de salutation de SuccessFactors
           user.salut = user.salutation === "3526" ? "Sra."
                     : user.salutation === "3525" ? "Sr."
                     : "Srta.";
 
           user.customLong1 = user.empInfo?.personNav?.customLong1 || "";
 
-          // Estado civil: traduce el código numérico a texto, adaptado al género
           const marriageStatusId = user.empInfo?.personNav?.personalInfoNav?.results?.[0]?.maritalStatus;
           user.marriageStatusId  = marriageStatusId;
           const isFemale         = user.gender === "F";
@@ -801,13 +797,16 @@ sap.ui.define([
           return user;
         });
 
+        // ── Muestra la tabla apenas llega /User, sin esperar EmpJob ──
+        this.getView().setModel(new JSONModel({ User: enrichedUsers }));
+        this.attachBoxEvents();
+
         // ── Segunda llamada: completa manager y frecuencia de pago desde EmpJob ──
         try {
           const userIds    = enrichedUsers.map(u => u.userId).filter(Boolean);
           const chunkSize  = 50;
           const managerMap = {};
 
-          // Trae el mapa de áreas de escala salarial para traducir códigos a nombres legibles
           const payScaleAreaMap = {};
           try {
             const psaData = await this._readOData(oComponentModel, "/PayScaleArea", {
@@ -822,7 +821,6 @@ sap.ui.define([
             console.warn("No se pudo cargar PayScaleArea:", e);
           }
 
-          // Consulta EmpJob en bloques de 50 para no superar el límite de la URL
           for (let i = 0; i < userIds.length; i += chunkSize) {
             const chunk     = userIds.slice(i, i + chunkSize);
             const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
@@ -859,7 +857,6 @@ sap.ui.define([
             });
           }
 
-          // Aplica los datos de EmpJob a cada empleado
           enrichedUsers.forEach(user => {
             const mgr = managerMap[user.userId] || {};
             user.managerId        = mgr.managerId        || "";
@@ -871,18 +868,26 @@ sap.ui.define([
             user.area             = mgr.area             || "";
           });
 
+          // Actualiza el modelo con los datos de EmpJob sin reemplazar el modelo entero
+          this.getView().getModel().setProperty("/User", enrichedUsers);
+
+          // Habilita el botón Descargar y marca la carga como completa
+          oViewStateModel.setProperty("/EmpJobLoaded", true);
+          this._activeEmployeesLoaded = true;
+          return enrichedUsers;
+
         } catch (e) {
           console.warn("No se pudieron cargar los managers desde EmpJob:", e);
+          // Habilita igual para no dejar el botón bloqueado para siempre
+          oViewStateModel.setProperty("/EmpJobLoaded", true);
+          this._activeEmployeesLoaded = true;
+          return enrichedUsers;
         }
-
-        this.getView().setModel(new JSONModel({ User: enrichedUsers }));
-        this._activeEmployeesLoaded = true;
-        this.attachBoxEvents();
-        return enrichedUsers;
 
       }).catch(oError => {
         console.error("Error cargando empleados activos:", oError);
         MessageToast.show("Error cargando los datos.");
+        oViewStateModel?.setProperty("/EmpJobLoaded", true); // Desbloquea igual si falla todo
         this._activeEmployeesLoaded = false;
         throw oError;
       });

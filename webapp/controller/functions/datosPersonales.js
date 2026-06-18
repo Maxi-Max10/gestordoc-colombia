@@ -2,27 +2,27 @@
  * @file onDownloadPDFDatosPersonales.js
  * @description Generador del formulario "Autorización de Datos Personales" (DIACO S.A.)
  *
- * Este módulo se encarga de producir el documento de datos personales del empleado
- * en dos formatos posibles, según el botón que presione el usuario en la app:
+ * Este módulo produce el documento de datos personales del empleado
+ * en dos formatos, según el botón que presione el usuario:
  *
- *  - Word (.docx): usa una plantilla Word con placeholders [[Campo]]
- *                  reemplazados por el helper `wordGenerator`.
- *  - PDF  (.pdf) : construye el contenido como HTML puro (3 páginas),
- *                  lo renderiza con html2canvas, lo convierte a imagen PNG
- *                  y lo superpone sobre una plantilla PDF con PDFLib.
+ *  - Word (.docx): toma una plantilla Word con placeholders [[Campo]]
+ *                  y los reemplaza con los datos del empleado usando `wordGenerator`.
+ *  - PDF  (.pdf) : construye el contenido como HTML (3 páginas),
+ *                  lo convierte a imagen PNG con html2canvas,
+ *                  y lo superpone sobre la plantilla institucional de DIACO con PDFLib.
  *
- * Dependencias externas cargadas dinámicamente en el controlador:
- *  - PDFLib    (manipulación y ensamblado de PDFs)
- *  - html2canvas (renderizado de HTML a canvas/PNG)
+ * Librerías externas (se cargan solo cuando el usuario genera el documento):
+ *  - PDFLib       (arma y manipula el PDF final)
+ *  - html2canvas  (convierte el HTML a imagen para incrustarlo en el PDF)
  *  - wordGenerator (helper propio para generar .docx desde plantilla)
  *
  * El formulario cumple con la Ley 1582 de 2012 de protección de datos
  * personales de Colombia y está diseñado específicamente para DIACO S.A.
  *
- * Estructura del PDF generado (3 páginas):
- *  - Página 1: Datos personales + primeros dependientes (DEP 1–4 parcial)
- *  - Página 2: Resto dependientes (DEP 4–6) + pagos + huella + texto legal inicial
- *  - Página 3: Continuación texto legal + autorización + firma del empleado
+ * Estructura del PDF (3 páginas):
+ *  - Página 1: Datos del empleado + dependientes DEP 1 al 4 (parcial)
+ *  - Página 2: Resto del DEP 4 + DEP 5 y 6 + información de pagos + huella + inicio texto legal
+ *  - Página 3: Continuación del texto legal + tabla de autorización con firma del empleado
  */
 sap.ui.define([
     "sap/m/MessageToast",
@@ -32,24 +32,23 @@ sap.ui.define([
 
     /**
      * Función principal del módulo.
-     * Se invoca desde el controlador cuando el usuario presiona el botón
-     * de descarga (PDF o Word) para el formulario de Datos Personales.
+     * Se llama desde el controller cuando el usuario presiona el botón de descarga
+     * del formulario de Datos Personales.
      *
-     * @param {object} oController - Instancia del controlador SAP UI5 que llama a esta función.
-     *                               Se usa para acceder a helpers (formatters, getSelectedUsers, etc.)
-     *                               y a las bibliotecas PDF cargadas dinámicamente.
-     * @param {string} sButtonId   - ID del botón presionado. Determina el formato de salida:
-     *                               si contiene "wordDataInfo" → genera Word; si no → genera PDF.
+     * @param {object} oController - Instancia del controller SAP UI5.
+     *                               Se usa para acceder a los helpers de formato,
+     *                               getSelectedUsers y las librerías PDF.
+     * @param {string} sButtonId   - ID del botón presionado.
+     *                               Si contiene "wordDataInfo" → genera Word.
+     *                               Si no → genera PDF.
      */
     async function onDownloadPDFDatosPersonales(oController, sButtonId) {
         try {
-            // ── Paso 1: Asegurar que las bibliotecas PDF estén cargadas ────────
-            // _ensurePdfToolkit carga PDFLib y html2canvas de forma lazy (solo cuando se necesitan),
-            // para no penalizar el tiempo de inicio de la app completa.
+            // ── Paso 1: Cargar las librerías PDF si todavía no están disponibles ──
+            // _ensurePdfToolkit descarga PDFLib y html2canvas solo la primera vez.
+            // Las siguientes veces las reutiliza sin volver a descargarlas.
             await oController._ensurePdfToolkit();
 
-            // Obtener referencias a las bibliotecas desde window o desde el controlador
-            // (dependiendo de cómo las haya cargado _ensurePdfToolkit)
             const PDFLibRef      = window.PDFLib      || oController._pdfLibRef;
             const html2canvasRef = window.html2canvas  || oController._html2canvasRef;
 
@@ -57,9 +56,9 @@ sap.ui.define([
                 throw new Error("No se pudieron cargar las bibliotecas PDF/Canvas requeridas.");
             }
 
-            // ── Paso 2: Obtener los empleados seleccionados en la tabla ────────
+            // ── Paso 2: Leer los empleados seleccionados en la tabla ───────────
             // getSelectedUsers() lee las filas marcadas en idUserTable y devuelve
-            // un array de objetos con todos los datos ya formateados (ver Formatter.js).
+            // un array con todos los datos del empleado ya formateados (ver Formatter.js).
             const aUsers = oController.getSelectedUsers();
             if (aUsers.length === 0) {
                 MessageToast.show("Seleccione al menos un colaborador.");
@@ -70,7 +69,7 @@ sap.ui.define([
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
 
-                /* DEBUG: para revisar datos del usuario antes de generar documento
+                /* DEBUG: para revisar datos del usuario antes de generar
                 console.log(
                     "country:", user.country,
                     "email:", user.email,
@@ -81,59 +80,57 @@ sap.ui.define([
                 );
                 */
 
-                // Mostrar progreso si se están generando múltiples documentos a la vez
                 if (aUsers.length > 1) {
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                // ── Preparar todas las variables que se insertan en el documento ──
+                // ── Preparar los valores que van en el documento ───────────────
                 // Cada variable extrae o formatea un dato del objeto `user`,
-                // usando los helpers del Formatter (getCiudadWork, resolveGender, etc.)
+                // usando los helpers del Formatter.
 
-                const sNombre        = `${user.firstName} ${user.lastName}`;
-                const sCedula        = user.nationalId || "";
+                const sNombre    = `${user.firstName} ${user.lastName}`;
+                const sCedula    = user.nationalId || "";
 
-                // Ciudad de trabajo: custom10 (ciudad SAP) con fallback a state
-                const sCiudadWork    = oController.getCiudadWork(user);
+                // Ciudad de trabajo: primero custom10 (campo SAP), con fallback a state
+                const sCiudadWork = oController.getCiudadWork(user);
 
-                // Fecha actual del sistema (fecha en que se genera el documento)
-                const localDate      = oController.getLocalDate();
+                // Fecha actual del sistema (la del día en que se genera el documento)
+                const localDate   = oController.getLocalDate();
 
-                // Cargo con género resuelto: "PENSIONADO" / "PENSIONADA" según user.gender
-                const sCargo         = oController.resolveGender(user.title || "", user.gender);
+                // Cargo con género resuelto: "OPERARIO" / "OPERARIA" según user.gender
+                const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
                 // Nombre del país a partir del código SAP o ISO
-                const sPais          = oController.getPaisName(user.country);
+                const sPais       = oController.getPaisName(user.country);
 
-                const sTelefono      = oController.getTelefono(user);
-                const sEmail         = oController.getEmail(user);
-                const sNacional      = oController.getNacionalidad(user);
+                const sTelefono    = oController.getTelefono(user);
+                const sEmail       = oController.getEmail(user);
+                const sNacional    = oController.getNacionalidad(user);
 
                 // "Masculino" / "Femenino" a partir del código SAP "M" / "F"
-                const sSexo          = oController.getSexo(user);
+                const sSexo        = oController.getSexo(user);
 
-                const sEstadoCivil   = oController.getEstadoCivil(user);
-                const sGrupoSangre   = oController.getGrupoSanguineo(user);
+                const sEstadoCivil  = oController.getEstadoCivil(user);
+                const sGrupoSangre  = oController.getGrupoSanguineo(user);
 
-                // Dirección: normalizar espacios extra que puedan venir de SAP
-                const sDireccion     = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                // Dirección: se limpian espacios extra que puedan venir de SAP
+                const sDireccion    = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
 
-                const sFechaExpedicion  = user.docExpeditionDate || "";
-                const sJefeNombre       = user.managerName || "";
-                const sDocCardType      = user.docCardType || "";
+                const sFechaExpedicion = user.docExpeditionDate || "";
+                const sJefeNombre      = user.managerName || "";
+                const sDocCardType     = user.docCardType || "";
 
-                // Fecha de nacimiento formateada: "15 de enero del año 1990"
-                // Solo se formatea si existe el dato en SAP
-                const sFechaNacimiento  = user.dateOfBirth
+                // Fecha de nacimiento en formato "15 de enero del año 1990"
+                // Solo se formatea si el dato existe en SAP
+                const sFechaNacimiento = user.dateOfBirth
                     ? oController.formatDateRaw(user.dateOfBirth)
                     : "";
 
                 // ════════════════════════════════════════════════════════════════
                 // RAMA WORD
-                // Si el botón presionado corresponde a "wordDataInfo", generar
-                // un archivo .docx usando la plantilla Word con placeholders.
-                // wordGenerator reemplaza los [[placeholders]] en la plantilla
-                // con los valores del objeto `data` y descarga el archivo.
+                // Si el botón presionado corresponde a Word ("wordDataInfo"),
+                // se genera el .docx reemplazando los [[placeholders]] de la plantilla
+                // con los datos del empleado y se descarga directamente.
                 // ════════════════════════════════════════════════════════════════
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
@@ -152,20 +149,20 @@ sap.ui.define([
                 // ════════════════════════════════════════════════════════════════
                 // RAMA PDF — construcción HTML página por página
                 //
-                // Estrategia de generación:
-                //  1. El contenido de cada página se define como un string HTML completo,
-                //     con estilos inline y las variables del empleado interpoladas.
-                //  2. Cada bloque HTML se inserta en un <div> invisible fuera de pantalla.
-                //  3. html2canvas renderiza ese <div> como una imagen PNG (escala x2 para
-                //     buena resolución en el PDF final).
-                //  4. La imagen se superpone sobre la plantilla PDF de DIACO
-                //     (que contiene el logo y el encabezado institucional).
-                //  5. PDFLib ensambla todo y produce el archivo final.
+                // Cómo funciona:
+                //  1. El contenido de cada página se escribe como HTML con estilos inline
+                //     y los datos del empleado interpolados directamente.
+                //  2. Ese HTML se inserta en un <div> oculto fuera de la pantalla.
+                //  3. html2canvas convierte ese <div> en una imagen PNG
+                //     (escala x2 para buena resolución en el PDF).
+                //  4. La imagen se superpone sobre la plantilla institucional de DIACO
+                //     (que ya tiene el logo y el encabezado).
+                //  5. PDFLib ensambla todo y produce el archivo .pdf final.
                 // ════════════════════════════════════════════════════════════════
 
-                // ── PÁGINA 1: Datos personales + dependientes DEP 1–4 (parcial) ──
-                // Incluye: fecha, datos del empleado, cargo, ciudad, dirección,
-                // tipo de documento (con checkbox marcado según docCardType),
+                // ── PÁGINA 1: Datos del empleado + DEP 1 al 4 (parcial) ────────
+                // Incluye: fecha, identificación, cargo, ciudad, dirección,
+                // tipo de documento con checkbox marcado según SAP,
                 // y la grilla de dependientes para completar a mano.
                 const htmlPagina1 = `
                     <!DOCTYPE html>
@@ -189,15 +186,15 @@ sap.ui.define([
                             padding: 12px;
                         }
 
-                        /* ── Contenedor principal con borde grueso exterior ── */
+                        /* Contenedor principal con borde grueso exterior */
                         .form-outer {
                             width: 760px;
-                            margin-left: 10px;   /* valores correctos para alineacion del borde izquierdo general de la tabla con la plantilla */
+                            margin-left: 10px;   /* calibrado para alinear con la plantilla institucional */
                             margin-right: auto;
                             border: 2px solid #000;
                         }
 
-                        /* ── Todas las filas comparten borde fino ── */
+                        /* Todas las filas tienen borde fino superior */
                         .row {
                             display: flex;
                             border-top: 1px solid #000;
@@ -229,7 +226,7 @@ sap.ui.define([
                         .cell-65   { width: 65%; }
                         .cell-35   { width: 35%; }
 
-                        /* Fila de sección azul */
+                        /* Encabezado azul de sección */
                         .section-header {
                             background: #0070a8;
                             color: #fff;
@@ -252,7 +249,7 @@ sap.ui.define([
                             font-weight: bold;
                         }
 
-                        /* Underline para campos de texto */
+                        /* Línea de subrayado para campos de texto en blanco */
                         .underline {
                             border-bottom: 1px solid #000;
                             display: block;
@@ -260,7 +257,7 @@ sap.ui.define([
                             margin-top: 3px;
                         }
 
-                        /* Checkboxes cuadrados — se muestran marcados según el tipo de documento del empleado */
+                        /* Checkboxes cuadrados — marcados según el tipo de documento del empleado en SAP */
                         input[type="checkbox"] {
                             -webkit-appearance: none;
                             appearance: none;
@@ -294,7 +291,6 @@ sap.ui.define([
                             border-left: 1px solid #000;
                         }
 
-                        /* Altura de filas compactas */
                         .h-auto { min-height: 26px; }
                         .h-tall  { min-height: 52px; }
                         .h-dep   { min-height: 70px; }
@@ -309,17 +305,16 @@ sap.ui.define([
 
                     <div class="form-outer">
 
-                        <!-- Fecha de generación del documento (fecha actual del sistema) -->
+                        <!-- Fecha actual del sistema (se genera automáticamente al crear el documento) -->
                         <div class="row h-auto" style="border-top:none;">
                             <div class="cell cell-full" style="min-height:28px;">
                                 <strong>Fecha de diligenciamiento:</strong> ${localDate}
                             </div>
                         </div>
 
-                        <!-- Encabezado de sección -->
                         <div class="section-header">INFORMACIÓN GENERAL – DATOS PERSONALES</div>
 
-                        <!-- Nombre completo + tipo de documento (CC o CE marcado según SAP) -->
+                        <!-- Nombre completo + tipo de documento (checkbox marcado según SAP) -->
                         <div class="row">
                             <div class="cell cell-45" style="min-height:62px;">
                                 <strong>Nombre Completo:</strong> ${sNombre}
@@ -341,7 +336,7 @@ sap.ui.define([
                             </div>
                         </div>
 
-                        <!-- Cargo con género resuelto (PENSIONADO / PENSIONADA) -->
+                        <!-- Cargo con género resuelto desde SAP -->
                         <div class="row h-tall">
                             <div class="cell cell-full">
                                 <strong>Cargo desempeñado dentro de la Compañía:</strong> ${sCargo}
@@ -349,7 +344,7 @@ sap.ui.define([
                             </div>
                         </div>
 
-                        <!-- Ciudad de trabajo (custom10) + nombre del país + jefe inmediato -->
+                        <!-- Ciudad de trabajo (custom10) + país + jefe inmediato -->
                         <div class="row">
                             <div class="cell cell-45" style="padding:0;">
                                 <div class="sub-row" style="min-height:26px;">
@@ -362,23 +357,20 @@ sap.ui.define([
                             </div>
                         </div>
 
-                        <!-- Layout de dos columnas: datos de contacto (izq) + planta (der) -->
+                        <!-- Columna izquierda: dirección, teléfono, correo | Columna derecha: planta (se completa a mano) -->
                         <div style="display:flex; border-top:1px solid #000;">
-    
-                            <!-- Columna izquierda: dirección, teléfono, correo -->
+
                             <div style="width:45%;">
                                 <div class="row">
                                     <div class="cell cell-full">
                                         <strong>Dirección de residencia:</strong> ${sDireccion}
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="cell cell-full">
                                         <strong>Teléfono:</strong> ${sTelefono}
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="cell cell-full">
                                         <strong>Correo Electrónico:</strong> ${sEmail}
@@ -386,11 +378,8 @@ sap.ui.define([
                                 </div>
                             </div>
 
-                            <!-- Columna derecha: planta (se completa a mano) -->
-                            <div class="cell" style="
-                                width:55%;
-                                border-left:1px solid #000;
-                            ">
+                            <!-- Planta: se completa a mano por el empleado -->
+                            <div class="cell" style="width:55%; border-left:1px solid #000;">
                                 <strong>Planta a la que pertenece:</strong>
                             </div>
 
@@ -408,7 +397,7 @@ sap.ui.define([
                             <div class="cell cell-55"><strong>RH y grupo sanguíneo:</strong> ${sGrupoSangre}</div>
                         </div>
 
-                        <!-- Sexo + campo de Dependientes (checkboxes en blanco para completar) -->
+                        <!-- Sexo + campo de Dependientes (checkboxes en blanco para completar en papel) -->
                         <div class="row">
                             <div class="cell cell-45"><strong>Sexo:</strong> ${sSexo}</div>
                             <div class="cell cell-55" style="padding:0;">
@@ -425,13 +414,13 @@ sap.ui.define([
                             </div>
                         </div>
 
-                        <!-- Sección dependientes: se completan a mano, no vienen de SAP -->
+                        <!-- Sección dependientes: todos los campos se completan a mano, no vienen de SAP -->
                         <div class="section-header">
                             INFORMACIÓN DEPENDIENTES
                             <span>Si este espacio no es suficiente, por favor adicione la información en documento aparte</span>
                         </div>
 
-                        <!-- Bloque reutilizado para cada dependiente (DEP 1 al 4).
+                        <!-- DEP 1 al 3: bloques idénticos, uno por cada dependiente.
                              Los campos están vacíos — los completa el empleado en papel. -->
 
                         <!-- DEP 1 -->
@@ -554,7 +543,7 @@ sap.ui.define([
                             <div class="cell cell-50"><strong>Teléfono de contacto</strong></div>
                         </div>
 
-                        <!-- DEP 4 (parcial): el bloque se corta aquí y continúa en página 2 -->
+                        <!-- DEP 4 (primera mitad): el bloque se corta aquí y continúa en página 2 -->
                         <div class="row">
                             <div class="cell cell-full" style="padding:4px 7px; min-height:32px;">
                                 <strong>Nombre y Apellidos:</strong>
@@ -582,8 +571,8 @@ sap.ui.define([
                     </html>
                 `;
 
-                // ── PÁGINA 2: Resto del DEP 4, DEP 5–6, pagos, huella y texto legal ──
-                // No contiene datos del empleado (todo se completa a mano),
+                // ── PÁGINA 2: DEP 4 (segunda mitad) + DEP 5 y 6 + pagos + huella + inicio del texto legal ──
+                // No contiene datos del empleado — todo se completa a mano,
                 // excepto el texto legal fijo de DIACO S.A.
                 const htmlPagina2 = `
                     <!DOCTYPE html>
@@ -696,7 +685,7 @@ sap.ui.define([
 
                     <div class="form-outer">
 
-                        <!-- Continuación DEP 4: la primera mitad quedó en la página 1 -->
+                        <!-- DEP 4 (segunda mitad): continúa desde la página 1 -->
                         <div class="row" style="border-top:none;">
                             <div class="cell cell-50 h-dep" style="padding:6px 7px;">
                                 <strong>
@@ -715,14 +704,9 @@ sap.ui.define([
                                 <strong>Fecha de expedición del documento:</strong>
                             </div>
                         </div>
-
                         <div class="row">
-                            <div class="cell cell-50">
-                                <strong>Fecha de nacimiento:</strong>
-                            </div>
-                            <div class="cell cell-50">
-                                <strong>Teléfono de contacto</strong>
-                            </div>
+                            <div class="cell cell-50"><strong>Fecha de nacimiento:</strong></div>
+                            <div class="cell cell-50"><strong>Teléfono de contacto</strong></div>
                         </div>
 
                         <!-- DEP 5 -->
@@ -807,27 +791,17 @@ sap.ui.define([
 
                     </div>
 
-                    <!-- Texto fuera de la tabla principal -->
-                    <div style="
-                        font-size:12px;
-                        margin-top:20px;
-                        margin-bottom:12px;
-                        font-weight:bold;
-                        margin-left:10px;
-                    ">
+                    <div style="font-size:12px; margin-top:20px; margin-bottom:12px; font-weight:bold; margin-left:10px;">
                         Si tiene más dependientes, por favor allegue la información solicitada en hoja aparte.
                     </div>
 
-                    <!-- Segunda tabla: sección de pagos y huella dactilar -->
+                    <!-- Segunda tabla: información bancaria y huella dactilar -->
                     <div class="form-outer">
 
-                        <!-- Sección información bancaria (se completa a mano) -->
                         <div class="section-header">INFORMACIÓN DE PAGOS</div>
 
                         <div class="row">
-                            <div class="cell" style="width:55%;">
-                                <strong>Entidad Bancaria:</strong>
-                            </div>
+                            <div class="cell" style="width:55%;"><strong>Entidad Bancaria:</strong></div>
                             <div class="cell" style="width:45%;">
                                 <div style="display:flex; align-items:center; gap:35px;">
                                     <div><strong>Ahorros</strong> <input type="checkbox"></div>
@@ -837,55 +811,27 @@ sap.ui.define([
                         </div>
 
                         <div class="row">
-                            <div class="cell cell-full">
-                                <strong>No. De Cuenta:</strong>
-                            </div>
+                            <div class="cell cell-full"><strong>No. De Cuenta:</strong></div>
                         </div>
 
-                        <!-- Sección huella dactilar: espacio para tomar la huella en papel -->
+                        <!-- Sección huella dactilar: recuadro naranja para tomar la huella en papel -->
                         <div class="section-header">INFORMACIÓN DE HUELLA</div>
 
                         <div class="row" style="min-height:150px;">
-                            <div class="cell" style="
-                                width:22%;
-                                display:flex;
-                                align-items:center;
-                                font-weight:bold;
-                                padding-right:0;
-                            ">
+                            <div class="cell" style="width:22%; display:flex; align-items:center; font-weight:bold; padding-right:0;">
                                 Huella Dactilar:
                             </div>
-                            <div class="cell" style="
-                                width:78%;
-                                border-left:none;
-                                display:flex;
-                                flex-direction:column;
-                                align-items:flex-start;
-                                justify-content:center;
-                                padding-left:0;
-                            ">
-                                <!-- Recuadro naranja para la huella — se completa en papel -->
-                                <div style="
-                                    width:95px;
-                                    height:95px;
-                                    border:1.5px solid #f4a460;
-                                    margin-bottom:8px;
-                                "></div>
+                            <div class="cell" style="width:78%; border-left:none; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding-left:0;">
+                                <!-- Recuadro naranja: se completa en papel -->
+                                <div style="width:95px; height:95px; border:1.5px solid #f4a460; margin-bottom:8px;"></div>
                                 <strong style="margin-left:6px;">Índice Derecho</strong>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- Inicio del texto legal de protección de datos (Ley 1582/2012) -->
-                    <div style="
-                        width:760px;
-                        margin-left:10px;
-                        margin-top:20px;
-                        margin-bottom:12px;
-                        font-size:10px;
-                        font-weight:normal;
-                    ">
+                    <!-- Inicio del texto legal (Ley 1582/2012 de protección de datos) -->
+                    <div style="width:760px; margin-left:10px; margin-top:20px; margin-bottom:12px; font-size:10px; font-weight:normal;">
                         Dando cumplimiento a lo dispuesto en la Ley 1582 de 2012,
                         "Por la cual se dictan disposiciones generales para la protección
                         de datos personales" y de conformidad con lo señalado en el
@@ -895,8 +841,7 @@ sap.ui.define([
 
                         <br><br>
 
-                        <strong>1.</strong>
-                        &nbsp;
+                        <strong>1.</strong>&nbsp;
                         <strong>DIACO S.A.</strong> actuará como responsable del Tratamiento de datos personales
                         de los cuales soy titular y que, conjunta o separadamente podrá recolectar,
                         usar y tratar mis datos personales conforme a la Política de Tratamiento de
@@ -904,22 +849,13 @@ sap.ui.define([
 
                         <br><br>
 
-                        <strong>2.</strong>
-                        &nbsp;
+                        <strong>2.</strong>&nbsp;
                         Que me ha sido informada la(s) finalidad(es) de la recolección de los datos personales,
                         en razón al proceso de selección y/o la relación laboral, las cuales son las siguientes:
-
                     </div>
 
-                    <!-- Caja de finalidades del tratamiento de datos -->
-                    <div style="
-                        width:730px;
-                        margin-left:28px;
-                        margin-top:10px;
-                        border:1px solid #000;
-                        font-size:10px;
-                        line-height:1.45;
-                    ">
+                    <!-- Caja con las finalidades del tratamiento de datos -->
+                    <div style="width:730px; margin-left:28px; margin-top:10px; border:1px solid #000; font-size:10px; line-height:1.45;">
                         <div style="padding:6px 8px; border-bottom:1px solid #000;">
                             Efectuar todas las gestiones necesarias para el desarrollo del objeto Social de <strong>DIACO S.A.</strong>,
                             en todo lo relacionado con el cumplimiento del objeto del contrato celebrado entre la Compañía
@@ -936,10 +872,10 @@ sap.ui.define([
                     </html>
                 `;
 
-                // ── PÁGINA 3: Continuación del texto legal + tabla de firma ──────
-                // Contiene los puntos 3–10 de la autorización de datos personales.
-                // Al final incluye el nombre y cédula del empleado ya precargados,
-                // y el espacio de firma que se completa a mano.
+                // ── PÁGINA 3: Continuación del texto legal + tabla de firma ────
+                // Puntos 3 al 10 de la autorización de datos personales.
+                // Al final, el nombre y cédula del empleado vienen precargados desde SAP.
+                // El espacio de firma se completa a mano.
                 const htmlPagina3 = `
                     <!DOCTYPE html>
                     <html lang="es">
@@ -1016,21 +952,14 @@ sap.ui.define([
                         input[type="checkbox"]:checked{
                             background:#000;
                         }
-
                     </style>
                     </head>
 
                     <body>
 
-                        <!-- Continuación de la lista de finalidades del tratamiento de datos -->
-                        <div style="
-                            width:730px;
-                            margin-left:28px;
-                            border:1px solid #000;
-                            font-size:10px;
-                            line-height:1.45;
-                        ">
-                            <!-- Fila vacía de alineación (continúa desde página 2) -->
+                        <!-- Continuación de la lista de finalidades (viene de la página 2) -->
+                        <div style="width:730px; margin-left:28px; border:1px solid #000; font-size:10px; line-height:1.45;">
+                            <!-- Fila vacía de alineación para encajar con el borde de la página 2 -->
                             <div style="height:18px; border-bottom:1px solid #000;"></div>
 
                             <div style="padding:6px 8px; border-bottom:1px solid #000;">
@@ -1054,14 +983,8 @@ sap.ui.define([
                             </div>
                         </div>
 
-                        <!-- Puntos 3–10 del texto legal (derechos del titular, canales de contacto, etc.) -->
-                        <div style="
-                            width:760px;
-                            margin-left:10px;
-                            margin-top:16px;
-                            font-size:10px;
-                            line-height:1.45;
-                        ">
+                        <!-- Puntos 3 al 10: derechos del titular, canales de contacto, compromisos de DIACO S.A. -->
+                        <div style="width:760px; margin-left:10px; margin-top:16px; font-size:10px; line-height:1.45;">
                             <strong>3.</strong>&nbsp;
                             Que la Política de Datos Personales y Privacidad de <strong>DIACO S.A.</strong>,
                             puede ser consultada en la página web
@@ -1119,11 +1042,11 @@ sap.ui.define([
                             de forma voluntaria y es verídica.
                         </div>
 
-                        <!-- Tabla de firma: nombre y cédula del empleado ya precargados desde SAP.
-                             El espacio de firma queda en blanco para completar en papel. -->
+                        <!-- Tabla de firma: nombre y cédula precargados desde SAP.
+                             El espacio de firma se completa a mano. -->
                         <div class="form-outer" style="margin-top:24px;">
 
-                            <!-- Nombre del titular (prellenado desde SAP) -->
+                            <!-- Nombre del titular (viene de SAP) -->
                             <div class="row">
                                 <div class="cell" style="width:38%;">
                                     <strong>Nombre del Representante legal o Persona Titular de los datos:</strong>
@@ -1133,12 +1056,10 @@ sap.ui.define([
 
                             <!-- Espacio en blanco para la firma manuscrita -->
                             <div class="row" style="min-height:95px;">
-                                <div class="cell cell-full">
-                                    <strong>Firma:</strong>
-                                </div>
+                                <div class="cell cell-full"><strong>Firma:</strong></div>
                             </div>
 
-                            <!-- Tipo de documento (checkboxes marcados según SAP) + número de cédula -->
+                            <!-- Tipo de documento con checkboxes marcados según SAP + número de cédula -->
                             <div class="row">
                                 <div class="cell" style="width:55%;">
                                     <strong>Documento de Identificación:</strong>
@@ -1164,22 +1085,23 @@ sap.ui.define([
                     </html>
                 `;
 
-                // Array con los 3 bloques HTML en orden de páginas del PDF
+                // Las 3 páginas en orden
                 const contentBlocks = [htmlPagina1, htmlPagina2, htmlPagina3];
 
-                // ── Ensamblado del PDF con PDFLib + html2canvas ────────────────
+                // ── Ensamblado del PDF final ───────────────────────────────────
                 //
-                // Flujo por página:
-                //  1. Cargar la plantilla institucional (logo, encabezado DIACO)
-                //  2. Por cada bloque HTML:
-                //     a. Insertar el HTML en un <div> invisible fuera de pantalla
-                //     b. Renderizarlo con html2canvas → imagen PNG (escala x2)
-                //     c. Agregar una nueva página al PDF con las dimensiones de la plantilla
-                //     d. Dibujar la plantilla como fondo
-                //     e. Superponer la imagen PNG con el contenido del empleado
-                //  3. En la última página (índice 2): agregar el enlace clickeable a diaco.com.co
-                //  4. Eliminar la página original de la plantilla (que era solo de referencia)
-                //  5. Descargar el PDF resultante
+                // Por cada página:
+                //  1. Cargar la plantilla institucional (logo + encabezado de DIACO)
+                //  2. Insertar el HTML en un <div> invisible fuera de pantalla
+                //  3. Renderizarlo con html2canvas → imagen PNG (escala x2)
+                //  4. Agregar una nueva página al PDF
+                //  5. Dibujar la plantilla como fondo
+                //  6. Superponer la imagen PNG con el contenido
+                //
+                // Al final:
+                //  - En la página 3 (índice 2): agregar el enlace clickeable a diaco.com.co
+                //  - Eliminar la página 0 original de la plantilla (era solo de referencia)
+                //  - Descargar el PDF
 
                 const existingPdfBytes = await fetch("pdf/plantillaDatosPersonales.pdf")
                     .then(res => res.arrayBuffer());
@@ -1188,13 +1110,13 @@ sap.ui.define([
                 const [templatePage] = pdfDoc.getPages();
                 const { width, height } = templatePage.getSize();
 
-                // Pre-incrustar la plantilla como imagen reutilizable en todas las páginas
+                // Se incrusta la plantilla una sola vez y se reutiliza en todas las páginas
                 const templatePageImage = await pdfDoc.embedPage(templatePage);
 
                 for (let pageIndex = 0; pageIndex < contentBlocks.length; pageIndex++) {
                     const blockHtml = contentBlocks[pageIndex];
 
-                    // Crear <div> invisible fuera de pantalla para renderizar el HTML
+                    // Crear un <div> invisible fuera de pantalla para renderizar el HTML
                     const div = document.createElement("div");
                     div.style.width           = "794px";
                     div.style.height          = "1400px";
@@ -1207,23 +1129,21 @@ sap.ui.define([
                     div.innerHTML             = blockHtml;
                     document.body.appendChild(div);
 
-                    // Renderizar el HTML a canvas (escala x2 = buena resolución en el PDF)
+                    // Renderizar el HTML a imagen PNG (escala x2 para mejor resolución en el PDF)
                     const canvas  = await html2canvasRef(div, { scale: 2, useCORS: true, backgroundColor: null });
                     const imgData = canvas.toDataURL("image/png");
-                    document.body.removeChild(div); // Limpiar el DOM después de renderizar
+                    document.body.removeChild(div); // Limpiar el DOM inmediatamente después
 
-                    // Agregar nueva página al PDF y superponer la plantilla + contenido
+                    // Agregar nueva página y superponer plantilla + contenido
                     const img     = await pdfDoc.embedPng(imgData);
                     const newPage = pdfDoc.addPage([width, height]);
 
-                    // Dibujar primero la plantilla (fondo institucional)
-                    newPage.drawPage(templatePageImage);
+                    newPage.drawPage(templatePageImage); // Primero el fondo institucional
 
-                    // Calcular dimensiones de la imagen para que encaje dentro de la página
-                    const imgWidth  = width * 0.88; // Dejar así (valor calibrado para la plantilla)
+                    // Calcular el tamaño de la imagen para que encaje en la página
+                    const imgWidth  = width * 0.88; // Valor calibrado para esta plantilla específica
                     const imgHeight = (img.height * imgWidth) / img.width;
 
-                    // Superponer la imagen del HTML sobre la plantilla
                     newPage.drawImage(img, {
                         x: (width - imgWidth) / 2 - 10,
                         y: height - imgHeight - 130,
@@ -1231,12 +1151,11 @@ sap.ui.define([
                         height: imgHeight
                     });
 
-                    // En la página 3 (índice 2): agregar enlace clickeable a la web de DIACO
-                    // Se dibuja el texto del link en azul y se registra la anotación PDF real
+                    // En la página 3 (índice 2): agregar el enlace clickeable a la web de DIACO
                     if (pageIndex === 2) {
                         const linkUrl = "https://www.diaco.com.co/";
 
-                        // Texto visible del enlace (en azul)
+                        // Texto visible del enlace (dibujado en azul)
                         newPage.drawText("https://www.diaco.com.co/", {
                             x: 373,
                             y: 511,
@@ -1244,12 +1163,12 @@ sap.ui.define([
                             color: PDFLibRef.rgb(0, 0.64, 1)
                         });
 
-                        // Anotación PDF tipo URI: hace el texto clickeable en el lector de PDF
+                        // Anotación PDF tipo URI: hace el texto realmente clickeable en el lector
                         const linkAnnotation = pdfDoc.context.register(
                             pdfDoc.context.obj({
                                 Type:    'Annot',
                                 Subtype: 'Link',
-                                Rect:    [355, 312, 515, 325], // Área clickeable (coordenadas PDF)
+                                Rect:    [355, 312, 515, 325], // Área clickeable en coordenadas PDF
                                 Border:  [0, 0, 0],            // Sin borde visible
                                 A: pdfDoc.context.obj({
                                     S:   'URI',
@@ -1263,13 +1182,12 @@ sap.ui.define([
                     }
                 }
 
-                // Eliminar la página 0 original de la plantilla (era solo de referencia)
+                // Eliminar la página original de la plantilla (ya no se necesita)
                 pdfDoc.removePage(0);
 
-                // Agregar metadatos al PDF (visible en lectores de PDF)
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Autorización Datos Personales`);
 
-                // Serializar y descargar el PDF en el navegador del usuario
+                // Serializar y descargar el PDF en el navegador
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Datos_Personales.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
@@ -1277,10 +1195,10 @@ sap.ui.define([
                 link.href      = URL.createObjectURL(blob);
                 link.download  = fileName;
                 link.click();
-                URL.revokeObjectURL(link.href); // Liberar memoria del objeto URL
+                URL.revokeObjectURL(link.href); // Liberar la memoria del objeto URL
             }
 
-            // Toast de confirmación final (solo para el flujo PDF)
+            // Toast de confirmación al terminar (solo para el flujo PDF)
             if (!sButtonId.includes("wordDataInfo")) {
                 MessageToast.show(
                     aUsers.length > 1
@@ -1290,7 +1208,6 @@ sap.ui.define([
             }
 
         } catch (error) {
-            // Capturar cualquier error del proceso y mostrarlo al usuario
             console.error("Error generando Datos Personales:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
