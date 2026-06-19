@@ -184,19 +184,6 @@ sap.ui.define([
                     `;
                 }
 
-                function _versionContrato() {
-                    return `
-                        <div style="
-                            position:absolute;
-                            bottom:10px;
-                            left:24px;
-                            font-size:6pt;
-                        ">
-                            Versión: 25 de julio de 2025
-                        </div>
-                    `;
-                }
-
 
                 // ── PÁGINA 1 — Título + Tabla de datos + inicio cláusula 1 ────
                 const htmlPagina1 = `
@@ -257,8 +244,6 @@ sap.ui.define([
                         de nuevos sistemas, siempre que el cambio no implique desmejora de la remuneración
                         básica de <strong>EL TRABAJADOR</strong>.
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -355,8 +340,6 @@ sap.ui.define([
                         Utilizar los elementos que EL EMPLEADOR le suministre para la realización de su trabajo;
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -442,8 +425,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -523,8 +504,6 @@ sap.ui.define([
                         relaciones que se establezcan entre el trabajador y los terceros en virtud de la poliasignación
                         mencionada en esta cláusula no se derivará vínculo laboral alguno, toda vez que la subordinación
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -628,8 +607,6 @@ sap.ui.define([
                         por cuarta vez.
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 6 ──────────────────────────────────────────────────
@@ -729,8 +706,6 @@ sap.ui.define([
                         <strong>EL EMPLEADOR</strong> de la violación.
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 7 ──────────────────────────────────────────────────
@@ -816,8 +791,6 @@ sap.ui.define([
                         salario pactado, cuando EL TRABAJADOR no haya sido previamente autorizado expresamente y
                         `
                     )}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -907,8 +880,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 9 ──────────────────────────────────────────────────
@@ -989,8 +960,6 @@ sap.ui.define([
                         aquellas personas que, en virtud de dicha obligación, deban recibirla, en cuyo caso
                         la
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1077,8 +1046,6 @@ sap.ui.define([
                         ""
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 11 ──────────────────────────────────────────────────
@@ -1160,8 +1127,6 @@ sap.ui.define([
                         d) Presentar ante la Superintendencia de
                         `
                     )}
-
-                    ${_versionContrato()}
 
                 </div>`;
                 
@@ -1251,8 +1216,6 @@ sap.ui.define([
                         Ley 1778 de 2016, el FCPA, el UK Bribery Act y otras relacionadas con soborno, corrupción y
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 13 ──────────────────────────────────────────────────
@@ -1334,8 +1297,6 @@ sap.ui.define([
                         sobre nuevas conductas ilícitas, la PARTE cumplida podrá rescindir el contrato unilateralmente y sin indemnización.
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 14 ──────────────────────────────────────────────────
@@ -1415,8 +1376,6 @@ sap.ui.define([
                         y todas las demás políticas internas de la compañía.
                         `
                     )}
-
-                    ${_versionContrato()}
 
                     </div>`;
 
@@ -1571,8 +1530,6 @@ sap.ui.define([
 
                     </div>
 
-                    <div style="${STYLE}width:100%;box-sizing:border-box;">
-                        ${_versionContrato()}
                     </div>`;
                     
 
@@ -1597,7 +1554,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf")
+                const existingPdfBytes = await fetch("pdf/Termino_Indef.pdf")
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
