@@ -750,6 +750,19 @@ sap.ui.define([], function () {
                     // Frecuencia de pago (obtenida vía $expand en OData: payGroupNav/paymentFrequencyFONav)
                     paymentFrequency: getProp("paymentFrequency") || "",
 
+                    // Contacto personal  ← NUEVO
+                    personalEmail: getProp("personalEmail") || "",
+                    personalPhone: getProp("personalPhone") || "",
+
+                    // Documento de identidad
+                    docCardType:       getProp("docCardType") || "",
+                    docExpeditionDate: this.formatDateRaw(getProp("docExpeditionDate")),
+                    ciudadCedula:      getProp("ciudadCedula") || "",  // ← NUEVO
+
+                    // Fecha de baja (disponible en inactivos; null en activos)  ← NUEVO
+                    endDateBaja:          getProp("endDateBaja") || null,
+                    endDateBajaFormatted: this.formatDateToWords(getProp("endDateBaja")),  // ← NUEVO
+
                     // Resuelve la ciudad de trabajo con fallback encadenado:
                     // primero custom10, después state, después country
                     getCiudadWork: function (user) {

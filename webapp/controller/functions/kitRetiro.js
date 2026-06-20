@@ -31,18 +31,30 @@ sap.ui.define([
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
                 }
 
-                const sNombre     = `${user.firstName} ${user.lastName}`;
-                const sCedula     = user.nationalId || "";
-                const sCiudadWork = oController.getCiudadWork(user);
-                const localDate   = oController.getLocalDate();
-                const sCargo      = oController.resolveGender(user.title || "", user.gender);
-                const sSalario    = oController.formatSalary(user.paycompvalue);
-                const sIngreso    = user.hireDatesimpl ? oController.formatDateToSpanish(user.hireDatesimpl) : "XXXX";
-                const sSalida     = user.endDate ? oController.formatDateToSpanish(user.endDate + "T12:00:00") : "XXXX";
-                const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
-                const sEmail      = oController.getEmail(user);
-                const sTelefono   = oController.getTelefono(user);
-                const sDireccion  = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                const sNombre        = `${user.firstName} ${user.lastName}`;
+                const sCedula        = user.nationalId     || "";
+                const sCiudadWork    = oController.getCiudadWork(user);
+                const sCiudadResidencia = user.state || "";
+                const localDate      = oController.getLocalDate();
+                const sCargo         = oController.resolveGender(user.title || "", user.gender);
+                const sSalario       = oController.formatSalary(user.paycompvalue);
+                const sIngreso       = user.hireDatesimpl ? oController.formatDateToSpanish(user.hireDatesimpl) : "XXXX";
+                const sIdentif       = (user.gender === "F") ? "identificada" : "identificado";
+                const sEmail         = oController.getEmail(user);          // email corporativo (ya existía)
+                const sTelefono      = oController.getTelefono(user);       // teléfono trabajo (ya existía)
+                const sDireccion     = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+
+                // ← NUEVO: campos que ahora vienen desde la carga enriquecida
+                const sEmailPersonal  = user.personalEmail || "";
+                const sTelefonoMovil  = user.personalPhone || "";
+                const sCiudadCedula   = user.ciudadCedula  || "";
+                const sFechaBaja      = user.endDateBaja
+                                        ? oController.formatDateToWords(user.endDateBaja)
+                                        : "";
+                // Si necesitás la fecha de baja sin formato extendido:
+                const sFechaBajaCorta = user.endDateBaja
+                                        ? oController.formatFechaCorta(user.endDateBaja)
+                                        : "";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -164,7 +176,7 @@ sap.ui.define([
                                 <table style="width:100%;border-collapse:collapse;margin-top:8px;">
                                     <tr>
                                         <td style="padding:3px 0;width:55%;">Ciudad de Residencia:</td>
-                                        <td>&nbsp${sCiudadWork}</td>
+                                        <td>&nbsp${sCiudadResidencia}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding:3px 0;">Dirección (incluir el barrio/sector):</td>
@@ -172,11 +184,11 @@ sap.ui.define([
                                     </tr>
                                     <tr>
                                         <td style="padding:3px 0;">Teléfono:</td>
-                                        <td>&nbsp${sTelefono}</td>
+                                        <td>&nbsp${sTelefonoMovil}</td>
                                     </tr>
                                     <tr>
                                         <td style="padding:3px 0;">Correo Electrónico:</td>
-                                        <td>&nbsp${sEmail}</td>
+                                        <td>&nbsp${sEmailPersonal}</td>
                                     </tr>
                                 </table>
                             </td>
@@ -209,7 +221,7 @@ sap.ui.define([
                     <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
                         Que, <strong>${sNombre}</strong> ${sIdentif} con cédula de ciudadanía número
                         <strong>${sCedula},</strong> trabajó en la empresa con contrato a término indefinido, desde
-                        <strong>${sIngreso}</strong> hasta el <strong>${sSalida}</strong>
+                        <strong>${sIngreso}</strong> hasta el <strong>${sFechaBaja}</strong>
                     </p>
 
                     <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
@@ -228,7 +240,7 @@ sap.ui.define([
                     </table>
 
                     <p style="text-align:justify;margin:0 0 60px 0;">
-                        La anterior se expide en Ciudad de Bogotá el ${localDate} de
+                        La anterior se expide en Ciudad de ${sCiudadWork} el ${localDate}
                     </p>
 
                     <div style="text-align:center;">

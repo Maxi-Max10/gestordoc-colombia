@@ -825,15 +825,48 @@ sap.ui.define([
             const chunk     = userIds.slice(i, i + chunkSize);
             const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
 
-            const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
-              urlParameters: {
-                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,payScaleArea",
-                "$filter": `(${filterIds})`,
-                "$expand": "managerUserNav,payGroupNav,locationNav"
-              }
-            });
+            // ─── Llamadas en paralelo: EmpJob + PerEmail + PerPhone ─────────────────
+            const [empJobData, perEmailData, perPhoneData] = await Promise.all([  // ← NUEVO: Promise.all
 
-            const empJobResults = Array.isArray(empJobData?.results) ? empJobData.results : [];
+              this._readOData(oComponentModel, "/EmpJob", {
+                urlParameters: {
+                  // ← NUEVO: agregamos locationNav/customString1Nav para ciudad de cédula
+                  "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,locationNav/customString1Nav/localeLabel,payScaleArea",
+                  "$filter": `(${filterIds})`,
+                  "$expand": "managerUserNav,payGroupNav,locationNav/customString1Nav"  // ← NUEVO: expand anidado
+                }
+              }),
+
+              // ← NUEVO: email personal (tipo 4083 = email personal en este tenant)
+              this._readOData(oComponentModel, "/PerEmail", {
+                urlParameters: {
+                  "$select": "personIdExternal,emailAddress",
+                  "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")}) and emailType eq '4083'`
+                }
+              }).catch(e => { console.warn("PerEmail falló:", e); return { results: [] }; }),
+
+              // ← NUEVO: teléfono celular (tipo 4088 = celular en este tenant)
+              this._readOData(oComponentModel, "/PerPhone", {
+                urlParameters: {
+                  "$select": "personIdExternal,phoneNumber",
+                  "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")}) and phoneType eq '4088'`
+                }
+              }).catch(e => { console.warn("PerPhone falló:", e); return { results: [] }; })
+
+            ]);
+            // ────────────────────────────────────────────────────────────────────────
+
+            const empJobResults  = Array.isArray(empJobData?.results)  ? empJobData.results  : [];
+            const perEmailMap    = {};  // ← NUEVO
+            const perPhoneMap    = {};  // ← NUEVO
+
+            // ← NUEVO: indexar por personIdExternal para lookup O(1)
+            (perEmailData?.results || []).forEach(e => {
+              if (e.personIdExternal) perEmailMap[e.personIdExternal] = e.emailAddress || "";
+            });
+            (perPhoneData?.results || []).forEach(p => {
+              if (p.personIdExternal) perPhoneMap[p.personIdExternal] = p.phoneNumber || "";
+            });
 
             const PAY_GROUP_LABELS = {
               "Q2": "QUINCENAL",
@@ -851,11 +884,30 @@ sap.ui.define([
                   managerJobCode:   (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, ""),
                   paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || ""),
                   planta:           job.locationNav?.name || job.location || "",
-                  area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || ""
+                  area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || "",
+                  ciudadCedula:     job.locationNav?.customString1Nav?.localeLabel || "",  // ← NUEVO
+                  personalEmail:    perEmailMap[job.userId] || "",   // ← NUEVO
+                  personalPhone:    perPhoneMap[job.userId] || "",   // ← NUEVO
                 };
               }
             });
+            
           }
+
+          // ← NUEVO: fecha de baja desde EmpEmployment (en activos vendrá null normalmente)
+          const empEmpData = await this._readOData(oComponentModel, "/EmpEmployment", {
+            urlParameters: {
+              "$select": "userId,endDate",
+              "$filter": userIds.map(id => `userId eq '${id}'`).join(" or ")
+              // Sin chunks: EmpEmployment es liviano y el filter de userId es suficiente.
+              // Si la empresa tiene miles de empleados activos, envolver esto en el mismo loop de chunks.
+            }
+          }).catch(e => { console.warn("EmpEmployment endDate falló:", e); return { results: [] }; });
+
+          const empEndDateMap = {};
+          (empEmpData?.results || []).forEach(emp => {
+            if (emp.userId) empEndDateMap[emp.userId] = emp.endDate || null;
+          });
 
           enrichedUsers.forEach(user => {
             const mgr = managerMap[user.userId] || {};
@@ -866,6 +918,10 @@ sap.ui.define([
             user.paymentFrequency = mgr.paymentFrequency || "";
             user.planta           = mgr.planta           || "";
             user.area             = mgr.area             || "";
+            user.ciudadCedula     = mgr.ciudadCedula     || "";  // ← NUEVO
+            user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
+            user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
+            user.endDateBaja = empEndDateMap[user.userId] || null;  // ← NUEVO: fecha de baja
           });
 
           // Actualiza el modelo con los datos de EmpJob sin reemplazar el modelo entero
@@ -1023,38 +1079,90 @@ sap.ui.define([
             const chunk     = userIds.slice(i, i + chunkSize);
             const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
 
-            const empJobData = await this._readOData(oComponentModel, "/EmpJob", {
-              urlParameters: {
-                "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,payScaleArea",
-                "$filter": `(${filterIds})`,
-                "$expand": "managerUserNav,payGroupNav,locationNav"
-              }
-            });
+            // ─── Llamadas en paralelo: EmpJob + PerEmail + PerPhone ─────────────────
+            const [empJobData, perEmailData, perPhoneData] = await Promise.all([  // ← NUEVO: Promise.all
 
-            const empJobResults = Array.isArray(empJobData?.results) ? empJobData.results : [];
+              this._readOData(oComponentModel, "/EmpJob", {
+                urlParameters: {
+                  // ← NUEVO: agregamos locationNav/customString1Nav para ciudad de cédula
+                  "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,locationNav/customString1Nav/localeLabel,payScaleArea",
+                  "$filter": `(${filterIds})`,
+                  "$expand": "managerUserNav,payGroupNav,locationNav/customString1Nav"  // ← NUEVO: expand anidado
+                }
+              }),
+
+              // ← NUEVO: email personal (tipo 4083 = email personal en este tenant)
+              this._readOData(oComponentModel, "/PerEmail", {
+                urlParameters: {
+                  "$select": "personIdExternal,emailAddress",
+                  "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")}) and emailType eq '4083'`
+                }
+              }).catch(e => { console.warn("PerEmail falló:", e); return { results: [] }; }),
+
+              // ← NUEVO: teléfono celular (tipo 4088 = celular en este tenant)
+              this._readOData(oComponentModel, "/PerPhone", {
+                urlParameters: {
+                  "$select": "personIdExternal,phoneNumber",
+                  "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")}) and phoneType eq '4088'`
+                }
+              }).catch(e => { console.warn("PerPhone falló:", e); return { results: [] }; })
+
+            ]);
+            // ────────────────────────────────────────────────────────────────────────
+
+            const empJobResults  = Array.isArray(empJobData?.results)  ? empJobData.results  : [];
+            const perEmailMap    = {};  // ← NUEVO
+            const perPhoneMap    = {};  // ← NUEVO
+
+            // ← NUEVO: indexar por personIdExternal para lookup O(1)
+            (perEmailData?.results || []).forEach(e => {
+              if (e.personIdExternal) perEmailMap[e.personIdExternal] = e.emailAddress || "";
+            });
+            (perPhoneData?.results || []).forEach(p => {
+              if (p.personIdExternal) perPhoneMap[p.personIdExternal] = p.phoneNumber || "";
+            });
 
             const PAY_GROUP_LABELS = {
               "Q2": "QUINCENAL",
               "M1": "MENSUAL",
-              "S1": "SEMANAL"
+              "M2": "MENSUAL",
+              "S1": "SEMANAL",
             };
 
             empJobResults.forEach(job => {
               if (job.userId) {
                 managerMap[job.userId] = {
                   managerId:        job.managerId || "",
-                  managerName:      job.managerUserNav?.displayName || "",
+                  managerName:      (job.managerUserNav?.displayName || "").trim(),
                   managerEmail:     job.managerUserNav?.email || "",
                   managerJobCode:   (job.managerUserNav?.jobCode || "").replace(/\s*\(\d+\)$/, ""),
                   paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || ""),
                   planta:           job.locationNav?.name || job.location || "",
-                  area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || ""
+                  area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || "",
+                  ciudadCedula:     job.locationNav?.customString1Nav?.localeLabel || "",  // ← NUEVO
+                  personalEmail:    perEmailMap[job.userId] || "",   // ← NUEVO
+                  personalPhone:    perPhoneMap[job.userId] || "",   // ← NUEVO
                 };
               }
             });
           }
 
-          aUsers.forEach(user => {
+          // ← NUEVO: fecha de baja desde EmpEmployment (en activos vendrá null normalmente)
+          const empEmpData = await this._readOData(oComponentModel, "/EmpEmployment", {
+            urlParameters: {
+              "$select": "userId,endDate",
+              "$filter": userIds.map(id => `userId eq '${id}'`).join(" or ")
+              // Sin chunks: EmpEmployment es liviano y el filter de userId es suficiente.
+              // Si la empresa tiene miles de empleados activos, envolver esto en el mismo loop de chunks.
+            }
+          }).catch(e => { console.warn("EmpEmployment endDate falló:", e); return { results: [] }; });
+
+          const empEndDateMap = {};
+          (empEmpData?.results || []).forEach(emp => {
+            if (emp.userId) empEndDateMap[emp.userId] = emp.endDate || null;
+          });
+
+          enrichedUsers.forEach(user => {
             const mgr = managerMap[user.userId] || {};
             user.managerId        = mgr.managerId        || "";
             user.managerName      = mgr.managerName      || "";
@@ -1063,6 +1171,10 @@ sap.ui.define([
             user.paymentFrequency = mgr.paymentFrequency || "";
             user.planta           = mgr.planta           || "";
             user.area             = mgr.area             || "";
+            user.ciudadCedula     = mgr.ciudadCedula     || "";  // ← NUEVO
+            user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
+            user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
+            user.endDateBaja = empEndDateMap[user.userId] || null;  // ← NUEVO: fecha de baja
           });
 
         } catch (e) {
