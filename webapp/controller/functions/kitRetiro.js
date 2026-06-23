@@ -33,8 +33,7 @@ sap.ui.define([
 
                 const sNombre        = `${user.firstName} ${user.lastName}`;
                 const sCedula        = user.nationalId     || "";
-                const sCiudadExpedicion = user.docExpeditionCity || "";
-                const sCiudadWork    = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
                 const sCiudadResidencia = user.state || "";
                 const localDate      = oController.getLocalDate();
                 const sCargo         = oController.resolveGender(user.title || "", user.gender);
@@ -62,9 +61,9 @@ sap.ui.define([
                         templatePath: "pdf/Kit_Retiro.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Kit_Retiro.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadWork, localDate, sCargo,
+                            sNombre, sCedula, localDate, sCargo,
                             sSalario, sIngreso, sSalida, sIdentif,
-                            sEmail, sTelefono, sDireccion
+                            sEmail, sTelefono, sDireccion, sCiudadFirma
                         }
                     });
                     continue;
@@ -76,11 +75,11 @@ sap.ui.define([
                 const htmlPagina1 = `
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                    <p style="margin:0 0 16px 0;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
+                    <p style="margin:0 0 16px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
                     <p style="margin:0;">Señor(a):</p>
                     <p style="font-weight:bold;margin:0;">${sNombre}</p>
-                    <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadWork}</p>
+                    <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         Con referencia al retiro de la empresa, a continuación, se relaciona lista documentos
@@ -110,11 +109,11 @@ sap.ui.define([
                 const htmlPagina2 = `
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                    <p style="margin:0 0 4px 0;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
+                    <p style="margin:0 0 4px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
                     <p style="margin:0;">Señor:</p>
                     <p style="font-weight:bold;margin:0;">${sNombre}</p>
-                    <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadWork}</p>
+                    <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                     <p style="text-align:justify;margin:0 0 14px 0;">
                         Pensando en su comodidad, tenemos disponible para usted las siguientes opciones (Marque X):
@@ -231,7 +230,7 @@ sap.ui.define([
                         </tr>
                         <tr>
                             <td style="padding:4px 0;font-weight:bold;">Ciudad de trabajo:</td>
-                            <td style="padding:4px 0;">${sCiudadWork}</td>
+                            <td style="padding:4px 0;">${sCiudadFirma}</td>
                         </tr>
                         <tr>
                             <td style="padding:4px 0;font-weight:bold;">Salario:</td>
@@ -240,7 +239,7 @@ sap.ui.define([
                     </table>
 
                     <p style="text-align:justify;margin:0 0 60px 0;">
-                        La anterior se expide en Ciudad de ${sCiudadWork} el ${localDate}
+                        La anterior se expide en Ciudad de ${sCiudadFirma} el ${localDate}
                     </p>
 
                     <div style="text-align:center;">

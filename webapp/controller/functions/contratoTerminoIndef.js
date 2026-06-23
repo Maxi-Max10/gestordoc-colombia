@@ -31,7 +31,7 @@ sap.ui.define([
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
                 const sCiudadExpedicion = user.docExpeditionCity || "";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDate    = oController.getLocalDate();
                 const sPais = oController.getPaisName(user.country);
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
@@ -48,8 +48,8 @@ sap.ui.define([
                         templatePath: "pdf/Contrato_Termino_Indefinido.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadWork, localDate, sPais, sDireccion, sCargo, sSalario, sSalarioLetras,
-                            sfechaContratacion, sPeriodoPago
+                            sNombre, sCedula, localDate, sPais, sDireccion, sCargo, sSalario, sSalarioLetras,
+                            sfechaContratacion, sPeriodoPago, sCiudadFirma
                         }
                     });
                     continue;
@@ -197,8 +197,8 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion}</td></tr>
@@ -1423,7 +1423,7 @@ sap.ui.define([
                         Del presente documento se han extendido dos ejemplares del mismo contenido,
                         uno para <strong>EL EMPLEADOR</strong> y otro para
                         <strong>EL TRABAJADOR</strong>, los cuales firmamos ante testigos en la ciudad
-                        de <strong>${sCiudadWork}</strong> el día <strong>${localDate}</strong>.
+                        de <strong>${sCiudadFirma}</strong> el día <strong>${localDate}</strong>.
                     `)}
 
 

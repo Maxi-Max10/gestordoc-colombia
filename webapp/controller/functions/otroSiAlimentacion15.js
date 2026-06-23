@@ -32,7 +32,7 @@ sap.ui.define([
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
                 const localDateLong = oController.formatDateToWords(new Date());
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -40,7 +40,7 @@ sap.ui.define([
                         templatePath: "pdf/Otro_Si_Alimentacion_15.docx",
                         fileName:     `${user.firstName}_${user.lastName}Otro_Si_Alimentacion_15.docx`,
                         data: {
-                            sNombre, sCedula, sIdentificado ,sCiudadWork, localDateLong
+                            sNombre, sCedula, sIdentificado ,sCiudadFirma, localDateLong
                         }
                     });
                     continue;
@@ -54,7 +54,11 @@ sap.ui.define([
                         OTRO SI AL CONTRATO DE TRABAJO
                     </p>
 
-                    <p style="text-align:justify;margin:0 0 16px 0;"><span style="background-color:#ea80fc;">En ${sCiudadWork}, a los ${localDateLong}, se reunieron por una parte</span> <strong>${sNombre}</strong> ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong> como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de <strong>DIACO S.A.</strong>, quien en adelante se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo provisto de las siguientes cláusulas.</p>
+                    <p style="text-align:justify;margin:0 0 16px 0;"><span style="background-color:#ea80fc;">En ${sCiudadFirma}, a los ${localDateLong}, 
+                    se reunieron por una parte</span> <strong>${sNombre}</strong> ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong> 
+                    como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>LAURA CRISTINA 
+                    CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de <strong>DIACO S.A.</strong>, quien en 
+                    adelante se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo provisto de las siguientes cláusulas.</p>
 
                     <p style="text-align:justify;margin:0 0 10px 0;">
                         <strong>PRIMERA:</strong> El empleador de mera liberalidad y como parte de su política de bienestar otorga al trabajador un 
@@ -84,7 +88,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        <mark style="background-color:#ea80fc;padding:0;">En constancia se firma en la ciudad de ${sCiudadWork} a los ${localDateLong}.</mark>
+                        <mark style="background-color:#ea80fc;padding:0;">En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.</mark>
                     </p>
 
                     <div style="width:100%;display:table;">

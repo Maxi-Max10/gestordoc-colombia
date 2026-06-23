@@ -30,7 +30,7 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDate    = oController.getLocalDate();
                 const sCiudadExpedicion = user.docExpeditionCity || "";
 
@@ -40,7 +40,7 @@ sap.ui.define([
                         templatePath: "pdf/Solicitud_Deducciones_Retencion.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Solicitud_Deducciones_Retencion.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadWork, localDate
+                            sNombre, sCedula, sCiudadFirma, localDate, sCiudadExpedicion
                         }
                     });
                     continue;
@@ -55,11 +55,11 @@ sap.ui.define([
                             SOLICITUD PARA DEDUCCIONES DE RETENCIÓN EN LA FUENTE Y CONDICION DE<br>DECLARANTE DE RENTA
                         </p>
 
-                        <p style="margin:0 0 8px 0;">Ciudad y Fecha: ${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
+                        <p style="margin:0 0 8px 0;">Ciudad y Fecha: ${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
                         <p style="margin:0;">Señores:</p>
                         <p style="margin:0;">Sección Nómina</p>
                         <p style="margin:0;">DIACO S.A.</p>
-                        <p style="margin:0 0 16px 0;">${sCiudadWork}</p>
+                        <p style="margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                         <p style="text-align:justify;margin:0 0 16px 0;">
                             Yo <strong>${sNombre}</strong>, con cédula número <strong>${sCedula}</strong>

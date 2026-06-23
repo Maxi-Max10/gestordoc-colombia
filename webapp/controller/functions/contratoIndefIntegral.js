@@ -31,7 +31,7 @@ sap.ui.define([
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
                 const sCiudadExpedicion = user.docExpeditionCity || "";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDate    = oController.getLocalDate();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
@@ -56,9 +56,7 @@ sap.ui.define([
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
-                const sPlanta = user.planta || sCiudadWork; // fallback a ciudad si planta viene vacía
-                const sCiudadFirma   = user.sCiudadFirma  || "";
-                //console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
+                const sPlanta = user.planta || "COMPLETAR"; // fallback
                 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -66,7 +64,7 @@ sap.ui.define([
                         templatePath: "pdf/Contrato_Termino_Indef_Integral.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indef_Integral.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadWork, localDate, sCargo, sSalario, sSalarioLetras,
+                            sNombre, sCedula, localDate, sCargo, sSalario, sSalarioLetras,
                             salarioIntegral, componenteRemunerativo, factorPrestacional, sCompRemunerativo, sFactorPrestacional,
                             sCompRemunerativoLetras, sFactorPrestacionalLetras, sfechaContratacion,
                             sDireccion, sPeriodoPago, sPlanta, sCiudadFirma
@@ -220,8 +218,8 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sPlanta ? sPlanta + ", " : ""}${localDate}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sPlanta}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">20 DE ABRIL DE 2026</td></tr>

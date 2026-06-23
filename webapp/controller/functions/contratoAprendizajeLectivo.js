@@ -37,7 +37,6 @@ sap.ui.define([
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sTelefono   = oController.getTelefono(user);                
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
-                const sCiudadWork  = oController.getCiudadWork(user);
                 // ── Institución de formación ──────────────────────────────────
                 const sInstitucion = await oController._getInstitucionFormacion(user.userId);
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
@@ -48,7 +47,7 @@ sap.ui.define([
                         templatePath: "pdf/Contrato_Aprendizaje_Lectivo.docx",
                         fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Lectivo.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCiudadWork, sCargo, sInstitucion
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCargo, sInstitucion
                         }
                     });
                     continue;

@@ -31,7 +31,8 @@ sap.ui.define([
                 const sNombre           = `${user.firstName} ${user.lastName}`;
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
+                //const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
 
                 // ── Word ─────────────────────────────────────────────────────
@@ -69,7 +70,7 @@ sap.ui.define([
                         </p>
 
                         <p style="margin:0 0 24px 0;">
-                            <strong>Ciudad y fecha:</strong> ${sCiudadWork}, ${localDate}&nbsp;</span>
+                            <strong>Ciudad y fecha:</strong> ${sCiudadFirma}, ${localDate}&nbsp;</span>
                         </p>
 
                         <p style="margin:0 0 24px 0;">

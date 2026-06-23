@@ -31,7 +31,7 @@ sap.ui.define([
                 const sNombre           = `${user.firstName} ${user.lastName}`;
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
-                const sCiudadWork      = user.location || user.city || "Bucaramanga";
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDate   = oController.getLocalDate();
                 const sSalario    = oController.formatSalary(user.paycompvalue);
                 const sSalarioLetras  = user.payCompValueWord || "" 
@@ -42,7 +42,7 @@ sap.ui.define([
                         templatePath: "pdf/Otro_Si_Rodamiento.docx",
                         fileName:     `${user.firstName}_${user.lastName}Otro_Si_Rodamiento.docx`,
                         data: {
-                            sNombre, sCedula, sIdentificado ,sCiudadWork, localDate, sSalario, sSalarioLetras
+                            sNombre, sCedula, sIdentificado ,sCiudadFirma, localDate, sSalario, sSalarioLetras
                         }
                     });
                     continue;
@@ -103,7 +103,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        En constancia se firma en ${sCiudadWork}, el ${localDate}.
+                        En constancia se firma en ${sCiudadFirma}, el ${localDate}.
                     </p>
 
                     <div style="width:100%;display:table;">

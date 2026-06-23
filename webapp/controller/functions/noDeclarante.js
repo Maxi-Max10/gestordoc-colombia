@@ -30,7 +30,7 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDate    = oController.getLocalDate();
 
                 // ── Word ─────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ sap.ui.define([
                         templatePath: "pdf/Manifestación_No_Declarante.docx",
                         fileName:     `${user.firstName}_${user.lastName}Manifestación_No_Declarante.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadWork, localDate
+                            sNombre, sCedula, localDate
                         }
                     });
                     continue;
@@ -50,13 +50,13 @@ sap.ui.define([
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
                     <p style="margin:0 0 36px 0;">
-                        Ciudad y Fecha: ${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}
+                        Ciudad y Fecha: ${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}
                     </p>
 
                     <p style="margin:0;">Señores</p>
                     <p style="margin:0;"><strong>RECURSOS HUMANOS</strong></p>
                     <p style="margin:0;"><strong>DIACO S.A.</strong></p>
-                    <p style="margin:0 0 36px 0;">${sCiudadWork}</p>
+                    <p style="margin:0 0 36px 0;">${sCiudadFirma}</p>
 
                     <p style="margin:0 0 20px 0;text-align:justify;">
                         <strong>Asunto:</strong> Manifestación de la calidad de <strong>NO Declarante</strong> en el Impuesto de Renta.
@@ -65,7 +65,9 @@ sap.ui.define([
                     <p style="margin:0 0 14px 0;">Cordial saludo:</p>
 
                     <p style="text-align:justify;margin:0 0 14px 0;">
-                        Me permito manifestar bajo la gravedad del juramento y actuando en mi calidad de empleado de la Compañía, que <strong>NO</strong> tengo la calidad de Declarante del Impuesto sobre la Renta, por lo tanto solicito no aplicar descuento de Retención en la Fuente por concepto de pagos laborales.
+                        Me permito manifestar bajo la gravedad del juramento y actuando en mi calidad de empleado de la Compañía, que 
+                        <strong>NO</strong> tengo la calidad de Declarante del Impuesto sobre la Renta, por lo tanto 
+                        solicito no aplicar descuento de Retención en la Fuente por concepto de pagos laborales.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 14px 0;">
@@ -73,7 +75,9 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 36px 0;">
-                        Lo anterior en cumplimiento de lo previsto por parágrafo tercero del artículo 14 de la Ley 1607 de 2012, que adicionó al artículo 384 al Estatuto Tributario y en concordancia con lo establecido por el parágrafo cuarto del artículo tercero del Decreto 0099 de 2013.
+                        Lo anterior en cumplimiento de lo previsto por parágrafo tercero del artículo 14 de la Ley 1607 de 2012, que 
+                        adicionó al artículo 384 al Estatuto Tributario y en concordancia con lo establecido por el parágrafo cuarto 
+                        del artículo tercero del Decreto 0099 de 2013.
                     </p>
 
                     <p style="margin:0 0 60px 0;">Atentamente,</p>

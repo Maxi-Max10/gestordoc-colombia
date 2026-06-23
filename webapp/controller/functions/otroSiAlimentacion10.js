@@ -32,7 +32,7 @@ sap.ui.define([
                 const sNombre           = `${user.firstName} ${user.lastName}`;
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDateLong = oController.formatDateToWords(new Date());
 
                 // ── Word ─────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ sap.ui.define([
                         templatePath: "pdf/Otro_Si_Alimentacion_10.docx",
                         fileName:     `${user.firstName}_${user.lastName}Otro_Si_Alimentacion_10.docx`,
                         data: {
-                            sNombre, sCedula, sIdentificado ,sCiudadWork, localDateLong
+                            sNombre, sCedula, sIdentificado, localDateLong, sCiudadFirma
                         }
                     });
                     continue;
@@ -56,7 +56,7 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        <mark style="background-color:#fff380;padding:0;"> En ${sCiudadWork}, a los ${localDateLong} se reunieron por una parte <strong>${sNombre}</strong>
+                        <mark style="background-color:#fff380;padding:0;"> En ${sCiudadFirma}, a los ${localDateLong} se reunieron por una parte <strong>${sNombre}</strong>
                         ${sIdentificado} con C.C. </mark><strong>${sCedula}</strong> como aparece al pie de su firma y quien actúa en su propio nombre y por la otra,
                         <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de  <strong>DIACO S.A.</strong>, 
                         con el fin de suscribir un acuerdo provisto de las siguientes cláusulas:
@@ -89,7 +89,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                    <mark style="background-color:#fff380;padding:0;">En constancia se firma en la ciudad de ${sCiudadWork} a los ${localDateLong}.</mark>
+                    <mark style="background-color:#fff380;padding:0;">En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.</mark>
                     </p>
 
                     <div style="width:100%;display:table;">
