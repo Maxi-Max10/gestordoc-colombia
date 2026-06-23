@@ -30,6 +30,7 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
+                const sCiudadExpedicion = user.docExpeditionCity || "";
                 const sFechaNacimiento = user.dateOfBirth 
                     ? oController.formatDateRaw(user.dateOfBirth) 
                     : "";
@@ -47,7 +48,7 @@ sap.ui.define([
                         templatePath: "pdf/Contrato_Aprendizaje_Lectivo.docx",
                         fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Lectivo.docx`,
                         data: {
-                            sNombre, sCedula, sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCiudadWork, sCargo, sInstitucion
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCiudadWork, sCargo, sInstitucion
                         }
                     });
                     continue;
@@ -471,7 +472,7 @@ sap.ui.define([
                         No. <strong>52.705.312</strong> de Pasto - Nariño, actuando como Representante de la Empresa <strong>DIACO S.A.</strong> Sociedad
                         identificada con el número de NIT 891.800.111-5, quien para los efectos del presente Contrato se
                         denominará <strong>EMPRESA</strong>, y <strong>${sNombre}</strong> identificada con cédula de ciudadanía No.
-                        <strong>${sCedula}</strong> Expedida en ${sCiudadWork}, quien para los efectos del presente contrato se
+                        <strong>${sCedula}</strong> Expedida en <strong>${sCiudadExpedicion}</strong>, quien para los efectos del presente contrato se
                         denominará el <strong>APRENDIZ</strong>, se suscribe el presente Contrato de Aprendizaje, el cual, conforme el
                         artículo 21 de la Ley 2466 de 2025 es considerado un contrato laboral especial a término fijo y de
                         acuerdo a las siguientes cláusulas:

@@ -30,6 +30,7 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
+                const sCiudadExpedicion = user.docExpeditionCity || "";
                 const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
                 const sPais = oController.getPaisName(user.country);
@@ -212,7 +213,7 @@ sap.ui.define([
                         número <strong>52.705.312</strong> y quien para todos los efectos del presente contrato
                         de trabajo se denominará <strong>EL EMPLEADOR</strong>, y <strong>${sNombre}</strong>,
                         identificado(a) con la cédula de ciudadanía número <strong>${sCedula}</strong>
-                        expedida en ${sPais}, domiciliada en ${sDireccion} obrando en nombre
+                        expedida en ${sCiudadExpedicion}, domiciliada en ${sDireccion} obrando en nombre
                         propio y quien para efectos del presente contrato se denominará
                         <strong>EL TRABAJADOR</strong>, hemos celebrado un contrato de trabajo según las
                         siguientes cláusulas:

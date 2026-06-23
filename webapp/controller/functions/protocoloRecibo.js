@@ -51,15 +51,20 @@ sap.ui.define([
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido la socialización del contenido del Reglamento Interno de Trabajo, Comité de convivencia Laboral y Política de Alcohol, Tabaco y Drogas.
+                        Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido 
+                        la socialización del contenido del Reglamento Interno de Trabajo, Comité de convivencia Laboral y Política de Alcohol, Tabaco y Drogas.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        Entiendo que Diaco S.A. podrá actualizar, corregir o alterar los contenidos en dichos documentos, los cuales serán debidamente divulgados, a través de los canales de comunicación internos, que declaro conocer.
+                        Entiendo que Diaco S.A. podrá actualizar, corregir o alterar los contenidos en dichos documentos, los cuales serán debidamente 
+                        divulgados, a través de los canales de comunicación internos, que declaro conocer.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 80px 0;">
-                        Las reglas contenidas en el Reglamento Interno de Trabajo, el Comité de convivencia Laboral y la Política de Alcohol, Tabaco y Drogas, integran mi contrato individual de trabajo con Diaco S.A., para todos los efectos, de modo que el incumplimiento de dichas reglas permitirá a la empresa aplicar las medidas establecidas en la legislación vigente, para los casos de incumplimiento de las normas laborales contractuales.
+                        Las reglas contenidas en el Reglamento Interno de Trabajo, el Comité de convivencia Laboral y la Política de Alcohol, Tabaco y Drogas, 
+                        integran mi contrato individual de trabajo con Diaco S.A., para todos los efectos, de modo que el incumplimiento de dichas reglas 
+                        permitirá a la empresa aplicar las medidas establecidas en la legislación vigente, para los casos de incumplimiento de las normas 
+                        laborales contractuales.
                     </p>
 
                     <div style="width:100%;margin-bottom:40px;text-align:center;">

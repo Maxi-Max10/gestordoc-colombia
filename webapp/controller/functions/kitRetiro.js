@@ -33,6 +33,7 @@ sap.ui.define([
 
                 const sNombre        = `${user.firstName} ${user.lastName}`;
                 const sCedula        = user.nationalId     || "";
+                const sCiudadExpedicion = user.docExpeditionCity || "";
                 const sCiudadWork    = oController.getCiudadWork(user);
                 const sCiudadResidencia = user.state || "";
                 const localDate      = oController.getLocalDate();
@@ -47,7 +48,6 @@ sap.ui.define([
                 // ← NUEVO: campos que ahora vienen desde la carga enriquecida
                 const sEmailPersonal  = user.personalEmail || "";
                 const sTelefonoMovil  = user.personalPhone || "";
-                const sCiudadCedula   = user.ciudadCedula  || "";
                 const sFechaBaja      = user.endDateBaja
                                         ? oController.formatDateToWords(user.endDateBaja)
                                         : "";

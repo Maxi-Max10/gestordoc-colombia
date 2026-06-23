@@ -32,7 +32,7 @@ sap.ui.define([
                 const sCedula      = user.nationalId || "";
                 const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
-                const sCiudadCedula   = user.ciudadCedula  || "";
+                const sCiudadExpedicion = user.docExpeditionCity || "";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -63,7 +63,7 @@ sap.ui.define([
 
                         <p style="text-align:justify;margin:0 0 16px 0;">
                             Yo <strong>${sNombre}</strong>, con cédula número <strong>${sCedula}</strong>
-                            de <strong>${sCiudadCedula}</strong> atendiendo lo dispuesto en la Ley 1607 de 2012 y el decreto 0099
+                            de <strong>${sCiudadExpedicion}</strong> atendiendo lo dispuesto en la Ley 1607 de 2012 y el decreto 0099
                             de 2013, manifiesto bajo la gravedad de juramento:
                         </p>
 

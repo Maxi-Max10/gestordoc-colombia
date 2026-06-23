@@ -727,7 +727,10 @@ sap.ui.define([
         "custom05Nav/localeLabel",
         "dateOfBirth",
         "addressLine1",
-        "custom15"
+        "custom15",
+        "empInfo/personNav/nationalIdNav/customString2",
+        "empInfo/personNav/nationalIdNav/customString2Nav/localeLabel"
+
       ].join(",");
 
       const sExpand = [
@@ -736,7 +739,8 @@ sap.ui.define([
         "empInfo/jobInfoNav",
         "empInfo/personNav/personalInfoNav",
         "empInfo/personNav/nationalIdNav",
-        "custom05Nav"
+        "custom05Nav",
+        "empInfo/personNav/nationalIdNav/customString2Nav"
       ].join(",");
 
       // Bloquea el botón Descargar hasta que EmpJob termine
@@ -759,6 +763,7 @@ sap.ui.define([
 
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
           const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
+          user.docExpeditionCity =  ccEntry?.customString2Nav?.localeLabel || "";
           user.nationalId         = ccEntry?.nationalId ?? "";
           user.docCardType        = nationalIdResults[0]?.cardType ?? "";
           user.originalStartDate  = user.empInfo?.originalStartDate || null;
@@ -885,7 +890,7 @@ sap.ui.define([
                   paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || ""),
                   planta:           job.locationNav?.name || job.location || "",
                   area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || "",
-                  ciudadCedula:     job.locationNav?.customString1Nav?.localeLabel || "",  // ← NUEVO
+                  ciudadFirma:     job.locationNav?.customString1Nav?.localeLabel || "",  // ← NUEVO
                   personalEmail:    perEmailMap[job.userId] || "",   // ← NUEVO
                   personalPhone:    perPhoneMap[job.userId] || "",   // ← NUEVO
                 };
@@ -918,7 +923,7 @@ sap.ui.define([
             user.paymentFrequency = mgr.paymentFrequency || "";
             user.planta           = mgr.planta           || "";
             user.area             = mgr.area             || "";
-            user.ciudadCedula     = mgr.ciudadCedula     || "";  // ← NUEVO
+            user.ciudadFirma     = mgr.ciudadFirma     || "";  // ← NUEVO
             user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
             user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
             user.endDateBaja = empEndDateMap[user.userId] || null;  // ← NUEVO: fecha de baja
@@ -988,7 +993,9 @@ sap.ui.define([
         "custom05",
         "custom05Nav/id",
         "custom05Nav/externalCode",
-        "custom05Nav/localeLabel"
+        "custom05Nav/localeLabel",
+        "empInfo/personNav/nationalIdNav/customString2",
+        "empInfo/personNav/nationalIdNav/customString2Nav/localeLabel"
       ].join(",");
 
       const sExpand = [
@@ -997,7 +1004,8 @@ sap.ui.define([
         "empInfo/jobInfoNav",
         "empInfo/personNav/personalInfoNav",
         "empInfo/personNav/nationalIdNav",
-        "custom05Nav"
+        "custom05Nav",
+        "empInfo/personNav/nationalIdNav/customString2Nav"
       ].join(",");
 
       const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
@@ -1037,6 +1045,7 @@ sap.ui.define([
 
           const nationalIdResults = user.empInfo?.personNav?.nationalIdNav?.results ?? [];
           const ccEntry           = nationalIdResults.find(i => i.cardType === "CC");
+          user.docExpeditionCity =  ccEntry?.customString2Nav?.localeLabel || "";
           user.nationalId         = ccEntry?.nationalId ?? "";
           user.docCardType        = nationalIdResults[0]?.cardType ?? "";
           user.originalStartDate  = user.empInfo?.originalStartDate || null;
@@ -1139,7 +1148,7 @@ sap.ui.define([
                   paymentFrequency: PAY_GROUP_LABELS[job.payGroup] || (job.payGroup || ""),
                   planta:           job.locationNav?.name || job.location || "",
                   area:             payScaleAreaMap[job.payScaleArea] || job.payScaleArea || "",
-                  ciudadCedula:     job.locationNav?.customString1Nav?.localeLabel || "",  // ← NUEVO
+                  ciudadFirma:     job.locationNav?.customString1Nav?.localeLabel || "",  // ← NUEVO
                   personalEmail:    perEmailMap[job.userId] || "",   // ← NUEVO
                   personalPhone:    perPhoneMap[job.userId] || "",   // ← NUEVO
                 };
@@ -1171,7 +1180,7 @@ sap.ui.define([
             user.paymentFrequency = mgr.paymentFrequency || "";
             user.planta           = mgr.planta           || "";
             user.area             = mgr.area             || "";
-            user.ciudadCedula     = mgr.ciudadCedula     || "";  // ← NUEVO
+            user.ciudadFirma     = mgr.ciudadFirma     || "";  // ← NUEVO
             user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
             user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
             user.endDateBaja = empEndDateMap[user.userId] || null;  // ← NUEVO: fecha de baja

@@ -738,6 +738,7 @@ sap.ui.define([], function () {
                     // Documento de identidad
                     docCardType:        getProp("docCardType") || "",
                     docExpeditionDate:  this.formatDateRaw(getProp("docExpeditionDate")),
+                    docExpeditionCity: getProp("docExpeditionCity") || "",
 
                     // Jefe directo (datos del manager, obtenidos por navegación OData)
                     managerName:   getProp("managerName")  || "",
@@ -757,7 +758,7 @@ sap.ui.define([], function () {
                     // Documento de identidad
                     docCardType:       getProp("docCardType") || "",
                     docExpeditionDate: this.formatDateRaw(getProp("docExpeditionDate")),
-                    ciudadCedula:      getProp("ciudadCedula") || "",  // ← NUEVO
+                    ciudadFirma:      getProp("ciudadFirma") || "",  // ← NUEVO
 
                     // Fecha de baja (disponible en inactivos; null en activos)  ← NUEVO
                     endDateBaja:          getProp("endDateBaja") || null,

@@ -30,6 +30,7 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
+                const sCiudadExpedicion = user.docExpeditionCity || "";
                 const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
@@ -56,7 +57,7 @@ sap.ui.define([
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
                 const sPlanta = user.planta || sCiudadWork; // fallback a ciudad si planta viene vacía
-                const sCiudadCedula   = user.ciudadCedula  || "";
+                const sCiudadFirma   = user.sCiudadFirma  || "";
                 //console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
                 
                 // ── Word ─────────────────────────────────────────────────────
@@ -68,7 +69,7 @@ sap.ui.define([
                             sNombre, sCedula, sCiudadWork, localDate, sCargo, sSalario, sSalarioLetras,
                             salarioIntegral, componenteRemunerativo, factorPrestacional, sCompRemunerativo, sFactorPrestacional,
                             sCompRemunerativoLetras, sFactorPrestacionalLetras, sfechaContratacion,
-                            sDireccion, sPeriodoPago
+                            sDireccion, sPeriodoPago, sPlanta, sCiudadFirma
                         }
                     });
                     continue;
@@ -235,7 +236,7 @@ sap.ui.define([
                         número <strong>52.705.312</strong> y quien para todos los efectos del presente contrato
                         de trabajo se denominará <strong>EL EMPLEADOR</strong>, y <strong>${sNombre}</strong>,
                         identificado(a) con la cédula de ciudadanía número <strong>${sCedula}</strong>
-                        expedida en <strong>${sCiudadCedula}</strong>, domiciliada en <strong>${sDireccion}</strong> obrando en nombre
+                        expedida en <strong>${sCiudadExpedicion}</strong>, domiciliada en <strong>${sDireccion}</strong> obrando en nombre
                         propio y quien para efectos del presente contrato se denominará
                         <strong>EL TRABAJADOR</strong>, hemos celebrado un contrato de trabajo según las
                         siguientes cláusulas:
@@ -1659,7 +1660,7 @@ sap.ui.define([
                         Del presente documento se han extendido dos ejemplares del mismo contenido,
                         uno para <strong>EL EMPLEADOR</strong> y otro para
                         <strong>EL TRABAJADOR</strong>, los cuales firmamos ante testigos en la ciudad
-                        de <strong>${sCiudadCedula}</strong> el día <strong>${localDate}}</strong>.
+                        de <strong>${sCiudadFirma}</strong> el día <strong>${localDate}}</strong>.
                     </p>
 
                     <!-- Firmas -->
