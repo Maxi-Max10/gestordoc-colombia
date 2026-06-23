@@ -39,7 +39,7 @@ sap.ui.define([
                         templatePath: "pdf/Manifestación_No_Declarante.docx",
                         fileName:     `${user.firstName}_${user.lastName}Manifestación_No_Declarante.docx`,
                         data: {
-                            sNombre, sCedula, localDate
+                            sNombre, sCedula, sCiudadFirma, localDate
                         }
                     });
                     continue;

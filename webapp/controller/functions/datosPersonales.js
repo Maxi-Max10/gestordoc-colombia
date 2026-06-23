@@ -92,7 +92,7 @@ sap.ui.define([
                 const sCedula    = user.nationalId || "";
 
                 // Ciudad de trabajo: primero custom10 (campo SAP), con fallback a state
-                const sCiudadWork = oController.getCiudadWork(user);
+                const sCiudadResidencia = oController.getCiudadResidencia(user);
 
                 // Fecha actual del sistema (la del día en que se genera el documento)
                 const localDate   = oController.getLocalDate();
@@ -348,7 +348,7 @@ sap.ui.define([
                         <div class="row">
                             <div class="cell cell-45" style="padding:0;">
                                 <div class="sub-row" style="min-height:26px;">
-                                    <div class="sub-cell" style="width:62%; padding:4px 7px;"><strong>Ciudad:</strong> ${sCiudadWork}</div>
+                                    <div class="sub-cell" style="width:62%; padding:4px 7px;"><strong>Ciudad:</strong> ${sCiudadResidencia}</div>
                                     <div class="sub-cell" style="width:38%; padding:4px 7px;"><strong>País:</strong> ${sPais}</div>
                                 </div>
                             </div>

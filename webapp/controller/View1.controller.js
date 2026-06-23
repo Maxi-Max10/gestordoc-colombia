@@ -705,7 +705,7 @@ sap.ui.define([
 
       const sSelect = [
         "userId", "status", "firstName", "lastName", "email", "nationality",
-        "jobCode", "title", "custom02", "custom03", "businessPhone", "state",
+        "jobCode", "title", "custom02", "custom03", "businessPhone", "state", "city",
         "custom10", "hireDate", "country", "salutation", "division", "department",
         "defaultFullName", "gender",
         "manager/jobCode", "manager/businessPhone", "manager/email",
@@ -771,6 +771,7 @@ sap.ui.define([
           user.docExpeditionDate  = ccEntry?.customDate1 || null;
           user.bloodType          = user.custom05Nav?.localeLabel || "";
           user.addressLine1       = user.addressLine1 || "";
+          user.city = user.city || "";
           user.hasDependents      = user.custom15 || "";
           user.dateOfBirth        = user.dateOfBirth || null;
 
@@ -830,8 +831,8 @@ sap.ui.define([
             const chunk     = userIds.slice(i, i + chunkSize);
             const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
 
-            // ─── Llamadas en paralelo: EmpJob + PerEmail + PerPhone ─────────────────
-            const [empJobData, perEmailData, perPhoneData] = await Promise.all([  // ← NUEVO: Promise.all
+            // ─── Llamadas en paralelo: EmpJob + PerEmail + PerPhone + PerAddress ─────────────────
+            const [empJobData, perEmailData, perPhoneData, perAddressData] = await Promise.all([  // ← NUEVO: Promise.all
 
               this._readOData(oComponentModel, "/EmpJob", {
                 urlParameters: {
@@ -856,7 +857,16 @@ sap.ui.define([
                   "$select": "personIdExternal,phoneNumber",
                   "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")}) and phoneType eq '4088'`
                 }
-              }).catch(e => { console.warn("PerPhone falló:", e); return { results: [] }; })
+              }).catch(e => { console.warn("PerPhone falló:", e); return { results: [] }; }),
+
+              // ← NUEVO: dirección de residencia, para sacar la ciudad real
+              this._readOData(oComponentModel, "/PerAddressDEFLT", {
+                urlParameters: {
+                  "$select": "personIdExternal,addressType,city,cityNav/externalCode,cityNav/localeLabel",
+                  "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")}) and addressType eq 'home'`,
+                  "$expand": "cityNav"
+                }
+              }).catch(e => { console.warn("PerAddress falló:", e); return { results: [] }; })
 
             ]);
             // ────────────────────────────────────────────────────────────────────────
@@ -864,6 +874,10 @@ sap.ui.define([
             const empJobResults  = Array.isArray(empJobData?.results)  ? empJobData.results  : [];
             const perEmailMap    = {};  // ← NUEVO
             const perPhoneMap    = {};  // ← NUEVO
+            const perCityMap = {};
+            (perAddressData?.results || []).forEach(a => {
+              if (a.personIdExternal) perCityMap[a.personIdExternal] = a.cityNav?.localeLabel || "";
+            });
 
             // ← NUEVO: indexar por personIdExternal para lookup O(1)
             (perEmailData?.results || []).forEach(e => {
@@ -893,6 +907,7 @@ sap.ui.define([
                   ciudadFirma:     job.locationNav?.customString1Nav?.localeLabel || "",  // ← NUEVO
                   personalEmail:    perEmailMap[job.userId] || "",   // ← NUEVO
                   personalPhone:    perPhoneMap[job.userId] || "",   // ← NUEVO
+                  city:             perCityMap[job.userId] || "",  // ← NUEVO: ciudad residencia
                 };
               }
             });
@@ -926,7 +941,8 @@ sap.ui.define([
             user.ciudadFirma     = mgr.ciudadFirma     || "";  // ← NUEVO
             user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
             user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
-            user.endDateBaja = empEndDateMap[user.userId] || null;  // ← NUEVO: fecha de baja
+            user.city             = mgr.city             || "";  // ← NUEVO: ciudad real (sobrescribe el city vacío del enrichedUsers inicial)
+            user.endDateBaja = empEndDateMap[user.userId] || null;
           });
 
           // Actualiza el modelo con los datos de EmpJob sin reemplazar el modelo entero
@@ -971,7 +987,7 @@ sap.ui.define([
 
       const sSelect = [
         "userId", "status", "firstName", "lastName", "email", "nationality",
-        "jobCode", "title", "custom02", "custom03", "businessPhone", "state",
+        "jobCode", "title", "custom02", "custom03", "businessPhone", "state", "city",
         "custom10", "hireDate", "country", "salutation", "division", "department",
         "defaultFullName", "gender",
         "manager/jobCode", "manager/businessPhone", "manager/email",
@@ -1052,6 +1068,7 @@ sap.ui.define([
           user.nationalityCode    = nationalIdResults.find(i => i.country)?.country ?? "";
           user.docExpeditionDate  = ccEntry?.customDate1 || null;
           user.addressLine1       = user.addressLine1 || "";
+          user.city                = user.city || "";
           user.hasDependents      = user.custom15 || "";
           user.dateOfBirth        = user.dateOfBirth || null;
 
@@ -1114,7 +1131,15 @@ sap.ui.define([
                   "$select": "personIdExternal,phoneNumber",
                   "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")}) and phoneType eq '4088'`
                 }
-              }).catch(e => { console.warn("PerPhone falló:", e); return { results: [] }; })
+              }).catch(e => { console.warn("PerPhone falló:", e); return { results: [] }; }),
+
+              // ← NUEVO: dirección de residencia, para sacar la ciudad real
+              this._readOData(oComponentModel, "/PerAddressDEFLT", {
+                urlParameters: {
+                  "$select": "personIdExternal,addressType,city",
+                  "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")})`
+                }
+              }).catch(e => { console.warn("PerAddress falló:", e); return { results: [] }; })
 
             ]);
             // ────────────────────────────────────────────────────────────────────────
@@ -1151,6 +1176,7 @@ sap.ui.define([
                   ciudadFirma:     job.locationNav?.customString1Nav?.localeLabel || "",  // ← NUEVO
                   personalEmail:    perEmailMap[job.userId] || "",   // ← NUEVO
                   personalPhone:    perPhoneMap[job.userId] || "",   // ← NUEVO
+                  city:             perCityMap[job.userId] || "",  // ← NUEVO: ciudad residencia
                 };
               }
             });
@@ -1183,7 +1209,8 @@ sap.ui.define([
             user.ciudadFirma     = mgr.ciudadFirma     || "";  // ← NUEVO
             user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
             user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
-            user.endDateBaja = empEndDateMap[user.userId] || null;  // ← NUEVO: fecha de baja
+            user.city             = mgr.city             || "";  // ← NUEVO: ciudad real (sobrescribe el city vacío del enrichedUsers inicial)
+            user.endDateBaja = empEndDateMap[user.userId] || null;
           });
 
         } catch (e) {
@@ -1494,7 +1521,7 @@ sap.ui.define([
     convertNumberToWords: function (num)          { return formatHelpers.convertNumberToWords(num); },
     formatDateToWords:    function (date)         { return formatHelpers.formatDateToWords(date); },
     resolveGender:        function (text, gender) { return formatHelpers.resolveGender(text, gender); },
-    getCiudadWork:        function (user)         { return formatHelpers.getCiudadWork(user); },
+    getCiudadResidencia:  function (user)         { return formatHelpers.getCiudadResidencia(user); },
     getLocalDate:         function ()             { return formatHelpers.getLocalDate(); },
     formatDateRaw:        function (dateStr)      { return formatHelpers.formatDateRaw(dateStr); },
     formatSalary:         function (value)        { return formatHelpers.formatSalary(value); },

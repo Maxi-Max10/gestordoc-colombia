@@ -276,8 +276,8 @@ sap.ui.define([], function () {
         // SAP guarda ese dato en el campo custom10; si ese campo viene vacío,
         // se cae al campo `state` como segunda opción.
         // ─────────────────────────────────────────────────────────────────────────
-        getCiudadWork: function (user) {
-            return user.custom10 || user.state || "";
+        getCiudadResidencia: function (user) {
+            return user.city || user.custom10 || user.state || user.country || "";
         },
 
         // ─────────────────────────────────────────────────────────────────────────
@@ -697,7 +697,8 @@ sap.ui.define([], function () {
                     nationality:    gentilicio,                     // Ej: "colombiana"
                     country:        this.getPaisName(getProp("country")),
                     state:          getProp("state"),
-                    custom10:       getProp("custom10"),            // Ciudad de trabajo (campo custom de SAP)
+                    city:             getProp("city") || "",
+                    ciudadResidencia: getProp("city") || getProp("custom10") || getProp("state") || getProp("country") || "",
 
                     // Cargo y estructura organizacional
                     title:          (getProp("jobCode") || "").replace(/\s*\(\d+\)$/, ""),    // Cargo sin el código numérico SAP al final
@@ -763,12 +764,6 @@ sap.ui.define([], function () {
                     // Fecha de baja (disponible en inactivos; null en activos)  ← NUEVO
                     endDateBaja:          getProp("endDateBaja") || null,
                     endDateBajaFormatted: this.formatDateToWords(getProp("endDateBaja")),  // ← NUEVO
-
-                    // Resuelve la ciudad de trabajo con fallback encadenado:
-                    // primero custom10, después state, después country
-                    getCiudadWork: function (user) {
-                        return user.custom10 || user.state || user.country || "";
-                    },
                 };
             });
         }

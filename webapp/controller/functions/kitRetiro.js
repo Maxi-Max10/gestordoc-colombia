@@ -34,7 +34,7 @@ sap.ui.define([
                 const sNombre        = `${user.firstName} ${user.lastName}`;
                 const sCedula        = user.nationalId     || "";
                 const sCiudadFirma = user.ciudadFirma || "";
-                const sCiudadResidencia = user.state || "";
+                const sCiudadResidencia = oController.getCiudadResidencia(user);
                 const localDate      = oController.getLocalDate();
                 const sCargo         = oController.resolveGender(user.title || "", user.gender);
                 const sSalario       = oController.formatSalary(user.paycompvalue);
