@@ -48,7 +48,7 @@ sap.ui.define([
                 const sEmailPersonal  = user.personalEmail || "";
                 const sTelefonoMovil  = user.personalPhone || "";
                 const sFechaBaja      = user.endDateBaja
-                                        ? oController.formatDateToWords(user.endDateBaja)
+                                        ? oController.formatDateToSpanish(user.endDateBaja)
                                         : "";
                 // Si necesitás la fecha de baja sin formato extendido:
                 const sFechaBajaCorta = user.endDateBaja

@@ -228,11 +228,15 @@ sap.ui.define([
     // ═══════════════════════════════════════════════════════════════════
 
     _ensureDataForTitle: function (sTitle) {
-      // Hoy todos los documentos Colombia usan empleados activos.
-      // Si en el futuro se agregan documentos de excolaboradores,
-      // la lógica de needsInactive se agrega acá según el sTitle.
-      const needsActive   = true;
-      const needsInactive = false; // Reservado para futuros documentos de excolaboradores
+
+      // Documentos que usan empleados inactivos (excolaboradores)
+      const aInactiveTitles = [
+        "Kit de Retiro",
+        "Certificado Laboral Excolaborador",
+        "Notificación Salida Ministerio"
+      ];
+      const needsInactive = aInactiveTitles.includes(sTitle);
+      const needsActive   = !needsInactive;
       const aPromises     = [];
 
       if (needsActive && !this._activeEmployeesLoaded) {
@@ -1106,7 +1110,7 @@ sap.ui.define([
             const filterIds = chunk.map(id => `userId eq '${id}'`).join(" or ");
 
             // ─── Llamadas en paralelo: EmpJob + PerEmail + PerPhone ─────────────────
-            const [empJobData, perEmailData, perPhoneData] = await Promise.all([  // ← NUEVO: Promise.all
+            const [empJobData, perEmailData, perPhoneData, perAddressData] = await Promise.all([  // ← NUEVO: Promise.all
 
               this._readOData(oComponentModel, "/EmpJob", {
                 urlParameters: {
@@ -1136,8 +1140,9 @@ sap.ui.define([
               // ← NUEVO: dirección de residencia, para sacar la ciudad real
               this._readOData(oComponentModel, "/PerAddressDEFLT", {
                 urlParameters: {
-                  "$select": "personIdExternal,addressType,city",
-                  "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")})`
+                  "$select": "personIdExternal,addressType,city,cityNav/externalCode,cityNav/localeLabel",
+                  "$filter": `(${chunk.map(id => `personIdExternal eq '${id}'`).join(" or ")}) and addressType eq 'home'`,
+                  "$expand": "cityNav"
                 }
               }).catch(e => { console.warn("PerAddress falló:", e); return { results: [] }; })
 
@@ -1147,6 +1152,7 @@ sap.ui.define([
             const empJobResults  = Array.isArray(empJobData?.results)  ? empJobData.results  : [];
             const perEmailMap    = {};  // ← NUEVO
             const perPhoneMap    = {};  // ← NUEVO
+            const perCityMap     = {};  // ← NUEVO
 
             // ← NUEVO: indexar por personIdExternal para lookup O(1)
             (perEmailData?.results || []).forEach(e => {
@@ -1154,6 +1160,9 @@ sap.ui.define([
             });
             (perPhoneData?.results || []).forEach(p => {
               if (p.personIdExternal) perPhoneMap[p.personIdExternal] = p.phoneNumber || "";
+            });
+            (perAddressData?.results || []).forEach(a => {
+              if (a.personIdExternal) perCityMap[a.personIdExternal] = a.cityNav?.localeLabel || "";
             });
 
             const PAY_GROUP_LABELS = {
@@ -1192,12 +1201,13 @@ sap.ui.define([
             }
           }).catch(e => { console.warn("EmpEmployment endDate falló:", e); return { results: [] }; });
 
+          console.log("¿60000778 está en EmpEmployment?", (empEmpData?.results || []).find(e => e.userId === "60000778"));
           const empEndDateMap = {};
           (empEmpData?.results || []).forEach(emp => {
             if (emp.userId) empEndDateMap[emp.userId] = emp.endDate || null;
           });
 
-          enrichedUsers.forEach(user => {
+          aUsers.forEach(user => {
             const mgr = managerMap[user.userId] || {};
             user.managerId        = mgr.managerId        || "";
             user.managerName      = mgr.managerName      || "";
@@ -1256,8 +1266,7 @@ sap.ui.define([
       }
 
       // Decide si mostrar activos o inactivos según el documento
-      const isInactive   = sTitle === "Certificado Laboral Excolaborador" ||
-                           sTitle === "Notificación Salida Ministerio";
+      const isInactive   = sTitle === "Kit de Retiro";
       const oSourceModel = isInactive ? oView.getModel("inactive") : oView.getModel();
       const aUsers       = isInactive
         ? (oSourceModel?.getProperty("/InactiveUsers") || [])
