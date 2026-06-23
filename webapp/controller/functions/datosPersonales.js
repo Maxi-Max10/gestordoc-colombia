@@ -99,6 +99,7 @@ sap.ui.define([
 
                 // Cargo con género resuelto: "OPERARIO" / "OPERARIA" según user.gender
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
+                const sPlanta      = user.planta || "";
 
                 // Nombre del país a partir del código SAP o ISO
                 const sPais       = oController.getPaisName(user.country);
@@ -380,7 +381,7 @@ sap.ui.define([
 
                             <!-- Planta: se completa a mano por el empleado -->
                             <div class="cell" style="width:55%; border-left:1px solid #000;">
-                                <strong>Planta a la que pertenece:</strong>
+                                <strong>Planta a la que pertenece:</strong> ${sPlanta}
                             </div>
 
                         </div>
