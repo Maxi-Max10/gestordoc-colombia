@@ -5,7 +5,11 @@ sap.ui.define([
 ], function (MessageToast, wordGenerator) {
     "use strict";
 
-    async function onDownloadPDFKitRetiro(oController, sButtonId) {
+    async function onDownloadPDFKitRetiro(oController, sButtonId, mOptions) {
+        const oOptions = mOptions || {};
+        const bReturnPdfDocuments = !!oOptions.returnPdfDocuments;
+        const aGeneratedPdfDocuments = [];
+
         try {
             await oController._ensurePdfToolkit();
 
@@ -317,16 +321,21 @@ sap.ui.define([
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Kit de Retiro`);
 
                 const pdfBytes = await pdfDoc.save();
-                const blob     = new Blob([pdfBytes], { type: "application/pdf" });
                 const fileName = `${user.firstName}_${user.lastName}_Kit_Retiro.pdf`;
+                // En vez de solo disparar la descarga, abrí en pestaña nueva
+                const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                if (bReturnPdfDocuments) {
+                    aGeneratedPdfDocuments.push({ user, fileName, blob, pdfBytes });
+                    continue;
+                }
 
-                const link = document.createElement("a");
-                link.href     = URL.createObjectURL(blob);
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank");  // ← abre en pestaña nueva con título correcto
+                URL.revokeObjectURL(url);
+            }
+
+            if (bReturnPdfDocuments) {
+                return aGeneratedPdfDocuments;
             }
 
             MessageToast.show(
@@ -336,6 +345,9 @@ sap.ui.define([
             );
 
         } catch (error) {
+            if (oOptions.throwErrors) {
+                throw error;
+            }
             console.error("Error generando el Kit de Retiro:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
@@ -358,5 +370,13 @@ sap.ui.define([
         });
     }
 
-    return { onDownloadPDFKitRetiro };
+    return {
+        onDownloadPDFKitRetiro,
+        generatePdfDocuments: function (oController) {
+            return onDownloadPDFKitRetiro(oController, "pdfDataInfo", {
+                returnPdfDocuments: true,
+                throwErrors: true
+            });
+        }
+    };
 });
