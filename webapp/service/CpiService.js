@@ -5,9 +5,11 @@ sap.ui.define([], function () {
     const CPI_TERM_FIJO_PATH = "cpi-term-fijo";
     const TERM_FIJO_DOCUMENT_TYPE = "CONTRATO_TERMINO_FIJO";
     const TERM_FIJO_CONTRACT_TYPE = "Contrato Término Fijo";
+    const PERSONAL_EMAIL_TYPE = "4083";
 
     async function buildTerminoFijoPayload(oDocument) {
         const oUser = oDocument?.user || {};
+        const sPersonalEmail = await _getPersonalEmail(oUser.userId);
         const sDocumentBase64 = cleanPdfBase64(await _documentToBase64(oDocument?.blob || oDocument?.pdfBytes));
 
         return {
@@ -22,7 +24,7 @@ sap.ui.define([], function () {
                 lastName: oUser.lastName || "",
                 fullName: _joinName(oUser.firstName, oUser.lastName),
                 nationalId: oUser.nationalId || "",
-                email: oUser.email || "",
+                email: sPersonalEmail,
                 phone: oUser.businessPhone || "",
                 gender: oUser.gender || "",
                 nationality: oUser.nationality || "",
@@ -48,6 +50,30 @@ sap.ui.define([], function () {
                 generatedAt: new Date().toISOString()
             }
         };
+    }
+
+    async function _getPersonalEmail(sUserId) {
+        if (!sUserId) {
+            return "";
+        }
+
+        const sEscapedUserId = String(sUserId).replace(/'/g, "''");
+        const sFilter = "personIdExternal eq '" + sEscapedUserId +
+            "' and emailType eq '" + PERSONAL_EMAIL_TYPE + "'";
+        const sUrl = "/odata/v2/PerEmail?$select=emailAddress&$filter=" +
+            encodeURIComponent(sFilter) + "&$top=1&$format=json";
+        const oResponse = await fetch(sUrl, {
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (!oResponse.ok) {
+            throw new Error("No se pudo consultar el email personal del colaborador " + sUserId + ".");
+        }
+
+        const oData = await oResponse.json();
+        return oData?.d?.results?.[0]?.emailAddress || "";
     }
 
     function getTerminoFijoCpiUrl() {
