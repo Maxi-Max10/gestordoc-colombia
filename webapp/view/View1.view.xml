@@ -594,6 +594,7 @@
                             press="onDownloadPDF"
                             class="wordButtonCustom"
                             type="Emphasized"
+                            enabled="{view>/EmpJobLoaded}"
                         />
                         <Button
                             id="pdfDataInfo"
@@ -603,6 +604,7 @@
                             press="onDownloadPDF"
                             class="pdfButtonCustom"
                             type="Accept"
+                            enabled="{view>/EmpJobLoaded}"
                         />
                         <Button
                             id="docusignDataInfo"
@@ -613,6 +615,7 @@
                             press="onSendToDocusign"
                             class="docusignButtonCustom"
                             type="Transparent"
+                            enabled="{view>/EmpJobLoaded}"
                         />
                     </buttons>
                 </Dialog>

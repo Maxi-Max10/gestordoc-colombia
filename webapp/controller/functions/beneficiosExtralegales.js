@@ -31,6 +31,7 @@ sap.ui.define([
                 const sCedula     = user.nationalId || "";
                 const sIdentif    = (user.gender === "F") ? "identificada" : "identificado";
                 const localDate   = oController.getLocalDate();
+                const sCiudadExpedicion = user.docExpeditionCity || "";
 
                 // ── Word ──────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -145,7 +146,7 @@ sap.ui.define([
                         <div style="border-top:1.5px solid #000;width:260px;padding-top:6px;margin-bottom:40px;">
                             <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;"><strong>${sNombre}</strong></p>
                             <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">NOMBRE TRABAJADOR</p>
-                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;"><strong>C.C. ${sCedula}</strong> de ____________</p>
+                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;"><strong>C.C. ${sCedula}</strong> de <strong>${sCiudadExpedicion}</strong></p>
                         </div>
 
                         <p style="font-size:9pt;font-family:Arial,sans-serif;margin:0;text-align:right;color:#555;">

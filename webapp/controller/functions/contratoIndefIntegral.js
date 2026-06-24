@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "gestordoccolombia/controller/helpers/wordGenerator"
+], function (MessageToast, wordGenerator) {
     "use strict";
 
     async function onDownloadPDFContratoIndefIntegral(oController, sButtonId) {
@@ -29,7 +30,8 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadExpedicion = user.docExpeditionCity || "";
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDate    = oController.getLocalDate();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
@@ -51,25 +53,22 @@ sap.ui.define([
                     oController.convertNumberToWords(factorPrestacional);
 
 
-                const fechaContratacion = oController.formatDateRaw(user.originalStartDate);
+                const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
-                console.log("hireDatesimpl:", user.hireDatesimpl, "hireDate:", user.hireDate, "hireDateRaw:", user.hireDateRaw);
-                const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
+                const sPlanta = user.planta || "COMPLETAR"; // fallback
+                
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre, sCedula, sCiudadWork, localDate, sCargo,
-                        sSalario, sHireDate, sDireccion,
-                        sCompRemunerativo,
-                        sFactorPrestacional,
-                        sCompRemunerativoLetras,
-                        sFactorPrestacionalLetras,
-                        fechaContratacion,
-                        sPeriodoPago,
-                        sSalarioLetras
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Contrato_Termino_Indef_Integral.docx",
+                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indef_Integral.docx`,
+                        data: {
+                            sNombre, sCedula, localDate, sCargo, sSalario, sSalarioLetras,
+                            salarioIntegral, componenteRemunerativo, factorPrestacional, sCompRemunerativo, sFactorPrestacional,
+                            sCompRemunerativoLetras, sFactorPrestacionalLetras, sfechaContratacion,
+                            sDireccion, sPeriodoPago, sPlanta, sCiudadFirma
+                        }
                     });
                     continue;
                 }
@@ -219,9 +218,9 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario} (${sSalarioLetras}) </td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">20 DE ABRIL DE 2026</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
@@ -235,7 +234,7 @@ sap.ui.define([
                         número <strong>52.705.312</strong> y quien para todos los efectos del presente contrato
                         de trabajo se denominará <strong>EL EMPLEADOR</strong>, y <strong>${sNombre}</strong>,
                         identificado(a) con la cédula de ciudadanía número <strong>${sCedula}</strong>
-                        expedida en <strong>${sCiudadWork}</strong>, domiciliada en <strong>${sDireccion}</strong> obrando en nombre
+                        expedida en <strong>${sCiudadExpedicion}</strong>, domiciliada en <strong>${sDireccion}</strong> obrando en nombre
                         propio y quien para efectos del presente contrato se denominará
                         <strong>EL TRABAJADOR</strong>, hemos celebrado un contrato de trabajo según las
                         siguientes cláusulas:
@@ -1422,7 +1421,7 @@ sap.ui.define([
                         "FECHA DE INICIACIÓN:",
                         `
                         Se deja constancia que <strong>EL TRABAJADOR</strong> inició sus labores el día
-                        ${fechaContratacion}, fecha ésta que las partes consideran como la del
+                        ${sfechaContratacion}, fecha ésta que las partes consideran como la del
                         comienzo de la vigencia del presente contrato.
                         `
                     )}
@@ -1659,7 +1658,7 @@ sap.ui.define([
                         Del presente documento se han extendido dos ejemplares del mismo contenido,
                         uno para <strong>EL EMPLEADOR</strong> y otro para
                         <strong>EL TRABAJADOR</strong>, los cuales firmamos ante testigos en la ciudad
-                        de <strong>BOGOTÁ</strong> el día <strong>20 DE ABRIL DE 2026</strong>.
+                        de <strong>${sCiudadFirma}</strong> el día <strong>${localDate}}</strong>.
                     </p>
 
                     <!-- Firmas -->
@@ -1866,74 +1865,6 @@ sap.ui.define([
             console.error("Error generando Contrato Indefinido:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
-    }
-
-    // ─── Word ─────────────────────────────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Contrato_Indefinido.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Contrato_Indefinido.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":                    data.sNombre,
-            "[[Cedula]]":                    data.sCedula,
-            "[[Cargo]]":                     data.sCargo,
-            "[[Ciudad]]":                    data.sCiudadWork,
-            "[[Fecha]]":                     data.localDate,
-            "[[Salario]]":                   data.sSalario,
-            "[[FechaInicio]]":               data.sHireDate,
-            "[[Direccion]]":                 data.sDireccion,
-            "[[ComponenteRemunerativo]]":    data.sCompRemunerativo,
-            "[[FactorPrestacional]]":        data.sFactorPrestacional,
-            "[[CompRemunerativoLetras]]":    data.sCompRemunerativoLetras,
-            "[[FactorPrestacionalLetras]]":  data.sFactorPrestacionalLetras,
-            "[[FechaContratacion]]":         data.fechaContratacion,
-            "[[PeriodoPago]]":               data.sPeriodoPago,
-            "[[SalarioLetras]]":             data.sSalarioLetras
-        };
-
-        const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp("\\[\\[" + key.slice(2,-2).split("").map(c => c + "(?:<[^>]*>)*").join("") + "\\]\\]","g");
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Contrato_Indefinido.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
     }
     return { onDownloadPDFContratoIndefIntegral };
 });

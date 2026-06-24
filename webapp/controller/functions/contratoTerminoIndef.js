@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "gestordoccolombia/controller/helpers/wordGenerator"
+], function (MessageToast, wordGenerator) {
     "use strict";
 
     async function onDownloadPDFContratoTerminoIndef(oController, sButtonId) {
@@ -29,23 +30,27 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadExpedicion = user.docExpeditionCity || "";
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDate    = oController.getLocalDate();
                 const sPais = oController.getPaisName(user.country);
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sSalario    = oController.formatSalary(user.paycompvalue);
-                const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
-                const sHireDate = oController.formatDateRaw(user.hireDatesimpl); //fecha de iniciacion de labores
-                const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
                 const sSalarioLetras  = user.payCompValueWord || "" 
+                const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
+                const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
+                
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre, sCedula, sCargo, sCiudadWork, sSalario, sHireDate, sSalarioLetras
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Contrato_Termino_Indefinido.docx",
+                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
+                        data: {
+                            sNombre, sCedula, localDate, sPais, sDireccion, sCargo, sSalario, sSalarioLetras,
+                            sfechaContratacion, sPeriodoPago, sCiudadFirma
+                        }
                     });
                     continue;
                 }
@@ -180,19 +185,6 @@ sap.ui.define([
                     `;
                 }
 
-                function _versionContrato() {
-                    return `
-                        <div style="
-                            position:absolute;
-                            bottom:10px;
-                            left:24px;
-                            font-size:6pt;
-                        ">
-                            Versión: 25 de julio de 2025
-                        </div>
-                    `;
-                }
-
 
                 // ── PÁGINA 1 — Título + Tabla de datos + inicio cláusula 1 ────
                 const htmlPagina1 = `
@@ -205,9 +197,9 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadWork}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario} (${sSalarioLetras})</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
@@ -221,7 +213,7 @@ sap.ui.define([
                         número <strong>52.705.312</strong> y quien para todos los efectos del presente contrato
                         de trabajo se denominará <strong>EL EMPLEADOR</strong>, y <strong>${sNombre}</strong>,
                         identificado(a) con la cédula de ciudadanía número <strong>${sCedula}</strong>
-                        expedida en ${sPais}, domiciliada en ${sDireccion} obrando en nombre
+                        expedida en ${sCiudadExpedicion}, domiciliada en ${sDireccion} obrando en nombre
                         propio y quien para efectos del presente contrato se denominará
                         <strong>EL TRABAJADOR</strong>, hemos celebrado un contrato de trabajo según las
                         siguientes cláusulas:
@@ -253,8 +245,6 @@ sap.ui.define([
                         de nuevos sistemas, siempre que el cambio no implique desmejora de la remuneración
                         básica de <strong>EL TRABAJADOR</strong>.
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -351,8 +341,6 @@ sap.ui.define([
                         Utilizar los elementos que EL EMPLEADOR le suministre para la realización de su trabajo;
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -438,8 +426,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -519,8 +505,6 @@ sap.ui.define([
                         relaciones que se establezcan entre el trabajador y los terceros en virtud de la poliasignación
                         mencionada en esta cláusula no se derivará vínculo laboral alguno, toda vez que la subordinación
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -624,8 +608,6 @@ sap.ui.define([
                         por cuarta vez.
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 6 ──────────────────────────────────────────────────
@@ -725,8 +707,6 @@ sap.ui.define([
                         <strong>EL EMPLEADOR</strong> de la violación.
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 7 ──────────────────────────────────────────────────
@@ -812,8 +792,6 @@ sap.ui.define([
                         salario pactado, cuando EL TRABAJADOR no haya sido previamente autorizado expresamente y
                         `
                     )}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -903,8 +881,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 9 ──────────────────────────────────────────────────
@@ -985,8 +961,6 @@ sap.ui.define([
                         aquellas personas que, en virtud de dicha obligación, deban recibirla, en cuyo caso
                         la
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1073,8 +1047,6 @@ sap.ui.define([
                         ""
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 11 ──────────────────────────────────────────────────
@@ -1156,8 +1128,6 @@ sap.ui.define([
                         d) Presentar ante la Superintendencia de
                         `
                     )}
-
-                    ${_versionContrato()}
 
                 </div>`;
                 
@@ -1247,8 +1217,6 @@ sap.ui.define([
                         Ley 1778 de 2016, el FCPA, el UK Bribery Act y otras relacionadas con soborno, corrupción y
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 13 ──────────────────────────────────────────────────
@@ -1330,8 +1298,6 @@ sap.ui.define([
                         sobre nuevas conductas ilícitas, la PARTE cumplida podrá rescindir el contrato unilateralmente y sin indemnización.
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
                 // ── PÁGINA 14 ──────────────────────────────────────────────────
@@ -1412,8 +1378,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
                     </div>`;
 
                 // ── PÁGINA 15 ──────────────────────────────────────────────────
@@ -1459,7 +1423,7 @@ sap.ui.define([
                         Del presente documento se han extendido dos ejemplares del mismo contenido,
                         uno para <strong>EL EMPLEADOR</strong> y otro para
                         <strong>EL TRABAJADOR</strong>, los cuales firmamos ante testigos en la ciudad
-                        de <strong>${sCiudadWork}</strong> el día <strong>${localDate}</strong>.
+                        de <strong>${sCiudadFirma}</strong> el día <strong>${localDate}</strong>.
                     `)}
 
 
@@ -1567,8 +1531,6 @@ sap.ui.define([
 
                     </div>
 
-                    <div style="${STYLE}width:100%;box-sizing:border-box;">
-                        ${_versionContrato()}
                     </div>`;
                     
 
@@ -1593,7 +1555,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf")
+                const existingPdfBytes = await fetch("pdf/Termino_Indef.pdf")
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
@@ -1666,80 +1628,5 @@ sap.ui.define([
             MessageToast.show("Error generando el documento: " + error.message);
         }
     }
-
-    // ─── Word ─────────────────────────────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Contrato_Termino_Indef.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Contrato_Termino_Indef.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":     data.sNombre,
-            "[[Cedula]]":     data.sCedula,
-            "[[Cargo]]":      data.sCargo,
-            "[[Ciudad]]":     data.sCiudadWork,
-            "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate,
-            "[[SalarioenLetras]]":data.sSalarioLetras
-            
-        };
-
-        const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp("\\[\\[" + key.slice(2,-2).split("").map(c => c + "(?:<[^>]*>)*").join("") + "\\]\\]","g");
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Contrato_Termino_Indefinido.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
-    }
-
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _formatDateLong(dateInput) {
-        if (!dateInput) return "";
-        const d = new Date(dateInput);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
-    }
-
     return { onDownloadPDFContratoTerminoIndef };
 });

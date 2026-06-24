@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "gestordoccolombia/controller/helpers/wordGenerator"
+], function (MessageToast, wordGenerator) {
     "use strict";
 
     async function onDownloadPDFRetencionFuente(oController, sButtonId) {
@@ -29,15 +30,18 @@ sap.ui.define([
 
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
-                const sCiudadWork  = oController.getCiudadWork(user);
+                const sCiudadFirma = user.ciudadFirma || "";
                 const localDate    = oController.getLocalDate();
+                const sCiudadExpedicion = user.docExpeditionCity || "";
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre, sCedula, sCiudadWork, localDate
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Solicitud_Deducciones_Retencion.docx",
+                        fileName:     `${user.firstName}_${user.lastName}_Solicitud_Deducciones_Retencion.docx`,
+                        data: {
+                            sNombre, sCedula, sCiudadFirma, localDate, sCiudadExpedicion
+                        }
                     });
                     continue;
                 }
@@ -51,15 +55,15 @@ sap.ui.define([
                             SOLICITUD PARA DEDUCCIONES DE RETENCIÓN EN LA FUENTE Y CONDICION DE<br>DECLARANTE DE RENTA
                         </p>
 
-                        <p style="margin:0 0 8px 0;">Ciudad y Fecha: ${sCiudadWork ? sCiudadWork + ", " : ""}${localDate}</p>
+                        <p style="margin:0 0 8px 0;">Ciudad y Fecha: ${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
                         <p style="margin:0;">Señores:</p>
                         <p style="margin:0;">Sección Nómina</p>
                         <p style="margin:0;">DIACO S.A.</p>
-                        <p style="margin:0 0 16px 0;">${sCiudadWork}</p>
+                        <p style="margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                         <p style="text-align:justify;margin:0 0 16px 0;">
                             Yo <strong>${sNombre}</strong>, con cédula número <strong>${sCedula}</strong>
-                            de___________ atendiendo lo dispuesto en la Ley 1607 de 2012 y el decreto 0099
+                            de <strong>${sCiudadExpedicion}</strong> atendiendo lo dispuesto en la Ley 1607 de 2012 y el decreto 0099
                             de 2013, manifiesto bajo la gravedad de juramento:
                         </p>
 
@@ -238,78 +242,6 @@ sap.ui.define([
             console.error("Error generando Retención en la Fuente:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
-    }
-
-    // ─── Word con JSZip + plantilla ──────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Solicitud_Deducciones_Retencion.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Solicitud_Deducciones_Retencion.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":      data.sNombre,
-            "[[Cedula]]":      data.sCedula,
-            "[[CiudadWork]]":  data.sCiudadWork,
-            "[[CiudadFecha]]": data.sCiudadWork ? `${data.sCiudadWork}, ${data.localDate}` : data.localDate,
-        };
-
-        const targets = [
-            "word/document.xml",
-            "word/header1.xml",
-            "word/header2.xml",
-            "word/footer1.xml",
-            "word/footer2.xml"
-        ];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp(
-                        "\\[\\[" +
-                        key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
-                        "\\]\\]", "g"
-                    );
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Solicitud_Deducciones_Retencion.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
     }
 
     return { onDownloadPDFRetencionFuente };

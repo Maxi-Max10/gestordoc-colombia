@@ -1,241 +1,310 @@
+/**
+ * @file wordGenerator.js
+ * @description Helper central para generar documentos Word (.docx)
+ *              a partir de plantillas con placeholders del tipo [[Campo]].
+ *
+ * La idea general:
+ *  Un archivo .docx es en realidad un ZIP que contiene XMLs internos.
+ *  Este módulo descarga la plantilla, la descomprime con JSZip, reemplaza
+ *  los placeholders [[Campo]] en los XMLs, y vuelve a empaquetar el archivo
+ *  para que el navegador lo descargue.
+ *
+ * Funciones exportadas:
+ *  - generateWord(config) → la función pública principal
+ *
+ * Funciones internas (no accesibles desde afuera):
+ *  - _replaceVariables(xml, variables) → orquesta el reemplazo de placeholders
+ *  - _cleanProofErr(xml)               → une fragmentos que Word separó sin querer
+ *  - _escapeRegex(c)                   → prepara caracteres especiales para usar en búsquedas
+ *  - _escXml(str)                      → prepara el texto del empleado para insertarlo en XML sin romperlo
+ *  - _ensureJSZip()                    → carga JSZip solo cuando se necesita
+ *
+ * Placeholders soportados (formato [[NombreCampo]] en la plantilla Word):
+ *  Datos personales, contacto, laboral, salarial, fechas y lugar.
+ *  Ver el mapa `variables` dentro de generateWord para la lista completa.
+ */
 sap.ui.define([
     "sap/m/MessageToast"
 ], function (MessageToast) {
     "use strict";
 
     /**
-     * WordGenerator — Kit de Retiro
+     * Función pública principal del módulo.
+     * Toma una plantilla .docx, reemplaza los [[placeholders]] con los datos
+     * del empleado y descarga el archivo resultante en el navegador.
      *
-     * Estrategia: carga Kit_Retiro.docx (plantilla real con diseño),
-     * reemplaza marcadores [[Variable]] dentro del XML interno del ZIP,
-     * y genera la descarga. El diseño queda intacto porque nunca
-     * reconstruimos el documento desde cero.
+     * @param {object} config
+     * @param {string} config.templatePath  - Ruta relativa a la plantilla .docx (ej: "pdf/Contrato.docx")
+     * @param {string} config.fileName      - Nombre del archivo descargado (ej: "Juan_Perez_Contrato.docx")
+     * @param {object} [config.data={}]     - Datos del empleado ya formateados
+     *                                        (viene de getSelectedUsers en Formatter.js)
      */
-    return {
+    async function generateWord(config) {
+        const { templatePath, fileName, data = {} } = config;
 
-        // ─── Punto de entrada desde kitRetiro.js ────────────────────────────
-        onDownloadWord: async function (oController) {
-            try {
-                const aUsers = oController.getSelectedUsers();
-                if (!aUsers.length) {
-                    MessageToast.show("Seleccione al menos un colaborador.");
-                    return;
-                }
+        // ── Paso 1: Asegurar que JSZip esté disponible ─────────────────────────
+        // JSZip se carga solo cuando hace falta (lazy loading) para no frenar
+        // el arranque de la app. Si ya estaba cargado, se reutiliza directamente.
+        const JSZip = await _ensureJSZip();
 
-                // Cargamos JSZip una sola vez
-                const JSZip = await _ensureJSZip();
-
-                // Cargamos la plantilla una sola vez (fetch al servidor)
-                const templateBytes = await _loadTemplate("pdf/Kit_Retiro.docx");
-
-                for (let i = 0; i < aUsers.length; i++) {
-                    const user = aUsers[i];
-                    if (aUsers.length > 1) {
-                        MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
-                    }
-                    await _generateForUser(JSZip, templateBytes, user);
-                }
-
-                const msg = aUsers.length > 1
-                    ? `${aUsers.length} documentos generados correctamente.`
-                    : "Documento generado correctamente.";
-                MessageToast.show(msg);
-
-            } catch (err) {
-                console.error("Error generando Word:", err);
-                MessageToast.show("Error generando el documento: " + err.message);
-            }
-        }
-    };
-
-    // ─── Genera y descarga un .docx por usuario ──────────────────────────────
-    async function _generateForUser(JSZip, templateBytes, user) {
+        // ── Paso 2: Descargar la plantilla .docx y abrirla ─────────────────────
+        // Como un .docx es un ZIP, se descarga como datos binarios (ArrayBuffer)
+        // y se abre con JSZip para acceder a los XMLs que contiene adentro.
+        const templateBytes = await fetch(templatePath).then(res => {
+            if (!res.ok) throw new Error(`No se pudo cargar ${templatePath} (${res.status})`);
+            return res.arrayBuffer();
+        });
         const zip = await JSZip.loadAsync(templateBytes);
 
-        const variables = _buildVariables(user);
+        // ── Paso 3: Definir qué reemplaza a cada placeholder ───────────────────
+        // Cada clave es el placeholder exacto que aparece en la plantilla Word.
+        // Cada valor es el dato del empleado ya formateado.
+        //
+        // Los checkboxes usan ☑ / ☐ según el tipo de documento del empleado
+        // (CC, CE, TI, RC), que viene del campo docCardType en SAP.
+        //
+        // [[CiudadFecha]] une ciudad y fecha en una sola línea,
+        // por ejemplo: "Bogotá, 15 de junio del año 2026"
+        const variables = {
+            // ── Datos personales ──────────────────────────────────────────────
+            "[[Nombre]]":          data.sNombre          || "",
+            "[[Cedula]]":          data.sCedula           || "",
+            "[[FechaNacimiento]]": data.sFechaNacimiento  || "",
+            "[[Sexo]]":            data.sSexo             || "",
+            "[[EstadoCivil]]":     data.sEstadoCivil      || "",
+            "[[GrupoSanguineo]]":  data.sGrupoSangre      || "",
+            "[[Nacionalidad]]":    data.sNacional         || "",
+            "[[Pais]]":            data.sPais             || "",
+            "[[DocCardType]]":     data.sDocCardType      || "",
 
-        // Los archivos de contenido relevantes en un .docx
+            // Checkboxes del tipo de documento: marcado (☑) o vacío (☐) según SAP
+            "[[CheckCC]]": data.sDocCardType === "CC" ? "☑" : "☐",
+            "[[CheckCE]]": data.sDocCardType === "CE" ? "☑" : "☐",
+            "[[CheckTI]]": data.sDocCardType === "TI" ? "☑" : "☐",
+            "[[CheckRC]]": data.sDocCardType === "RC" ? "☑" : "☐",
+
+            "[[FechaExpedicion]]": data.sFechaExpedicion  || "",
+
+            // sIdentif y sIdentificado son el mismo dato; distintas plantillas usan distintos nombres
+            "[[Identificado]]":    data.sIdentif || data.sIdentificado || "",
+
+            // ── Contacto ─────────────────────────────────────────────────────
+            "[[Email]]":     data.sEmail     || "",
+            "[[Telefono]]":  data.sTelefono  || "",
+            "[[Direccion]]": data.sDireccion || "",
+
+            // ── Datos laborales ──────────────────────────────────────────────
+            "[[Cargo]]":             data.sCargo             || "",
+            "[[CiudadWork]]":        data.sCiudadWork        || "",  // Ciudad de trabajo (custom10 en SAP)
+            "[[Planta]]":            data.sPlanta            || "",
+            "[[Area]]":              data.sArea              || "",
+            "[[JefeNombre]]":        data.sJefeNombre        || "",
+            "[[Institucion]]":       data.sInstitucion       || "",
+            "[[FechaIngreso]]":      data.sIngreso           || "",
+            "[[FechaSalida]]":       data.sSalida            || "",
+
+            // Alias: distintas plantillas escriben distinto el mismo campo (diferencia de mayúscula)
+            "[[FechaContratacion]]": data.sFechaContratacion || data.sfechaContratacion || "",
+
+            // ── Datos salariales ─────────────────────────────────────────────
+            "[[Salario]]":                  data.sSalario                || "",
+            "[[SalarioLetras]]":            data.sSalarioLetras          || "",  // Ej: "CUATRO MILLONES PESOS COLOMBIANOS"
+            "[[SalarioenLetras]]":          data.sSalarioLetras          || "",  // Alias para plantillas que usan este nombre
+            "[[PeriodoPago]]":              data.sPeriodoPago            || "",  // Mensual / Quincenal
+            "[[ComponenteRemunerativo]]":   data.sCompRemunerativo       || "",  // Para contratos de salario integral
+            "[[CompRemunerativoLetras]]":   data.sCompRemunerativoLetras || "",
+            "[[FactorPrestacional]]":       data.sFactorPrestacional     || "",
+            "[[FactorPrestacionalLetras]]": data.sFactorPrestacionalLetras || "",
+
+            // ── Fecha y lugar del documento ──────────────────────────────────
+            "[[Fecha]]":     data.localDate     || "",
+            "[[FechaLarga]]": data.localDateLong || "",
+            "[[FechaCert]]": data.localDate     || "",  // Alias que usan los certificados laborales
+
+            // Une ciudad + fecha en un solo placeholder:
+            // "Bogotá, 15 de junio del año 2026"
+            "[[CiudadFecha]]": data.sCiudadWork
+                ? `${data.sCiudadWork}, ${data.localDate}`
+                : (data.localDate || ""),
+
+            "[[CiudadFirma]]": data.sCiudadWork || "",  // Solo la ciudad, sin fecha
+        };
+
+        // ── Paso 4: Reemplazar los placeholders en los XMLs internos del .docx ─
+        // Los placeholders pueden aparecer en el cuerpo, los encabezados o los pies
+        // de página. Se procesan todos para no dejar ninguno sin reemplazar.
         const targets = [
-            "word/document.xml",
-            "word/header1.xml",
-            "word/header2.xml",
-            "word/footer1.xml",
-            "word/footer2.xml"
+            "word/document.xml",  // Cuerpo principal del documento
+            "word/header1.xml",   // Encabezado (primera página o sección 1)
+            "word/header2.xml",   // Encabezado (resto de páginas)
+            "word/footer1.xml",   // Pie de página (primera página o sección 1)
+            "word/footer2.xml"    // Pie de página (resto de páginas)
         ];
 
         for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                xml = _replaceVariables(xml, variables);
-                zip.file(path, xml);
-            }
+            if (!zip.files[path]) continue; // No todas las plantillas tienen todos estos archivos
+            let xml = await zip.files[path].async("string");
+            xml = _replaceVariables(xml, variables); // Hacer los reemplazos
+            zip.file(path, xml); // Guardar el XML modificado de vuelta en el ZIP
         }
 
+        // ── Paso 5: Reempaquetar el ZIP y descargar el .docx ───────────────────
         const blob = await zip.generateAsync({ type: "blob" });
-        _triggerDownload(blob, `${user.firstName}_${user.lastName}_Kit_Retiro.docx`);
+        console.log("Tamaño del blob:", blob.size, "bytes");
+
+        // Crear un enlace temporal invisible para forzar la descarga en el navegador
+        const link = document.createElement("a");
+        link.href     = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href); // Liberar la memoria usada por el enlace temporal
+
+        MessageToast.show("Documento Word generado correctamente.");
     }
 
-    // ─── Construye el mapa de reemplazos ─────────────────────────────────────
-    function _buildVariables(user) {
-        const localDate    = _formatDate(new Date());
-        const sNombre      = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-        const sCedula      = user.nationalId  || "";
-        const sCargo       = user.title       || "";
-        const sCiudadWork  = user.division    || "";
-        const sSalario     = _formatSalary(user.paycompValue);
-        const sIngreso     = user.hireDate    ? _formatDate(new Date(user.hireDate))   : "XXXX";
-        const sSalida      = user.empEndDate  ? _formatDate(new Date(user.empEndDate)) : "XXXX";
-        const sIdentif     = (user.gender === "F") ? "identificada" : "identificado";
-        const sCity        = user.location || user.city || user.addressLine1 || "";
-        const sCiudadFecha = sCity ? `${sCity}, ${localDate}` : localDate;
-        const sCertFecha   = `${_getDayMonth()} de ${_numToWords(new Date().getFullYear())} (${new Date().getFullYear()})`;
+    // ════════════════════════════════════════════════════════════════════════════
+    // FUNCIONES PRIVADAS
+    // ════════════════════════════════════════════════════════════════════════════
 
-        return {
-            "[[Nombre]]":      sNombre,
-            "[[Cedula]]":      sCedula,
-            "[[Cargo]]":       sCargo,
-            "[[CiudadWork]]":  sCiudadWork,
-            "[[Salario]]":     sSalario,
-            "[[FechaIngreso]]": sIngreso,
-            "[[FechaSalida]]": sSalida,
-            "[[Identificado]]": sIdentif,
-            "[[CiudadFecha]]": sCiudadFecha,
-            "[[FechaCert]]":   sCertFecha,
-            // Variables de wordGenerator original — compatibilidad total
-            "[[SegundoNombre]]":  user.secondName    || "",
-            "[[Apellido]]":       user.lastName       || "",
-            "[[Documento]]":      sCedula,
-            "[[Nacionalidad]]":   user.nationality    || "",
-            "[[EstadoCivil]]":    user.maritalStatus  || "",
-            "[[Departamento]]":   user.state          || "",
-            "[[Municipio]]":      user.custom10       || "",
-            "[[CorreoTrabajo]]":  user.email          || "",
-            "[[Telefono]]":       user.businessPhone  || "",
-            "[[TipoTrabajo]]":    user.title          || "",
-            "[[hireDate]]":       user.hireDate       || "",
-            "[[HireDatePost]]":   user.HireDatePost   || "",
-            "[[HireDateEnd]]":    localDate,
-            "[[SueldoNumeros]]":  user.paycompValue   || "",
-            "[[SueldoLetras]]":   _convertNumberToWords(user.paycompValue || 0),
-            "[[Department]]":     user.department     || "",
-            "[[Division]]":       user.division       || "",
-            "[[Custom03]]":       user.custom03       || ""
-        };
-    }
-
-    // ─── Reemplaza marcadores en el XML ──────────────────────────────────────
-    // IMPORTANTE: Word puede fragmentar "[[Variable]]" en múltiples <w:r> runs.
-    // Primero consolidamos el texto plano del XML para hacer el reemplazo seguro,
-    // luego restauramos la estructura.
+    /**
+     * Orquesta el reemplazo de placeholders en el XML interno de un archivo Word.
+     *
+     * El problema de fondo: cuando se escribe una plantilla en Word, el editor
+     * puede dividir un placeholder en varios fragmentos XML (por el corrector
+     * ortográfico, cambios de formato, autoguardado, etc.).
+     * Por ejemplo, [[Nombre]] puede quedar así en el XML:
+     *
+     *   <w:t>[[Nom</w:t></w:r><w:proofErr/><w:r><w:t>bre]]</w:t>
+     *
+     * La solución tiene tres pasos:
+     *  1. _cleanProofErr: une los fragmentos separados por w:proofErr
+     *  2. Reemplazo directo del placeholder completo (texto ya unido)
+     *  3. Reemplazo con regex por si quedaron tags XML intercalados dentro del placeholder
+     *
+     * @param {string} xml        - Contenido del archivo XML interno del .docx
+     * @param {object} variables  - Mapa { "[[Placeholder]]": "valor" }
+     * @returns {string} XML con todos los placeholders reemplazados
+     */
     function _replaceVariables(xml, variables) {
-        // Enfoque simple y robusto: reemplazar en el texto plano del XML.
-        // Los marcadores que Word no fragmenta (la mayoría) se reemplazan directo.
-        // Para mayor robustez, también eliminamos los tags XML entre los corchetes.
-        for (const [key, value] of Object.entries(variables)) {
-            // 1. Reemplazo directo (marcador no fragmentado)
-            xml = xml.split(key).join(_escapeXml(value));
+        // Paso 1: unir los fragmentos separados por w:proofErr
+        xml = _cleanProofErr(xml);
 
-            // 2. Reemplazo con posibles tags XML dentro del marcador
-            //    Ejemplo: [[Nom<w:rPr/>bre]] → reemplazar el patrón con tags intercalados
-            const escaped = key.replace(/\[\[/, "\\[\\[").replace(/\]\]/, "\\]\\]");
-            const fragmented = new RegExp(
-                "\\[\\[" +
-                key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
-                "\\]\\]",
-                "g"
-            );
-            xml = xml.replace(fragmented, _escapeXml(value));
+        for (const [key, value] of Object.entries(variables)) {
+            const escaped = _escXml(value); // Preparar el valor para insertarlo en XML
+
+            // Paso 2: reemplazo directo (cubre los placeholders completos y los ya unidos en el paso 1)
+            xml = xml.split(key).join(escaped);
+
+            // Paso 3: reemplazo con regex por si quedan tags XML intercalados entre los caracteres
+            // del placeholder (ej: [[No<w:rPr/>mbre]] → busca cada letra con tags opcionales entre ellas)
+            const inner        = key.slice(2, -2); // Extraer "Nombre" de "[[Nombre]]"
+            const anyXmlInline = "(?:<[^>]*>)*";   // Patrón que ignora cualquier tag XML entre caracteres
+            const bracketOpen  = "\\[\\[" + anyXmlInline;
+            const bracketClose = anyXmlInline + "\\]\\]";
+            const innerPattern = inner.split("").map(c => _escapeRegex(c) + anyXmlInline).join("");
+            const pattern = bracketOpen + innerPattern + bracketClose;
+            xml = xml.replace(new RegExp(pattern, "g"), escaped);
+
+            // Debug: detectar si "Ciudad de trabajo" aparece en el XML (útil para diagnosticar problemas de tabla)
+            const idx4 = xml.indexOf("Ciudad de trabajo");
+            if (idx4 !== -1) {
+                console.log("CONTEXTO tabla completa:", xml.substring(idx4 - 1000, idx4 + 500));
+            }
         }
         return xml;
     }
 
-    function _escapeXml(str) {
+    /**
+     * Une fragmentos de texto que Word separó con etiquetas w:proofErr cuando juntos
+     * forman parte de un placeholder [[Campo]].
+     *
+     * Word inserta etiquetas <w:proofErr> (del corrector ortográfico) entre bloques
+     * de texto, lo que puede partir un placeholder en dos y hacerlo irreconocible
+     * para un reemplazo simple de string.
+     *
+     * Esta función detecta esos casos con una regex y los une en un solo bloque <w:t>,
+     * pero solo cuando el texto combinado contiene "[" o "]" (es decir, es parte de
+     * un placeholder). Los bloques que no tienen relación con placeholders no se tocan.
+     *
+     * Se repite en bucle hasta que no haya nada más para unir, para cubrir casos
+     * donde haya varios w:proofErr seguidos fragmentando el mismo placeholder.
+     *
+     * @param {string} xml - XML del archivo interno del .docx
+     * @returns {string}   - XML con los fragmentos unidos donde corresponde
+     */
+    function _cleanProofErr(xml) {
+        let prev;
+        do {
+            prev = xml;
+            xml = xml.replace(
+                // Detecta: <w:t>texto1</w:t></w:r> + <w:proofErr/> + <w:r><w:rPr>...</w:rPr><w:t>texto2</w:t>
+                /<w:t([^>]*)>([^<]*)<\/w:t><\/w:r>(?:<w:proofErr[^>]*\/>|<w:proofErr[^>]*><\/w:proofErr>)<w:r(?:[^>]*)><w:rPr>[\s\S]*?<\/w:rPr><w:t([^>]*)>([^<]*)<\/w:t>/g,
+                function(match, attr1, text1, attr2, text2) {
+                    const combined = text1 + text2;
+                    // Solo unir si el texto combinado tiene parte de un placeholder
+                    if (combined.includes("[") || combined.includes("]")) {
+                        return `<w:t xml:space="preserve">${combined}</w:t>`;
+                    }
+                    return match; // No es un placeholder: dejar el XML tal como está
+                }
+            );
+        } while (xml !== prev); // Repetir hasta que no quede nada más por unir
+        return xml;
+    }
+
+    /**
+     * Escapa los caracteres especiales de una cadena para poder usarla en una búsqueda RegExp.
+     * Hace falta porque los placeholders tienen corchetes [[ ]] que son metacaracteres en regex.
+     *
+     * @param {string} c - Carácter a escapar
+     * @returns {string}
+     */
+    function _escapeRegex(c) {
+        return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    /**
+     * Escapa los caracteres reservados de XML en el valor del empleado antes de insertarlo.
+     * Sin esto, un nombre como "Juan & María <Pérez>" rompería el XML y Word no podría
+     * abrir el archivo generado.
+     *
+     * @param {string} str - Valor a insertar en el XML
+     * @returns {string}   - Valor con los caracteres XML escapados
+     */
+    function _escXml(str) {
         return String(str)
-            .replace(/&/g, "&amp;")
+            .replace(/&/g, "&amp;")   // & va primero para no re-escapar los demás
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;");
     }
 
-    // ─── Carga la plantilla .docx como ArrayBuffer ───────────────────────────
-    function _loadTemplate(path) {
-        return fetch(path).then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar la plantilla: ${path} (${res.status})`);
-            return res.arrayBuffer();
-        });
-    }
-
-    // ─── Carga JSZip dinámicamente (igual que _ensurePdfToolkit) ─────────────
+    /**
+     * Carga JSZip desde CDN solo si todavía no está disponible en el navegador.
+     *
+     * JSZip es la librería que permite abrir y volver a empaquetar el .docx
+     * (que internamente es un ZIP). Se carga de forma lazy para no incluirla
+     * en el bundle principal de la app: solo se descarga cuando el usuario
+     * realmente genera un documento Word.
+     *
+     * @returns {Promise<JSZip>} - JSZip listo para usar
+     */
     function _ensureJSZip() {
+        // Si ya estaba cargado de una generación anterior, reutilizarlo sin volver a descargarlo
         if (window.JSZip) return Promise.resolve(window.JSZip);
+
+        // Si no está disponible, inyectar el script desde CDN y esperar a que cargue
         return new Promise((resolve, reject) => {
-            const script = document.createElement("script");
-            script.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+            const script   = document.createElement("script");
+            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
             script.onload  = () => resolve(window.JSZip);
             script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
             document.head.appendChild(script);
         });
     }
 
-    // ─── Descarga del blob ────────────────────────────────────────────────────
-    function _triggerDownload(blob, fileName) {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-    }
-
-    // ─── Helpers de fecha / texto ─────────────────────────────────────────────
-    function _formatDate(date) {
-        const d = new Date(date);
-        d.setDate(d.getDate() + 1);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getDate()} de ${months[d.getMonth()]} del año ${d.getFullYear()}`;
-    }
-
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _getDayMonth() {
-        const d = new Date();
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getDate()} de ${months[d.getMonth()]}`;
-    }
-
-    function _numToWords(year) {
-        const map = {
-            2020:"dos mil veinte",2021:"dos mil veintiuno",2022:"dos mil veintidós",
-            2023:"dos mil veintitrés",2024:"dos mil veinticuatro",2025:"dos mil veinticinco",
-            2026:"dos mil veintiséis",2027:"dos mil veintisiete",2028:"dos mil veintiocho",
-            2029:"dos mil veintinueve",2030:"dos mil treinta"
-        };
-        return map[year] || String(year);
-    }
-
-    function _convertNumberToWords(num) {
-        if (isNaN(num) || num < 0) return "CERO PESOS CON 00/100";
-        const numToWords = (n) => {
-            const u = ["","UN","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE"];
-            const d = ["DIEZ","VEINTE","TREINTA","CUARENTA","CINCUENTA","SESENTA","SETENTA","OCHENTA","NOVENTA"];
-            const c = ["CIENTO","DOSCIENTOS","TRESCIENTOS","CUATROCIENTOS","QUINIENTOS",
-                       "SEISCIENTOS","SETECIENTOS","OCHOCIENTOS","NOVECIENTOS"];
-            if (n === 0)   return "CERO";
-            if (n < 10)    return u[n];
-            if (n < 100)   return d[Math.floor(n/10)-1] + (n%10 ? " Y " + u[n%10] : "");
-            if (n < 1000)  return c[Math.floor(n/100)-1] + (n%100 ? " " + numToWords(n%100) : "");
-            if (n < 1e6)   return numToWords(Math.floor(n/1000)) + " MIL" + (n%1000 ? " " + numToWords(n%1000) : "");
-            return String(n);
-        };
-        const pesos = Math.floor(num);
-        const cents = Math.round((num - pesos) * 100);
-        return `${numToWords(pesos)} PESOS CON ${String(cents).padStart(2,"0")}/100`;
-    }
-
+    // Solo se exporta generateWord; las funciones privadas no son accesibles desde afuera
+    return { generateWord };
 });

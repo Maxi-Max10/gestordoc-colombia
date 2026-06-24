@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function (MessageToast) {
+    "sap/m/MessageToast",
+    "gestordoccolombia/controller/helpers/wordGenerator"
+], function (MessageToast, wordGenerator) {
     "use strict";
 
     async function onDownloadPDFProtocoloRecibo(oController, sButtonId) {
@@ -35,10 +36,12 @@ sap.ui.define([
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre, sCedula, localDate, sPlanta, sArea
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Protocolo_Recibo.docx",
+                        fileName:     `${user.firstName}_${user.lastName}_Protocolo_Recibo.docx`,
+                        data: {
+                            sNombre, sCedula, localDate, sPlanta, sArea
+                        }
                     });
                     continue;
                 }
@@ -48,15 +51,20 @@ sap.ui.define([
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido la socialización del contenido del Reglamento Interno de Trabajo, Comité de convivencia Laboral y Política de Alcohol, Tabaco y Drogas.
+                        Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido 
+                        la socialización del contenido del Reglamento Interno de Trabajo, Comité de convivencia Laboral y Política de Alcohol, Tabaco y Drogas.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        Entiendo que Diaco S.A. podrá actualizar, corregir o alterar los contenidos en dichos documentos, los cuales serán debidamente divulgados, a través de los canales de comunicación internos, que declaro conocer.
+                        Entiendo que Diaco S.A. podrá actualizar, corregir o alterar los contenidos en dichos documentos, los cuales serán debidamente 
+                        divulgados, a través de los canales de comunicación internos, que declaro conocer.
                     </p>
 
                     <p style="text-align:justify;margin:0 0 80px 0;">
-                        Las reglas contenidas en el Reglamento Interno de Trabajo, el Comité de convivencia Laboral y la Política de Alcohol, Tabaco y Drogas, integran mi contrato individual de trabajo con Diaco S.A., para todos los efectos, de modo que el incumplimiento de dichas reglas permitirá a la empresa aplicar las medidas establecidas en la legislación vigente, para los casos de incumplimiento de las normas laborales contractuales.
+                        Las reglas contenidas en el Reglamento Interno de Trabajo, el Comité de convivencia Laboral y la Política de Alcohol, Tabaco y Drogas, 
+                        integran mi contrato individual de trabajo con Diaco S.A., para todos los efectos, de modo que el incumplimiento de dichas reglas 
+                        permitirá a la empresa aplicar las medidas establecidas en la legislación vigente, para los casos de incumplimiento de las normas 
+                        laborales contractuales.
                     </p>
 
                     <div style="width:100%;margin-bottom:40px;text-align:center;">
@@ -155,79 +163,6 @@ sap.ui.define([
             console.error("Error generando Protocolo de Recibo:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
-    }
-
-    // ─── Word con JSZip + plantilla ───────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Protocolo_Recibo.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Protocolo_Recibo.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]": data.sNombre,
-            "[[Cedula]]": data.sCedula,
-            "[[Fecha]]": data.localDate,
-            "[[Planta]]": data.sPlanta,
-            "[[Area]]": data.sArea
-        };
-
-        const targets = [
-            "word/document.xml",
-            "word/header1.xml",
-            "word/header2.xml",
-            "word/footer1.xml",
-            "word/footer2.xml"
-        ];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp(
-                        "\\[\\[" +
-                        key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
-                        "\\]\\]", "g"
-                    );
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Protocolo_Recibo.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
     }
 
     return { onDownloadPDFProtocoloRecibo };
