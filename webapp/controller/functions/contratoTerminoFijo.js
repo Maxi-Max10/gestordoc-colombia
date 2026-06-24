@@ -1721,6 +1721,13 @@ sap.ui.define([
         }
     }
 
+    async function generateContratoTerminoFijoPdfDocuments(oController) {
+        return onDownloadPDFContratoTerminoFijo(oController, "pdfDataInfo", {
+            returnPdfDocuments: true,
+            throwErrors: true
+        });
+    }
+
     return {
         onDownloadPDFContratoTerminoFijo,
         generateContratoTerminoFijoPdfDocuments

@@ -1201,7 +1201,6 @@ sap.ui.define([
             }
           }).catch(e => { console.warn("EmpEmployment endDate falló:", e); return { results: [] }; });
 
-          console.log("¿60000778 está en EmpEmployment?", (empEmpData?.results || []).find(e => e.userId === "60000778"));
           const empEndDateMap = {};
           (empEmpData?.results || []).forEach(emp => {
             if (emp.userId) empEndDateMap[emp.userId] = emp.endDate || null;
