@@ -1529,6 +1529,7 @@ sap.ui.define([
     convertNumberToWords: function (num)          { return formatHelpers.convertNumberToWords(num); },
     formatDateToWords:    function (date)         { return formatHelpers.formatDateToWords(date); },
     resolveGender:        function (text, gender) { return formatHelpers.resolveGender(text, gender); },
+    getCiudadWork:        function (user)         { return formatHelpers.getCiudadWork(user); },
     getCiudadResidencia:  function (user)         { return formatHelpers.getCiudadResidencia(user); },
     getLocalDate:         function ()             { return formatHelpers.getLocalDate(); },
     formatDateRaw:        function (dateStr)      { return formatHelpers.formatDateRaw(dateStr); },

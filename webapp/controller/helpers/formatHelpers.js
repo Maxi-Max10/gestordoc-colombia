@@ -276,6 +276,10 @@ sap.ui.define([], function () {
         // SAP guarda ese dato en el campo custom10; si ese campo viene vacío,
         // se cae al campo `state` como segunda opción.
         // ─────────────────────────────────────────────────────────────────────────
+        getCiudadWork: function (user) {
+            return user.custom10 || user.state || user.country || "";
+        },
+
         getCiudadResidencia: function (user) {
             return user.city || user.custom10 || user.state || user.country || "";
         },
