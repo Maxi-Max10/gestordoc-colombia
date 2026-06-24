@@ -35,7 +35,7 @@ sap.ui.define([
                     ? oController.formatDateRaw(user.dateOfBirth) 
                     : "";
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
-                const sTelefono   = oController.getTelefono(user);                
+                const sTelefono    = user.personalPhone || "";               
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sInstitucion = await oController._getInstitucionFormacion(user.userId);
                 const sCiudadWork  = oController.getCiudadWork(user);

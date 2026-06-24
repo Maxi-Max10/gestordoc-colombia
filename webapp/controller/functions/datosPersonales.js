@@ -105,7 +105,7 @@ sap.ui.define([
                 const sPais       = oController.getPaisName(user.country);
 
                 const sTelefono    = user.personalPhone || "";
-                const sEmail       = oController.getEmail(user);
+                const sEmail       = user.personalEmail || "";
                 const sNacional    = oController.getNacionalidad(user);
 
                 // "Masculino" / "Femenino" a partir del código SAP "M" / "F"

@@ -45,7 +45,7 @@ sap.ui.define([
                 const sDireccion     = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
 
                 // ← NUEVO: campos que ahora vienen desde la carga enriquecida
-                const sEmailPersonal  = user.personalEmail || "";
+                const sEmailPersonal  = user.personalEmail || ""; 
                 const sTelefonoMovil  = user.personalPhone || "";
                 const sFechaBaja      = user.endDateBaja
                                         ? oController.formatDateToSpanish(user.endDateBaja)
