@@ -764,6 +764,10 @@ sap.ui.define([], function () {
                     // Fecha de baja (disponible en inactivos; null en activos)  ← NUEVO
                     endDateBaja:          getProp("endDateBaja") || null,
                     endDateBajaFormatted: this.formatDateToWords(getProp("endDateBaja")),  // ← NUEVO
+
+                    // Empresa (CO10 = Diaco, CO24 = Cyrgo)
+                    company:     getProp("company") || "",
+                    companyName: { "CO10": "Diaco S.A.", "CO24": "Cyrgo S.A." }[getProp("company")] || getProp("company") || "",
                 };
             });
         }

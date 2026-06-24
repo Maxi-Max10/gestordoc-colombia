@@ -841,7 +841,7 @@ sap.ui.define([
               this._readOData(oComponentModel, "/EmpJob", {
                 urlParameters: {
                   // ← NUEVO: agregamos locationNav/customString1Nav para ciudad de cédula
-                  "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,locationNav/customString1Nav/localeLabel,payScaleArea",
+                  "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,locationNav/customString1Nav/localeLabel,payScaleArea, company",
                   "$filter": `(${filterIds})`,
                   "$expand": "managerUserNav,payGroupNav,locationNav/customString1Nav"  // ← NUEVO: expand anidado
                 }
@@ -912,6 +912,7 @@ sap.ui.define([
                   personalEmail:    perEmailMap[job.userId] || "",   // ← NUEVO
                   personalPhone:    perPhoneMap[job.userId] || "",   // ← NUEVO
                   city:             perCityMap[job.userId] || "",  // ← NUEVO: ciudad residencia
+                  company:          job.company || "",   // ← NUEVO
                 };
               }
             });
@@ -942,11 +943,13 @@ sap.ui.define([
             user.paymentFrequency = mgr.paymentFrequency || "";
             user.planta           = mgr.planta           || "";
             user.area             = mgr.area             || "";
-            user.ciudadFirma     = mgr.ciudadFirma     || "";  // ← NUEVO
+            user.ciudadFirma      = mgr.ciudadFirma     || "";  // ← NUEVO
             user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
             user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
             user.city             = mgr.city             || "";  // ← NUEVO: ciudad real (sobrescribe el city vacío del enrichedUsers inicial)
-            user.endDateBaja = empEndDateMap[user.userId] || null;
+            user.endDateBaja      = empEndDateMap[user.userId] || null;
+            user.company          = mgr.company || "";   // ← NUEVO
+
           });
 
           // Actualiza el modelo con los datos de EmpJob sin reemplazar el modelo entero
@@ -1115,7 +1118,7 @@ sap.ui.define([
               this._readOData(oComponentModel, "/EmpJob", {
                 urlParameters: {
                   // ← NUEVO: agregamos locationNav/customString1Nav para ciudad de cédula
-                  "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,locationNav/customString1Nav/localeLabel,payScaleArea",
+                  "$select": "userId,managerId,managerUserNav/userId,managerUserNav/displayName,managerUserNav/email,managerUserNav/jobCode,payGroup,location,locationNav/name,locationNav/customString1Nav/localeLabel,payScaleArea,company",
                   "$filter": `(${filterIds})`,
                   "$expand": "managerUserNav,payGroupNav,locationNav/customString1Nav"  // ← NUEVO: expand anidado
                 }
@@ -1186,6 +1189,7 @@ sap.ui.define([
                   personalEmail:    perEmailMap[job.userId] || "",   // ← NUEVO
                   personalPhone:    perPhoneMap[job.userId] || "",   // ← NUEVO
                   city:             perCityMap[job.userId] || "",  // ← NUEVO: ciudad residencia
+                  company:          job.company || "",   // ← NUEVO
                 };
               }
             });
@@ -1215,11 +1219,12 @@ sap.ui.define([
             user.paymentFrequency = mgr.paymentFrequency || "";
             user.planta           = mgr.planta           || "";
             user.area             = mgr.area             || "";
-            user.ciudadFirma     = mgr.ciudadFirma     || "";  // ← NUEVO
+            user.ciudadFirma      = mgr.ciudadFirma     || "";  // ← NUEVO
             user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
             user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
             user.city             = mgr.city             || "";  // ← NUEVO: ciudad real (sobrescribe el city vacío del enrichedUsers inicial)
-            user.endDateBaja = empEndDateMap[user.userId] || null;
+            user.company          = mgr.company || "";   // ← NUEVO
+            user.endDateBaja      = empEndDateMap[user.userId] || null;
           });
 
         } catch (e) {

@@ -41,6 +41,38 @@ sap.ui.define([
                 const sInstitucion = await oController._getInstitucionFormacion(user.userId);
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
+                // ── Fecha de terminación: inicio + 13 meses y 19 días ────────
+                const dFechaInicio = new Date(user.originalStartDate);
+                const dFechaFin = new Date(dFechaInicio);
+                dFechaFin.setMonth(dFechaFin.getMonth() + 13);
+                dFechaFin.setDate(dFechaFin.getDate() + 19);
+                const sfechaTerminacion = oController.formatDateRaw(dFechaFin);
+                const sfechaTerminacionLarga = oController.formatDateToWords(dFechaFin);
+
+                const templateFile = user.company === "CO24"
+                    ? "pdf/Termino_Indef.pdf"
+                    : "pdf/hojaDiaco.pdf";
+
+                // ── Datos según empresa ───────────────────────────────────────
+                const isCyrgo = user.company === "CO24";
+                const empresaData = isCyrgo ? {
+                    empresaNombre: "CYRGO S.A.S.",
+                    domicilio:     "Bogotá",
+                    repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
+                    repCC:         "74.371.977",
+                    repGenero:     "identificado",
+                    firmaImg:      "pdf/firma_Daniel_Cyrgo.jpg",
+                    nit:            "8600096942"
+                } : {
+                    empresaNombre: "DIACO S.A.",
+                    domicilio:     "Bogotá",
+                    repNombre:     "LAURA CRISTINA CERÓN MUÑOZ",
+                    repCC:         "52.705.312",
+                    repGenero:     "identificada",
+                    firmaImg:      "",
+                    nit:           "891.800.111-5"
+                };
+
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
@@ -51,6 +83,15 @@ sap.ui.define([
                         }
                     });
                     continue;
+                }
+
+                //Si la empresa es CYRGO, convierto la imagen de la firma de Daniel en base64
+                let firmaBase64 = "";
+                if (empresaData.firmaImg) {
+                    const firmaBytes = await fetch(empresaData.firmaImg).then(r => r.arrayBuffer());
+                    firmaBase64 = "data:image/jpeg;base64," + btoa(
+                        new Uint8Array(firmaBytes).reduce((s, b) => s + String.fromCharCode(b), "")
+                    );
                 }
 
                 // ══════════════════════════════════════════════════════════════
@@ -233,7 +274,7 @@ sap.ui.define([
                                 EMPRESA
                             </td>
                             <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                DIACO S.A
+                                ${empresaData.empresaNombre}
                             </td>
                         </tr>
 
@@ -425,7 +466,7 @@ sap.ui.define([
                             ">
                                 FECHA TERMINACIÓN CONTRATO
                             </td>
-                            <td style="padding:1px 5px;"></td>
+                            <td style="padding:1px 5px;"></td> ${sfechaTerminacion}
                         </tr>
                     </table>
 
@@ -467,9 +508,9 @@ sap.ui.define([
                     <div style="text-align:center;font-weight:bold;margin:10px 0 14px 0;font-size:10pt;">CLÁUSULAS</div>
 
                     ${_bloqueContrato(`
-                        Entre los suscritos a saber, <strong>LAURA CRISTINA CERÓN MUÑOZ</strong>, identificado con la cédula de ciudadanía
-                        No. <strong>52.705.312</strong> de Pasto - Nariño, actuando como Representante de la Empresa <strong>DIACO S.A.</strong> Sociedad
-                        identificada con el número de NIT 891.800.111-5, quien para los efectos del presente Contrato se
+                        Entre los suscritos a saber, <strong>${empresaData.repNombre}</strong>, identificado con la cédula de ciudadanía
+                        No. <strong>${empresaData.repCC}</strong> de ${empresaData.domicilio}, actuando como Representante de la Empresa <strong>${empresaData.empresaNombre}</strong> Sociedad
+                        identificada con el número de NIT ${empresaData.nit}, quien para los efectos del presente Contrato se
                         denominará <strong>EMPRESA</strong>, y <strong>${sNombre}</strong> identificada con cédula de ciudadanía No.
                         <strong>${sCedula}</strong> Expedida en <strong>${sCiudadExpedicion}</strong>, quien para los efectos del presente contrato se
                         denominará el <strong>APRENDIZ</strong>, se suscribe el presente Contrato de Aprendizaje, el cual, conforme el
@@ -519,9 +560,16 @@ sap.ui.define([
                         `
                     )}
 
-                    <div style="margin:18px 0 12px 0;text-align:justify;">
-                        <strong>SEGUNDA:</strong> De acuerdo con el artículo 21 de la Ley 2466 de 2025, el contrato de aprendizaje es considerado un contrato laboral especial a término fijo, por lo que, este tendrá, un término de duración de <span style="background-color:yellow;display:inline-block;"><strong>13</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>MESES</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>Y</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>19</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>DÍAS,</strong></span> <span style="background-color:yellow;display:inline-block;">comprendidos</span> <span style="background-color:yellow;display:inline-block;">entre</span> <span style="background-color:yellow;display:inline-block;">el</span> <span style="background-color:yellow;display:inline-block;"><strong>24</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>DE</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>SEPTIEMBRE</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>DEL</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>2025</strong></span> <span style="background-color:yellow;display:inline-block;">fecha</span> <span style="background-color:yellow;display:inline-block;">de</span> <span style="background-color:yellow;display:inline-block;">iniciación</span> <span style="background-color:yellow;display:inline-block;">del</span> <span style="background-color:yellow;display:inline-block;">Contrato;</span> <span style="background-color:yellow;display:inline-block;">y</span> <span style="background-color:yellow;display:inline-block;">el</span> <span style="background-color:yellow;display:inline-block;"><strong>12</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>DE</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>NOVIEMBRE</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>DE</strong></span> <span style="background-color:yellow;display:inline-block;"><strong>2026</strong></span> <span style="background-color:yellow;display:inline-block;">fecha</span> <span style="background-color:yellow;display:inline-block;">de</span> <span style="background-color:yellow;display:inline-block;">terminación</span> <span style="background-color:yellow;display:inline-block;">de</span> <span style="background-color:yellow;display:inline-block;">este,</span> sin que pueda exceder de tres (3) años. Así las cosas, se deja previsto que el contrato finalizará en la fecha de terminación indicada el sin que sea necesaria la presentación de un aviso previo o el cumplimiento de un requisito adicional.
-                    </div>
+                    ${_paragrafoContrato(
+                        "SEGUNDA:",
+                        `
+                        De acuerdo con el artículo 21 de la Ley 2466 de 2025, el contrato de aprendizaje es considerado un contrato laboral especial a término fijo
+                        , por lo que, este tendrá un término de duración de <strong>13 MESES Y 19 DÍAS</strong>, comprendidos entre el <strong>${sfechaContratacion}
+                        </strong> fecha de iniciación del Contrato; y el <strong>${sfechaTerminacion}</strong> fecha de terminación de este, sin que pueda 
+                        exceder de tres (3) años. Así las cosas, se deja previsto que el contrato finalizará en la fecha de terminación indicada sin que sea necesaria
+                         la presentación de un aviso previo o el cumplimiento de un requisito adicional.
+                        `
+                    )}
 
                     ${_tituloContrato(
                         "TERCERA.",
@@ -991,7 +1039,7 @@ sap.ui.define([
                         `
                         En virtud de la Ley 1581 de 2012, <strong>EL APRENDIZ</strong> titular de los datos
                         voluntariamente suministrados para la constitución y ejecución del presente contrato autoriza
-                        a <strong>DIACO S.A.</strong> para hacer uso de los mismos con fines laborales y los demás relacionados con el
+                        a <strong>${empresaData.empresaNombre}</strong> para hacer uso de los mismos con fines laborales y los demás relacionados con el
                         giro ordinario de los negocios de esta empresa y que sean necesarios para la ejecución del
                         presente contrato. El titular declara conocer los derechos y condiciones del tratamiento de sus
                         datos.
@@ -1002,7 +1050,7 @@ sap.ui.define([
                         "9.2.",
                         "",
                         `
-                        Los datos personales que sean recopilados por <strong>DIACO S.A.</strong> serán tratados para las finalidades
+                        Los datos personales que sean recopilados por <strong>${empresaData.empresaNombre}</strong> serán tratados para las finalidades
                         que sean autorizados por los titulares de la información. Sin embargo, los datos también
                         podrán ser tratados para las siguientes finalidades:
                         `
@@ -1010,7 +1058,7 @@ sap.ui.define([
 
                     ${_bulletContrato(`
                         Efectuar todas las gestiones necesarias para el desarrollo del objeto Social de
-                        <strong>DIACO S.A.</strong>, así como todo lo relacionado con el cumplimiento del objeto del contrato celebrado
+                        <strong>${empresaData.empresaNombre}</strong>, así como todo lo relacionado con el cumplimiento del objeto del contrato celebrado
                         entre la Compañía y el Titular de la información, incluida la ejecución y terminación de este.
                     `)}
 
@@ -1018,15 +1066,15 @@ sap.ui.define([
 
                     ${_bulletContrato(`
                         Gestionar solicitudes, quejas o reclamos promovidos por el Titular o para el
-                        ejercicio de los derechos y deberes de <strong>DIACO</strong> frente a las diferentes
+                        ejercicio de los derechos y deberes de <strong>${empresaData.empresaNombre}</strong> frente a las diferentes
                         autoridades, incluido pero sin limitarse, la rama judicial.
                     `)}
 
                     ${_bulletContrato(`
                         El ofrecimiento de servicios por parte de proveedores estratégicos de
-                        <strong>DIACO S.A.</strong>, a fin de brindar al titular de la información acceso a
+                        <strong>${empresaData.empresaNombre}</strong>, a fin de brindar al titular de la información acceso a
                         servicios o facilidades de pago para la adquisición de productos ofrecidos por
-                        <strong>DIACO S.A.</strong>
+                        <strong>${empresaData.empresaNombre}</strong>
                     `)}
 
                     ${_versionContrato()}
@@ -1052,10 +1100,10 @@ sap.ui.define([
                     ${_bloqueContrato(`
                         Los datos personales recopilados serán usados, almacenados, procesados, transferidos (nacional e
                         internacionalmente) y circulados para las finalidades descritas en la Política de Tratamiento de Datos
-                        personales disponible en la página de <strong>DIACO S.A.</strong> a la cual se tiene acceso directo accediendo al
+                        personales disponible en la página de <strong>${empresaData.empresaNombre}</strong> a la cual se tiene acceso directo accediendo al
                         siguiente enlace www.diaco.com.co. Dada la naturaleza del contrato laboral y las condiciones bajo las
-                        cuales ser llevará a cabo, <strong>DIACO S.A.</strong> tratará datos personales sensibles, tales como datos de salud,
-                        raza, situación sentimental o genero, imagen, voz y/o video. Adicionalmente <strong>DIACO S.A.</strong> tendrá
+                        cuales ser llevará a cabo, <strong>${empresaData.empresaNombre}</strong> tratará datos personales sensibles, tales como datos de salud,
+                        raza, situación sentimental o genero, imagen, voz y/o video. Adicionalmente <strong>${empresaData.empresaNombre}</strong> tendrá
                         acceso a los datos de su familia, tales como datos de sus hijos (para aspectos relacionados con
                         beneficios o celebraciones a los que estos puedan llegar a tener), conyuge o familiares (para aspectos
                         relacionados con beneficios o celebraciones a los que estos puedan llegar a tener, contacto de
@@ -1220,13 +1268,13 @@ sap.ui.define([
                         "PROGRAMA DE TRANSPARENCIA Y ÉTICA EMPRESARIAL.",
                         `
                         <strong>EL APRENDIZ</strong> reconoce
-                        haber sido informado por <strong>DIACO S.A.</strong> sobre su obligación de cumplir con las normas de prevención del
+                        haber sido informado por <strong>${empresaData.empresaNombre}</strong> sobre su obligación de cumplir con las normas de prevención del
                         Soborno Transnacional y Corrupción y se compromete a conocer el Programa implementado por
-                        <strong>DIACO S.A.</strong>, disponible en su página web, así como las consecuencias de su incumplimiento. <strong>EL
-                        APRENDIZ</strong> acepta que <strong>DIACO S.A.</strong> puede realizar procedimientos de Debida Diligencia para verificar
+                        <strong>${empresaData.empresaNombre}</strong>, disponible en su página web, así como las consecuencias de su incumplimiento. <strong>EL
+                        APRENDIZ</strong> acepta que <strong>${empresaData.empresaNombre}</strong> puede realizar procedimientos de Debida Diligencia para verificar
                         el cumplimiento de estas obligaciones. El incumplimiento de conductas definidas por la Ley
                         colombiana como Soborno Transnacional y Corrupción será considerado una falta grave, permitiendo
-                        a <strong>DIACO S.A.</strong> terminar el contrato de manera unilateral, sin previo aviso ni indemnización, y hacer
+                        a <strong>${empresaData.empresaNombre}</strong> terminar el contrato de manera unilateral, sin previo aviso ni indemnización, y hacer
                         exigibles las penalidades pactadas.
                         `
                     )}
@@ -1295,28 +1343,17 @@ sap.ui.define([
 
                         <!-- EMPLEADOR -->
                         <div style="width:40%;">
+                            <div style="border-top:1px solid #000;padding-top:6px;">
 
-                            <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                            ">
+                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
 
-                                <div style="
-                                    font-weight:bold;
-                                    min-height:18px;
-                                ">
-                                    LAURA CRISTINA CERÓN MUÑOZ
+                                <div style="font-weight:bold;min-height:18px;">
+                                    ${empresaData.repNombre}
                                 </div>
-
-                                <div style="
-                                    margin-top:2px;
-                                    font-weight:bold;
-                                ">
-                                    C.C.No. 52.705.312
+                                <div style="margin-top:2px;font-weight:bold;">
+                                    C.C.No. ${empresaData.repCC}
                                 </div>
-
                             </div>
-
                         </div>
 
                         <!-- TRABAJADOR -->
@@ -1368,7 +1405,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf")
+                const existingPdfBytes = await fetch(templateFile)
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);

@@ -38,7 +38,6 @@ sap.ui.define([
                 const sTelefono    = user.personalPhone || "";               
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sInstitucion = await oController._getInstitucionFormacion(user.userId);
-                const sCiudadWork  = oController.getCiudadWork(user);
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
                 // ── Word ─────────────────────────────────────────────────────
@@ -47,7 +46,7 @@ sap.ui.define([
                         templatePath: "pdf/Contrato_Aprendizaje_Productivo.docx",
                         fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Productivo.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCiudadWork, sCargo, sInstitucion
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCargo, sInstitucion
                         }
                     });
                     continue;
@@ -393,7 +392,7 @@ sap.ui.define([
                             ">
                                 FECHA TERMINACIÓN CONTRATO
                             </td>
-                            <td style="padding:1px 5px;"></td>
+                            <td style="padding:1px 5px;"></td> ${sFechaBaja}
                         </tr>
                     </table>
 

@@ -34,6 +34,22 @@ sap.ui.define([
                 const localDateLong = oController.formatDateToWords(new Date());
                 const sCiudadFirma = user.ciudadFirma || "";
 
+                // ── Datos según empresa ───────────────────────────────────────
+                const isCyrgo = user.company === "CO24";
+                const empresaData = isCyrgo ? {
+                    repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
+                    repCC:         "79.553.641",
+                    repGenero:     "identificado",
+                    repCargo:      "Representante Legal",
+                    empresaNombre: "CYRGO S.A.S",
+                } : {
+                    repNombre:     "LAURA CRISTINA CERÓN MUÑOZ",
+                    repCC:         "52.705.312",
+                    repGenero:     "identificada",
+                    repCargo:      "Representante Legal",
+                    empresaNombre: "DIACO S.A.",
+                };
+
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
@@ -56,8 +72,8 @@ sap.ui.define([
 
                     <p style="text-align:justify;margin:0 0 16px 0;"><span style="background-color:#ea80fc;">En ${sCiudadFirma}, a los ${localDateLong}, 
                     se reunieron por una parte</span> <strong>${sNombre}</strong> ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong> 
-                    como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>LAURA CRISTINA 
-                    CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de <strong>DIACO S.A.</strong>, quien en 
+                    como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>${empresaData.repNombre}</strong> ${empresaData.repGenero} con la C.C. No. 
+                    ${empresaData.repCC} y quien actúa en representación de <strong>${empresaData.empresaNombre}</strong>, quien en 
                     adelante se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo provisto de las siguientes cláusulas.</p>
 
                     <p style="text-align:justify;margin:0 0 10px 0;">
@@ -95,9 +111,9 @@ sap.ui.define([
                         <div style="display:table-row;">
                             <div style="display:table-cell;width:50%;vertical-align:top;padding-right:20px;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
-                                    C.C. No. 52.705.312<br>
-                                    Representante Legal
+                                    <strong>${empresaData.repNombre}</strong><br>
+                                    C.C. No. ${empresaData.repCC}<br>
+                                    ${empresaData.repCargo}
                                 </div>
                             </div>
                             <div style="display:table-cell;width:50%;vertical-align:top;">
@@ -140,23 +156,50 @@ sap.ui.define([
                 const imgData = canvas.toDataURL("image/png");
                 document.body.removeChild(div);
 
-                const pdfDoc = await PDFLibRef.PDFDocument.create();
-                const img    = await pdfDoc.embedPng(imgData);
+                // ── Crear o cargar documento según empresa ────────────────────
+                let pdfDoc, templatePageImage, pageWidth, pageHeight;
 
-                // Página cuya altura se ajusta exactamente al contenido — sin cortes
-                const PAGE_W = 595;
-                const MARGIN = 36;
-                const drawW  = PAGE_W - MARGIN * 2;
-                const drawH  = (img.height * drawW) / img.width;
-                const PAGE_H = drawH + MARGIN * 2;
+                if (isCyrgo) {
+                    const existingPdfBytes = await fetch("pdf/PlantillaCyrgo.pdf")
+                        .then(res => res.arrayBuffer());
+                    pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
+                    const [templatePage] = pdfDoc.getPages();
+                    const { width, height } = templatePage.getSize();
+                    pageWidth         = width;
+                    pageHeight        = height;
+                    templatePageImage = await pdfDoc.embedPage(templatePage);
+                } else {
+                    pdfDoc    = await PDFLibRef.PDFDocument.create();
+                    pageWidth = 595;
+                }
 
-                const pg = pdfDoc.addPage([PAGE_W, PAGE_H]);
-                pg.drawImage(img, {
-                    x:      MARGIN,
-                    y:      MARGIN,
-                    width:  drawW,
-                    height: drawH
-                });
+                const img = await pdfDoc.embedPng(imgData);
+
+                if (isCyrgo) {
+                    const newPage = pdfDoc.addPage([pageWidth, pageHeight]);
+                    newPage.drawPage(templatePageImage);
+                    const imgWidth  = pageWidth * 0.88;
+                    const imgHeight = (img.height * imgWidth) / img.width;
+                    newPage.drawImage(img, {
+                        x:      (pageWidth - imgWidth) / 2,
+                        y:      pageHeight - imgHeight - 70,
+                        width:  imgWidth,
+                        height: imgHeight
+                    });
+                    pdfDoc.removePage(0);
+                } else {
+                    const MARGIN = 36;
+                    const drawW  = pageWidth - MARGIN * 2;
+                    const drawH  = (img.height * drawW) / img.width;
+                    const PAGE_H = drawH + MARGIN * 2;
+                    const pg     = pdfDoc.addPage([pageWidth, PAGE_H]);
+                    pg.drawImage(img, {
+                        x:      MARGIN,
+                        y:      MARGIN,
+                        width:  drawW,
+                        height: drawH
+                    });
+                }
 
                 const pdfBytes = await pdfDoc.save();
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Otro Si Al Contrato 15.000 Alimentación`);

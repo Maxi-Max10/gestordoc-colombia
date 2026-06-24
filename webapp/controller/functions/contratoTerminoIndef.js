@@ -40,7 +40,28 @@ sap.ui.define([
                 const sSalarioLetras  = user.payCompValueWord || "" 
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
-                
+
+                const templateFile = user.company === "CO24"
+                    ? "pdf/Termino_Indef.pdf"
+                    : "pdf/hojaDiaco.pdf";
+
+                // ── Datos según empresa ───────────────────────────────────────
+                const isCyrgo = user.company === "CO24";
+                const empresaData = isCyrgo ? {
+                    empresaNombre: "CYRGO S.A.S.",
+                    domicilio:     "Bogotá",
+                    repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
+                    repCC:         "74.371.977",
+                    repGenero:     "identificado",
+                    firmaImg:      "pdf/firma_Daniel_Cyrgo.jpg",
+                } : {
+                    empresaNombre: "DIACO S.A.",
+                    domicilio:     "Bogotá",
+                    repNombre:     "LAURA CRISTINA CERÓN MUÑOZ",
+                    repCC:         "52.705.312",
+                    repGenero:     "identificada",
+                    firmaImg:      "",
+                };
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -53,6 +74,15 @@ sap.ui.define([
                         }
                     });
                     continue;
+                }
+
+                //Si la empresa es CYRGO, convierto la imagen de la firma de Daniel en base64
+                let firmaBase64 = "";
+                if (empresaData.firmaImg) {
+                    const firmaBytes = await fetch(empresaData.firmaImg).then(r => r.arrayBuffer());
+                    firmaBase64 = "data:image/jpeg;base64," + btoa(
+                        new Uint8Array(firmaBytes).reduce((s, b) => s + String.fromCharCode(b), "")
+                    );
                 }
 
                 // ══════════════════════════════════════════════════════════════
@@ -193,7 +223,7 @@ sap.ui.define([
                     ${HEADER}
 
                     <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:14px 0 16px 0;">
-                        <tr><td style="border:1px solid #000;padding:1px 5px;width:45%;font-weight:bold;background-color:#DCEEFF;">EMPLEADOR</td><td style="border:1px solid #000;padding:1px 5px;">DIACO S.A.</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;width:45%;font-weight:bold;background-color:#DCEEFF;">EMPLEADOR</td><td style="border:1px solid #000;padding:1px 5px;">${empresaData.empresaNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
@@ -207,10 +237,10 @@ sap.ui.define([
                     </table>
 
                     ${_bloqueContrato(`
-                        Entre los suscritos a saber: <strong>DIACO S.A.</strong>, sociedad legalmente constituida,
-                        con domicilio en Bogotá, representada en este contrato por
-                        <strong>LAURA CRISTINA CERÓN MUÑOZ</strong>, identificada con la cédula de ciudadanía
-                        número <strong>52.705.312</strong> y quien para todos los efectos del presente contrato
+                        Entre los suscritos a saber: <strong>${empresaData.empresaNombre}</strong>, sociedad legalmente constituida,
+                        con domicilio en ${empresaData.domicilio}, representada en este contrato por
+                        <strong>${empresaData.repNombre}</strong>, ${empresaData.repGenero} con la cédula de ciudadanía
+                        número <strong>${empresaData.repCC}</strong> y quien para todos los efectos del presente contrato
                         de trabajo se denominará <strong>EL EMPLEADOR</strong>, y <strong>${sNombre}</strong>,
                         identificado(a) con la cédula de ciudadanía número <strong>${sCedula}</strong>
                         expedida en ${sCiudadExpedicion}, domiciliada en ${sDireccion} obrando en nombre
@@ -515,7 +545,7 @@ sap.ui.define([
                     ${HEADER}
 
                     ${_bloqueContrato(`
-                        se mantiene en cabeza del empleador DIACO S.A. y será ejercida en virtud del contrato de trabajo
+                        se mantiene en cabeza del empleador ${empresaData.empresaNombre} y será ejercida en virtud del contrato de trabajo
                         celebrado entre esta y <strong>EL TRABAJADOR</strong>.
                     `)}
 
@@ -907,7 +937,7 @@ sap.ui.define([
                         del contrato de trabajo en los términos de los numerales 6º y 8º del
                         literal a) del artículo 7 del decreto 2351 de 1965, sin perjuicio de las
                         acciones civiles y penales que pueda interponer la sociedad
-                        <strong>DIACO S.A.</strong> con posterioridad a la desvinculación.
+                        <strong>${empresaData.empresaNombre}</strong> con posterioridad a la desvinculación.
                         `
                     )}
 
@@ -1020,12 +1050,11 @@ sap.ui.define([
 
                     ${_bloqueContrato(`
                         17. Las partes acuerdan que en virtud del contrato de servicios que tiene celebrado la sociedad
-                        <strong>DIACO S.A.</strong> con las sociedades vinculadas a ésta, <strong>EL TRABAJADOR</strong> desarrollará como parte de sus
+                        <strong>${empresaData.empresaNombre}</strong> con las sociedades vinculadas a ésta, <strong>EL TRABAJADOR</strong> desarrollará como parte de sus
                         funciones, actividades relacionadas con éstas últimas entidades y que tienen por objeto el
                         cumplimiento del contrato mencionado, sin que por ello se entienda que surge relación laboral o
                         de ninguna otra índole entre ella y <strong>EL TRABAJADOR</strong>, teniendo en cuenta que tales actividades se
-                        cumplen en ejercicio del contrato de trabajo suscrito entre el colaborador y la sociedad DIACO
-                        S.A. y dentro de la jornada en él convenida.
+                        cumplen en ejercicio del contrato de trabajo suscrito entre el colaborador y la sociedad ${empresaData.empresaNombre} y dentro de la jornada en él convenida.
 
                     `)}
 
@@ -1061,7 +1090,7 @@ sap.ui.define([
                         `
                         En virtud de la Ley 1581 de 2012, <strong>EL TRABAJADOR</strong> titular de los
                         datos voluntariamente suministrados para la constitución y ejecución del presente
-                        contrato autoriza a <strong>DIACO S.A.</strong> para hacer uso de los mismos con
+                        contrato autoriza a <strong>${empresaData.empresaNombre}</strong> para hacer uso de los mismos con
                         fines laborales y los demás relacionados con el giro ordinario de los negocios de
                         esta empresa y que sean necesarios para la ejecución del presente contrato. El titular
                         declara conocer los derechos y condiciones del tratamiento de sus datos.
@@ -1073,7 +1102,7 @@ sap.ui.define([
                         "",
                         `
                         Los datos personales que sean recopilados por
-                        <strong>DIACO S.A.</strong> serán tratados para las finalidades que sean autorizados
+                        <strong>${empresaData.empresaNombre}</strong> serán tratados para las finalidades que sean autorizados
                         por los titulares de la información. Sin embargo, los datos también podrán ser
                         tratados para las siguientes finalidades:
                         `
@@ -1081,7 +1110,7 @@ sap.ui.define([
 
                     ${_bulletContrato(`
                         Efectuar todas las gestiones necesarias para el desarrollo del objeto Social de
-                        <strong>DIACO S.A.</strong>, así como todo lo relacionado con el cumplimiento del objeto del
+                        <strong>${empresaData.empresaNombre}</strong>, así como todo lo relacionado con el cumplimiento del objeto del
                         contrato celebrado entre la Compañía y el Titular de la información, incluida la
                         ejecución y terminación de este.>
                     `)}
@@ -1093,15 +1122,15 @@ sap.ui.define([
 
                     ${_bulletContrato(`
                         Gestionar solicitudes, quejas o reclamos promovidos por el Titular o para el
-                        ejercicio de los derechos y deberes de <strong>DIACO</strong> frente a las diferentes
+                        ejercicio de los derechos y deberes de <strong>${empresaData.empresaNombre}</strong> frente a las diferentes
                         autoridades, incluido pero sin limitarse, la rama judicial.
                     `)}
 
                     ${_bulletContrato(`
                         El ofrecimiento de servicios por parte de proveedores estratégicos de
-                        <strong>DIACO S.A.</strong>, a fin de brindar al titular de la información acceso a
+                        <strong>${empresaData.empresaNombre}</strong>, a fin de brindar al titular de la información acceso a
                         servicios o facilidades de pago para la adquisición de productos ofrecidos por
-                        <strong>DIACO S.A.</strong>
+                        <strong>${empresaData.empresaNombre}</strong>
                     `)}
 
                     ${_bulletContrato(`
@@ -1311,13 +1340,13 @@ sap.ui.define([
                         "PROGRAMA DE TRANSPARENCIA Y ÉTICA EMPRESARIAL:",
                         `
                         <strong>EL EMPLEADO</strong>  reconoce haber sido
-                        informado por <strong>DIACO S.A.</strong> sobre su obligación de cumplir con las normas de prevención del
+                        informado por <strong>${empresaData.empresaNombre}</strong> sobre su obligación de cumplir con las normas de prevención del
                         Soborno Transnacional y Corrupción y se compromete a conocer el Programa implementado por
-                        <strong>DIACO S.A.</strong>, disponible en su página web, así como las consecuencias de su incumplimiento.
-                        <strong>EL EMPLEADO</strong> acepta que <strong>DIACO S.A.</strong> puede realizar procedimientos de Debida Diligencia para
+                        <strong>${empresaData.empresaNombre}</strong>, disponible en su página web, así como las consecuencias de su incumplimiento.
+                        <strong>EL EMPLEADO</strong> acepta que <strong>${empresaData.empresaNombre}</strong> puede realizar procedimientos de Debida Diligencia para
                         verificar el cumplimiento de estas obligaciones. El incumplimiento de conductas definidas por la
                         Ley colombiana como Soborno Transnacional y Corrupción será considerado una falta grave,
-                        permitiendo a <strong>DIACO S.A.</strong> terminar el contrato de manera unilateral, sin previo aviso ni
+                        permitiendo a <strong>${empresaData.empresaNombre}</strong> terminar el contrato de manera unilateral, sin previo aviso ni
                         indemnización, y hacer exigibles las penalidades pactadas.
 
                         `
@@ -1431,55 +1460,35 @@ sap.ui.define([
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        margin-top:70px;
+                        margin-top:120px;
                         padding:0 20px;
                     ">
 
                         <!-- EMPLEADOR -->
                         <div style="width:40%;">
+                            <div style="border-top:1px solid #000;padding-top:6px;">
 
-                            <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                            ">
+                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
 
-                                <div style="
-                                    font-weight:bold;
-                                    min-height:18px;
-                                ">
-                                    LAURA CRISTINA CERÓN MUÑOZ
+                                <div style="font-weight:bold;min-height:18px;">
+                                    ${empresaData.repNombre}
                                 </div>
-
-                                <div style="
-                                    margin-top:2px;
-                                    font-weight:bold;
-                                ">
-                                    C.C.No. 52.705.312
+                                <div style="margin-top:2px;font-weight:bold;">
+                                    C.C.No. ${empresaData.repCC}
                                 </div>
-
                             </div>
-
                         </div>
 
                         <!-- TRABAJADOR -->
                         <div style="width:40%;">
 
-                            <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                            ">
+                            <div style="border-top:1px solid #000;padding-top:6px;">
 
-                                <div style="
-                                    font-weight:bold;
-                                    min-height:18px;
-                                ">
+                                <div style="font-weight:bold;min-height:18px;">
                                     ${sNombre}
                                 </div>
 
-                                <div style="
-                                    margin-top:2px;
-                                    font-weight:bold;
-                                ">
+                                <div style="margin-top:2px;font-weight:bold;">
                                     CC. ${sCedula}
                                 </div>
 
@@ -1555,7 +1564,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/Termino_Indef.pdf")
+                const existingPdfBytes = await fetch(templateFile)
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
