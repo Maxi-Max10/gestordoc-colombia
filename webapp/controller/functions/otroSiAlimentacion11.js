@@ -3,7 +3,11 @@ sap.ui.define([
 ], function (MessageToast) {
     "use strict";
 
-    async function onDownloadPDFOtroSiAlimentacion11(oController, sButtonId) {
+    async function onDownloadPDFOtroSiAlimentacion11(oController, sButtonId, mOptions) {
+        const oOptions = mOptions || {};
+        const bReturnPdfDocuments = !!oOptions.returnPdfDocuments;
+        const aGeneratedPdfDocuments = [];
+
         try {
             await oController._ensurePdfToolkit();
 
@@ -146,6 +150,15 @@ sap.ui.define([
                         width:  drawW,
                         height: drawH
                     });
+
+                    if (p === totalPgs - 1) {
+                        pg.drawText("[[FIRMA_EMPLEADO]]", {
+                            x: PAGE_W * 0.63,
+                            y: 90,
+                            size: 6,
+                            color: PDFLibRef.rgb(1, 1, 1)
+                        });
+                    }
                 }
 
                 const pdfBytes = await pdfDoc.save();
@@ -153,11 +166,20 @@ sap.ui.define([
 
                 const fileName = `${user.firstName}_${user.lastName}_OtroSi_Alimentacion_11.500.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
+                if (bReturnPdfDocuments) {
+                    aGeneratedPdfDocuments.push({ user, fileName, blob, pdfBytes });
+                    continue;
+                }
+
                 const link     = document.createElement("a");
                 link.href      = URL.createObjectURL(blob);
                 link.download  = fileName;
                 link.click();
                 URL.revokeObjectURL(link.href);
+            }
+
+            if (bReturnPdfDocuments) {
+                return aGeneratedPdfDocuments;
             }
 
             if (!sButtonId.includes("wordDataInfo")) {
@@ -169,6 +191,9 @@ sap.ui.define([
             }
 
         } catch (error) {
+            if (oOptions.throwErrors) {
+                throw error;
+            }
             console.error("Error generando Otro Sí - Aliementacion 11.500:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
@@ -247,5 +272,13 @@ sap.ui.define([
             document.head.appendChild(script);
         });
     }
-    return { onDownloadPDFOtroSiAlimentacion11 };
+    return {
+        onDownloadPDFOtroSiAlimentacion11,
+        generatePdfDocuments: function (oController) {
+            return onDownloadPDFOtroSiAlimentacion11(oController, "pdfDataInfo", {
+                returnPdfDocuments: true,
+                throwErrors: true
+            });
+        }
+    };
 });

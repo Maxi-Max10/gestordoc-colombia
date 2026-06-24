@@ -3,7 +3,11 @@ sap.ui.define([
 ], function (MessageToast) {
     "use strict";
 
-    async function onDownloadPDFContratoIndefIntegral(oController, sButtonId) {
+    async function onDownloadPDFContratoIndefIntegral(oController, sButtonId, mOptions) {
+        const oOptions = mOptions || {};
+        const bReturnPdfDocuments = !!oOptions.returnPdfDocuments;
+        const aGeneratedPdfDocuments = [];
+
         try {
             await oController._ensurePdfToolkit();
 
@@ -1839,6 +1843,15 @@ sap.ui.define([
                         width:  imgWidth,
                         height: imgHeight
                     });
+
+                    if (pageIndex === contentBlocks.length - 1) {
+                        newPage.drawText("[[FIRMA_EMPLEADO]]", {
+                            x: width * 0.63,
+                            y: 306,
+                            size: 6,
+                            color: PDFLibRef.rgb(1, 1, 1)
+                        });
+                    }
                 }
 
                 pdfDoc.removePage(0);
@@ -1847,11 +1860,20 @@ sap.ui.define([
                 const pdfBytes = await pdfDoc.save();
                 const fileName = `${user.firstName}_${user.lastName}_Contrato_Indefinido.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
+                if (bReturnPdfDocuments) {
+                    aGeneratedPdfDocuments.push({ user, fileName, blob, pdfBytes });
+                    continue;
+                }
+
                 const link     = document.createElement("a");
                 link.href      = URL.createObjectURL(blob);
                 link.download  = fileName;
                 link.click();
                 URL.revokeObjectURL(link.href);
+            }
+
+            if (bReturnPdfDocuments) {
+                return aGeneratedPdfDocuments;
             }
 
             if (!sButtonId.includes("wordDataInfo")) {
@@ -1863,6 +1885,9 @@ sap.ui.define([
             }
 
         } catch (error) {
+            if (oOptions.throwErrors) {
+                throw error;
+            }
             console.error("Error generando Contrato Indefinido:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
@@ -1935,5 +1960,13 @@ sap.ui.define([
             document.head.appendChild(script);
         });
     }
-    return { onDownloadPDFContratoIndefIntegral };
+    return {
+        onDownloadPDFContratoIndefIntegral,
+        generatePdfDocuments: function (oController) {
+            return onDownloadPDFContratoIndefIntegral(oController, "pdfDataInfo", {
+                returnPdfDocuments: true,
+                throwErrors: true
+            });
+        }
+    };
 });

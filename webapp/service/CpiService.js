@@ -3,19 +3,69 @@ sap.ui.define([], function () {
 
     const CPI_DOCUSIGN_DESTINATION = "CPI_DOCUSIGN_DESTINATION";
     const CPI_TERM_FIJO_PATH = "cpi-term-fijo";
-    const TERM_FIJO_DOCUMENT_TYPE = "CONTRATO_TERMINO_FIJO";
-    const TERM_FIJO_CONTRACT_TYPE = "Contrato Término Fijo";
+    const DOCUMENT_TYPES = {
+        CONTRATO_TERMINO_FIJO: "CONTRATO_TERMINO_FIJO",
+        CONTRATO_TERMINO_INDEFINIDO: "CONTRATO_TERMINO_INDEFINIDO",
+        CONTRATO_APRENDIZAJE_LECTIVO: "CONTRATO_APRENDIZAJE_LECTIVO",
+        CONTRATO_APRENDIZAJE_PRODUCTIVO: "CONTRATO_APRENDIZAJE_PRODUCTIVO",
+        CONTRATO_INDEFINIDO_INTEGRAL: "CONTRATO_INDEFINIDO_INTEGRAL",
+        OTRO_SI_ALIMENTACION_10000: "OTRO_SI_ALIMENTACION_10000",
+        OTRO_SI_ALIMENTACION_11500: "OTRO_SI_ALIMENTACION_11500",
+        OTRO_SI_ALIMENTACION_15000: "OTRO_SI_ALIMENTACION_15000",
+        OTRO_SI_RODAMIENTO: "OTRO_SI_RODAMIENTO"
+    };
+    const TERM_FIJO_DOCUMENT_TYPE = DOCUMENT_TYPES.CONTRATO_TERMINO_FIJO;
     const PERSONAL_EMAIL_TYPE = "4083";
 
+    const DOCUMENT_CONFIGS = {
+        [DOCUMENT_TYPES.CONTRATO_TERMINO_FIJO]: _createDocumentConfig("Contrato Término Fijo", "Por favor revisa y firma el contrato a término fijo."),
+        [DOCUMENT_TYPES.CONTRATO_TERMINO_INDEFINIDO]: _createDocumentConfig("Contrato Término Indefinido", "Por favor revisa y firma el contrato a término indefinido."),
+        [DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_LECTIVO]: _createDocumentConfig("Contrato de Aprendizaje - Etapa Lectiva", "Por favor revisa y firma el contrato de aprendizaje en etapa lectiva."),
+        [DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_PRODUCTIVO]: _createDocumentConfig("Contrato de Aprendizaje - Etapa Productiva", "Por favor revisa y firma el contrato de aprendizaje en etapa productiva."),
+        [DOCUMENT_TYPES.CONTRATO_INDEFINIDO_INTEGRAL]: _createDocumentConfig("Contrato Indefinido Integral", "Por favor revisa y firma el contrato indefinido integral."),
+        [DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_10000]: _createDocumentConfig("Otro Sí Alimentación $10.000", "Por favor revisa y firma el otro sí de alimentación por $10.000."),
+        [DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_11500]: _createDocumentConfig("Otro Sí Alimentación $11.500", "Por favor revisa y firma el otro sí de alimentación por $11.500."),
+        [DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_15000]: _createDocumentConfig("Otro Sí Alimentación $15.000", "Por favor revisa y firma el otro sí de alimentación por $15.000."),
+        [DOCUMENT_TYPES.OTRO_SI_RODAMIENTO]: _createDocumentConfig("Otro Sí Auxilio de Rodamiento", "Por favor revisa y firma el otro sí de auxilio de rodamiento.")
+    };
+
+    function _createDocumentConfig(contractType, emailBlurb) {
+        return {
+            contractType,
+            emailSubject: "Firma requerida - " + contractType,
+            emailBlurb,
+            anchorString: "[[FIRMA_EMPLEADO]]",
+            status: "sent"
+        };
+    }
+
     async function buildTerminoFijoPayload(oDocument) {
+        return buildDocusignPayload(oDocument, TERM_FIJO_DOCUMENT_TYPE);
+    }
+
+    async function buildDocusignPayload(oDocument, sDocumentType) {
+        const oConfig = DOCUMENT_CONFIGS[sDocumentType];
+
+        if (!oConfig) {
+            throw new Error("No existe configuración de DocuSign para el documento " + sDocumentType + ".");
+        }
+
         const oUser = oDocument?.user || {};
-        const sPersonalEmail = await _getPersonalEmail(oUser.userId);
+        const sPersonalEmail = oUser.personalEmail
+            || oUser.primaryEmail
+            || oUser.emailPersonal
+            || oUser.privateEmail
+            || await _getPersonalEmail(oUser.userId);
+        const sWorkEmail = oUser.email
+            || oUser.businessEmail
+            || oUser.defaultEmail
+            || "";
         const sDocumentBase64 = cleanPdfBase64(await _documentToBase64(oDocument?.blob || oDocument?.pdfBytes));
 
         return {
-            documentType: TERM_FIJO_DOCUMENT_TYPE,
-            contractType: TERM_FIJO_CONTRACT_TYPE,
-            fileName: oDocument?.fileName || "Contrato_Termino_Fijo.pdf",
+            documentType: sDocumentType,
+            contractType: oConfig.contractType,
+            fileName: oDocument?.fileName || "Documento.pdf",
             fileExtension: "pdf",
             documentBase64: sDocumentBase64,
             employee: {
@@ -24,7 +74,9 @@ sap.ui.define([], function () {
                 lastName: oUser.lastName || "",
                 fullName: _joinName(oUser.firstName, oUser.lastName),
                 nationalId: oUser.nationalId || "",
-                email: sPersonalEmail,
+                email: sPersonalEmail || sWorkEmail,
+                personalEmail: sPersonalEmail,
+                workEmail: sWorkEmail,
                 phone: oUser.businessPhone || "",
                 gender: oUser.gender || "",
                 nationality: oUser.nationality || "",
@@ -32,8 +84,8 @@ sap.ui.define([], function () {
                 address: oUser.addressLine1 || oUser.address || ""
             },
             contract: {
-                title: TERM_FIJO_CONTRACT_TYPE,
-                category: "contratoTerminoFijo",
+                title: oConfig.contractType,
+                category: sDocumentType,
                 position: oUser.position || oUser.title || "",
                 department: oUser.department || "",
                 division: oUser.division || "",
@@ -43,6 +95,12 @@ sap.ui.define([], function () {
                 endDate: oUser.endDate || "",
                 salary: oUser.paycompvalue || 0,
                 salaryInWords: oUser.payCompValueWord || ""
+            },
+            docusign: {
+                emailSubject: oConfig.emailSubject,
+                emailBlurb: oConfig.emailBlurb,
+                anchorString: oConfig.anchorString,
+                status: oConfig.status || "sent"
             },
             metadata: {
                 sourceApplication: "gestordoccolombia",
@@ -95,7 +153,13 @@ sap.ui.define([], function () {
 
         console.log("Enviando payload a CPI:", {
             url: sUrl,
+            signerEmail: payload?.employee?.email,
+            personalEmail: payload?.employee?.personalEmail,
+            workEmail: payload?.employee?.workEmail,
             documentType: payload?.documentType,
+            contractType: payload?.contractType,
+            emailSubject: payload?.docusign?.emailSubject,
+            anchorString: payload?.docusign?.anchorString,
             fileName: payload?.fileName,
             fileExtension: payload?.fileExtension,
             base64Length: payload?.documentBase64 ? payload.documentBase64.length : 0,
@@ -223,6 +287,8 @@ sap.ui.define([], function () {
     return {
         CPI_DOCUSIGN_DESTINATION,
         CPI_TERM_FIJO_PATH,
+        DOCUMENT_TYPES,
+        buildDocusignPayload,
         buildTerminoFijoPayload,
         sendTerminoFijoToCPI,
         cleanPdfBase64

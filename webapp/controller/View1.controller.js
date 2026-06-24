@@ -33,6 +33,18 @@ sap.ui.define([
     protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo, contratoTerminoIndef, contratoAprendizajeLectivo, contratoAprendizajeProductivo, CpiService) => {
   "use strict";
 
+  const DOCUSIGN_DOCUMENTS = {
+    contratoTerminoFijo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_TERMINO_FIJO, generator: contratoTerminoFijo.generatePdfDocuments },
+    contratoTerminoIndef: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_TERMINO_INDEFINIDO, generator: contratoTerminoIndef.generatePdfDocuments },
+    contratoAprendizajeLectivo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_LECTIVO, generator: contratoAprendizajeLectivo.generatePdfDocuments },
+    contratoAprendizajeProductivo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_PRODUCTIVO, generator: contratoAprendizajeProductivo.generatePdfDocuments },
+    contratoIndefIntegral: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_INDEFINIDO_INTEGRAL, generator: contratoIndefIntegral.generatePdfDocuments },
+    otroSiAlimentacion10: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_10000, generator: otroSiAlimentacion10.generatePdfDocuments },
+    otroSiAlimentacion11: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_11500, generator: otroSiAlimentacion11.generatePdfDocuments },
+    otroSiAlimentacion15: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_15000, generator: otroSiAlimentacion15.generatePdfDocuments },
+    otroSiRodamiento: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_RODAMIENTO, generator: otroSiRodamiento.generatePdfDocuments }
+  };
+
   return Controller.extend("gestordoccolombia.controller.View1", {
 
     // ═══════════════════════════════════════════════════════════════════
@@ -1110,17 +1122,7 @@ sap.ui.define([
 
 
     _shouldShowDocuSignButton: function () {
-      return [
-        "contratoTerminoFijo",
-        "contratoTerminoIndef",
-        "contratoAprendizajeLectivo",
-        "contratoAprendizajeProductivo",
-        "contratoIndefIntegral",
-        "otroSiAlimentacion10",
-        "otroSiAlimentacion11",
-        "otroSiAlimentacion15",
-        "otroSiRodamiento"
-      ].indexOf(this._currentCategory) > -1;
+      return !!DOCUSIGN_DOCUMENTS[this._currentCategory];
     },
 
     _getDocumentPresentation: function () {
@@ -1717,8 +1719,9 @@ sap.ui.define([
     onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); },
 
     onSendToDocusign: async function (oEvent) {
-      if (this._currentCategory !== "contratoTerminoFijo" || this.sSelectedContract !== "Contrato Término Fijo") {
-        MessageToast.show("Por ahora solo está disponible el envío a DocuSign para Contrato Término Fijo.");
+      const oDocusignDocument = DOCUSIGN_DOCUMENTS[this._currentCategory];
+      if (!oDocusignDocument) {
+        MessageToast.show("Este documento no está habilitado para envío a DocuSign.");
         return;
       }
 
@@ -1729,7 +1732,7 @@ sap.ui.define([
 
       try {
         await this._withBusy(async () => {
-          const aDocuments = await contratoTerminoFijo.generateContratoTerminoFijoPdfDocuments(this);
+          const aDocuments = await oDocusignDocument.generator(this);
 
           if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
             MessageToast.show("Seleccione al menos un colaborador.");
@@ -1738,16 +1741,23 @@ sap.ui.define([
 
           for (let i = 0; i < aDocuments.length; i++) {
             const oDocument = aDocuments[i];
-            const oPayload = await CpiService.buildTerminoFijoPayload(oDocument);
+            const oPayload = await CpiService.buildDocusignPayload(
+              oDocument,
+              oDocusignDocument.documentType
+            );
             const oCpiResponse = await CpiService.sendTerminoFijoToCPI(oPayload);
-            console.log("Respuesta CPI DocuSign Contrato Término Fijo:", oCpiResponse);
+            console.log("Respuesta CPI DocuSign " + oDocusignDocument.documentType + ":", oCpiResponse);
           }
 
-          MessageToast.show("Contrato enviado a DocuSign correctamente.");
+          MessageToast.show(
+            aDocuments.length > 1
+              ? aDocuments.length + " documentos enviados a DocuSign correctamente."
+              : "Documento enviado a DocuSign correctamente."
+          );
         });
       } catch (oError) {
-        console.error("No se pudo enviar el contrato a DocuSign:", oError);
-        MessageToast.show("No se pudo enviar el contrato a DocuSign. Intentalo nuevamente.");
+        console.error("No se pudo enviar el documento a DocuSign:", oError);
+        MessageToast.show("No se pudo enviar el documento a DocuSign. Inténtalo nuevamente.");
       } finally {
         if (oButton?.setBusy) {
           oButton.setBusy(false);

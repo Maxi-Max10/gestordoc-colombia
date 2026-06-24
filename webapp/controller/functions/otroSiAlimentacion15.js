@@ -3,7 +3,11 @@ sap.ui.define([
 ], function (MessageToast) {
     "use strict";
 
-    async function onDownloadPDFOtroSiAlimentacion15(oController, sButtonId) {
+    async function onDownloadPDFOtroSiAlimentacion15(oController, sButtonId, mOptions) {
+        const oOptions = mOptions || {};
+        const bReturnPdfDocuments = !!oOptions.returnPdfDocuments;
+        const aGeneratedPdfDocuments = [];
+
         try {
             await oController._ensurePdfToolkit();
 
@@ -151,16 +155,32 @@ sap.ui.define([
                     height: drawH
                 });
 
+                pg.drawText("[[FIRMA_EMPLEADO]]", {
+                    x: PAGE_W * 0.63,
+                    y: 90,
+                    size: 6,
+                    color: PDFLibRef.rgb(1, 1, 1)
+                });
+
                 const pdfBytes = await pdfDoc.save();
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Otro Si Al Contrato 15.000 Alimentación`);
 
                 const fileName = `${user.firstName}_${user.lastName}_OtroSi_Alimentacion_15.000.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
+                if (bReturnPdfDocuments) {
+                    aGeneratedPdfDocuments.push({ user, fileName, blob, pdfBytes });
+                    continue;
+                }
+
                 const link     = document.createElement("a");
                 link.href      = URL.createObjectURL(blob);
                 link.download  = fileName;
                 link.click();
                 URL.revokeObjectURL(link.href);
+            }
+
+            if (bReturnPdfDocuments) {
+                return aGeneratedPdfDocuments;
             }
 
             if (!sButtonId.includes("wordDataInfo")) {
@@ -172,6 +192,9 @@ sap.ui.define([
             }
 
         } catch (error) {
+            if (oOptions.throwErrors) {
+                throw error;
+            }
             console.error("Error generando Otro Sí - Alimentacion 15.000:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
@@ -251,5 +274,13 @@ sap.ui.define([
         });
     }
 
-    return { onDownloadPDFOtroSiAlimentacion15 };
+    return {
+        onDownloadPDFOtroSiAlimentacion15,
+        generatePdfDocuments: function (oController) {
+            return onDownloadPDFOtroSiAlimentacion15(oController, "pdfDataInfo", {
+                returnPdfDocuments: true,
+                throwErrors: true
+            });
+        }
+    };
 });
