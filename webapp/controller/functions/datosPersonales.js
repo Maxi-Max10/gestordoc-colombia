@@ -104,7 +104,7 @@ sap.ui.define([
                 // Nombre del país a partir del código SAP o ISO
                 const sPais       = oController.getPaisName(user.country);
 
-                const sTelefono    = oController.getTelefono(user);
+                const sTelefono    = user.personalPhone || "";
                 const sEmail       = oController.getEmail(user);
                 const sNacional    = oController.getNacionalidad(user);
 
