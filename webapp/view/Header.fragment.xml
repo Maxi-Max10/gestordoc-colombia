@@ -26,6 +26,19 @@
                 <IconTabFilter id="_IDGenIconTabFilter" text="Inicio" key="1" />
             </items>
         </IconTabHeader>
+        <SearchField
+            id="headerDocumentSearch"
+            width="13rem"
+            placeholder="Buscar documentos"
+            showSearchButton="true"
+            liveChange="onDocumentSearch"
+            search="onDocumentSearch"
+            class="headerSearchField"
+        >
+            <layoutData>
+                <OverflowToolbarLayoutData id="_IDGenHeaderSearchLayoutData" priority="NeverOverflow" shrinkable="true" />
+            </layoutData>
+        </SearchField>
         <Button
             id="themeToggleButton"
             text="{view>/ThemeToggleText}"
@@ -59,6 +72,15 @@
         contentWidth="12.5rem"
         class="mobileHeaderMenuPopover">
         <VBox class="mobileHeaderMenuContent">
+            <SearchField
+                id="mobileHeaderDocumentSearch"
+                width="100%"
+                placeholder="Buscar documentos"
+                showSearchButton="true"
+                liveChange="onDocumentSearch"
+                search="onDocumentSearch"
+                class="mobileHeaderSearchField"
+            />
             <Button
                 id="mobileHeaderHomeButton"
                 text="Inicio"

@@ -1608,13 +1608,31 @@ sap.ui.define([
     // Handler del buscador de tiles en la pantalla principal.
     // Filtra los tiles visibles en el grid según el texto que escribe el usuario.
     onDocumentSearch: function (oEvent) {
-      const oSearchField = this.byId("documentSearch");
-      const sValue = oEvent?.getParameter("newValue") ?? oEvent?.getParameter("query") ?? oSearchField?.getValue() ?? "";
+      const oMainSearch   = this.byId("documentSearch");
+      const oHeaderSearch = this.byId("headerDocumentSearch");
+      const oMobileSearch = this.byId("mobileHeaderDocumentSearch");
+      const oSource       = oEvent?.getSource?.();
+      const sValue = oEvent?.getParameter("newValue")
+        ?? oEvent?.getParameter("query")
+        ?? oSource?.getValue?.()
+        ?? oMainSearch?.getValue()
+        ?? oHeaderSearch?.getValue()
+        ?? oMobileSearch?.getValue()
+        ?? "";
       const sQuery = this._normalizeSearchText(sValue);
       const aCards = this._getDocumentSearchCards();
       const oGrid  = this.byId("gridItems");
+      const bHasQuery = Boolean(sQuery);
 
-      oSearchField?.toggleStyleClass("documentSearchFieldActive", Boolean(sQuery));
+      [oMainSearch, oHeaderSearch, oMobileSearch].forEach(oField => {
+        if (!oField) return;
+        if (oField !== oSource && oField.getValue?.() !== sValue) {
+          oField.setValue(sValue);
+        }
+        oField.toggleStyleClass("documentSearchFieldActive", bHasQuery);
+        oField.toggleStyleClass("headerSearchFieldActive", bHasQuery);
+      });
+
       if (!oGrid) return;
 
       // Guarda el estado original del grid la primera vez que se usa el buscador
