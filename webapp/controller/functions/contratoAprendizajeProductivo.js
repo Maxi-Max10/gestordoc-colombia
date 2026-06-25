@@ -40,6 +40,14 @@ sap.ui.define([
                 const sInstitucion = await oController._getInstitucionFormacion(user.userId);
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
+                // ── Fecha de terminación: inicio + 13 meses y 19 días ────────
+                const dFechaInicio = new Date(user.originalStartDate);
+                const dFechaFin = new Date(dFechaInicio);
+                dFechaFin.setMonth(dFechaFin.getMonth() + 6);
+                dFechaFin.setDate(dFechaFin.getDate() + 0);
+                const sfechaTerminacion = oController.formatDateRaw(dFechaFin);
+                const sfechaTerminacionLarga = oController.formatDateToWords(dFechaFin);
+
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
@@ -392,7 +400,7 @@ sap.ui.define([
                             ">
                                 FECHA TERMINACIÓN CONTRATO
                             </td>
-                            <td style="padding:1px 5px;"></td> ${sFechaBaja}
+                            <td style="padding:1px 5px;">${sfechaTerminacion}</td> 
                         </tr>
                     </table>
 
@@ -492,8 +500,8 @@ sap.ui.define([
                         "",
                         `De acuerdo con el artículo 21 de la Ley 2466 de 2025, el contrato de aprendizaje es
                         considerado un contrato laboral especial a término fijo, por lo que, este tendrá, un término de
-                        duración de 6 meses, comprendidos entre <strong>16 DE ENERO DE 2026 fecha</strong> de iniciación del Contrato; y
-                        el <strong>15 DE JULIO DE 2026 fecha</strong> de terminación de este, sin que pueda exceder de tres (3) años. Así las
+                        duración de 6 meses, comprendidos entre <strong>${sfechaContratacion} fecha</strong> de iniciación del Contrato; y
+                        el <strong>${sfechaTerminacion}</strong> de terminación de este, sin que pueda exceder de tres (3) años. Así las
                         cosas, se deja previsto que el contrato finalizará en la fecha de terminación indicada anteriormente,
                         sin que sea necesaria la presentación de un aviso previo o el cumplimiento de un requisito adicional`
                     )}

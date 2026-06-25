@@ -31,18 +31,11 @@ sap.ui.define([
                 const sCedula = user.nationalId || "";
                 const localDate    = oController.getLocalDate();
 
-                // ── Word ──────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await _generateWord({
-                        firstName: user.firstName,
-                        lastName:  user.lastName,
-                        sNombre, sCedula, localDate
-                    });
-                    continue;
-                }
+                // ── Empresa ───────────────────────────────────────────────────
+                const isCyrgo = user.company === "CO24";
 
-                // ── HTML del bloque de firma ──────────────────────────────────
-                const htmlFirma = `
+                function _buildHtmlDiaco() {
+                    return `
                     <div style="font-size:14pt;font-family:Arial,sans-serif;padding:0;margin:0;">
 
                         <p style="margin:0 0 5px 0;color:#E8601C;font-weight:bold;margin-bottom:20px;">Firma</p>
@@ -59,11 +52,50 @@ sap.ui.define([
                             <span style="color:#E8601C;font-weight:bold;">Fecha firma del documento:</span>
                             <span style="color:#E8601C;"> ${localDate}</span>
                         </p>
-                    </div>
-                `;
+                    </div>`;
+                }
 
-                // ── PDF ───────────────────────────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/plantillaEtica.pdf")
+                function _buildHtmlCyrgo() {
+                    return `
+                    <div style="font-size:14pt;font-family:Arial,sans-serif;padding:0;margin:0;">
+
+                        <p style="margin:0 0 5px 0;color:#104574;font-weight:bold;margin-bottom:20px;">Firma</p>
+
+                        <p style="margin:0 0 4px 0;">
+                            <span style="color:#265680;font-weight:bold;">Nombre del empleado:</span>
+                            <span style="color:#265680;"> ${sNombre}</span>
+                        </p>
+                        <p style="margin:0 0 4px 0;">
+                            <span style="color:#265680;font-weight:bold;">Número de cedula:</span>
+                            <span style="color:#265680;"> ${sCedula}</span>
+                        </p>
+                        <p style="margin:0;">
+                            <span style="color:#265680;font-weight:bold;">Fecha firma del documento:</span>
+                            <span style="color:#265680;"> ${localDate}</span>
+                        </p>
+                    </div>`;
+                }
+
+                // ── Word ──────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    await _generateWord({
+                        firstName: user.firstName,
+                        lastName:  user.lastName,
+                        sNombre, sCedula, localDate
+                    });
+                    continue;
+                }
+
+                // ── PDF — con plantilla de fondo ──────────────────────────────
+                const htmlPagina1 = isCyrgo ? _buildHtmlCyrgo() : _buildHtmlDiaco();
+                const contentBlocks = [htmlPagina1];
+
+                // ── Carga plantilla de fondo ───────────────────────────────────
+               const templateFile = isCyrgo
+                    ? "pdf/plantillaEticaCyrgo.pdf"
+                    : "pdf/plantillaEtica.pdf";
+
+                const existingPdfBytes = await fetch(templateFile)
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
@@ -72,24 +104,22 @@ sap.ui.define([
                 const templatePageImage = await pdfDoc.embedPage(templatePage);
 
                 // Renderizar bloque de firma
-                const div = document.createElement("div");
-                div.style.width           = "794px";
-                div.style.height          = "160px";
-                div.style.padding         = "40px";
-                div.style.backgroundColor = "transparent";
-                div.style.background      = "none";
-                div.style.fontSize        = "14px";
-                div.style.boxSizing       = "border-box";
-                div.style.position        = "absolute";
-                div.style.top             = "-9999px";
-                div.innerHTML             = htmlFirma;
-                document.body.appendChild(div);
+                for (let pageIndex = 0; pageIndex < contentBlocks.length; pageIndex++) {
+                    const blockHtml = contentBlocks[pageIndex];
+                    const div = document.createElement("div");
+                    div.style.width           = "794px";
+                    div.style.height          = "160px";
+                    div.style.padding         = "40px";
+                    div.style.backgroundColor = "transparent";
+                    div.style.background      = "none";
+                    div.style.fontSize        = "14px";
+                    div.style.boxSizing       = "border-box";
+                    div.style.position        = "absolute";
+                    div.style.top             = "-9999px";
+                    div.innerHTML             = blockHtml;
+                    document.body.appendChild(div);
 
-                const canvas = await html2canvasRef(div, {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: null
-                });
+                const canvas  = await html2canvasRef(div, { scale: 2, useCORS: true, backgroundColor: null });
                 const imgData = canvas.toDataURL("image/png");
                 document.body.removeChild(div);
 
@@ -107,6 +137,7 @@ sap.ui.define([
                     width:  imgWidth,
                     height: imgHeight
                 });
+            }
 
                 pdfDoc.removePage(0);
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Compromiso con la Ética`);

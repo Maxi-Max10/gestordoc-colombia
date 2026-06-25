@@ -32,23 +32,14 @@ sap.ui.define([
                 const sCedula      = user.nationalId || "";
                 const localDate    = oController.getLocalDate();
                 const sPlanta      = user.planta || "";
-                const sArea      = user.area || "";
+                const sArea = user.area || "";
 
-                // ── Word ─────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await wordGenerator.generateWord({
-                        templatePath: "pdf/Protocolo_Recibo.docx",
-                        fileName:     `${user.firstName}_${user.lastName}_Protocolo_Recibo.docx`,
-                        data: {
-                            sNombre, sCedula, localDate, sPlanta, sArea
-                        }
-                    });
-                    continue;
-                }
+                // ── Empresa ───────────────────────────────────────────────────
+                const isCyrgo = user.company === "CO24";
 
-                // ── PDF — con plantilla de fondo ──────────────────────────────
-                const htmlPagina1 = `
-                <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+                function _buildHtmlDiaco() {
+                    return `
+                    <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
                         Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido 
@@ -90,11 +81,96 @@ sap.ui.define([
                     </div>
 
                 </div>`;
+                }
 
+                function _buildHtmlCyrgo() {
+                    return `
+                    <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+
+                    <p style="text-align:justify;margin:0 0 28px 0;">
+                        Código de Ética Gerdau y Cartilla de la Seguridad de la Información
+                    </p>
+
+                    <p style="text-align:justify;margin:0 0 28px 0;">
+                        Yo, ${sNombre} identificado con documento de identidad N° ${sCedula} declaro que he recibido el
+                        Código de Ética Gerdau y la Cartilla de la Seguridad de la Información,
+                        de la cual <strong>CYRGO S.A.S.</strong> forma parte; y conozco las normas y
+                        directrices de la Empresa.
+                    </p>
+
+                    <p style="text-align:justify;margin:0 0 28px 0;">
+                        Entiendo que GERDAU podrá actualizar, corregir o alterar los contenidos
+                        en dichos documentos, los cuales serán debidamente divulgados, a
+                        través de los canales de comunicación internos, que declaro conocer.
+                    </p>
+
+                    <p style="text-align:justify;margin:0 0 80px 0;">
+                        Las reglas contenidas en el Código de Ética Gerdau y en la Cartilla de la
+                        Seguridad de la Información integran mi contrato individual de trabajo
+                        con <strong>CYRGO S.A.S.</strong>, para todos los efectos, de modo que el
+                        incumplimiento de dichas reglas permitirá a la empresa aplicar las
+                        medidas establecidas en la legislación vigente, para los casos de
+                        incumplimiento de las normas laborales contractuales.
+                    </p>
+
+                    <div style="width:100%;margin-bottom:50px;">
+                        <div style="width:60%;margin-left:200px;">
+                            <div style="border-top:1.5px solid #000;"></div>
+                            <div style="padding-top:10px;text-align:left;">
+                                Ciudad, fecha
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width:100%;margin-bottom:40px;">
+                        <div style="width:60%;margin-left:200px;">
+                            <div style="border-top:1.5px solid #000;"></div>
+                            <div style="padding-top:10px;text-align:center;font-weight:bold;">
+                                Firma
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width:100%;border:1px solid #000;border-collapse:collapse;display:table;margin-top:20px;">
+                        <div style="display:table-row;">
+                            <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
+                                <strong>Fecha:</strong> ${localDate}
+                            </div>
+                            <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
+                                <strong>Planta:</strong> ${sPlanta}
+                            </div>
+                            <div style="display:table-cell;width:34%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
+                                <strong>Área:</strong> ${sArea}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>`;
+                }
+
+
+                // ── Word ─────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    await wordGenerator.generateWord({
+                        templatePath: "pdf/Protocolo_Recibo.docx",
+                        fileName:     `${user.firstName}_${user.lastName}_Protocolo_Recibo.docx`,
+                        data: {
+                            sNombre, sCedula, localDate, sPlanta, sArea
+                        }
+                    });
+                    continue;
+                }
+
+                // ── PDF — con plantilla de fondo ──────────────────────────────
+                const htmlPagina1 = isCyrgo ? _buildHtmlCyrgo() : _buildHtmlDiaco();
                 const contentBlocks = [htmlPagina1];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/plantilaProtocoloRecibo.pdf")
+               const templateFile = isCyrgo
+                    ? "pdf/plantilaProtocoloReciboCyrgo.pdf"
+                    : "pdf/plantillaProtocoloRecibo.pdf";
+
+                const existingPdfBytes = await fetch(templateFile)
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);

@@ -42,7 +42,7 @@ sap.ui.define([
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
 
                 const templateFile = user.company === "CO24"
-                    ? "pdf/Termino_Indef.pdf"
+                    ? "pdf/Cyrgo.pdf"
                     : "pdf/hojaDiaco.pdf";
 
                 // ── Datos según empresa ───────────────────────────────────────

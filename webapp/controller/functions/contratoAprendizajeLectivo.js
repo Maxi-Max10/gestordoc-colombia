@@ -50,7 +50,7 @@ sap.ui.define([
                 const sfechaTerminacionLarga = oController.formatDateToWords(dFechaFin);
 
                 const templateFile = user.company === "CO24"
-                    ? "pdf/Termino_Indef.pdf"
+                    ? "pdf/Cyrgo.pdf"
                     : "pdf/hojaDiaco.pdf";
 
                 // ── Datos según empresa ───────────────────────────────────────
@@ -61,8 +61,8 @@ sap.ui.define([
                     repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
                     repCC:         "74.371.977",
                     repGenero:     "identificado",
-                    firmaImg:      "pdf/firma_Daniel_Cyrgo.jpg",
-                    nit:            "8600096942"
+                    firmaImg:      "img/firma_Daniel_Cyrgo.jpg",
+                    nit:            "860.009.694-2"
                 } : {
                     empresaNombre: "DIACO S.A.",
                     domicilio:     "Bogotá",
