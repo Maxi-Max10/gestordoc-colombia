@@ -233,6 +233,25 @@ sap.ui.define([
       ].includes(sTitle);
     },
 
+    _compareEmployeeNames: function (aUser, bUser) {
+      const sALast  = String(aUser?.lastName || "");
+      const sBLast  = String(bUser?.lastName || "");
+      const sAFirst = String(aUser?.firstName || "");
+      const sBFirst = String(bUser?.firstName || "");
+
+      return sALast.localeCompare(sBLast, "es", { sensitivity: "base" }) ||
+        sAFirst.localeCompare(sBFirst, "es", { sensitivity: "base" });
+    },
+
+    _prepareEmployeeDialogUsers: function (aUsers, mOptions) {
+      const bInactiveOnly = !!mOptions?.inactiveOnly;
+
+      return (Array.isArray(aUsers) ? aUsers : [])
+        .filter(user => user.custom02 === "Administrativo" && (!bInactiveOnly || user.status !== "t"))
+        .slice()
+        .sort(this._compareEmployeeNames.bind(this));
+    },
+
 
     // ═══════════════════════════════════════════════════════════════════
     // CARGA DE EMPLEADOS SEGÚN EL DOCUMENTO
@@ -286,14 +305,7 @@ sap.ui.define([
         return Promise.resolve();
       }
 
-      this._initialEmployeesPreloadRequest = Promise.allSettled(aPreloads)
-        .then(aResults => {
-          const aRejected = aResults.filter(oResult => oResult.status === "rejected");
-          if (aRejected.length) {
-            console.warn("La precarga inicial de colaboradores terminó con errores:", aRejected.map(oResult => oResult.reason));
-          }
-          return aResults;
-        })
+      this._initialEmployeesPreloadRequest = Promise.all(aPreloads)
         .finally(() => {
           this._initialEmployeesPreloadRequest = null;
         });
@@ -307,7 +319,7 @@ sap.ui.define([
       }
 
       if (bPreloadEmployees && typeof window.gmaHoldAppPreloader === "function") {
-        window.gmaHoldAppPreloader(45000);
+        window.gmaHoldAppPreloader();
       }
 
       if (bPreloadEmployees && typeof window.gmaSetAppPreloaderStatus === "function") {
@@ -319,17 +331,38 @@ sap.ui.define([
         pPreload = bPreloadEmployees ? this._preloadEmployeesForStartup() : Promise.resolve();
       } catch (oError) {
         console.error("No se pudo iniciar la precarga inicial de colaboradores:", oError);
-        pPreload = Promise.resolve();
+        pPreload = Promise.reject(oError);
       }
 
-      this._initialPreloadCompletionRequest = pPreload.finally(() => {
+      this._initialPreloadCompletionRequest = pPreload.then(() => {
         if (bPreloadEmployees && typeof window.gmaSetAppPreloaderStatus === "function") {
           window.gmaSetAppPreloaderStatus("Listo", "Tablas preparadas", 99);
         }
         this._hideInitialPreloader();
+      }).catch(oError => {
+        this._showInitialPreloadError(
+          "Error cargando colaboradores",
+          "No se pudo completar la carga de usuarios de SuccessFactors.",
+          oError
+        );
       });
 
       return this._initialPreloadCompletionRequest;
+    },
+
+
+    _showInitialPreloadError: function (sStatus, sCopy, oError) {
+      if (oError) {
+        console.error(oError);
+      }
+
+      if (typeof window.gmaHoldAppPreloader === "function") {
+        window.gmaHoldAppPreloader();
+      }
+
+      if (typeof window.gmaSetAppPreloaderStatus === "function") {
+        window.gmaSetAppPreloaderStatus(sStatus, sCopy, 99);
+      }
     },
 
 
@@ -353,7 +386,7 @@ sap.ui.define([
       this.oGlobalBusyDialog = new sap.m.BusyDialog();
       this._busyCounter      = 0; // Contador en 0: ninguna operación corriendo todavía
       if (typeof window.gmaHoldAppPreloader === "function") {
-        window.gmaHoldAppPreloader(45000);
+        window.gmaHoldAppPreloader();
       }
 
       // Modelo "view": guarda el estado de la interfaz (lista de usuarios, filtros, tema, etc.)
@@ -379,6 +412,8 @@ sap.ui.define([
       this.aSelectedEmployees        = [];    // Empleados seleccionados en la tabla
       this._activeEmployeesLoaded    = false; // Evita recargar empleados activos si ya se trajeron
       this._inactiveEmployeesLoaded  = false; // Idem para inactivos
+      this._activeAdministrativeUsers = [];
+      this._inactiveAdministrativeUsers = [];
       this._activeEmployeesRequest   = null;  // Promesa en curso (evita llamadas duplicadas)
       this._inactiveEmployeesRequest = null;
       this._initialEmployeesPreloadRequest = null;
@@ -685,17 +720,24 @@ sap.ui.define([
         that.getUserCompany(userId).then(function (sCompany) {
           UseroModel.setProperty("/company", sCompany);
           that.getDataUser(userId);
-        }).catch(function () {
+        }).catch(function (oError) {
           MessageToast.show("Error al obtener información de la empresa.");
           that.oGlobalBusyDialog.close();
-          that._hideInitialPreloader(); // Aunque falle, hay que ocultar el splash igual
+          that._showInitialPreloadError(
+            "Error cargando empresa",
+            "No se pudo completar la carga inicial desde SuccessFactors.",
+            oError
+          );
         });
       });
 
-      UseroModel.attachRequestFailed(function () {
-        // Si ni siquiera se puede obtener el usuario, libera la UI igual
+      UseroModel.attachRequestFailed(function (oError) {
         that.oGlobalBusyDialog.close();
-        that._hideInitialPreloader();
+        that._showInitialPreloadError(
+          "Error cargando usuario",
+          "No se pudo obtener el usuario actual para iniciar la carga de SSFF.",
+          oError
+        );
       });
     },
 
@@ -763,8 +805,11 @@ sap.ui.define([
 
         error: function (oError) {
           MessageToast.show("Error al leer grupo de usuario.");
-          console.error(oError);
-          that._hideInitialPreloader();
+          that._showInitialPreloadError(
+            "Error cargando permisos",
+            "No se pudieron validar permisos ni completar la carga inicial de SSFF.",
+            oError
+          );
         }
       });
     },
@@ -1042,17 +1087,18 @@ sap.ui.define([
           // Actualiza el modelo con los datos de EmpJob sin reemplazar el modelo entero
           this.getView().getModel().setProperty("/User", enrichedUsers);
 
+          this._activeAdministrativeUsers = this._prepareEmployeeDialogUsers(enrichedUsers);
+
           // Habilita el botón Descargar y marca la carga como completa
           oViewStateModel.setProperty("/EmpJobLoaded", true);
           this._activeEmployeesLoaded = true;
           return enrichedUsers;
 
         } catch (e) {
-          console.warn("No se pudieron cargar los managers desde EmpJob:", e);
-          // Habilita igual para no dejar el botón bloqueado para siempre
-          oViewStateModel.setProperty("/EmpJobLoaded", true);
-          this._activeEmployeesLoaded = true;
-          return enrichedUsers;
+          console.error("No se pudo completar la carga de datos SSFF para empleados activos:", e);
+          oViewStateModel.setProperty("/EmpJobLoaded", false);
+          this._activeEmployeesLoaded = false;
+          throw e;
         }
 
       }).catch(oError => {
@@ -1060,7 +1106,7 @@ sap.ui.define([
         if (!mOptions.silent) {
           MessageToast.show("Error cargando los datos.");
         }
-        oViewStateModel?.setProperty("/EmpJobLoaded", true); // Desbloquea igual si falla todo
+        oViewStateModel?.setProperty("/EmpJobLoaded", false); // No se marca listo si la carga completa falló
         this._activeEmployeesLoaded = false;
         throw oError;
       });
@@ -1318,9 +1364,12 @@ sap.ui.define([
           });
 
         } catch (e) {
-          console.warn("No se pudieron cargar los managers desde EmpJob (inactivos):", e);
+          console.error("No se pudo completar la carga de datos SSFF para empleados inactivos:", e);
+          this._inactiveEmployeesLoaded = false;
+          throw e;
         }
 
+        this._inactiveAdministrativeUsers = this._prepareEmployeeDialogUsers(aUsers, { inactiveOnly: true });
         this.getView().setModel(new JSONModel({ InactiveUsers: aUsers }), "inactive");
         this._inactiveEmployeesLoaded = true;
         this.attachBoxEvents();
@@ -1368,13 +1417,21 @@ sap.ui.define([
         ? (oSourceModel?.getProperty("/InactiveUsers") || [])
         : (oSourceModel?.getProperty("/User") || []);
 
-      if (!Array.isArray(aUsers) || aUsers.length === 0) {
+      let aFilteredUsers = isInactive ? this._inactiveAdministrativeUsers : this._activeAdministrativeUsers;
+      if (!Array.isArray(aFilteredUsers) || !aFilteredUsers.length) {
+        aFilteredUsers = this._prepareEmployeeDialogUsers(aUsers, { inactiveOnly: isInactive });
+        if (isInactive) {
+          this._inactiveAdministrativeUsers = aFilteredUsers;
+        } else {
+          this._activeAdministrativeUsers = aFilteredUsers;
+        }
+      }
+
+      if ((!Array.isArray(aUsers) || aUsers.length === 0) && !aFilteredUsers.length) {
         console.error("No hay usuarios disponibles para el diálogo.");
         return;
       }
 
-      // Filtro base: solo Administrativos (aplica a todos los documentos Colombia actuales)
-      const aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
       if (!aFilteredUsers.length) {
         console.warn("No se encontraron usuarios Administrativos.");
       }
@@ -1516,21 +1573,26 @@ sap.ui.define([
       const oViewStateModel = oView.getModel("view");
       const isExColaborador = this._isInactiveDocumentTitle(this.sSelectedContract);
 
-      // Apunta la tabla al modelo correcto (activos o inactivos)
-      const oModel = isExColaborador ? oView.getModel("inactive") : oView.getModel();
-      const oTable = this.byId("idUserTable");
-      if (oTable.getModel() !== oModel) oTable.setModel(oModel);
-
       // Parte de la lista base definida al abrir el diálogo
+      const oModel = isExColaborador ? oView.getModel("inactive") : oView.getModel();
       const aBaseFromState = oViewStateModel?.getProperty("/BaseUsers");
       let filtered = Array.isArray(aBaseFromState) && aBaseFromState.length
         ? aBaseFromState
         : (isExColaborador
             ? (oModel.getProperty("/InactiveUsers") || [])
             : (oModel.getProperty("/User") || []));
+      const bHasDateFilter = !!(this._activeDateFilter?.dFrom && this._activeDateFilter?.dTo);
+      const sSearch = this._activeSearch?.trim() || "";
+
+      if (!bHasDateFilter && !sSearch) {
+        if (oViewStateModel?.getProperty("/FilteredUsers") !== filtered) {
+          oViewStateModel?.setProperty("/FilteredUsers", filtered);
+        }
+        return;
+      }
 
       // Filtro por rango de fechas
-      if (this._activeDateFilter?.dFrom && this._activeDateFilter?.dTo) {
+      if (bHasDateFilter) {
         const toUTC   = d => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         const utcFrom = toUTC(this._activeDateFilter.dFrom);
         const utcTo   = toUTC(this._activeDateFilter.dTo);
@@ -1547,11 +1609,11 @@ sap.ui.define([
       }
 
       // Filtro por texto (varias palabras funcionan como AND: el empleado debe coincidir con todas)
-      if (this._activeSearch?.trim()) {
+      if (sSearch) {
         const normalize = str =>
           str?.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
              .replace(/\s+/g, " ").trim().toLowerCase() || "";
-        const words = normalize(this._activeSearch).split(" ");
+        const words = normalize(sSearch).split(" ");
 
         filtered = filtered.filter(user =>
           words.every(word =>
@@ -1570,7 +1632,7 @@ sap.ui.define([
       oViewStateModel?.setProperty("/FilteredUsers", filtered);
 
       // Fuerza el refresco del binding para que UI5 actualice la tabla
-      const oItemsBinding = oTable.getBinding("items");
+      const oItemsBinding = this.byId("idUserTable")?.getBinding("items");
       if (typeof oItemsBinding?.refresh === "function") oItemsBinding.refresh();
     },
 

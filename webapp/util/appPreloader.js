@@ -2,14 +2,8 @@
   "use strict";
 
   var oTimer = null;
-  var oFailsafeTimer = null;
   var iProgress = 8;
   var iTarget = 84;
-
-  function clearFailsafeTimer() {
-    window.clearTimeout(oFailsafeTimer);
-    oFailsafeTimer = null;
-  }
 
   function updateProgress(iValue) {
     var oPreloader = document.getElementById("appPreloader");
@@ -41,24 +35,10 @@
         iTarget += 1;
       }
     }, 280);
-
-    oFailsafeTimer = window.setTimeout(function () {
-      if (typeof window.gmaHideAppPreloader === "function") {
-        window.gmaHideAppPreloader();
-      }
-    }, 20000);
   }
 
-  window.gmaHoldAppPreloader = function (iFailsafeMs) {
-    clearFailsafeTimer();
-
-    if (iFailsafeMs && iFailsafeMs > 0) {
-      oFailsafeTimer = window.setTimeout(function () {
-        if (typeof window.gmaHideAppPreloader === "function") {
-          window.gmaHideAppPreloader();
-        }
-      }, iFailsafeMs);
-    }
+  window.gmaHoldAppPreloader = function () {
+    // El preload inicial queda visible hasta que el controller llama a gmaHideAppPreloader().
   };
 
   window.gmaSetAppPreloaderStatus = function (sStatus, sCopy, iValue) {
@@ -91,7 +71,6 @@
     }
 
     window.clearInterval(oTimer);
-    clearFailsafeTimer();
     updateProgress(100);
 
     window.setTimeout(function () {

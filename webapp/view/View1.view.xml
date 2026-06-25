@@ -558,7 +558,7 @@
                             selectionChange="onSelectionChange"
                             inset="false"
                             mode="MultiSelect"
-                            items="{ path: 'view>/FilteredUsers', sorter: { path: 'lastName' } }"
+                            items="{ path: 'view>/FilteredUsers' }"
                         >
                             <columns>
                                 <Column id="_IDGenColumn1" width="20%">
