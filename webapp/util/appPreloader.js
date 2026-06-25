@@ -6,6 +6,11 @@
   var iProgress = 8;
   var iTarget = 84;
 
+  function clearFailsafeTimer() {
+    window.clearTimeout(oFailsafeTimer);
+    oFailsafeTimer = null;
+  }
+
   function updateProgress(iValue) {
     var oPreloader = document.getElementById("appPreloader");
     if (!oPreloader) {
@@ -41,8 +46,43 @@
       if (typeof window.gmaHideAppPreloader === "function") {
         window.gmaHideAppPreloader();
       }
-    }, 9000);
+    }, 20000);
   }
+
+  window.gmaHoldAppPreloader = function (iFailsafeMs) {
+    clearFailsafeTimer();
+
+    if (iFailsafeMs && iFailsafeMs > 0) {
+      oFailsafeTimer = window.setTimeout(function () {
+        if (typeof window.gmaHideAppPreloader === "function") {
+          window.gmaHideAppPreloader();
+        }
+      }, iFailsafeMs);
+    }
+  };
+
+  window.gmaSetAppPreloaderStatus = function (sStatus, sCopy, iValue) {
+    var oPreloader = document.getElementById("appPreloader");
+    if (!oPreloader) {
+      return;
+    }
+
+    var oStatus = oPreloader.querySelector(".appPreloader__status");
+    var oCopy = oPreloader.querySelector(".appPreloader__copy");
+
+    if (oStatus && sStatus) {
+      oStatus.textContent = sStatus;
+    }
+
+    if (oCopy && sCopy) {
+      oCopy.textContent = sCopy;
+    }
+
+    if (typeof iValue === "number") {
+      iTarget = Math.max(iTarget, Math.min(99, iValue));
+      updateProgress(iTarget);
+    }
+  };
 
   window.gmaHideAppPreloader = function () {
     var oPreloader = document.getElementById("appPreloader");
@@ -51,7 +91,7 @@
     }
 
     window.clearInterval(oTimer);
-    window.clearTimeout(oFailsafeTimer);
+    clearFailsafeTimer();
     updateProgress(100);
 
     window.setTimeout(function () {

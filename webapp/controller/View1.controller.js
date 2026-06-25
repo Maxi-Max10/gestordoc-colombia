@@ -225,6 +225,14 @@ sap.ui.define([
       });
     },
 
+    _isInactiveDocumentTitle: function (sTitle) {
+      return [
+        "Kit de Retiro",
+        "Certificado Laboral Excolaborador",
+        "Notificación Salida Ministerio"
+      ].includes(sTitle);
+    },
+
 
     // ═══════════════════════════════════════════════════════════════════
     // CARGA DE EMPLEADOS SEGÚN EL DOCUMENTO
@@ -239,13 +247,7 @@ sap.ui.define([
 
     _ensureDataForTitle: function (sTitle) {
 
-      // Documentos que usan empleados inactivos (excolaboradores)
-      const aInactiveTitles = [
-        "Kit de Retiro",
-        "Certificado Laboral Excolaborador",
-        "Notificación Salida Ministerio"
-      ];
-      const needsInactive = aInactiveTitles.includes(sTitle);
+      const needsInactive = this._isInactiveDocumentTitle(sTitle);
       const needsActive   = !needsInactive;
       const aPromises     = [];
 
@@ -265,6 +267,69 @@ sap.ui.define([
       return this._ensureDataForTitle(sTitle).then(() => {
         this._openDialogForTitle(sTitle); // El diálogo se abre solo cuando los datos ya están listos
       });
+    },
+
+    _preloadEmployeesForStartup: function () {
+      if (this._initialEmployeesPreloadRequest) {
+        return this._initialEmployeesPreloadRequest;
+      }
+
+      const aPreloads = [];
+      if (!this._activeEmployeesLoaded) {
+        aPreloads.push(this.loadEmployees({ suppressBusy: true, silent: true }));
+      }
+      if (!this._inactiveEmployeesLoaded) {
+        aPreloads.push(this.loadEmployeesBkp({ suppressBusy: true, silent: true }));
+      }
+
+      if (!aPreloads.length) {
+        return Promise.resolve();
+      }
+
+      this._initialEmployeesPreloadRequest = Promise.allSettled(aPreloads)
+        .then(aResults => {
+          const aRejected = aResults.filter(oResult => oResult.status === "rejected");
+          if (aRejected.length) {
+            console.warn("La precarga inicial de colaboradores terminó con errores:", aRejected.map(oResult => oResult.reason));
+          }
+          return aResults;
+        })
+        .finally(() => {
+          this._initialEmployeesPreloadRequest = null;
+        });
+
+      return this._initialEmployeesPreloadRequest;
+    },
+
+    _completeInitialPreload: function (bPreloadEmployees) {
+      if (this._initialPreloadCompletionRequest) {
+        return this._initialPreloadCompletionRequest;
+      }
+
+      if (bPreloadEmployees && typeof window.gmaHoldAppPreloader === "function") {
+        window.gmaHoldAppPreloader(45000);
+      }
+
+      if (bPreloadEmployees && typeof window.gmaSetAppPreloaderStatus === "function") {
+        window.gmaSetAppPreloaderStatus("Cargando colaboradores...", "Preparando tablas para abrir sin espera", 92);
+      }
+
+      let pPreload;
+      try {
+        pPreload = bPreloadEmployees ? this._preloadEmployeesForStartup() : Promise.resolve();
+      } catch (oError) {
+        console.error("No se pudo iniciar la precarga inicial de colaboradores:", oError);
+        pPreload = Promise.resolve();
+      }
+
+      this._initialPreloadCompletionRequest = pPreload.finally(() => {
+        if (bPreloadEmployees && typeof window.gmaSetAppPreloaderStatus === "function") {
+          window.gmaSetAppPreloaderStatus("Listo", "Tablas preparadas", 99);
+        }
+        this._hideInitialPreloader();
+      });
+
+      return this._initialPreloadCompletionRequest;
     },
 
 
@@ -287,6 +352,9 @@ sap.ui.define([
       // Crea una sola instancia del spinner de carga que se reutiliza durante toda la sesión
       this.oGlobalBusyDialog = new sap.m.BusyDialog();
       this._busyCounter      = 0; // Contador en 0: ninguna operación corriendo todavía
+      if (typeof window.gmaHoldAppPreloader === "function") {
+        window.gmaHoldAppPreloader(45000);
+      }
 
       // Modelo "view": guarda el estado de la interfaz (lista de usuarios, filtros, tema, etc.)
       const oViewModel = new JSONModel({
@@ -313,6 +381,8 @@ sap.ui.define([
       this._inactiveEmployeesLoaded  = false; // Idem para inactivos
       this._activeEmployeesRequest   = null;  // Promesa en curso (evita llamadas duplicadas)
       this._inactiveEmployeesRequest = null;
+      this._initialEmployeesPreloadRequest = null;
+      this._initialPreloadCompletionRequest = null;
       this._tilesEventsAttached      = false; // Evita registrar eventos de tiles más de una vez
       this._currentCategory          = null;  // Categoría del documento actualmente seleccionado
       this._activeSearch             = "";    // Texto actual del buscador de empleados
@@ -364,6 +434,13 @@ sap.ui.define([
         oViewModel.setProperty("/ThemeToggleText",    bDarkMode ? "☾" : "☀");
         oViewModel.setProperty("/ThemeToggleTooltip", bDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
       }
+
+      ["themeToggleButton", "mobileThemeToggleButton"].forEach(function (sButtonId) {
+        const oButton = this.byId(sButtonId);
+        if (oButton) {
+          oButton.toggleStyleClass("themeToggleButtonActive", bDarkMode);
+        }
+      }.bind(this));
 
       try {
         window.localStorage.setItem("gestordoccolombia-theme", bDarkMode ? "dark" : "light");
@@ -681,7 +758,7 @@ sap.ui.define([
             that.byId(sId)?.setVisible(bVisible);
           });
 
-          that._hideInitialPreloader(); // Ya se sabe qué mostrar: ocultar el splash
+          that._completeInitialPreload(bVisible); // Ya se sabe qué mostrar: precarga tablas y libera el splash
         },
 
         error: function (oError) {
@@ -710,7 +787,8 @@ sap.ui.define([
     //   - customLong1:    campo personalizado de SuccessFactors
     // ═══════════════════════════════════════════════════════════════════
 
-    loadEmployees: function () {
+    loadEmployees: function (mOptions) {
+      mOptions = mOptions || {};
       if (this._activeEmployeesRequest) return this._activeEmployeesRequest;
 
       const oComponentModel = this.getOwnerComponent().getModel();
@@ -760,13 +838,15 @@ sap.ui.define([
       // Bloquea el botón Descargar hasta que EmpJob termine
       oViewStateModel.setProperty("/EmpJobLoaded", false);
 
-      const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
+      const fnReadUsers = () => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
           "$filter": `status eq 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`,
           "$expand": sExpand
         }
-      })).then(async oUsers => {
+      });
+
+      const pFetch = (mOptions.suppressBusy ? Promise.resolve().then(fnReadUsers) : this._withBusy(fnReadUsers)).then(async oUsers => {
         const aUsers = Array.isArray(oUsers?.results) ? oUsers.results : [];
 
         const enrichedUsers = aUsers.map(user => {
@@ -977,7 +1057,9 @@ sap.ui.define([
 
       }).catch(oError => {
         console.error("Error cargando empleados activos:", oError);
-        MessageToast.show("Error cargando los datos.");
+        if (!mOptions.silent) {
+          MessageToast.show("Error cargando los datos.");
+        }
         oViewStateModel?.setProperty("/EmpJobLoaded", true); // Desbloquea igual si falla todo
         this._activeEmployeesLoaded = false;
         throw oError;
@@ -986,14 +1068,15 @@ sap.ui.define([
       this._activeEmployeesRequest = pFetch;
       pFetch.finally(() => {
         if (this._activeEmployeesRequest === pFetch) this._activeEmployeesRequest = null;
-      });
+      }).catch(() => {});
       return pFetch;
     },
 
 
     // Igual que loadEmployees, pero trae los empleados con status diferente de 't' (dados de baja).
     // Se usa para documentos que aplican a excolaboradores.
-    loadEmployeesBkp: function () {
+    loadEmployeesBkp: function (mOptions) {
+      mOptions = mOptions || {};
       if (this._inactiveEmployeesRequest) return this._inactiveEmployeesRequest;
 
       const oComponentModel = this.getOwnerComponent().getModel();
@@ -1038,13 +1121,15 @@ sap.ui.define([
         "empInfo/personNav/nationalIdNav/customString2Nav"
       ].join(",");
 
-      const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
+      const fnReadUsers = () => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
           "$filter": `status ne 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`, // ne 't' = no activo
           "$expand": sExpand
         }
-      })).then(async oData => {
+      });
+
+      const pFetch = (mOptions.suppressBusy ? Promise.resolve().then(fnReadUsers) : this._withBusy(fnReadUsers)).then(async oData => {
         const aUsers   = [];
         const aResults = Array.isArray(oData?.results) ? oData.results : [];
 
@@ -1241,7 +1326,9 @@ sap.ui.define([
         this.attachBoxEvents();
 
       }).catch(oError => {
-        MessageToast.show("Error al cargar empleados dados de baja.");
+        if (!mOptions.silent) {
+          MessageToast.show("Error al cargar empleados dados de baja.");
+        }
         console.error(oError);
         this._inactiveEmployeesLoaded = false;
         throw oError;
@@ -1250,7 +1337,7 @@ sap.ui.define([
       this._inactiveEmployeesRequest = pFetch;
       pFetch.finally(() => {
         if (this._inactiveEmployeesRequest === pFetch) this._inactiveEmployeesRequest = null;
-      });
+      }).catch(() => {});
       return pFetch;
     },
 
@@ -1275,7 +1362,7 @@ sap.ui.define([
       }
 
       // Decide si mostrar activos o inactivos según el documento
-      const isInactive   = sTitle === "Kit de Retiro";
+      const isInactive   = this._isInactiveDocumentTitle(sTitle);
       const oSourceModel = isInactive ? oView.getModel("inactive") : oView.getModel();
       const aUsers       = isInactive
         ? (oSourceModel?.getProperty("/InactiveUsers") || [])
@@ -1427,8 +1514,7 @@ sap.ui.define([
     _applyCombinedFilters: function () {
       const oView           = this.getView();
       const oViewStateModel = oView.getModel("view");
-      const isExColaborador = this.sSelectedContract === "Certificado Laboral Excolaborador" ||
-                              this.sSelectedContract === "Notificación Salida Ministerio";
+      const isExColaborador = this._isInactiveDocumentTitle(this.sSelectedContract);
 
       // Apunta la tabla al modelo correcto (activos o inactivos)
       const oModel = isExColaborador ? oView.getModel("inactive") : oView.getModel();

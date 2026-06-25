@@ -2,8 +2,6 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:tnt="sap.tnt"
-    xmlns:micro="sap.suite.ui.microchart"
     controllerName="gestordoccolombia.controller.View1"
 >
     <Shell
@@ -70,7 +68,7 @@
                         id="_IDGenTitle"
                         text="Gestión de Documentos"
                         titleStyle="H4"
-                        textAlign="Left"
+                        textAlign="Center"
                         class="sectionTitle"
                     />
                     <SearchField

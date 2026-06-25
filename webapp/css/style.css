@@ -32,7 +32,7 @@ html,
 .sapMShell, .sapMShellBG, .sapMShellGlobalOuterBackground {
     background: transparent !important;
   }
-  
+
   #contentContainer {
     background: none !important;
     box-shadow: none !important;
@@ -56,19 +56,22 @@ html,
 }
 
 .customTable th {
-    background-color: #d3d3d3 !important; 
+    background-color: #d3d3d3 !important;
+
 }
 
 .blurredBackground {
     filter: blur(5px);
     transition: filter 0.3s ease;
-    pointer-events: none; 
+    pointer-events: none;
+
 }
 
 .greetingText {
     font-family: var(--app-font-family) !important;
     font-size: 1.75rem;
-    font-weight: 700; 
+    font-weight: 700;
+
     color: #123766;
     padding: 0;
     border-radius: 0;
@@ -107,7 +110,7 @@ html,
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(244, 246, 248, 0.78) 0%, rgba(244, 246, 248, 0.58) 21%, rgba(244, 246, 248, 0.30) 48%, rgba(244, 246, 248, 0) 76%),
+    linear-gradient(90deg, rgba(244, 246, 248, 0.952) 0%, rgba(244, 246, 248, 0.58) 21%, rgba(244, 246, 248, 0.30) 48%, rgba(244, 246, 248, 0) 76%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 62%);
 }
 
@@ -162,21 +165,11 @@ html,
   letter-spacing: 0 !important;
 }
 
-/* Asegura que el Grid tenga el tamaño adecuado */
-.customGrid {
-    position: relative;
-    z-index: 4;
-    margin-top: 1.1rem;
-    max-width: none;
-    padding: 0 var(--page-gutter) !important;
-    box-sizing: border-box;
-}
-
 .documentsHeader {
   width: auto !important;
   display: flex !important;
   justify-content: center !important;
-  margin: 1.75rem calc(var(--page-gutter) + 0.5rem) 1.35rem calc(var(--page-gutter) + 0.5rem) !important;
+  margin: 1.15rem calc(var(--page-gutter) + 0.5rem) 1.25rem calc(var(--page-gutter) + 0.5rem) !important;
   gap: 1rem;
   flex-wrap: nowrap;
   box-sizing: border-box;
@@ -192,7 +185,7 @@ html,
   justify-content: center;
   width: auto !important;
   margin: 0 auto !important;
-  padding: 0 0 0.72rem !important;
+  padding: 0 0 0.56rem !important;
   position: relative;
   font-family: var(--app-font-family) !important;
   font-size: clamp(1.45rem, 1.85vw, 2rem) !important;
@@ -491,7 +484,7 @@ html,
     align-items: center !important;
     justify-content: center !important;
     gap: 0.7rem;
-    margin: 1.2rem var(--page-gutter) 1rem var(--page-gutter) !important;
+    margin: 0.9rem var(--page-gutter) 0.95rem var(--page-gutter) !important;
     padding: 0 !important;
     text-align: center;
   }
@@ -501,7 +494,7 @@ html,
     max-width: 100% !important;
     font-size: clamp(1.18rem, 5.2vw, 1.42rem) !important;
     line-height: 1.18 !important;
-    padding-bottom: 0.62rem !important;
+    padding-bottom: 0.48rem !important;
     text-align: center !important;
   }
 
@@ -630,16 +623,6 @@ html,
     position: relative !important;
 }
 
-/* Contenedor VBox dentro de CustomListItem */
-.interactiveBox {
-    width: 100% !important;
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    justify-content: flex-start !important;
-}
-
 /* Efecto hover */
 .customListItem:hover {
     transform: translateY(-4px) !important;
@@ -647,69 +630,13 @@ html,
     cursor: pointer !important;
 }
 
-/* Ícono dentro del ítem */
-.customIcon {
-    font-size: 2.5rem !important;
-    color: white !important;
-    margin-bottom: 1rem !important;
-    display: block !important;
-    flex-shrink: 0 !important;
-}
-
-/* Texto centrado debajo del icono */
-.customText {
-    font-size: 0.95rem !important;
-    font-weight: 600 !important;
-    color: white !important;
-    text-align: left !important;
-    overflow-wrap: break-word !important;
-    cursor: pointer !important;
-    line-height: 1.4 !important;
-    margin: 0 !important;
-    flex-shrink: 0 !important;
-}
-
-/* Descripción secundaria en las tarjetas */
-.customDescription {
-    font-size: 0.75rem !important;
-    font-weight: 400 !important;
-    color: rgba(255, 255, 255, 0.8) !important;
-    text-align: left !important;
-    overflow-wrap: break-word !important;
-    cursor: pointer !important;
-    line-height: 1.3 !important;
-    margin-top: 0.5rem !important;
-    margin-bottom: 0 !important;
-    flex-shrink: 0 !important;
-}
-
-
-/* Colores personalizados por clase */
-.blue { background-color: #0057D2 !important; }
-.pink { background-color: #DF1278 !important; }
-.teal { background-color: #078387 !important; }
-.purple { background-color: #7858FF !important; }
-.gray { background-color: #5B738B !important; }
-
-
-
 /* Contenedor general del Dialog */
 .dialogContainer {
     width: 100%;
     padding: 0rem;
     box-sizing: border-box;
   }
-  
-  /* HBox contenedor de filtros */
-  .filterBar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-  
+
   /* Asegura que los inputs usen bien el espacio */
   #searchField,
   #dateRange {
@@ -1564,37 +1491,64 @@ html,
 /* --- Theme toggle and dark mode --- */
 .themeToggleButton.sapMBtn {
   flex: 0 0 auto !important;
-  width: 2.85rem !important;
-  min-width: 2.85rem !important;
-  height: 1.35rem !important;
+  width: 3.05rem !important;
+  min-width: 3.05rem !important;
+  height: 1.45rem !important;
   margin-left: 0.75rem !important;
   padding: 0 !important;
 }
 
 .themeToggleButton .sapMBtnInner {
-  width: 2.85rem !important;
-  min-width: 2.85rem !important;
-  height: 1.35rem !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  background: #151922 !important;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09), 0 5px 14px rgba(18, 55, 102, 0.18) !important;
+  width: 3.05rem !important;
+  min-width: 3.05rem !important;
+  height: 1.45rem !important;
+  padding: 2px 5px !important;
+  cursor: pointer;
+  box-sizing: border-box !important;
+  border-radius: 540px !important;
+  border: 2px solid #999999 !important;
+  background: rgba(255, 255, 255, 0.46) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  position: relative !important;
+  transition: background-color 500ms ease, border-color 500ms ease, box-shadow 500ms ease;
+}
+
+.themeToggleButton .sapMBtnInner::before,
+.themeToggleButton .sapMBtnInner::after {
+  content: none !important;
+  display: none !important;
 }
 
 .themeToggleButton .sapMBtnContent {
   display: block !important;
-  height: 1.35rem !important;
-  line-height: 1.28rem !important;
-  color: #ffb000 !important;
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 0.95rem !important;
-  font-weight: 700 !important;
-  text-align: center !important;
+  position: absolute !important;
+  inset: 0 !important;
+  height: 100% !important;
+  line-height: 0 !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none;
+}
+
+.themeToggleButton .sapMBtnContent::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0.27rem;
+  width: 0.82rem;
+  height: 0.82rem;
+  border-radius: 100%;
+  background-color: #999999;
+  box-shadow: none;
+  transform: translate(1.55rem, -50%);
+  transition: transform 500ms ease, background-color 500ms ease;
 }
 
 .themeToggleButton:hover .sapMBtnInner {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.17), 0 7px 18px rgba(18, 55, 102, 0.22) !important;
+  border-color: #858585 !important;
+  background: rgba(255, 255, 255, 0.58) !important;
 }
 
 .mobileHeaderMenuButton.sapMBtn {
@@ -1875,17 +1829,24 @@ html.gdDarkMode .sapUiBody,
   box-shadow: inset 0 0 0 1px rgba(142, 199, 255, 0.2) !important;
 }
 
+.themeToggleButton.themeToggleButtonActive .sapMBtnInner,
 .gdDarkMode .themeToggleButton .sapMBtnInner {
-  background: #ffffff !important;
-  box-shadow: inset 0 0 0 1px rgba(215, 226, 239, 0.9), 0 6px 16px rgba(0, 0, 0, 0.28) !important;
+  border-color: #404040 !important;
+  background: #252a29 !important;
+  box-shadow: none !important;
 }
 
-.gdDarkMode .themeToggleButton .sapMBtnContent {
-  color: #ffd22e !important;
+.themeToggleButton.themeToggleButtonActive .sapMBtnContent::before,
+.gdDarkMode .themeToggleButton .sapMBtnContent::before {
+  background-color: #ffffff;
+  transform: translate(0, -50%);
 }
 
+.themeToggleButton.themeToggleButtonActive:hover .sapMBtnInner,
 .gdDarkMode .themeToggleButton:hover .sapMBtnInner {
-  box-shadow: inset 0 0 0 1px rgba(184, 203, 225, 0.95), 0 8px 18px rgba(0, 0, 0, 0.36) !important;
+  border-color: #555555 !important;
+  background: #2d3331 !important;
+  box-shadow: none !important;
 }
 
 .gdDarkMode .mobileHeaderMenuButton .sapMBtnInner {
@@ -1943,10 +1904,11 @@ html.gdDarkMode .sapUiBody,
 }
 
 .gdDarkMode .sectionTitle {
-  background: linear-gradient(90deg, #eef5ff 0%, #b8d8ff 55%, #74b8ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: #ffffff !important;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
 }
 
@@ -2332,7 +2294,6 @@ html.gdDarkMode .sapUiBody,
 .card-rose    { --card-color: #dc4a65; --card-color-strong: #ba304c; }
 .card-emerald { --card-color: #1d9b73; --card-color-strong: #147957; }
 .card-sky     { --card-color: #2384bf; --card-color-strong: #176598; }
-
 
 /* --- Smooth theme transitions --- */
 .imageContainer,
