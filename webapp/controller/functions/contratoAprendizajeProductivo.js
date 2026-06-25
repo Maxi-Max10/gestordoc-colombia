@@ -1411,7 +1411,7 @@ sap.ui.define([
                     if (pageIndex === contentBlocks.length - 1) {
                         newPage.drawText("[[FIRMA_EMPLEADO]]", {
                             x: width * 0.63,
-                            y: 210,
+                            y: 110,
                             size: 6,
                             color: PDFLibRef.rgb(1, 1, 1)
                         });
