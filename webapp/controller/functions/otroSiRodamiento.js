@@ -4,7 +4,11 @@ sap.ui.define([
 ], function (MessageToast, wordGenerator) {
     "use strict";
 
-    async function onDownloadPDFOtroSiRodamiento(oController, sButtonId) {
+    async function onDownloadPDFOtroSiRodamiento(oController, sButtonId, mOptions) {
+        const oOptions = mOptions || {};
+        const bReturnPdfDocuments = !!oOptions.returnPdfDocuments;
+        const aGeneratedPdfDocuments = [];
+
         try {
             await oController._ensurePdfToolkit();
 
@@ -164,6 +168,15 @@ sap.ui.define([
                         width:  drawW,
                         height: drawH
                     });
+
+                    if (p === totalPgs - 1) {
+                        pg.drawText("[[FIRMA_EMPLEADO]]", {
+                            x: PAGE_W * 0.60,
+                            y: 183,
+                            size: 10,
+                            color: PDFLibRef.rgb(1, 1, 1)
+                        });
+                    }
                 }
 
                 const pdfBytes = await pdfDoc.save();
@@ -171,11 +184,20 @@ sap.ui.define([
 
                 const fileName = `${user.firstName}_${user.lastName}_OtroSi_Rodamiento.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });
+                if (bReturnPdfDocuments) {
+                    aGeneratedPdfDocuments.push({ user, fileName, blob, pdfBytes });
+                    continue;
+                }
+
                 const link     = document.createElement("a");
                 link.href      = URL.createObjectURL(blob);
                 link.download  = fileName;
                 link.click();
                 URL.revokeObjectURL(link.href);
+            }
+
+            if (bReturnPdfDocuments) {
+                return aGeneratedPdfDocuments;
             }
 
             if (!sButtonId.includes("wordDataInfo")) {
@@ -187,10 +209,94 @@ sap.ui.define([
             }
 
         } catch (error) {
+            if (oOptions.throwErrors) {
+                throw error;
+            }
             console.error("Error generando Otro Sí - Rodamiento:", error);
             MessageToast.show("Error generando el documento: " + error.message);
         }
     }
 
-    return { onDownloadPDFOtroSiRodamiento };
+    // ─── Word con JSZip + plantilla OtroSi_Rodamiento.docx ──────────────────
+    async function _generateWord(data) {
+        const JSZip         = await _ensureJSZip();
+        const templateBytes = await fetch("pdf/Otro_Si_Rodamiento.docx").then(res => {
+        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Rodamiento.docx (${res.status})`);
+            return res.arrayBuffer();
+        });
+        const zip = await JSZip.loadAsync(templateBytes);
+
+        const variables = {
+            "[[Nombre]]":           data.sNombre,
+            "[[Cedula]]":           data.sCedula,
+            "[[Identificado]]":     data.sIdentificado,
+            "[[CiudadFirma]]":      data.sCiudadWork,
+            "[[Fecha]]":            data.localDate
+        };
+
+        const targets = [
+            "word/document.xml",
+            "word/header1.xml",
+            "word/header2.xml",
+            "word/footer1.xml",
+            "word/footer2.xml"
+        ];
+
+        for (const path of targets) {
+            if (zip.files[path]) {
+                let xml = await zip.files[path].async("string");
+                for (const [key, value] of Object.entries(variables)) {
+                    xml = xml.split(key).join(_escXml(value));
+                    const frag = new RegExp(
+                        "\\[\\[" +
+                        key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
+                        "\\]\\]", "g"
+                    );
+                    xml = xml.replace(frag, _escXml(value));
+                }
+                zip.file(path, xml);
+            }
+        }
+
+        const blob = await zip.generateAsync({ type: "blob" });
+        const link = document.createElement("a");
+        link.href  = URL.createObjectURL(blob);
+        link.download = `${data.firstName}_${data.lastName}_OtroSi_Rodamiento.docx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+
+        MessageToast.show("Documento Word generado correctamente.");
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
+
+    function _escXml(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function _ensureJSZip() {
+        if (window.JSZip) return Promise.resolve(window.JSZip);
+        return new Promise((resolve, reject) => {
+            const script    = document.createElement("script");
+            script.src      = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+            script.onload   = () => resolve(window.JSZip);
+            script.onerror  = () => reject(new Error("No se pudo cargar JSZip."));
+            document.head.appendChild(script);
+        });
+    }
+    return {
+        onDownloadPDFOtroSiRodamiento,
+        generatePdfDocuments: function (oController) {
+            return onDownloadPDFOtroSiRodamiento(oController, "pdfDataInfo", {
+                returnPdfDocuments: true,
+                throwErrors: true
+            });
+        }
+    };
 });

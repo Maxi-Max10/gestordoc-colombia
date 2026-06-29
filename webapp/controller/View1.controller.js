@@ -36,8 +36,18 @@ sap.ui.define([
     protocoloRecibo, contratoIndefIntegral, contratoTerminoFijo, contratoTerminoIndef, contratoAprendizajeLectivo, contratoAprendizajeProductivo, CpiService) => {
   "use strict";
 
-  // Extiende el Controller base de SAPUI5 y devuelve la clase de este controller,
-  // identificada con el nombre completo "gestordoccolombia.controller.View1"
+  const DOCUSIGN_DOCUMENTS = {
+    contratoTerminoFijo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_TERMINO_FIJO, generator: contratoTerminoFijo.generatePdfDocuments },
+    contratoTerminoIndef: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_TERMINO_INDEFINIDO, generator: contratoTerminoIndef.generatePdfDocuments },
+    contratoAprendizajeLectivo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_LECTIVO, generator: contratoAprendizajeLectivo.generatePdfDocuments },
+    contratoAprendizajeProductivo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_PRODUCTIVO, generator: contratoAprendizajeProductivo.generatePdfDocuments },
+    contratoIndefIntegral: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_INDEFINIDO_INTEGRAL, generator: contratoIndefIntegral.generatePdfDocuments },
+    otroSiAlimentacion10: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_10000, generator: otroSiAlimentacion10.generatePdfDocuments },
+    otroSiAlimentacion11: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_11500, generator: otroSiAlimentacion11.generatePdfDocuments },
+    otroSiAlimentacion15: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_15000, generator: otroSiAlimentacion15.generatePdfDocuments },
+    otroSiRodamiento: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_RODAMIENTO, generator: otroSiRodamiento.generatePdfDocuments }
+  };
+
   return Controller.extend("gestordoccolombia.controller.View1", {
 
     // ═══════════════════════════════════════════════════════════════════
@@ -215,6 +225,33 @@ sap.ui.define([
       });
     },
 
+    _isInactiveDocumentTitle: function (sTitle) {
+      return [
+        "Kit de Retiro",
+        "Certificado Laboral Excolaborador",
+        "Notificación Salida Ministerio"
+      ].includes(sTitle);
+    },
+
+    _compareEmployeeNames: function (aUser, bUser) {
+      const sALast  = String(aUser?.lastName || "");
+      const sBLast  = String(bUser?.lastName || "");
+      const sAFirst = String(aUser?.firstName || "");
+      const sBFirst = String(bUser?.firstName || "");
+
+      return sALast.localeCompare(sBLast, "es", { sensitivity: "base" }) ||
+        sAFirst.localeCompare(sBFirst, "es", { sensitivity: "base" });
+    },
+
+    _prepareEmployeeDialogUsers: function (aUsers, mOptions) {
+      const bInactiveOnly = !!mOptions?.inactiveOnly;
+
+      return (Array.isArray(aUsers) ? aUsers : [])
+        .filter(user => user.custom02 === "Administrativo" && (!bInactiveOnly || user.status !== "t"))
+        .slice()
+        .sort(this._compareEmployeeNames.bind(this));
+    },
+
 
     // ═══════════════════════════════════════════════════════════════════
     // CARGA DE EMPLEADOS SEGÚN EL DOCUMENTO
@@ -229,13 +266,7 @@ sap.ui.define([
 
     _ensureDataForTitle: function (sTitle) {
 
-      // Documentos que usan empleados inactivos (excolaboradores)
-      const aInactiveTitles = [
-        "Kit de Retiro",
-        "Certificado Laboral Excolaborador",
-        "Notificación Salida Ministerio"
-      ];
-      const needsInactive = aInactiveTitles.includes(sTitle);
+      const needsInactive = this._isInactiveDocumentTitle(sTitle);
       const needsActive   = !needsInactive;
       const aPromises     = [];
 
@@ -255,6 +286,83 @@ sap.ui.define([
       return this._ensureDataForTitle(sTitle).then(() => {
         this._openDialogForTitle(sTitle); // El diálogo se abre solo cuando los datos ya están listos
       });
+    },
+
+    _preloadEmployeesForStartup: function () {
+      if (this._initialEmployeesPreloadRequest) {
+        return this._initialEmployeesPreloadRequest;
+      }
+
+      const aPreloads = [];
+      if (!this._activeEmployeesLoaded) {
+        aPreloads.push(this.loadEmployees({ suppressBusy: true, silent: true }));
+      }
+      if (!this._inactiveEmployeesLoaded) {
+        aPreloads.push(this.loadEmployeesBkp({ suppressBusy: true, silent: true }));
+      }
+
+      if (!aPreloads.length) {
+        return Promise.resolve();
+      }
+
+      this._initialEmployeesPreloadRequest = Promise.all(aPreloads)
+        .finally(() => {
+          this._initialEmployeesPreloadRequest = null;
+        });
+
+      return this._initialEmployeesPreloadRequest;
+    },
+
+    _completeInitialPreload: function (bPreloadEmployees) {
+      if (this._initialPreloadCompletionRequest) {
+        return this._initialPreloadCompletionRequest;
+      }
+
+      if (bPreloadEmployees && typeof window.gmaHoldAppPreloader === "function") {
+        window.gmaHoldAppPreloader();
+      }
+
+      if (bPreloadEmployees && typeof window.gmaSetAppPreloaderStatus === "function") {
+        window.gmaSetAppPreloaderStatus("Cargando colaboradores...", "Preparando tablas para abrir sin espera", 92);
+      }
+
+      let pPreload;
+      try {
+        pPreload = bPreloadEmployees ? this._preloadEmployeesForStartup() : Promise.resolve();
+      } catch (oError) {
+        console.error("No se pudo iniciar la precarga inicial de colaboradores:", oError);
+        pPreload = Promise.reject(oError);
+      }
+
+      this._initialPreloadCompletionRequest = pPreload.then(() => {
+        if (bPreloadEmployees && typeof window.gmaSetAppPreloaderStatus === "function") {
+          window.gmaSetAppPreloaderStatus("Listo", "Tablas preparadas", 99);
+        }
+        this._hideInitialPreloader();
+      }).catch(oError => {
+        this._showInitialPreloadError(
+          "Error cargando colaboradores",
+          "No se pudo completar la carga de usuarios de SuccessFactors.",
+          oError
+        );
+      });
+
+      return this._initialPreloadCompletionRequest;
+    },
+
+
+    _showInitialPreloadError: function (sStatus, sCopy, oError) {
+      if (oError) {
+        console.error(oError);
+      }
+
+      if (typeof window.gmaHoldAppPreloader === "function") {
+        window.gmaHoldAppPreloader();
+      }
+
+      if (typeof window.gmaSetAppPreloaderStatus === "function") {
+        window.gmaSetAppPreloaderStatus(sStatus, sCopy, 99);
+      }
     },
 
 
@@ -277,6 +385,9 @@ sap.ui.define([
       // Crea una sola instancia del spinner de carga que se reutiliza durante toda la sesión
       this.oGlobalBusyDialog = new sap.m.BusyDialog();
       this._busyCounter      = 0; // Contador en 0: ninguna operación corriendo todavía
+      if (typeof window.gmaHoldAppPreloader === "function") {
+        window.gmaHoldAppPreloader();
+      }
 
       // Modelo "view": guarda el estado de la interfaz (lista de usuarios, filtros, tema, etc.)
       const oViewModel = new JSONModel({
@@ -301,8 +412,12 @@ sap.ui.define([
       this.aSelectedEmployees        = [];    // Empleados seleccionados en la tabla
       this._activeEmployeesLoaded    = false; // Evita recargar empleados activos si ya se trajeron
       this._inactiveEmployeesLoaded  = false; // Idem para inactivos
+      this._activeAdministrativeUsers = [];
+      this._inactiveAdministrativeUsers = [];
       this._activeEmployeesRequest   = null;  // Promesa en curso (evita llamadas duplicadas)
       this._inactiveEmployeesRequest = null;
+      this._initialEmployeesPreloadRequest = null;
+      this._initialPreloadCompletionRequest = null;
       this._tilesEventsAttached      = false; // Evita registrar eventos de tiles más de una vez
       this._currentCategory          = null;  // Categoría del documento actualmente seleccionado
       this._activeSearch             = "";    // Texto actual del buscador de empleados
@@ -354,6 +469,13 @@ sap.ui.define([
         oViewModel.setProperty("/ThemeToggleText",    bDarkMode ? "☾" : "☀");
         oViewModel.setProperty("/ThemeToggleTooltip", bDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
       }
+
+      ["themeToggleButton", "mobileThemeToggleButton"].forEach(function (sButtonId) {
+        const oButton = this.byId(sButtonId);
+        if (oButton) {
+          oButton.toggleStyleClass("themeToggleButtonActive", bDarkMode);
+        }
+      }.bind(this));
 
       try {
         window.localStorage.setItem("gestordoccolombia-theme", bDarkMode ? "dark" : "light");
@@ -598,17 +720,24 @@ sap.ui.define([
         that.getUserCompany(userId).then(function (sCompany) {
           UseroModel.setProperty("/company", sCompany);
           that.getDataUser(userId);
-        }).catch(function () {
+        }).catch(function (oError) {
           MessageToast.show("Error al obtener información de la empresa.");
           that.oGlobalBusyDialog.close();
-          that._hideInitialPreloader(); // Aunque falle, hay que ocultar el splash igual
+          that._showInitialPreloadError(
+            "Error cargando empresa",
+            "No se pudo completar la carga inicial desde SuccessFactors.",
+            oError
+          );
         });
       });
 
-      UseroModel.attachRequestFailed(function () {
-        // Si ni siquiera se puede obtener el usuario, libera la UI igual
+      UseroModel.attachRequestFailed(function (oError) {
         that.oGlobalBusyDialog.close();
-        that._hideInitialPreloader();
+        that._showInitialPreloadError(
+          "Error cargando usuario",
+          "No se pudo obtener el usuario actual para iniciar la carga de SSFF.",
+          oError
+        );
       });
     },
 
@@ -671,13 +800,16 @@ sap.ui.define([
             that.byId(sId)?.setVisible(bVisible);
           });
 
-          that._hideInitialPreloader(); // Ya se sabe qué mostrar: ocultar el splash
+          that._completeInitialPreload(bVisible); // Ya se sabe qué mostrar: precarga tablas y libera el splash
         },
 
         error: function (oError) {
           MessageToast.show("Error al leer grupo de usuario.");
-          console.error(oError);
-          that._hideInitialPreloader();
+          that._showInitialPreloadError(
+            "Error cargando permisos",
+            "No se pudieron validar permisos ni completar la carga inicial de SSFF.",
+            oError
+          );
         }
       });
     },
@@ -700,7 +832,8 @@ sap.ui.define([
     //   - customLong1:    campo personalizado de SuccessFactors
     // ═══════════════════════════════════════════════════════════════════
 
-    loadEmployees: function () {
+    loadEmployees: function (mOptions) {
+      mOptions = mOptions || {};
       if (this._activeEmployeesRequest) return this._activeEmployeesRequest;
 
       const oComponentModel = this.getOwnerComponent().getModel();
@@ -750,13 +883,15 @@ sap.ui.define([
       // Bloquea el botón Descargar hasta que EmpJob termine
       oViewStateModel.setProperty("/EmpJobLoaded", false);
 
-      const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
+      const fnReadUsers = () => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
           "$filter": `status eq 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`,
           "$expand": sExpand
         }
-      })).then(async oUsers => {
+      });
+
+      const pFetch = (mOptions.suppressBusy ? Promise.resolve().then(fnReadUsers) : this._withBusy(fnReadUsers)).then(async oUsers => {
         const aUsers = Array.isArray(oUsers?.results) ? oUsers.results : [];
 
         const enrichedUsers = aUsers.map(user => {
@@ -955,23 +1090,26 @@ sap.ui.define([
           // Actualiza el modelo con los datos de EmpJob sin reemplazar el modelo entero
           this.getView().getModel().setProperty("/User", enrichedUsers);
 
+          this._activeAdministrativeUsers = this._prepareEmployeeDialogUsers(enrichedUsers);
+
           // Habilita el botón Descargar y marca la carga como completa
           oViewStateModel.setProperty("/EmpJobLoaded", true);
           this._activeEmployeesLoaded = true;
           return enrichedUsers;
 
         } catch (e) {
-          console.warn("No se pudieron cargar los managers desde EmpJob:", e);
-          // Habilita igual para no dejar el botón bloqueado para siempre
-          oViewStateModel.setProperty("/EmpJobLoaded", true);
-          this._activeEmployeesLoaded = true;
-          return enrichedUsers;
+          console.error("No se pudo completar la carga de datos SSFF para empleados activos:", e);
+          oViewStateModel.setProperty("/EmpJobLoaded", false);
+          this._activeEmployeesLoaded = false;
+          throw e;
         }
 
       }).catch(oError => {
         console.error("Error cargando empleados activos:", oError);
-        MessageToast.show("Error cargando los datos.");
-        oViewStateModel?.setProperty("/EmpJobLoaded", true); // Desbloquea igual si falla todo
+        if (!mOptions.silent) {
+          MessageToast.show("Error cargando los datos.");
+        }
+        oViewStateModel?.setProperty("/EmpJobLoaded", false); // No se marca listo si la carga completa falló
         this._activeEmployeesLoaded = false;
         throw oError;
       });
@@ -979,14 +1117,15 @@ sap.ui.define([
       this._activeEmployeesRequest = pFetch;
       pFetch.finally(() => {
         if (this._activeEmployeesRequest === pFetch) this._activeEmployeesRequest = null;
-      });
+      }).catch(() => {});
       return pFetch;
     },
 
 
     // Igual que loadEmployees, pero trae los empleados con status diferente de 't' (dados de baja).
     // Se usa para documentos que aplican a excolaboradores.
-    loadEmployeesBkp: function () {
+    loadEmployeesBkp: function (mOptions) {
+      mOptions = mOptions || {};
       if (this._inactiveEmployeesRequest) return this._inactiveEmployeesRequest;
 
       const oComponentModel = this.getOwnerComponent().getModel();
@@ -1031,13 +1170,15 @@ sap.ui.define([
         "empInfo/personNav/nationalIdNav/customString2Nav"
       ].join(",");
 
-      const pFetch = this._withBusy(() => this._readOData(oComponentModel, "/User", {
+      const fnReadUsers = () => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
           "$filter": `status ne 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`, // ne 't' = no activo
           "$expand": sExpand
         }
-      })).then(async oData => {
+      });
+
+      const pFetch = (mOptions.suppressBusy ? Promise.resolve().then(fnReadUsers) : this._withBusy(fnReadUsers)).then(async oData => {
         const aUsers   = [];
         const aResults = Array.isArray(oData?.results) ? oData.results : [];
 
@@ -1228,15 +1369,20 @@ sap.ui.define([
           });
 
         } catch (e) {
-          console.warn("No se pudieron cargar los managers desde EmpJob (inactivos):", e);
+          console.error("No se pudo completar la carga de datos SSFF para empleados inactivos:", e);
+          this._inactiveEmployeesLoaded = false;
+          throw e;
         }
 
+        this._inactiveAdministrativeUsers = this._prepareEmployeeDialogUsers(aUsers, { inactiveOnly: true });
         this.getView().setModel(new JSONModel({ InactiveUsers: aUsers }), "inactive");
         this._inactiveEmployeesLoaded = true;
         this.attachBoxEvents();
 
       }).catch(oError => {
-        MessageToast.show("Error al cargar empleados dados de baja.");
+        if (!mOptions.silent) {
+          MessageToast.show("Error al cargar empleados dados de baja.");
+        }
         console.error(oError);
         this._inactiveEmployeesLoaded = false;
         throw oError;
@@ -1245,7 +1391,7 @@ sap.ui.define([
       this._inactiveEmployeesRequest = pFetch;
       pFetch.finally(() => {
         if (this._inactiveEmployeesRequest === pFetch) this._inactiveEmployeesRequest = null;
-      });
+      }).catch(() => {});
       return pFetch;
     },
 
@@ -1270,19 +1416,27 @@ sap.ui.define([
       }
 
       // Decide si mostrar activos o inactivos según el documento
-      const isInactive   = sTitle === "Kit de Retiro";
+      const isInactive   = this._isInactiveDocumentTitle(sTitle);
       const oSourceModel = isInactive ? oView.getModel("inactive") : oView.getModel();
       const aUsers       = isInactive
         ? (oSourceModel?.getProperty("/InactiveUsers") || [])
         : (oSourceModel?.getProperty("/User") || []);
 
-      if (!Array.isArray(aUsers) || aUsers.length === 0) {
+      let aFilteredUsers = isInactive ? this._inactiveAdministrativeUsers : this._activeAdministrativeUsers;
+      if (!Array.isArray(aFilteredUsers) || !aFilteredUsers.length) {
+        aFilteredUsers = this._prepareEmployeeDialogUsers(aUsers, { inactiveOnly: isInactive });
+        if (isInactive) {
+          this._inactiveAdministrativeUsers = aFilteredUsers;
+        } else {
+          this._activeAdministrativeUsers = aFilteredUsers;
+        }
+      }
+
+      if ((!Array.isArray(aUsers) || aUsers.length === 0) && !aFilteredUsers.length) {
         console.error("No hay usuarios disponibles para el diálogo.");
         return;
       }
 
-      // Filtro base: solo Administrativos (aplica a todos los documentos Colombia actuales)
-      const aFilteredUsers = aUsers.filter(user => user.custom02 === "Administrativo");
       if (!aFilteredUsers.length) {
         console.warn("No se encontraron usuarios Administrativos.");
       }
@@ -1307,17 +1461,7 @@ sap.ui.define([
 
 
     _shouldShowDocuSignButton: function () {
-      return [
-        "contratoTerminoFijo",
-        "contratoTerminoIndef",
-        "contratoAprendizajeLectivo",
-        "contratoAprendizajeProductivo",
-        "contratoIndefIntegral",
-        "otroSiAlimentacion10",
-        "otroSiAlimentacion11",
-        "otroSiAlimentacion15",
-        "otroSiRodamiento"
-      ].indexOf(this._currentCategory) > -1;
+      return !!DOCUSIGN_DOCUMENTS[this._currentCategory];
     },
 
     _getDocumentPresentation: function () {
@@ -1432,24 +1576,28 @@ sap.ui.define([
     _applyCombinedFilters: function () {
       const oView           = this.getView();
       const oViewStateModel = oView.getModel("view");
-      const isExColaborador = this.sSelectedContract === "Certificado Laboral Excolaborador" ||
-                              this.sSelectedContract === "Notificación Salida Ministerio";
-
-      // Apunta la tabla al modelo correcto (activos o inactivos)
-      const oModel = isExColaborador ? oView.getModel("inactive") : oView.getModel();
-      const oTable = this.byId("idUserTable");
-      if (oTable.getModel() !== oModel) oTable.setModel(oModel);
+      const isExColaborador = this._isInactiveDocumentTitle(this.sSelectedContract);
 
       // Parte de la lista base definida al abrir el diálogo
+      const oModel = isExColaborador ? oView.getModel("inactive") : oView.getModel();
       const aBaseFromState = oViewStateModel?.getProperty("/BaseUsers");
       let filtered = Array.isArray(aBaseFromState) && aBaseFromState.length
         ? aBaseFromState
         : (isExColaborador
             ? (oModel.getProperty("/InactiveUsers") || [])
             : (oModel.getProperty("/User") || []));
+      const bHasDateFilter = !!(this._activeDateFilter?.dFrom && this._activeDateFilter?.dTo);
+      const sSearch = this._activeSearch?.trim() || "";
+
+      if (!bHasDateFilter && !sSearch) {
+        if (oViewStateModel?.getProperty("/FilteredUsers") !== filtered) {
+          oViewStateModel?.setProperty("/FilteredUsers", filtered);
+        }
+        return;
+      }
 
       // Filtro por rango de fechas
-      if (this._activeDateFilter?.dFrom && this._activeDateFilter?.dTo) {
+      if (bHasDateFilter) {
         const toUTC   = d => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         const utcFrom = toUTC(this._activeDateFilter.dFrom);
         const utcTo   = toUTC(this._activeDateFilter.dTo);
@@ -1466,11 +1614,11 @@ sap.ui.define([
       }
 
       // Filtro por texto (varias palabras funcionan como AND: el empleado debe coincidir con todas)
-      if (this._activeSearch?.trim()) {
+      if (sSearch) {
         const normalize = str =>
           str?.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
              .replace(/\s+/g, " ").trim().toLowerCase() || "";
-        const words = normalize(this._activeSearch).split(" ");
+        const words = normalize(sSearch).split(" ");
 
         filtered = filtered.filter(user =>
           words.every(word =>
@@ -1489,7 +1637,7 @@ sap.ui.define([
       oViewStateModel?.setProperty("/FilteredUsers", filtered);
 
       // Fuerza el refresco del binding para que UI5 actualice la tabla
-      const oItemsBinding = oTable.getBinding("items");
+      const oItemsBinding = this.byId("idUserTable")?.getBinding("items");
       if (typeof oItemsBinding?.refresh === "function") oItemsBinding.refresh();
     },
 
@@ -1534,6 +1682,7 @@ sap.ui.define([
     convertNumberToWords: function (num)          { return formatHelpers.convertNumberToWords(num); },
     formatDateToWords:    function (date)         { return formatHelpers.formatDateToWords(date); },
     resolveGender:        function (text, gender) { return formatHelpers.resolveGender(text, gender); },
+    getCiudadWork:        function (user)         { return formatHelpers.getCiudadWork(user); },
     getCiudadResidencia:  function (user)         { return formatHelpers.getCiudadResidencia(user); },
     getLocalDate:         function ()             { return formatHelpers.getLocalDate(); },
     formatDateRaw:        function (dateStr)      { return formatHelpers.formatDateRaw(dateStr); },
@@ -1612,13 +1761,31 @@ sap.ui.define([
     // Handler del buscador de tiles en la pantalla principal.
     // Filtra los tiles visibles en el grid según el texto que escribe el usuario.
     onDocumentSearch: function (oEvent) {
-      const oSearchField = this.byId("documentSearch");
-      const sValue = oEvent?.getParameter("newValue") ?? oEvent?.getParameter("query") ?? oSearchField?.getValue() ?? "";
+      const oMainSearch   = this.byId("documentSearch");
+      const oHeaderSearch = this.byId("headerDocumentSearch");
+      const oMobileSearch = this.byId("mobileHeaderDocumentSearch");
+      const oSource       = oEvent?.getSource?.();
+      const sValue = oEvent?.getParameter("newValue")
+        ?? oEvent?.getParameter("query")
+        ?? oSource?.getValue?.()
+        ?? oMainSearch?.getValue()
+        ?? oHeaderSearch?.getValue()
+        ?? oMobileSearch?.getValue()
+        ?? "";
       const sQuery = this._normalizeSearchText(sValue);
       const aCards = this._getDocumentSearchCards();
       const oGrid  = this.byId("gridItems");
+      const bHasQuery = Boolean(sQuery);
 
-      oSearchField?.toggleStyleClass("documentSearchFieldActive", Boolean(sQuery));
+      [oMainSearch, oHeaderSearch, oMobileSearch].forEach(oField => {
+        if (!oField) return;
+        if (oField !== oSource && oField.getValue?.() !== sValue) {
+          oField.setValue(sValue);
+        }
+        oField.toggleStyleClass("documentSearchFieldActive", bHasQuery);
+        oField.toggleStyleClass("headerSearchFieldActive", bHasQuery);
+      });
+
       if (!oGrid) return;
 
       // Guarda el estado original del grid la primera vez que se usa el buscador
@@ -1904,8 +2071,9 @@ sap.ui.define([
     onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); },
 
     onSendToDocusign: async function (oEvent) {
-      if (this._currentCategory !== "contratoTerminoFijo" || this.sSelectedContract !== "Contrato Término Fijo") {
-        MessageToast.show("Por ahora solo está disponible el envío a DocuSign para Contrato Término Fijo.");
+      const oDocusignDocument = DOCUSIGN_DOCUMENTS[this._currentCategory];
+      if (!oDocusignDocument) {
+        MessageToast.show("Este documento no está habilitado para envío a DocuSign.");
         return;
       }
 
@@ -1916,7 +2084,7 @@ sap.ui.define([
 
       try {
         await this._withBusy(async () => {
-          const aDocuments = await contratoTerminoFijo.generateContratoTerminoFijoPdfDocuments(this);
+          const aDocuments = await oDocusignDocument.generator(this);
 
           if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
             MessageToast.show("Seleccione al menos un colaborador.");
@@ -1924,17 +2092,24 @@ sap.ui.define([
           }
 
           for (let i = 0; i < aDocuments.length; i++) {
-            const oDocument    = aDocuments[i];
-            const oPayload     = await CpiService.buildTerminoFijoPayload(oDocument);
+            const oDocument = aDocuments[i];
+            const oPayload = await CpiService.buildDocusignPayload(
+              oDocument,
+              oDocusignDocument.documentType
+            );
             const oCpiResponse = await CpiService.sendTerminoFijoToCPI(oPayload);
-            console.log("Respuesta CPI DocuSign Contrato Término Fijo:", oCpiResponse);
+            console.log("Respuesta CPI DocuSign " + oDocusignDocument.documentType + ":", oCpiResponse);
           }
 
-          MessageToast.show("Contrato enviado a DocuSign correctamente.");
+          MessageToast.show(
+            aDocuments.length > 1
+              ? aDocuments.length + " documentos enviados a DocuSign correctamente."
+              : "Documento enviado a DocuSign correctamente."
+          );
         });
       } catch (oError) {
-        console.error("No se pudo enviar el contrato a DocuSign:", oError);
-        MessageToast.show("No se pudo enviar el contrato a DocuSign. Intentalo nuevamente.");
+        console.error("No se pudo enviar el documento a DocuSign:", oError);
+        MessageToast.show("No se pudo enviar el documento a DocuSign. Inténtalo nuevamente.");
       } finally {
         if (oButton?.setBusy) {
           oButton.setBusy(false);
