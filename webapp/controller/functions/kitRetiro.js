@@ -25,6 +25,7 @@ sap.ui.define([
             for (let i = 0; i < aUsers.length; i++) {
                 const user = aUsers[i];
 
+                /*
                 // ── FORZAR CYRGO PARA PRUEBAS — BORRAR ANTES DE PRODUCCIÓN ──
                 user.company       = "CO24";
                 user.ciudadFirma   = "Barranquilla";
@@ -39,6 +40,8 @@ sap.ui.define([
                 user.personalPhone = "3001234567";
                 user.hireDatesimpl = "2022-01-15";
                 user.endDateBaja   = "2026-05-25";
+                
+                */
 
                 if (aUsers.length > 1) {
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
