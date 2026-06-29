@@ -379,10 +379,10 @@ sap.ui.define([
                     const htmlPagina2 = `
                         <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                            <p style="margin:0 0 4px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
+                            <p style="margin:0 0 20px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
-                            <p style="margin:0;">Señor:</p>
-                            <p style="font-weight:bold;margin:0;">${sNombre}</p>
+                            <p style="margin:0 0 16px 0;">Señor(a):</p>
+                            <p style="font-weight:bold;margin:0 0 16px 0;">${sNombre}</p>
                             <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                             <p style="text-align:justify;margin:0 0 14px 0;">
@@ -478,112 +478,34 @@ sap.ui.define([
                     `;
 
                     const htmlPagina3 = `
-                        <div style="${STYLE}width:100%;box-sizing:border-box;">
+                        <div style="${STYLE}width:100%;box-sizing:border-box;padding-top:70px;">
+
+                            <p style="margin:0 0 40px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
                             <p style="font-weight:bold;text-align:center;letter-spacing:1px;margin:0 0 28px 0;">
                                 EL ÁREA DE GESTIÓN DE PERSONAS
                             </p>
 
-                            <p style="font-weight:bold;text-align:center;letter-spacing:6px;margin:0 0 40px 0;">
-                                HACE CONSTAR:
+                            <p style="font-weight:bold;text-align:center;letter-spacing:1px;margin:0 0 28px 0;">
+                                HACE CONSTAR
                             </p>
 
-                            <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                                Que, <strong>${sNombre}</strong> ${sIdentif} con cédula de ciudadanía número
+                            <p style="text-align:justify;line-height:1.7;margin:30px 0 24px 0;">
+                                Que, <strong>${sNombre}</strong> ${sIdentif} con la cédula de ciudadanía número
                                 <strong>${sCedula},</strong> estuvo vinculado(a) con nuestra empresa mediante contrato de trabajo 
                                 a término Indefinido, prestando sus servicios en el <strong>PV MALAMBO</strong> desde el día 
                                 <strong>${sIngreso}</strong> hasta el <strong>${sFechaBaja}</strong>
                             </p>
 
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                                A la fecha de su retiro desempeñaba el cargo de ${sCargo} con un Salario Básico Mensual de $${sSalario}.
+                                A la fecha de su retiro desempeñaba el cargo de <strong>${sCargo}</strong> con un Salario Básico Mensual de <strong>$${sSalario}</strong>.
                             </p>
 
-                            <p style="margin:0 0 60px 0;">Atentamente,</p>
+                            <div style="margin-top:110px;">
 
-                            <div style="width:40%;">
-                            <div style="border-top:1px solid #000;padding-top:6px;">
+                                <p style="margin:0 0 20px 0;">Atentamente,</p>
 
-                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
-
-                                <div style="font-weight:bold;min-height:18px;">
-                                    ${empresaData.repNombre}
-                                </div>
-                                <div style="margin-top:2px;font-weight:bold;">
-                                    ${empresaData.empresaNombre}
-                                </div>
-                                <div style="margin-top:2px;font-weight:bold;">
-                                    Nit. ${empresaData.nit}
-                                </div>
-                            </div>
-                        </div>
-
-                        </div>
-                    `;
-
-                    const htmlPagina4 = `
-                    
-                    <div style="${STYLE}width:100%;box-sizing:border-box;">
-
-                        <p style="margin:0 0 4px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
-                        <p style="margin:0;">Señor:</p>
-                        <p style="font-weight:bold;margin:0;">${sNombre}</p>
-
-                        
-                        <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                            Encontrará a continuación la solicitud de servicio para la realización de sus exámenes médicos
-                            post – ocupacionales, deberá hacer uso de este servicio dentro de los cinco (5) días hábiles 
-                            siguientes a la fecha de este comunicado, de lo contrario daremos por entendido que no se encuentra
-                            interesado (a) en realizar este trámite
-                        </p>
-
-                            <p style="margin:0 0 60px 0;">Coordialmente,</p>
-
-                            <div style="width:40%;">
-                            <div style="border-top:1px solid #000;padding-top:6px;">
-
-                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
-
-                                <div style="font-weight:bold;min-height:18px;">
-                                    ${empresaData.repNombre}
-                                </div>
-                                <div style="margin-top:2px;font-weight:bold;">
-                                    ${empresaData.empresaNombre}
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div>`;
-
-                    const htmlPagina5 = `
-                        <div style="${STYLE}width:100%;box-sizing:border-box;">
-
-                            <p style="margin:0 0 4px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
-                            <p style="margin:0;">Señores:</p>
-                            <p style="font-weight:bold;margin:0;">ZONAMEDICA MR SA S</p>
-                            <p style="font-weight:bold;margin:0;">${sDireccion}</p>
-                            <p style="font-weight:bold;margin:0;">${sCiudadFirma}</p>
-
-                            
-                            <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                                Apreciados Señores:
-                            </p>
-
-                            <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                                Cordialmente solicito sean practicado el examen médico de retiro de 
-                                <strong>${sNombre}</strong> ${sIdentif} con la cédula de ciudadanía número 
-                                <strong>${sCedula}</strong>, quien desempeñaba el cargo de <strong>${sCargo}</strong>.
-                            </p>
-
-                            <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                                Favor facturarlos a nombre de ${empresaData.empresaNombre}, ${empresaData.nit}.
-                            </p>
-
-                            <p style="margin:0 0 60px 0;">Atentamente,</p>
-
-                            <div style="width:40%;">
-                                <div style="border-top:1px solid #000;padding-top:6px;">
+                                <div style="width:40%;">
 
                                     ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
 
@@ -593,14 +515,91 @@ sap.ui.define([
                                     <div style="margin-top:2px;font-weight:bold;">
                                         ${empresaData.empresaNombre}
                                     </div>
-
+                                    <div style="margin-top:2px">
+                                        Nit. ${empresaData.nit}
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    `;
+
+                    const htmlPagina4 = `
+                    
+                        <div style="${STYLE}width:100%;box-sizing:border-box;padding-top:90px;">
+
+                            <p style="margin:0 0 20px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
+
+                            <p style="margin:0 0 16px 0;">Señor(a):</p>
+                            <p style="font-weight:bold;margin:0 0 16px 0;">${sNombre}</p>
+
 
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                                <strong>Nota</strong>: para la realización de sus exámenes médicos post – ocupacionales, deberá hacer uso 
-                                de este servicio dentro de los cinco (5) días hábiles siguientes a la fecha de este comunicado
-                                , de lo contrario daremos por entendido que no se encuentra interesado en realizar este trámite
+                                Encontrará a continuación la solicitud de servicio para la realización de sus exámenes médicos post – 
+                                ocupacionales, deberá hacer uso de este servicio dentro de los cinco (5) días hábiles siguientes a la 
+                                fecha de este comunicado, de lo contrario daremos por entendido que no se encuentra interesado (a) 
+                                en realizar este trámite
+                            </p>
+
+                            <div style="margin-top:100px;">
+
+                                <div style="width:40%;">
+
+                                    <p style="text-align:left;margin:0 0 20px 0;">Cordialmente,</p>
+
+                                    ${firmaBase64 ? `<img src="${firmaBase64}" style="height:60px;width:auto;display:block;margin:0 auto 8px auto;mix-blend-mode:multiply;">` : ""}
+
+                                        <strong>${empresaData.repNombre}</strong>
+                                    </p>
+
+                                    <p style="font-size:9pt;width:320px;padding-top:2px;margin:0 auto;">
+                                        ${empresaData.empresaNombre}
+                                    </p>
+
+                                </div>
+                            
+                            </div>
+
+                        </div>
+
+                        </div>
+                    `;
+
+                    const htmlPagina5 = `
+                        <div style="${STYLE}width:100%;box-sizing:border-box;">
+
+                            <p style="margin:0 0 20px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
+                            <p style="margin:0;">Señor(a):</p>
+                            <p style="font-weight:bold;margin:0;">ZONAMEDICA MR SA S</p>
+                            <p style="margin:0;">${sDireccion}</p>
+                            <p style="margin:0;">${sCiudadFirma}</p>
+
+                            <p style="text-align:justify;line-height:1.7;margin:60px 0 24px 0;">
+                                Apreciados Señores:
+                            </p>
+
+                            <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
+                                Cordialmente solicito sean practicado el examen médico de retiro de 
+                                <strong>${sNombre}</strong> ${sIdentif} con la cédula de ciudadanía número 
+                                <strong>${sCedula}</strong>, quien desempeñaba el cargo de <strong>${sCargo}</strong>.
+                            </p>
+
+                            <p style="text-align:justify;line-height:1.7;margin:60px 0 24px 0;">
+                                Favor facturarlos a nombre de ${empresaData.empresaNombre}, ${empresaData.nit}.
+                            </p>
+
+                            <p style="margin:0 0 20px 0;">Atentamente,</p>
+
+                            <div style="width:40%;">
+                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
+                                <div style="font-weight:bold;min-height:18px;">${empresaData.repNombre}</div>
+                                <div style="margin-top:2px;font-weight:bold;">${empresaData.empresaNombre}</div>
+                            </div>
+
+                            <p style="width:90%;text-align:justify;line-height:1.5;margin:40px 0 0 0;">
+                                <strong>Nota:</strong> Para la realización de sus exámenes médicos post-ocupacionales, 
+                                deberá hacer uso de este servicio dentro de los cinco (5) días hábiles siguientes a la 
+                                fecha de este comunicado; de lo contrario, daremos por entendido que no se encuentra 
+                                interesado en realizar este trámite.
                             </p>
 
                         </div>`;
