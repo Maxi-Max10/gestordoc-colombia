@@ -424,8 +424,42 @@ sap.ui.define([
       this._activeDateFilter         = null;  // Rango de fechas activo en el filtro
 
       // Arranca el flujo de autenticación: usuario → empresa → permisos
-      this.getUserInfo();
-      this.updateGreeting(); // Saludo provisional; se actualiza cuando llega el nombre real
+      // ── MOCK PARA PRUEBAS — BORRAR ANTES DE PRODUCCIÓN ──────────────
+      const UseroModel = new JSONModel({
+          firstname:   "TEST_USER_01",
+          company:     "CO24",
+          displayName: "Usuario Prueba",
+          gender:      "M",
+          grupo:       "Gestor Documental - Administradores",
+          permisos:    "admin"
+      });
+      this.getOwnerComponent().setModel(UseroModel, "user");
+
+      const aTileIds = [
+          "customListItemKitRetiro",
+          "customListItemOtroSiRodamiento",
+          "customListItemOtroSiAlimentacion15",
+          "customListItemOtroSiAlimentacion11",
+          "customListItemOtroSiAlimentacion10",
+          "customListItemBeneficios",
+          "customListItemSolicitudDeduccionesRetencion",
+          "customListItemCompromisoEtica",
+          "customListItemAutorizacionDescuento",
+          "customListItemDatosPersonales",
+          "customListItemNoDeclarante",
+          "customListItemProtocoloRecibo",
+          "customListItemContratoIntegral",
+          "customListItemContratoTerminoFijo",
+          "customListItemContratoTerminoIndef",
+          "customListItemContratoAprendizajeLectivo",
+          "customListItemContratoAprendizajeProductivo"
+      ];
+      aTileIds.forEach(sId => { this.byId(sId)?.setVisible(true); });
+
+      this._completeInitialPreload(true);
+      // ── FIN MOCK ─────────────────────────────────────────────────────
+
+      this.updateGreeting();
 
       // Carga el logo de la app
       const oImage = this.byId("_IDGenImageeee");
