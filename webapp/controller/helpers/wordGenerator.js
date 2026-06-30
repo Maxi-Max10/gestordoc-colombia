@@ -75,8 +75,8 @@ sap.ui.define([
             "[[GrupoSanguineo]]":  data.sGrupoSangre      || "",
             "[[Nacionalidad]]":    data.sNacional         || "",
             "[[Pais]]":            data.sPais             || "",
-            "[CiudadResidencia]":  data.sCiudadResidencia || "",
-            "[CiudadExpedicion]":  data.sCiudadExpedicion || "",
+            "[[CiudadResidencia]]":  data.sCiudadResidencia || "",
+            "[[CiudadExpedicion]]":  data.sCiudadExpedicion || "",
             "[[DocCardType]]":     data.sDocCardType      || "",
 
             // Checkboxes del tipo de documento: marcado (☑) o vacío (☐) según SAP
