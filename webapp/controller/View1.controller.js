@@ -1061,7 +1061,9 @@ sap.ui.define([
             });
 
             const PAY_GROUP_LABELS = {
+              "Q1": "QUINCENAL",
               "Q2": "QUINCENAL",
+              "Q3": "QUINCENAL",
               "M1": "MENSUAL",
               "M2": "MENSUAL",
               "S1": "SEMANAL",
@@ -1344,7 +1346,9 @@ sap.ui.define([
             });
 
             const PAY_GROUP_LABELS = {
+              "Q1": "QUINCENAL",
               "Q2": "QUINCENAL",
+              "Q3": "QUINCENAL",
               "M1": "MENSUAL",
               "M2": "MENSUAL",
               "S1": "SEMANAL",

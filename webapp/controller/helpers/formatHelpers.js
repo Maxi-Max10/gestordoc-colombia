@@ -720,9 +720,9 @@ sap.ui.define([], function () {
                     HireDatePost:               getProp("HireDatePost"),
                     originalStartDate:          getProp("empInfo/originalStartDate"),
                     originalStartDateFormatted: this.formatDateToWords(getProp("empInfo/originalStartDate")),
-                    hireDateExt:                this.formatDateToWords(getProp("empInfo/endDate")),
                     endDate:                    getProp("empInfo/endDate"),
                     endDateFormated:            this.formatDateToWords(getProp("empInfo/endDate")),
+                    
                     customDate01:               this.formatDateToWords(getProp("empInfo/customDate1")),
 
                     // Salario: valor numérico para cálculos + texto en palabras para el contrato

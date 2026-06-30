@@ -75,6 +75,8 @@ sap.ui.define([
             "[[GrupoSanguineo]]":  data.sGrupoSangre      || "",
             "[[Nacionalidad]]":    data.sNacional         || "",
             "[[Pais]]":            data.sPais             || "",
+            "[CiudadResidencia]":  data.sCiudadResidencia || "",
+            "[CiudadExpedicion]":  data.sCiudadExpedicion || "",
             "[[DocCardType]]":     data.sDocCardType      || "",
 
             // Checkboxes del tipo de documento: marcado (☑) o vacío (☐) según SAP
@@ -95,13 +97,13 @@ sap.ui.define([
 
             // ── Datos laborales ──────────────────────────────────────────────
             "[[Cargo]]":             data.sCargo             || "",
-            "[[CiudadWork]]":        data.sCiudadWork        || "",  // Ciudad de trabajo (custom10 en SAP)
+            "[[CidadFirma]]":        data.sCiudadFirma        || "",
             "[[Planta]]":            data.sPlanta            || "",
             "[[Area]]":              data.sArea              || "",
             "[[JefeNombre]]":        data.sJefeNombre        || "",
             "[[Institucion]]":       data.sInstitucion       || "",
-            "[[FechaIngreso]]":      data.sIngreso           || "",
-            "[[FechaSalida]]":       data.sSalida            || "",
+            "[[FechaIngreso]]":      data.sfechaContratacion || "",
+            "[[FechaSalida]]":       data.sfechaBaja         || "",
 
             // Alias: distintas plantillas escriben distinto el mismo campo (diferencia de mayúscula)
             "[[FechaContratacion]]": data.sFechaContratacion || data.sfechaContratacion || "",

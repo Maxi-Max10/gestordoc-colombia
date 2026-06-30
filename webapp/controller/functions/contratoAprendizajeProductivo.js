@@ -41,16 +41,19 @@ sap.ui.define([
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sTelefono    = user.personalPhone || "";               
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
+                const sfechaBaja = oController.formatDateRaw(user.endDateBaja);
                 const sInstitucion = await oController._getInstitucionFormacion(user.userId);
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
 
-                // ── Fecha de terminación: inicio + 13 meses y 19 días ────────
+                /*
+                 ── Fecha de terminación: inicio + 13 meses y 19 días ────────
                 const dFechaInicio = new Date(user.originalStartDate);
                 const dFechaFin = new Date(dFechaInicio);
                 dFechaFin.setMonth(dFechaFin.getMonth() + 6);
                 dFechaFin.setDate(dFechaFin.getDate() + 0);
                 const sfechaTerminacion = oController.formatDateRaw(dFechaFin);
                 const sfechaTerminacionLarga = oController.formatDateToWords(dFechaFin);
+                */
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -58,7 +61,7 @@ sap.ui.define([
                         templatePath: "pdf/Contrato_Aprendizaje_Productivo.docx",
                         fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Productivo.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCargo, sInstitucion
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sCargo, sInstitucion
                         }
                     });
                     continue;
@@ -404,7 +407,7 @@ sap.ui.define([
                             ">
                                 FECHA TERMINACIÓN CONTRATO
                             </td>
-                            <td style="padding:1px 5px;">${sfechaTerminacion}</td> 
+                            <td style="padding:1px 5px;">${sfechaBaja}</td> 
                         </tr>
                     </table>
 
@@ -505,7 +508,7 @@ sap.ui.define([
                         `De acuerdo con el artículo 21 de la Ley 2466 de 2025, el contrato de aprendizaje es
                         considerado un contrato laboral especial a término fijo, por lo que, este tendrá, un término de
                         duración de 6 meses, comprendidos entre <strong>${sfechaContratacion} fecha</strong> de iniciación del Contrato; y
-                        el <strong>${sfechaTerminacion}</strong> de terminación de este, sin que pueda exceder de tres (3) años. Así las
+                        el <strong>${sfechaBaja}</strong> de terminación de este, sin que pueda exceder de tres (3) años. Así las
                         cosas, se deja previsto que el contrato finalizará en la fecha de terminación indicada anteriormente,
                         sin que sea necesaria la presentación de un aviso previo o el cumplimiento de un requisito adicional`
                     )}
@@ -1463,74 +1466,6 @@ sap.ui.define([
             MessageToast.show("Error generando el documento: " + error.message);
         }
     }
-
-    // ─── Word ─────────────────────────────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Contrato_Aprendizaje_Productivo.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Contrato_Aprendizaje_Productivo.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":     data.sNombre,
-            "[[Cedula]]":     data.sCedula,
-            "[[FechaNacimiento]]":      data.sFechaNacimiento,
-            "[[Direccion]]":     data.sDireccion,
-            "[[Telefono]]":     data.sTelefono,
-            "[[FechaContratacion]]":data.sfechaContratacion,
-            "[[Institucion]]":   data.sInstitucion
-        };
-
-        const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp("\\[\\[" + key.slice(2,-2).split("").map(c => c + "(?:<[^>]*>)*").join("") + "\\]\\]","g");
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Contrato_Aprendizaje_Productivo.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
-    }
-
-    return {
-        onDownloadPDFContratoAprendizajeProductivo,
-        generatePdfDocuments: function (oController) {
-            return onDownloadPDFContratoAprendizajeProductivo(oController, "pdfDataInfo", {
-                returnPdfDocuments: true,
-                throwErrors: true
-            });
-        }
-    };
+    
+    return {onDownloadPDFContratoAprendizajeProductivo};
 });

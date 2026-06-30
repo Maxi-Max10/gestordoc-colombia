@@ -61,13 +61,8 @@ sap.ui.define([
                 // ← NUEVO: campos que ahora vienen desde la carga enriquecida
                 const sEmail       = user.personalEmail || "";
                 const sTelefono    = user.personalPhone || "";
-                const sFechaBaja      = user.endDateBaja
-                                        ? oController.formatDateToSpanish(user.endDateBaja)
-                                        : "";
-                // Si necesitás la fecha de baja sin formato extendido:
-                const sFechaBajaCorta = user.endDateBaja
-                                        ? oController.formatFechaCorta(user.endDateBaja)
-                                        : "";
+                const sfechaBaja        = oController.formatDateRaw(user.endDateBaja);
+                //const sFechaBajaCorta = user.endDateBaja? oController.formatFechaCorta(user.endDateBaja): "";
 
                 // ── Empresa ───────────────────────────────────────────────────
                 const isCyrgo = user.company === "CO24";
@@ -297,7 +292,7 @@ sap.ui.define([
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
                                 Que, <strong>${sNombre}</strong> ${sIdentif} con cédula de ciudadanía número
                                 <strong>${sCedula},</strong> trabajó en la empresa con contrato a término indefinido, desde
-                                <strong>${sIngreso}</strong> hasta el <strong>${sFechaBaja}</strong>
+                                <strong>${sIngreso}</strong> hasta el <strong>${sfechaBaja}</strong>
                             </p>
 
                             <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
@@ -497,7 +492,7 @@ sap.ui.define([
                                 Que, <strong>${sNombre}</strong> ${sIdentif} con la cédula de ciudadanía número
                                 <strong>${sCedula},</strong> estuvo vinculado(a) con nuestra empresa mediante contrato de trabajo 
                                 a término Indefinido, prestando sus servicios en el <strong>PV MALAMBO</strong> desde el día 
-                                <strong>${sIngreso}</strong> hasta el <strong>${sFechaBaja}</strong>
+                                <strong>${sIngreso}</strong> hasta el <strong>${sfechaBaja}</strong>
                             </p>
 
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
