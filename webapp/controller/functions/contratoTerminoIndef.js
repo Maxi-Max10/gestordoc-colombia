@@ -73,8 +73,8 @@ sap.ui.define([
                         templatePath: "templates/word/Contrato_Termino_Indefinido.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
                         data: {
-                            sNombre, sCedula, localDate, sPais, sDireccion, sCargo, sSalario, sSalarioLetras,
-                            sfechaContratacion, sPeriodoPago, sCiudadFirma
+                            sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sPais, sDireccion,
+                             sCargo, sSalario, sSalarioLetras, sfechaContratacion, sPeriodoPago
                         }
                     });
                     continue;

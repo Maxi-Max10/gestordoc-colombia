@@ -32,21 +32,23 @@ sap.ui.define([
                 const sCedula = user.nationalId || "";
                 const localDate    = oController.getLocalDate();
 
+                // ── Empresa ───────────────────────────────────────────────────
+                const isCyrgo = user.company === "CO24";
+
                 // ── Word ──────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
+                    const isCyrgoWord = user.company === "CO24";
                     await wordGenerator.generateWord({
-                        templatePath: "templates/word/Compromiso_Etica.docx",
-                        fileName:     `${user.firstName}_${user.lastName}_Compromiso_Etica.docx`,
-                        data: {
-                            sNombre, sCedula, localDate
-                        }
+                        templatePath: isCyrgoWord
+                            ? "pdf/Compromiso_Etica_Cyrgo.docx"
+                            : "pdf/Compromiso_Etica.docx",
+                        fileName: `${user.firstName}_${user.lastName}_Compromiso_Etica.docx`,
+                        data: { sNombre, sCedula, localDate }
                     });
                     continue;
                 }
 
-                // ── Empresa ───────────────────────────────────────────────────
-                const isCyrgo = user.company === "CO24";
-
+            
                 function _buildHtmlDiaco() {
                     return `
                     <div style="font-size:14pt;font-family:Arial,sans-serif;padding:0;margin:0;">
@@ -99,7 +101,10 @@ sap.ui.define([
                     : "templates/pdf/plantillaEtica.pdf";
 
                 const existingPdfBytes = await fetch(templateFile)
-                    .then(res => res.arrayBuffer());
+                .then(res => {
+                    if (!res.ok) throw new Error(`No se pudo cargar ${templateFile} (${res.status})`);
+                    return res.arrayBuffer();
+                });
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
                 const [templatePage] = pdfDoc.getPages();

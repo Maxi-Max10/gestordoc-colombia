@@ -68,10 +68,10 @@ sap.ui.define([
                         templatePath: "templates/word/Contrato_Termino_Indef_Integral.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indef_Integral.docx`,
                         data: {
-                            sNombre, sCedula, localDate, sCargo, sSalario, sSalarioLetras,
-                            salarioIntegral, componenteRemunerativo, factorPrestacional, sCompRemunerativo, sFactorPrestacional,
-                            sCompRemunerativoLetras, sFactorPrestacionalLetras, sfechaContratacion,
-                            sDireccion, sPeriodoPago, sPlanta, sCiudadFirma
+                            sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sCargo, 
+                            sSalario, sSalarioLetras, salarioIntegral, componenteRemunerativo, factorPrestacional, 
+                            sCompRemunerativo, sFactorPrestacional, sCompRemunerativoLetras, sFactorPrestacionalLetras, 
+                            sfechaContratacion, sDireccion, sPeriodoPago, sPlanta
                         }
                     });
                     continue;
