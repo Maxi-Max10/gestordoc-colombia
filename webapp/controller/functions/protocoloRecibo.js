@@ -37,6 +37,7 @@ sap.ui.define([
                 // ── Empresa ───────────────────────────────────────────────────
                 const isCyrgo = user.company === "CO24";
 
+
                 function _buildHtmlDiaco() {
                     return `
                     <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
@@ -168,7 +169,7 @@ sap.ui.define([
                 // ── Carga plantilla de fondo ───────────────────────────────────
                const templateFile = isCyrgo
                     ? "pdf/plantilaProtocoloReciboCyrgo.pdf"
-                    : "pdf/plantillaProtocoloRecibo.pdf";
+                    : "pdf/plantilaProtocoloRecibo.pdf";
 
                 const existingPdfBytes = await fetch(templateFile)
                     .then(res => res.arrayBuffer());
