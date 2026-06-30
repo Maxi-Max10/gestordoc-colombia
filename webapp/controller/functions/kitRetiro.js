@@ -27,7 +27,7 @@ sap.ui.define([
 
                 /*
                 // ── FORZAR CYRGO PARA PRUEBAS — BORRAR ANTES DE PRODUCCIÓN ──
-                user.company       = "CO24";
+                user.company       = "CO10";
                 user.ciudadFirma   = "Barranquilla";
                 user.firstName     = "Juan";
                 user.lastName      = "Pérez";
@@ -40,8 +40,8 @@ sap.ui.define([
                 user.personalPhone = "3001234567";
                 user.hireDatesimpl = "2022-01-15";
                 user.endDateBaja   = "2026-05-25";
-                
                 */
+                
 
                 if (aUsers.length > 1) {
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
@@ -391,7 +391,7 @@ sap.ui.define([
                                 <tr>
                                     <td style="width:24px;vertical-align:top;font-weight:bold;">1.</td>
                                     <td style="text-align:justify;">
-                                        <strong>Envío de documentos de retiro a correo electrónico: Recibir, revisar y
+                                        <strong>Envío de documentos de retiro a correo electrónico:</strong> Recibir, revisar y
                                          aprobar a través de su correo electrónico, los documentos de su paquete de egreso.
                                           Una vez dicha documentación de egreso haya sido aprobada por usted, deberá imprimirla,
                                            firmarla en señal de aceptación y enviarla escaneada al correo electrónico
@@ -496,7 +496,7 @@ sap.ui.define([
                             </p>
 
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                                A la fecha de su retiro desempeñaba el cargo de <strong>${sCargo}</strong> con un Salario Básico Mensual de <strong>$${sSalario}</strong>.
+                                A la fecha de su retiro desempeñaba el cargo de <strong>${sCargo}</strong> con un Salario Básico Mensual de <strong>${sSalario}</strong>.
                             </p>
 
                             <div style="margin-top:110px;">
