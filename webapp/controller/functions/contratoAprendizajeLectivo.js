@@ -59,8 +59,8 @@ sap.ui.define([
                 */
 
                 const templateFile = user.company === "CO24"
-                    ? "pdf/Cyrgo.pdf"
-                    : "pdf/hojaDiaco.pdf";
+                    ? "templates/pdf/Cyrgo.pdf"
+                    : "templates/pdf/hojaDiaco.pdf";
 
                 // ── Datos según empresa ───────────────────────────────────────
                 const isCyrgo = user.company === "CO24";
@@ -85,7 +85,7 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Contrato_Aprendizaje_Lectivo.docx",
+                        templatePath: "templates/word/Contrato_Aprendizaje_Lectivo.docx",
                         fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Lectivo.docx`,
                         data: {
                             sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCargo, sInstitucion, sfechaBaja

@@ -50,7 +50,7 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Contrato_Termino_Fijo.docx",
+                        templatePath: "templates/word/Contrato_Termino_Fijo.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Fijo.docx`,
                         data: {
                             sNombre, sCedula, localDate, sCargo, sSalario, sSalarioLetras,
@@ -1616,7 +1616,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf")
+                const existingPdfBytes = await fetch("templates/pdf/hojaDiaco.pdf")
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
@@ -1719,13 +1719,6 @@ sap.ui.define([
             MessageToast.show("Error generando el documento: " + error.message);
             return bReturnPdfDocuments ? [] : undefined;
         }
-    }
-
-    async function generateContratoTerminoFijoPdfDocuments(oController) {
-        return onDownloadPDFContratoTerminoFijo(oController, "pdfDataInfo", {
-            returnPdfDocuments: true,
-            throwErrors: true
-        });
     }
 
     return {onDownloadPDFContratoTerminoFijo};

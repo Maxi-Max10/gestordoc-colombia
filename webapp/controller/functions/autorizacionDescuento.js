@@ -37,7 +37,7 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Autorizacion_Descuento.docx",
+                        templatePath: "templates/word/Autorizacion_Descuento.docx",
                         fileName:     `${user.firstName}_${user.lastName}Autorizacion_Descuento.docx`,
                         data: {
                             sNombre, sCedula, sIdentificado, sCiudadFirma, localDate

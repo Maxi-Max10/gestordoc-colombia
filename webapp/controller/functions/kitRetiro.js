@@ -54,14 +54,14 @@ sap.ui.define([
                 const localDate      = oController.getLocalDate();
                 const sCargo         = oController.resolveGender(user.title || "", user.gender);
                 const sSalario       = oController.formatSalary(user.paycompvalue);
-                const sIngreso       = user.hireDatesimpl ? oController.formatDateToSpanish(user.hireDatesimpl) : "XXXX";
+                const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
+                const sfechaBaja = oController.formatDateRaw(user.endDateBaja);
                 const sIdentif       = (user.gender === "F") ? "identificada" : "identificado";
                 const sDireccion     = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
 
                 // ← NUEVO: campos que ahora vienen desde la carga enriquecida
                 const sEmail       = user.personalEmail || "";
                 const sTelefono    = user.personalPhone || "";
-                const sfechaBaja        = oController.formatDateRaw(user.endDateBaja);
                 //const sFechaBajaCorta = user.endDateBaja? oController.formatFechaCorta(user.endDateBaja): "";
 
                 // ── Empresa ───────────────────────────────────────────────────
@@ -85,11 +85,11 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Kit_Retiro.docx",
+                        templatePath: "templates/word/Kit_Retiro.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Kit_Retiro.docx`,
                         data: {
                             sNombre, sCedula, localDate, sCargo,
-                            sSalario, sIngreso, sSalida, sIdentif,
+                            sSalario, sfechaContratacion, sfechaBaja, sIdentif,
                             sEmail, sTelefono, sDireccion, sCiudadFirma
                         }
                     });
@@ -292,7 +292,7 @@ sap.ui.define([
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
                                 Que, <strong>${sNombre}</strong> ${sIdentif} con cédula de ciudadanía número
                                 <strong>${sCedula},</strong> trabajó en la empresa con contrato a término indefinido, desde
-                                <strong>${sIngreso}</strong> hasta el <strong>${sfechaBaja}</strong>
+                                <strong>${sfechaContratacion}</strong> hasta el <strong>${sfechaBaja}</strong>
                             </p>
 
                             <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
@@ -492,7 +492,7 @@ sap.ui.define([
                                 Que, <strong>${sNombre}</strong> ${sIdentif} con la cédula de ciudadanía número
                                 <strong>${sCedula},</strong> estuvo vinculado(a) con nuestra empresa mediante contrato de trabajo 
                                 a término Indefinido, prestando sus servicios en el <strong>PV MALAMBO</strong> desde el día 
-                                <strong>${sIngreso}</strong> hasta el <strong>${sfechaBaja}</strong>
+                                <strong>${sfechaContratacion}</strong> hasta el <strong>${sfechaBaja}</strong>
                             </p>
 
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
@@ -610,8 +610,8 @@ sap.ui.define([
                 const contentBlocks = isCyrgo ? _buildCyrgo() : _buildDiaco();
 
                 const templateFile = isCyrgo
-                    ? "pdf/Cyrgo.pdf"
-                    : "pdf/hojaDiaco.pdf";
+                    ? "templates/pdf/Cyrgo.pdf"
+                    : "templates/pdf/hojaDiaco.pdf";
 
                 const existingPdfBytes = await fetch(templateFile).then(res => res.arrayBuffer());
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);

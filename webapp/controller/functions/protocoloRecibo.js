@@ -34,6 +34,19 @@ sap.ui.define([
                 const sPlanta      = user.planta || "";
                 const sArea = user.area || "";
 
+                
+                // ── Word ─────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    await wordGenerator.generateWord({
+                        templatePath: "templates/word/Protocolo_Recibo.docx",
+                        fileName:     `${user.firstName}_${user.lastName}_Protocolo_Recibo.docx`,
+                        data: {
+                            sNombre, sCedula, localDate, sPlanta, sArea
+                        }
+                    });
+                    continue;
+                }
+
                 // ── Empresa ───────────────────────────────────────────────────
                 const isCyrgo = user.company === "CO24";
 
@@ -149,27 +162,14 @@ sap.ui.define([
                 </div>`;
                 }
 
-
-                // ── Word ─────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await wordGenerator.generateWord({
-                        templatePath: "pdf/Protocolo_Recibo.docx",
-                        fileName:     `${user.firstName}_${user.lastName}_Protocolo_Recibo.docx`,
-                        data: {
-                            sNombre, sCedula, localDate, sPlanta, sArea
-                        }
-                    });
-                    continue;
-                }
-
                 // ── PDF — con plantilla de fondo ──────────────────────────────
                 const htmlPagina1 = isCyrgo ? _buildHtmlCyrgo() : _buildHtmlDiaco();
                 const contentBlocks = [htmlPagina1];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
                const templateFile = isCyrgo
-                    ? "pdf/plantilaProtocoloReciboCyrgo.pdf"
-                    : "pdf/plantilaProtocoloRecibo.pdf";
+                    ? "templates/pdf/plantilaProtocoloReciboCyrgo.pdf"
+                    : "templates/pdf/plantilaProtocoloRecibo.pdf";
 
                 const existingPdfBytes = await fetch(templateFile)
                     .then(res => res.arrayBuffer());

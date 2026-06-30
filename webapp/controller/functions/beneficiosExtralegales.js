@@ -37,7 +37,7 @@ sap.ui.define([
                 // ── Word ──────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Beneficios_Extralegales.docx",
+                        templatePath: "templates/word/Beneficios_Extralegales.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Beneficios_Extralegales.docx`,
                         data: {
                             sNombre, sCedula, sIdentif, localDate, sCiudadExpedicion

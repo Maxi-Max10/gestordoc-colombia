@@ -36,7 +36,7 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Manifestación_No_Declarante.docx",
+                        templatePath: "templates/word/Manifestación_No_Declarante.docx",
                         fileName:     `${user.firstName}_${user.lastName}Manifestación_No_Declarante.docx`,
                         data: {
                             sNombre, sCedula, sCiudadFirma, localDate
