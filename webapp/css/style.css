@@ -912,12 +912,17 @@ html,
 .wordButtonCustom .sapMBtnInner,
 .pdfButtonCustom .sapMBtnInner,
 .docusignButtonCustom .sapMBtnInner {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   height: 2rem !important;
   min-width: 7.4rem !important;
   border-radius: 5px !important;
+  box-sizing: border-box !important;
   font-family: var(--app-font-family) !important;
   font-size: 0.78rem !important;
   font-weight: 700 !important;
+  line-height: 1 !important;
 }
 
 .wordButtonCustom .sapMBtnInner {
@@ -963,10 +968,23 @@ html,
 .pdfButtonCustom .sapMBtnIcon,
 .docusignButtonCustom .sapMBtnIcon {
   color: #ffffff !important;
-  display: inline-block !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1 !important;
   opacity: 1 !important;
   font-size: 0.9rem !important;
   margin-right: 0.35rem !important;
+}
+
+.wordButtonCustom .sapMBtnContent,
+.pdfButtonCustom .sapMBtnContent,
+.docusignButtonCustom .sapMBtnContent {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1 !important;
 }
 
 .wordButtonCustom .sapMBtnContent,
