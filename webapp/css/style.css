@@ -206,7 +206,7 @@ html,
   padding: 0 0 0.56rem !important;
   position: relative;
   font-family: var(--app-font-family) !important;
-  font-size: clamp(1.45rem, 1.75vw, 2rem) !important;
+  font-size: clamp(1.45rem, 1.75vw, 1.9rem) !important;
 
   color: #123766 !important;
   background: none !important;
@@ -854,6 +854,36 @@ html,
 
 .employeeDialog .customTable .sapMListTblRow:hover {
   background: #f2f7ff !important;
+}
+
+.employeeDialog .customTable .sapMListTblRow.sapMLIBSelected,
+.employeeDialog .customTable .sapMListTblRow.sapMLIBSelected:nth-child(even) {
+  background: #e5f1ff !important;
+  box-shadow: inset 4px 0 0 #0a6ed1 !important;
+}
+
+.employeeDialog .customTable .sapMListTblRow.sapMLIBSelected:hover {
+  background: #dcecff !important;
+}
+
+.employeeDialog .customTable .sapMListTblRow.sapMLIBSelected .sapMListTblCell {
+  background: #e5f1ff !important;
+  border-bottom-color: #b7d3f6 !important;
+}
+
+.employeeDialog .customTable .sapMListTblRow.sapMLIBSelected:hover .sapMListTblCell {
+  background: #dcecff !important;
+}
+
+.employeeDialog .customTable .sapMListTblRow.sapMLIBSelected .sapMText {
+  color: #0b376d !important;
+  font-weight: 700 !important;
+}
+
+.employeeDialog .customTable .sapMListTblRow.sapMLIBSelected .sapMCbBg {
+  border-color: #0a6ed1 !important;
+  background: #f4f9ff !important;
+  box-shadow: 0 0 0 2px rgba(10, 110, 209, 0.14) !important;
 }
 
 .employeeDialog .sapMCbBg {
@@ -2227,6 +2257,36 @@ html.gdDarkMode .sapUiBody,
 
 .gdDarkMode .employeeDialog .customTable .sapMListTblRow:hover {
   background: #1b2b45 !important;
+}
+
+.gdDarkMode .employeeDialog .customTable .sapMListTblRow.sapMLIBSelected,
+.gdDarkMode .employeeDialog .customTable .sapMListTblRow.sapMLIBSelected:nth-child(even) {
+  background: #193b63 !important;
+  box-shadow: inset 4px 0 0 #74b8ff !important;
+}
+
+.gdDarkMode .employeeDialog .customTable .sapMListTblRow.sapMLIBSelected:hover {
+  background: #214a78 !important;
+}
+
+.gdDarkMode .employeeDialog .customTable .sapMListTblRow.sapMLIBSelected .sapMListTblCell {
+  background: #193b63 !important;
+  border-bottom-color: #35618f !important;
+}
+
+.gdDarkMode .employeeDialog .customTable .sapMListTblRow.sapMLIBSelected:hover .sapMListTblCell {
+  background: #214a78 !important;
+}
+
+.gdDarkMode .employeeDialog .customTable .sapMListTblRow.sapMLIBSelected .sapMText {
+  color: #eef7ff !important;
+  font-weight: 700 !important;
+}
+
+.gdDarkMode .employeeDialog .customTable .sapMListTblRow.sapMLIBSelected .sapMCbBg {
+  border-color: #8ec7ff !important;
+  background: #0f233f !important;
+  box-shadow: 0 0 0 2px rgba(116, 184, 255, 0.18) !important;
 }
 
 .gdDarkMode .employeeDialog .customTable .sapMListTblSubCntHdr,
