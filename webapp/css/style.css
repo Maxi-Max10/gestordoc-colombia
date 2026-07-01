@@ -206,13 +206,13 @@ html,
   padding: 0 0 0.56rem !important;
   position: relative;
   font-family: var(--app-font-family) !important;
-  font-size: clamp(1.45rem, 1.85vw, 2rem) !important;
+  font-size: clamp(1.45rem, 1.75vw, 2rem) !important;
 
-  color: #000000 !important;
+  color: #123766 !important;
   background: none !important;
   -webkit-background-clip: initial !important;
   background-clip: initial !important;
-  -webkit-text-fill-color: #000000 !important;
+  -webkit-text-fill-color: #123766 !important;
 
   font-weight: 800 !important;
   line-height: 1.16 !important;
@@ -450,9 +450,9 @@ html,
   background-color: rgba(18, 55, 102, 0.1) !important;
 }
 
-@media (min-width: 1024px) {
-  .customGrid > .sapUiRespGridSpanL3,
-  .customGrid > .sapUiRespGridSpanXL3 {
+@media (min-width: 1440px) {
+  .customGrid > .sapUiRespGridSpanXL3,
+  .customGrid > .sapUiRespGridSpanL3 {
     width: calc(16.6667% - 1rem) !important;
   }
 }
@@ -1401,10 +1401,10 @@ html,
 .headerSearchField .sapMSFI {
   height: 2.12rem !important;
   line-height: 2.12rem !important;
-  padding: 0 2.35rem 0 1rem !important;
+  padding: 0 0.45rem 0 0.78rem !important;
   color: #18304f !important;
   font-family: var(--app-font-family) !important;
-  font-size: 0.82rem !important;
+  font-size: 0.78rem !important;
   opacity: 1;
   caret-color: #0a6ed1 !important;
 }
@@ -1418,13 +1418,14 @@ html,
 .headerSearchField .sapMSFB,
 .headerSearchField .sapMSFS,
 .headerSearchField .sapMSFR {
-  width: 2.25rem !important;
+  width: 1.55rem !important;
   height: 2.12rem !important;
   line-height: 2.12rem !important;
   margin: 0 !important;
   border-radius: 999px !important;
   color: #123766 !important;
   background: transparent !important;
+  transform: translateX(-0.16rem);
 }
 
 .headerSearchField .sapMSFB:hover,
@@ -1627,10 +1628,10 @@ html,
 .mobileHeaderSearchField .sapMSFI {
   height: 2.25rem !important;
   line-height: 2.25rem !important;
-  padding: 0 2.1rem 0 0.7rem !important;
+  padding: 0 0.4rem 0 0.55rem !important;
   color: #18304f !important;
   font-family: var(--app-font-family) !important;
-  font-size: 0.8rem !important;
+  font-size: 0.74rem !important;
 }
 
 .mobileHeaderSearchField .sapMSFI::placeholder {
@@ -1641,9 +1642,11 @@ html,
 .mobileHeaderSearchField .sapMSFB,
 .mobileHeaderSearchField .sapMSFS,
 .mobileHeaderSearchField .sapMSFR {
+  width: 1.55rem !important;
   height: 2.25rem !important;
   line-height: 2.25rem !important;
   color: #65758a !important;
+  transform: translateX(-0.16rem);
 }
 
 .mobileHeaderMenuItem.sapMBtn {
@@ -1703,6 +1706,19 @@ html,
     width: 10.75rem !important;
     min-width: 10.75rem !important;
     max-width: 10.75rem !important;
+  }
+
+  .headerSearchField .sapMSFI {
+    padding-right: 0.3rem !important;
+    padding-left: 0.58rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .headerSearchField .sapMSFB,
+  .headerSearchField .sapMSFS,
+  .headerSearchField .sapMSFR {
+    width: 1.45rem !important;
+    transform: translateX(-0.12rem);
   }
 }
 
