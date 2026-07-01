@@ -84,13 +84,17 @@ sap.ui.define([
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Kit_Retiro_Cyrgo.docx"
+                        : "templates/word/Kit_Retiro_Diaco.docx";
+
                     await wordGenerator.generateWord({
-                        templatePath: "templates/word/Kit_Retiro.docx",
+                        templatePath: wordTemplatePath,
                         fileName:     `${user.firstName}_${user.lastName}_Kit_Retiro.docx`,
                         data: {
                             sNombre, sCedula, localDate, sCargo,
-                            sSalario, sfechaContratacion, sfechaBaja, sIdentif,
-                            sEmail, sTelefono, sDireccion, sCiudadFirma
+                            sSalario, sfechaContratacion, sfechaBaja, sfechaContratacion, sIdentif,
+                            sEmail, sTelefono, sDireccion, sCiudadFirma, sCiudadResidencia
                         }
                     });
                     continue;
@@ -544,8 +548,7 @@ sap.ui.define([
 
                                     <p style="text-align:left;margin:0 0 20px 0;">Cordialmente,</p>
 
-                                    ${firmaBase64 ? `<img src="${firmaBase64}" style="height:60px;width:auto;display:block;margin:0 auto 8px auto;mix-blend-mode:multiply;">` : ""}
-
+                                        ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
                                         <strong>${empresaData.repNombre}</strong>
                                     </p>
 

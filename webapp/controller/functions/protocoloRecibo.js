@@ -33,22 +33,27 @@ sap.ui.define([
                 const localDate    = oController.getLocalDate();
                 const sPlanta      = user.planta || "";
                 const sArea = user.area || "";
+                const sCiudadFirma = user.ciudadFirma || "";
 
-                
+
+                // ── Empresa ───────────────────────────────────────────────────
+                const isCyrgo = user.company === "CO24";
+
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Protocolo_Recibo_Cyrgo.docx"
+                        : "templates/word/Protocolo_Recibo.docx";
+
                     await wordGenerator.generateWord({
-                        templatePath: "templates/word/Protocolo_Recibo.docx",
+                        templatePath: wordTemplatePath,
                         fileName:     `${user.firstName}_${user.lastName}_Protocolo_Recibo.docx`,
                         data: {
-                            sNombre, sCedula, localDate, sPlanta, sArea
+                            sNombre, sCedula, localDate, sPlanta, sArea, sCiudadFirma
                         }
                     });
                     continue;
                 }
-
-                // ── Empresa ───────────────────────────────────────────────────
-                const isCyrgo = user.company === "CO24";
 
 
                 function _buildHtmlDiaco() {

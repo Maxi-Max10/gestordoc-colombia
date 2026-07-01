@@ -57,7 +57,7 @@ sap.ui.define([
                     repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
                     repCC:         "74.371.977",
                     repGenero:     "identificado",
-                    firmaImg:      "templates/pdf/firma_Daniel_Cyrgo.jpg",
+                    firmaImg:      "img/firma_Daniel_Cyrgo.jpg",
                 } : {
                     empresaNombre: "DIACO S.A.",
                     domicilio:     "Bogotá",
@@ -67,19 +67,6 @@ sap.ui.define([
                     firmaImg:      "",
                 };
 
-                // ── Word ─────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await wordGenerator.generateWord({
-                        templatePath: "templates/word/Contrato_Termino_Indefinido.docx",
-                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
-                        data: {
-                            sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sPais, sDireccion,
-                             sCargo, sSalario, sSalarioLetras, sfechaContratacion, sPeriodoPago
-                        }
-                    });
-                    continue;
-                }
-
                 //Si la empresa es CYRGO, convierto la imagen de la firma de Daniel en base64
                 let firmaBase64 = "";
                 if (empresaData.firmaImg) {
@@ -87,6 +74,23 @@ sap.ui.define([
                     firmaBase64 = "data:image/jpeg;base64," + btoa(
                         new Uint8Array(firmaBytes).reduce((s, b) => s + String.fromCharCode(b), "")
                     );
+                }
+
+                // ── Word ─────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Contrato_Termino_Indefinido_Cyrgo.docx"
+                        : "templates/word/Contrato_Termino_Indefinido_Diaco.docx";
+
+                    await wordGenerator.generateWord({
+                        templatePath: wordTemplatePath,
+                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
+                        data: {
+                            sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sPais, sDireccion,
+                            sCargo, sSalario, sSalarioLetras, sfechaContratacion, sPeriodoPago
+                        }
+                    });
+                    continue;
                 }
 
                 // ══════════════════════════════════════════════════════════════
@@ -1469,10 +1473,9 @@ sap.ui.define([
                     ">
 
                         <!-- EMPLEADOR -->
-                        <div style="width:40%;">
+                        <div style="width:40%;position:relative;">
+                            ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;position:absolute;bottom:100%;left:0;margin-bottom:4px;">` : ""}
                             <div style="border-top:1px solid #000;padding-top:6px;">
-
-                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
 
                                 <div style="font-weight:bold;min-height:18px;">
                                     ${empresaData.repNombre}

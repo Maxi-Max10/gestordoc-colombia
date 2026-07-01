@@ -1950,7 +1950,10 @@ sap.ui.define([
     onOtroSiAlimentacion15Press: function () {
       this.sSelectedContract = "Otro Sí - Alim. $15.000";
       this._currentCategory  = "otroSiAlimentacion15";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
@@ -1985,7 +1988,10 @@ sap.ui.define([
     onCompromisoEticaPress: function () {
       this.sSelectedContract = "Compromiso con la Ética";
       this._currentCategory  = "compromisoEtica";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
@@ -2037,14 +2043,20 @@ sap.ui.define([
     onContratoIndefinidoPress: function () {
       this.sSelectedContract = "Contrato Término Indefinido";
       this._currentCategory  = "contratoTerminoIndef";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
     onContratoAprendizajeLectivoPress: function () {
       this.sSelectedContract = "Aprendizaje Etapa Lectiva";
       this._currentCategory  = "contratoAprendizajeLectivo";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 

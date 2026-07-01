@@ -35,6 +35,7 @@ sap.ui.define([
                 const sNombre           = `${user.firstName} ${user.lastName}`;
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
+                const localDate    = oController.getLocalDate();
                 const localDateLong = oController.formatDateToWords(new Date());
                 const sSalario    = oController.formatSalary(user.paycompvalue);
                 const sSalarioLetras  = user.payCompValueWord || "";
@@ -58,11 +59,15 @@ sap.ui.define([
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Otro_Si_Alimentacion_15_Cyrgo.docx"
+                        : "templates/word/Otro_Si_Alimentacion_15.docx";
+
                     await wordGenerator.generateWord({
-                        templatePath: "templates/word/Otro_Si_Alimentacion_15.docx",
-                        fileName:     `${user.firstName}_${user.lastName}Otro_Si_Alimentacion_15.docx`,
+                        templatePath: wordTemplatePath,
+                        fileName:     `${user.firstName}_${user.lastName}_Otro_Si_Alimentacion_15.docx`,
                         data: {
-                            sNombre, sCedula, sIdentificado ,sCiudadFirma, sSalario, sSalarioLetras, localDateLong
+                            sNombre, sCedula, localDate, localDateLong, sSalario, sSalarioLetras, sCiudadFirma
                         }
                     });
                     continue;
