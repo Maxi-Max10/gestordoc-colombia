@@ -135,10 +135,10 @@ sap.ui.define([
                 // ════════════════════════════════════════════════════════════════
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Datos_Personales.docx",
+                        templatePath: "templates/word/Datos_Personales.docx",
                         fileName:     `${user.firstName}_${user.lastName}Datos_Personales.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadWork, localDate, sCargo, sPais,
+                            sNombre, sCedula, sCiudadResidencia, localDate, sCargo, sPais,
                             sTelefono, sEmail, sNacional, sSexo, sEstadoCivil,
                             sGrupoSangre, sDireccion, sFechaExpedicion, sJefeNombre,
                             sDocCardType, sFechaNacimiento
@@ -1104,7 +1104,7 @@ sap.ui.define([
                 //  - Eliminar la página 0 original de la plantilla (era solo de referencia)
                 //  - Descargar el PDF
 
-                const existingPdfBytes = await fetch("pdf/plantillaDatosPersonales.pdf")
+                const existingPdfBytes = await fetch("templates/pdf/plantillaDatosPersonales.pdf")
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);

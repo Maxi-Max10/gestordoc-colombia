@@ -59,8 +59,8 @@ sap.ui.define([
                 */
 
                 const templateFile = user.company === "CO24"
-                    ? "pdf/Cyrgo.pdf"
-                    : "pdf/hojaDiaco.pdf";
+                    ? "templates/pdf/Cyrgo.pdf"
+                    : "templates/pdf/hojaDiaco.pdf";
 
                 // ── Datos según empresa ───────────────────────────────────────
                 const isCyrgo = user.company === "CO24";
@@ -82,18 +82,6 @@ sap.ui.define([
                     nit:           "891.800.111-5"
                 };
 
-                // ── Word ─────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await wordGenerator.generateWord({
-                        templatePath: "pdf/Contrato_Aprendizaje_Lectivo.docx",
-                        fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Lectivo.docx`,
-                        data: {
-                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sCargo, sInstitucion, sfechaBaja
-                        }
-                    });
-                    continue;
-                }
-
                 //Si la empresa es CYRGO, convierto la imagen de la firma de Daniel en base64
                 let firmaBase64 = "";
                 if (empresaData.firmaImg) {
@@ -101,6 +89,23 @@ sap.ui.define([
                     firmaBase64 = "data:image/jpeg;base64," + btoa(
                         new Uint8Array(firmaBytes).reduce((s, b) => s + String.fromCharCode(b), "")
                     );
+                }
+
+                // ── Word ─────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Contrato_Aprendizaje_Lectivo_Cyrgo.docx"
+                        : "templates/word/Contrato_Aprendizaje_Lectivo_Diaco.docx";
+
+                    await wordGenerator.generateWord({
+                        templatePath: wordTemplatePath,
+                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Aprendizaje_Lectivo.docx`,
+                        data: {
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, 
+                            sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sInstitucion, sCargo
+                        }
+                    });
+                    continue;
                 }
 
                 // ══════════════════════════════════════════════════════════════

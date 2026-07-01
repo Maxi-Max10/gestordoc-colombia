@@ -33,9 +33,28 @@ sap.ui.define([
                 const localDate    = oController.getLocalDate();
                 const sPlanta      = user.planta || "";
                 const sArea = user.area || "";
+                const sCiudadFirma = user.ciudadFirma || "";
+
 
                 // ── Empresa ───────────────────────────────────────────────────
                 const isCyrgo = user.company === "CO24";
+
+                // ── Word ─────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Protocolo_Recibo_Cyrgo.docx"
+                        : "templates/word/Protocolo_Recibo.docx";
+
+                    await wordGenerator.generateWord({
+                        templatePath: wordTemplatePath,
+                        fileName:     `${user.firstName}_${user.lastName}_Protocolo_Recibo.docx`,
+                        data: {
+                            sNombre, sCedula, localDate, sPlanta, sArea, sCiudadFirma
+                        }
+                    });
+                    continue;
+                }
+
 
                 function _buildHtmlDiaco() {
                     return `
@@ -148,27 +167,14 @@ sap.ui.define([
                 </div>`;
                 }
 
-
-                // ── Word ─────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await wordGenerator.generateWord({
-                        templatePath: "pdf/Protocolo_Recibo.docx",
-                        fileName:     `${user.firstName}_${user.lastName}_Protocolo_Recibo.docx`,
-                        data: {
-                            sNombre, sCedula, localDate, sPlanta, sArea
-                        }
-                    });
-                    continue;
-                }
-
                 // ── PDF — con plantilla de fondo ──────────────────────────────
                 const htmlPagina1 = isCyrgo ? _buildHtmlCyrgo() : _buildHtmlDiaco();
                 const contentBlocks = [htmlPagina1];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
                const templateFile = isCyrgo
-                    ? "pdf/plantilaProtocoloReciboCyrgo.pdf"
-                    : "pdf/plantillaProtocoloRecibo.pdf";
+                    ? "templates/pdf/plantilaProtocoloReciboCyrgo.pdf"
+                    : "templates/pdf/plantilaProtocoloRecibo.pdf";
 
                 const existingPdfBytes = await fetch(templateFile)
                     .then(res => res.arrayBuffer());

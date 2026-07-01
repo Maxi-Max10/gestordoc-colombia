@@ -75,8 +75,8 @@ sap.ui.define([
             "[[GrupoSanguineo]]":  data.sGrupoSangre      || "",
             "[[Nacionalidad]]":    data.sNacional         || "",
             "[[Pais]]":            data.sPais             || "",
-            "[CiudadResidencia]":  data.sCiudadResidencia || "",
-            "[CiudadExpedicion]":  data.sCiudadExpedicion || "",
+            "[[CiudadResidencia]]":  data.sCiudadResidencia || "",
+            "[[CiudadExpedicion]]":  data.sCiudadExpedicion || "",
             "[[DocCardType]]":     data.sDocCardType      || "",
 
             // Checkboxes del tipo de documento: marcado (☑) o vacío (☐) según SAP
@@ -97,7 +97,7 @@ sap.ui.define([
 
             // ── Datos laborales ──────────────────────────────────────────────
             "[[Cargo]]":             data.sCargo             || "",
-            "[[CidadFirma]]":        data.sCiudadFirma        || "",
+            "[[CiudadFirma]]":       data.sCiudadFirma       || "",
             "[[Planta]]":            data.sPlanta            || "",
             "[[Area]]":              data.sArea              || "",
             "[[JefeNombre]]":        data.sJefeNombre        || "",
@@ -125,11 +125,9 @@ sap.ui.define([
 
             // Une ciudad + fecha en un solo placeholder:
             // "Bogotá, 15 de junio del año 2026"
-            "[[CiudadFecha]]": data.sCiudadWork
-                ? `${data.sCiudadWork}, ${data.localDate}`
+            "[[CiudadFecha]]": data.sCiudadFirma
+                ? `${data.sCiudadFirma}, ${data.localDate}`
                 : (data.localDate || ""),
-
-            "[[CiudadFirma]]": data.sCiudadWork || "",  // Solo la ciudad, sin fecha
         };
 
         // ── Paso 4: Reemplazar los placeholders en los XMLs internos del .docx ─

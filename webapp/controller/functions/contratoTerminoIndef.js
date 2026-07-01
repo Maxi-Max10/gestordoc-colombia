@@ -46,8 +46,8 @@ sap.ui.define([
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
 
                 const templateFile = user.company === "CO24"
-                    ? "pdf/Cyrgo.pdf"
-                    : "pdf/hojaDiaco.pdf";
+                    ? "templates/pdf/Cyrgo.pdf"
+                    : "templates/pdf/hojaDiaco.pdf";
 
                 // ── Datos según empresa ───────────────────────────────────────
                 const isCyrgo = user.company === "CO24";
@@ -57,7 +57,7 @@ sap.ui.define([
                     repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
                     repCC:         "74.371.977",
                     repGenero:     "identificado",
-                    firmaImg:      "pdf/firma_Daniel_Cyrgo.jpg",
+                    firmaImg:      "img/firma_Daniel_Cyrgo.jpg",
                 } : {
                     empresaNombre: "DIACO S.A.",
                     domicilio:     "Bogotá",
@@ -67,19 +67,6 @@ sap.ui.define([
                     firmaImg:      "",
                 };
 
-                // ── Word ─────────────────────────────────────────────────────
-                if (sButtonId.includes("wordDataInfo")) {
-                    await wordGenerator.generateWord({
-                        templatePath: "pdf/Contrato_Termino_Indefinido.docx",
-                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
-                        data: {
-                            sNombre, sCedula, localDate, sPais, sDireccion, sCargo, sSalario, sSalarioLetras,
-                            sfechaContratacion, sPeriodoPago, sCiudadFirma
-                        }
-                    });
-                    continue;
-                }
-
                 //Si la empresa es CYRGO, convierto la imagen de la firma de Daniel en base64
                 let firmaBase64 = "";
                 if (empresaData.firmaImg) {
@@ -87,6 +74,23 @@ sap.ui.define([
                     firmaBase64 = "data:image/jpeg;base64," + btoa(
                         new Uint8Array(firmaBytes).reduce((s, b) => s + String.fromCharCode(b), "")
                     );
+                }
+
+                // ── Word ─────────────────────────────────────────────────────
+                if (sButtonId.includes("wordDataInfo")) {
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Contrato_Termino_Indefinido_Cyrgo.docx"
+                        : "templates/word/Contrato_Termino_Indefinido_Diaco.docx";
+
+                    await wordGenerator.generateWord({
+                        templatePath: wordTemplatePath,
+                        fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
+                        data: {
+                            sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sPais, sDireccion,
+                            sCargo, sSalario, sSalarioLetras, sfechaContratacion, sPeriodoPago
+                        }
+                    });
+                    continue;
                 }
 
                 // ══════════════════════════════════════════════════════════════
@@ -1469,10 +1473,9 @@ sap.ui.define([
                     ">
 
                         <!-- EMPLEADOR -->
-                        <div style="width:40%;">
+                        <div style="width:40%;position:relative;">
+                            ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;position:absolute;bottom:100%;left:0;margin-bottom:4px;">` : ""}
                             <div style="border-top:1px solid #000;padding-top:6px;">
-
-                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
 
                                 <div style="font-weight:bold;min-height:18px;">
                                     ${empresaData.repNombre}
@@ -1663,87 +1666,6 @@ sap.ui.define([
         }
     }
 
-    // ─── Word ─────────────────────────────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Contrato_Termino_Indef.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Contrato_Termino_Indef.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
 
-        const variables = {
-            "[[Nombre]]":     data.sNombre,
-            "[[Cedula]]":     data.sCedula,
-            "[[Cargo]]":      data.sCargo,
-            "[[Ciudad]]":     data.sCiudadWork,
-            "[[Salario]]":    data.sSalario,
-            "[[FechaInicio]]":data.sHireDate,
-            "[[SalarioenLetras]]":data.sSalarioLetras
-            
-        };
-
-        const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp("\\[\\[" + key.slice(2,-2).split("").map(c => c + "(?:<[^>]*>)*").join("") + "\\]\\]","g");
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Contrato_Termino_Indefinido.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
-    }
-
-    function _formatSalary(value) {
-        if (!value) return "";
-        return "$ " + Number(value).toLocaleString("es-CO");
-    }
-
-    function _formatDateLong(dateInput) {
-        if (!dateInput) return "";
-        const d = new Date(dateInput);
-        const months = ["enero","febrero","marzo","abril","mayo","junio",
-                        "julio","agosto","septiembre","octubre","noviembre","diciembre"];
-        return `${d.getUTCDate()} de ${months[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
-    }
-
-    return {
-        onDownloadPDFContratoTerminoIndef,
-        generatePdfDocuments: function (oController) {
-            return onDownloadPDFContratoTerminoIndef(oController, "pdfDataInfo", {
-                returnPdfDocuments: true,
-                throwErrors: true
-            });
-        }
-    };
+    return {onDownloadPDFContratoTerminoIndef};
 });

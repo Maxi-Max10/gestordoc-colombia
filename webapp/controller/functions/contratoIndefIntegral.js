@@ -65,13 +65,13 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Contrato_Termino_Indef_Integral.docx",
+                        templatePath: "templates/word/Contrato_Termino_Indef_Integral.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indef_Integral.docx`,
                         data: {
-                            sNombre, sCedula, localDate, sCargo, sSalario, sSalarioLetras,
-                            salarioIntegral, componenteRemunerativo, factorPrestacional, sCompRemunerativo, sFactorPrestacional,
-                            sCompRemunerativoLetras, sFactorPrestacionalLetras, sfechaContratacion,
-                            sDireccion, sPeriodoPago, sPlanta, sCiudadFirma
+                            sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sCargo, 
+                            sSalario, sSalarioLetras, salarioIntegral, componenteRemunerativo, factorPrestacional, 
+                            sCompRemunerativo, sFactorPrestacional, sCompRemunerativoLetras, sFactorPrestacionalLetras, 
+                            sfechaContratacion, sDireccion, sPeriodoPago, sPlanta
                         }
                     });
                     continue;
@@ -1797,7 +1797,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf")
+                const existingPdfBytes = await fetch("templates/pdf/hojaDiaco.pdf")
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
@@ -1892,80 +1892,5 @@ sap.ui.define([
         }
     }
 
-    // ─── Word ─────────────────────────────────────────────────────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Contrato_Indefinido.docx").then(res => {
-            if (!res.ok) throw new Error(`No se pudo cargar Contrato_Indefinido.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":                    data.sNombre,
-            "[[Cedula]]":                    data.sCedula,
-            "[[Cargo]]":                     data.sCargo,
-            "[[Ciudad]]":                    data.sCiudadWork,
-            "[[Fecha]]":                     data.localDate,
-            "[[Salario]]":                   data.sSalario,
-            "[[FechaInicio]]":               data.sHireDate,
-            "[[Direccion]]":                 data.sDireccion,
-            "[[ComponenteRemunerativo]]":    data.sCompRemunerativo,
-            "[[FactorPrestacional]]":        data.sFactorPrestacional,
-            "[[CompRemunerativoLetras]]":    data.sCompRemunerativoLetras,
-            "[[FactorPrestacionalLetras]]":  data.sFactorPrestacionalLetras,
-            "[[FechaContratacion]]":         data.fechaContratacion,
-            "[[PeriodoPago]]":               data.sPeriodoPago,
-            "[[SalarioLetras]]":             data.sSalarioLetras
-        };
-
-        const targets = ["word/document.xml","word/header1.xml","word/header2.xml","word/footer1.xml","word/footer2.xml"];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp("\\[\\[" + key.slice(2,-2).split("").map(c => c + "(?:<[^>]*>)*").join("") + "\\]\\]","g");
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Contrato_Indefinido.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-    function _escXml(str) {
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script   = document.createElement("script");
-            script.src     = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload  = () => resolve(window.JSZip);
-            script.onerror = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
-    }
-    return {
-        onDownloadPDFContratoIndefIntegral,
-        generatePdfDocuments: function (oController) {
-            return onDownloadPDFContratoIndefIntegral(oController, "pdfDataInfo", {
-                returnPdfDocuments: true,
-                throwErrors: true
-            });
-        }
-    };
+    return {onDownloadPDFContratoIndefIntegral};
 });

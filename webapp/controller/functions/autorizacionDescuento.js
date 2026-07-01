@@ -32,16 +32,15 @@ sap.ui.define([
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
                 const sCiudadFirma = user.ciudadFirma || "";
-                //const sCiudadWork  = oController.getCiudadWork(user);
                 const localDate    = oController.getLocalDate();
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Autorizacion_Descuento.docx",
+                        templatePath: "templates/word/Autorizacion_Descuento.docx",
                         fileName:     `${user.firstName}_${user.lastName}Autorizacion_Descuento.docx`,
                         data: {
-                            sNombre, sCedula, sIdentificado, localDate
+                            sNombre, sCedula, sIdentificado, sCiudadFirma, localDate
                         }
                     });
                     continue;

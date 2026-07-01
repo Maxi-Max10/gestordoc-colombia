@@ -37,7 +37,7 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Solicitud_Deducciones_Retencion.docx",
+                        templatePath: "templates/word/Solicitud_Deducciones_Retencion.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Solicitud_Deducciones_Retencion.docx`,
                         data: {
                             sNombre, sCedula, sCiudadFirma, localDate, sCiudadExpedicion

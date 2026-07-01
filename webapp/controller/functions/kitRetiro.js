@@ -27,7 +27,7 @@ sap.ui.define([
 
                 /*
                 // ── FORZAR CYRGO PARA PRUEBAS — BORRAR ANTES DE PRODUCCIÓN ──
-                user.company       = "CO24";
+                user.company       = "CO10";
                 user.ciudadFirma   = "Barranquilla";
                 user.firstName     = "Juan";
                 user.lastName      = "Pérez";
@@ -40,8 +40,8 @@ sap.ui.define([
                 user.personalPhone = "3001234567";
                 user.hireDatesimpl = "2022-01-15";
                 user.endDateBaja   = "2026-05-25";
-                
                 */
+                
 
                 if (aUsers.length > 1) {
                     MessageToast.show(`Generando documento ${i + 1} de ${aUsers.length}...`);
@@ -54,14 +54,14 @@ sap.ui.define([
                 const localDate      = oController.getLocalDate();
                 const sCargo         = oController.resolveGender(user.title || "", user.gender);
                 const sSalario       = oController.formatSalary(user.paycompvalue);
-                const sIngreso       = user.hireDatesimpl ? oController.formatDateToSpanish(user.hireDatesimpl) : "XXXX";
+                const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
+                const sfechaBaja = oController.formatDateRaw(user.endDateBaja);
                 const sIdentif       = (user.gender === "F") ? "identificada" : "identificado";
                 const sDireccion     = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
 
                 // ← NUEVO: campos que ahora vienen desde la carga enriquecida
                 const sEmail       = user.personalEmail || "";
                 const sTelefono    = user.personalPhone || "";
-                const sfechaBaja        = oController.formatDateRaw(user.endDateBaja);
                 //const sFechaBajaCorta = user.endDateBaja? oController.formatFechaCorta(user.endDateBaja): "";
 
                 // ── Empresa ───────────────────────────────────────────────────
@@ -84,13 +84,17 @@ sap.ui.define([
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Kit_Retiro_Cyrgo.docx"
+                        : "templates/word/Kit_Retiro_Diaco.docx";
+
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Kit_Retiro.docx",
+                        templatePath: wordTemplatePath,
                         fileName:     `${user.firstName}_${user.lastName}_Kit_Retiro.docx`,
                         data: {
                             sNombre, sCedula, localDate, sCargo,
-                            sSalario, sIngreso, sSalida, sIdentif,
-                            sEmail, sTelefono, sDireccion, sCiudadFirma
+                            sSalario, sfechaContratacion, sfechaBaja, sfechaContratacion, sIdentif,
+                            sEmail, sTelefono, sDireccion, sCiudadFirma, sCiudadResidencia
                         }
                     });
                     continue;
@@ -292,7 +296,7 @@ sap.ui.define([
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
                                 Que, <strong>${sNombre}</strong> ${sIdentif} con cédula de ciudadanía número
                                 <strong>${sCedula},</strong> trabajó en la empresa con contrato a término indefinido, desde
-                                <strong>${sIngreso}</strong> hasta el <strong>${sfechaBaja}</strong>
+                                <strong>${sfechaContratacion}</strong> hasta el <strong>${sfechaBaja}</strong>
                             </p>
 
                             <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
@@ -391,7 +395,7 @@ sap.ui.define([
                                 <tr>
                                     <td style="width:24px;vertical-align:top;font-weight:bold;">1.</td>
                                     <td style="text-align:justify;">
-                                        <strong>Envío de documentos de retiro a correo electrónico: Recibir, revisar y
+                                        <strong>Envío de documentos de retiro a correo electrónico:</strong> Recibir, revisar y
                                          aprobar a través de su correo electrónico, los documentos de su paquete de egreso.
                                           Una vez dicha documentación de egreso haya sido aprobada por usted, deberá imprimirla,
                                            firmarla en señal de aceptación y enviarla escaneada al correo electrónico
@@ -492,11 +496,11 @@ sap.ui.define([
                                 Que, <strong>${sNombre}</strong> ${sIdentif} con la cédula de ciudadanía número
                                 <strong>${sCedula},</strong> estuvo vinculado(a) con nuestra empresa mediante contrato de trabajo 
                                 a término Indefinido, prestando sus servicios en el <strong>PV MALAMBO</strong> desde el día 
-                                <strong>${sIngreso}</strong> hasta el <strong>${sfechaBaja}</strong>
+                                <strong>${sfechaContratacion}</strong> hasta el <strong>${sfechaBaja}</strong>
                             </p>
 
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
-                                A la fecha de su retiro desempeñaba el cargo de <strong>${sCargo}</strong> con un Salario Básico Mensual de <strong>$${sSalario}</strong>.
+                                A la fecha de su retiro desempeñaba el cargo de <strong>${sCargo}</strong> con un Salario Básico Mensual de <strong>${sSalario}</strong>.
                             </p>
 
                             <div style="margin-top:110px;">
@@ -544,8 +548,7 @@ sap.ui.define([
 
                                     <p style="text-align:left;margin:0 0 20px 0;">Cordialmente,</p>
 
-                                    ${firmaBase64 ? `<img src="${firmaBase64}" style="height:60px;width:auto;display:block;margin:0 auto 8px auto;mix-blend-mode:multiply;">` : ""}
-
+                                        ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
                                         <strong>${empresaData.repNombre}</strong>
                                     </p>
 
@@ -610,8 +613,8 @@ sap.ui.define([
                 const contentBlocks = isCyrgo ? _buildCyrgo() : _buildDiaco();
 
                 const templateFile = isCyrgo
-                    ? "pdf/Cyrgo.pdf"
-                    : "pdf/hojaDiaco.pdf";
+                    ? "templates/pdf/Cyrgo.pdf"
+                    : "templates/pdf/hojaDiaco.pdf";
 
                 const existingPdfBytes = await fetch(templateFile).then(res => res.arrayBuffer());
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);

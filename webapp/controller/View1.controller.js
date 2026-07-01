@@ -920,7 +920,7 @@ sap.ui.define([
       const fnReadUsers = () => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
-          "$filter": `status eq 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`,
+          "$filter": `status eq 't' and (empInfo/jobInfoNav/company eq 'CO10' or empInfo/jobInfoNav/company eq 'CO24')`,
           "$expand": sExpand
         }
       });
@@ -1209,7 +1209,7 @@ sap.ui.define([
       const fnReadUsers = () => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
-          "$filter": `status ne 't' and empInfo/jobInfoNav/company eq '${sUserCompany}'`, // ne 't' = no activo
+          "$filter": `status ne 't' and (empInfo/jobInfoNav/company eq 'CO10' or empInfo/jobInfoNav/company eq 'CO24')`, // ne 't' = no activo
           "$expand": sExpand
         }
       });
@@ -1443,7 +1443,7 @@ sap.ui.define([
     // se puede agregar la lógica acá según el sTitle recibido.
     // ═══════════════════════════════════════════════════════════════════
 
-    _openDialogForTitle: function (sTitle) {
+    _openDialogForTitle: function (sTitle, sCompany) {
       const oView           = this.getView();
       const oDialog         = oView.byId("employeeDialog");
       const oViewStateModel = oView.getModel("view");
@@ -1468,6 +1468,10 @@ sap.ui.define([
         } else {
           this._activeAdministrativeUsers = aFilteredUsers;
         }
+      }
+
+      if (sCompany) {
+        aFilteredUsers = aFilteredUsers.filter(u => u.company === sCompany);
       }
 
       if ((!Array.isArray(aUsers) || aUsers.length === 0) && !aFilteredUsers.length) {
@@ -1497,6 +1501,50 @@ sap.ui.define([
       this._applyCombinedFilters();
     },
 
+    _openCompanySelector: function (sTitle) {
+      if (!this._oCompanyDialog) {
+        this._oCompanyDialog = new sap.m.Dialog({
+          title: "Seleccionar empresa",
+          contentWidth: "24rem",
+          contentHeight: "auto",
+          class: "companySelectorDialog",
+          content: [
+            new sap.m.HBox({
+              justifyContent: "Center",
+              fitContainer: true,
+              justifyContent: "SpaceBetween",
+              items: [
+                new sap.m.Button({
+                  text: "Diaco",
+                  width: "9rem",
+                  press: () => {
+                    this._oCompanyDialog.close();
+                    this._openDialogForTitle(sTitle, "CO10");
+                  }
+                }).addStyleClass("companySelectorButton companySelectorButtonDiaco"),
+                new sap.m.Button({
+                  text: "Cyrgo",
+                  width: "9rem",
+                  press: () => {
+                    this._oCompanyDialog.close();
+                    this._openDialogForTitle(sTitle, "CO24");
+                  }
+                }).addStyleClass("companySelectorButton companySelectorButtonCyrgo")
+              ]
+            })
+            .addStyleClass("sapUiSmallMargin")
+            .addStyleClass("companySelectorBox")
+          ],
+          beginButton: new sap.m.Button({
+            text: "Cancelar",
+            type: "Transparent",
+            press: () => this._oCompanyDialog.close()
+          }).addStyleClass("companySelectorCancelButton")
+        });
+        this.getView().addDependent(this._oCompanyDialog);
+      }
+      this._oCompanyDialog.open();
+    },
 
     _shouldShowDocuSignButton: function () {
       return !!DOCUSIGN_DOCUMENTS[this._currentCategory];
@@ -1885,7 +1933,10 @@ sap.ui.define([
     onKitRetiroPress: function () {
       this.sSelectedContract = "Kit de Retiro";
       this._currentCategory  = "kitRetiro";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
@@ -1899,7 +1950,10 @@ sap.ui.define([
     onOtroSiAlimentacion15Press: function () {
       this.sSelectedContract = "Otro Sí - Alim. $15.000";
       this._currentCategory  = "otroSiAlimentacion15";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
@@ -1934,7 +1988,10 @@ sap.ui.define([
     onCompromisoEticaPress: function () {
       this.sSelectedContract = "Compromiso con la Ética";
       this._currentCategory  = "compromisoEtica";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
@@ -1962,7 +2019,10 @@ sap.ui.define([
     onProtocoloReciboPress: function () {
       this.sSelectedContract = "Protocolo Reglamento Interno";
       this._currentCategory  = "protocoloRecibo";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
@@ -1983,14 +2043,20 @@ sap.ui.define([
     onContratoIndefinidoPress: function () {
       this.sSelectedContract = "Contrato Término Indefinido";
       this._currentCategory  = "contratoTerminoIndef";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
     onContratoAprendizajeLectivoPress: function () {
       this.sSelectedContract = "Aprendizaje Etapa Lectiva";
       this._currentCategory  = "contratoAprendizajeLectivo";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 

@@ -42,19 +42,19 @@ sap.ui.define([
                 const localDate    = oController.getLocalDate();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sSalarioLetras  = user.payCompValueWord || "";
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
-                const sSalarioLetras  = user.payCompValueWord || "";
-
+                
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Contrato_Termino_Fijo.docx",
+                        templatePath: "templates/word/Contrato_Termino_Fijo.docx",
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Fijo.docx`,
                         data: {
-                            sNombre, sCedula, localDate, sCargo, sSalario, sSalarioLetras,
-                            sfechaContratacion, sDireccion, sPeriodoPago, sCiudadFirma
+                            sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sCargo, 
+                            sSalario, sSalarioLetras, sfechaContratacion, sDireccion, sPeriodoPago
                         }
                     });
                     continue;
@@ -1616,7 +1616,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf")
+                const existingPdfBytes = await fetch("templates/pdf/hojaDiaco.pdf")
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
@@ -1719,13 +1719,6 @@ sap.ui.define([
             MessageToast.show("Error generando el documento: " + error.message);
             return bReturnPdfDocuments ? [] : undefined;
         }
-    }
-
-    async function generateContratoTerminoFijoPdfDocuments(oController) {
-        return onDownloadPDFContratoTerminoFijo(oController, "pdfDataInfo", {
-            returnPdfDocuments: true,
-            throwErrors: true
-        });
     }
 
     return {onDownloadPDFContratoTerminoFijo};

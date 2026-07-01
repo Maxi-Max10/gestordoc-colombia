@@ -37,15 +37,17 @@ sap.ui.define([
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
                 const sCiudadFirma = user.ciudadFirma || "";
+                const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sSalarioLetras  = user.payCompValueWord || "";
                 const localDateLong = oController.formatDateToWords(new Date());
 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Otro_Si_Alimentacion_10.docx",
+                        templatePath: "templates/word/Otro_Si_Alimentacion_10.docx",
                         fileName:     `${user.firstName}_${user.lastName}Otro_Si_Alimentacion_10.docx`,
                         data: {
-                            sNombre, sCedula, sIdentificado, localDateLong, sCiudadFirma
+                            sNombre, sCedula, sIdentificado, localDateLong, sCiudadFirma, sSalario, sSalarioLetras
                         }
                     });
                     continue;
@@ -72,7 +74,7 @@ sap.ui.define([
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         Con esta finalidad, las partes han convenido que por cada día laborado el trabajador recibe un valor de
-                        <strong>DIEZ MIL PESOS 00/100 MCTE. ($10.000,00)</strong>, por día trabajado, por medio de una tarjeta recargable con la cual podrá
+                        <strong>${sSalarioLetras} (${sSalario})</strong>, por día trabajado, por medio de una tarjeta recargable con la cual podrá
                         acceder a comprar alimentos en los establecimientos que tengan y acepten el convenio con la entidad expendedora de las tarjetas. 
                     </p>
 
@@ -202,88 +204,5 @@ sap.ui.define([
             MessageToast.show("Error generando el documento: " + error.message);
         }
     }
-
-    // ─── Word con JSZip + plantilla OtroSi_Alimentacion_10.000.docx ──────────────────
-    async function _generateWord(data) {
-        const JSZip         = await _ensureJSZip();
-        const templateBytes = await fetch("pdf/Otro_Si_Alimentacion_10.docx").then(res => {
-        if (!res.ok) throw new Error(`No se pudo cargar Otro_Si_Alimentacion_10.docx (${res.status})`);
-            return res.arrayBuffer();
-        });
-        const zip = await JSZip.loadAsync(templateBytes);
-
-        const variables = {
-            "[[Nombre]]":       data.sNombre,
-            "[[Cedula]]":       data.sCedula,
-            "[[Identificado]]": data.sIdentificado,
-            "[[CiudadWork]]":   data.sCiudadWork,
-            "[[FechaLarga]]": data.localDateLong
-        };
-
-        const targets = [
-            "word/document.xml",
-            "word/header1.xml",
-            "word/header2.xml",
-            "word/footer1.xml",
-            "word/footer2.xml"
-        ];
-
-        for (const path of targets) {
-            if (zip.files[path]) {
-                let xml = await zip.files[path].async("string");
-                for (const [key, value] of Object.entries(variables)) {
-                    xml = xml.split(key).join(_escXml(value));
-                    const frag = new RegExp(
-                        "\\[\\[" +
-                        key.slice(2, -2).split("").map(c => c + "(?:<[^>]*>)*").join("") +
-                        "\\]\\]", "g"
-                    );
-                    xml = xml.replace(frag, _escXml(value));
-                }
-                zip.file(path, xml);
-            }
-        }
-
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement("a");
-        link.href  = URL.createObjectURL(blob);
-        link.download = `${data.firstName}_${data.lastName}_Otro_Si_Alimentacion_10.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-
-        MessageToast.show("Documento Word generado correctamente.");
-    }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
-
-    function _escXml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    function _ensureJSZip() {
-        if (window.JSZip) return Promise.resolve(window.JSZip);
-        return new Promise((resolve, reject) => {
-            const script    = document.createElement("script");
-            script.src      = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-            script.onload   = () => resolve(window.JSZip);
-            script.onerror  = () => reject(new Error("No se pudo cargar JSZip."));
-            document.head.appendChild(script);
-        });
-    }
-
-    return {
-        onDownloadPDFOtroSiAlimentacion10,
-        generatePdfDocuments: function (oController) {
-            return onDownloadPDFOtroSiAlimentacion10(oController, "pdfDataInfo", {
-                returnPdfDocuments: true,
-                throwErrors: true
-            });
-        }
-    };
+    return {onDownloadPDFOtroSiAlimentacion10};
 });

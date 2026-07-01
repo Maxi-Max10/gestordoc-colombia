@@ -58,7 +58,7 @@ sap.ui.define([
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
-                        templatePath: "pdf/Contrato_Aprendizaje_Productivo.docx",
+                        templatePath: "templates/word/Contrato_Aprendizaje_Productivo.docx",
                         fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Productivo.docx`,
                         data: {
                             sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sCargo, sInstitucion
@@ -1372,7 +1372,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("pdf/hojaDiaco.pdf")
+                const existingPdfBytes = await fetch("templates/pdf/hojaDiaco.pdf")
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
