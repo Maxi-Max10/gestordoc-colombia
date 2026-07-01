@@ -37,6 +37,8 @@ sap.ui.define([
                 const sCedula           = user.nationalId || "";
                 const sIdentificado     = (user.gender === "F") ? "identificada" : "identificado";
                 const sCiudadFirma = user.ciudadFirma || "";
+                const sSalario    = oController.formatSalary(user.paycompvalue);
+                const sSalarioLetras  = user.payCompValueWord || "";
                 const localDateLong = oController.formatDateToWords(new Date());
 
                 // ── Word ─────────────────────────────────────────────────────
@@ -45,7 +47,7 @@ sap.ui.define([
                         templatePath: "templates/word/Otro_Si_Alimentacion_10.docx",
                         fileName:     `${user.firstName}_${user.lastName}Otro_Si_Alimentacion_10.docx`,
                         data: {
-                            sNombre, sCedula, sIdentificado, localDateLong, sCiudadFirma
+                            sNombre, sCedula, sIdentificado, localDateLong, sCiudadFirma, sSalario, sSalarioLetras
                         }
                     });
                     continue;
@@ -72,7 +74,7 @@ sap.ui.define([
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         Con esta finalidad, las partes han convenido que por cada día laborado el trabajador recibe un valor de
-                        <strong>DIEZ MIL PESOS 00/100 MCTE. ($10.000,00)</strong>, por día trabajado, por medio de una tarjeta recargable con la cual podrá
+                        <strong>${sSalarioLetras} (${sSalario})</strong>, por día trabajado, por medio de una tarjeta recargable con la cual podrá
                         acceder a comprar alimentos en los establecimientos que tengan y acepten el convenio con la entidad expendedora de las tarjetas. 
                     </p>
 
