@@ -15,6 +15,10 @@ html,
   --gd-theme-transition-slow: 560ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+html.gdDarkMode {
+  --gd-page-bg: #0b1220;
+}
+
 body,
 html,
 .sapUiBody,
@@ -30,11 +34,24 @@ html,
   letter-spacing: 0 !important;
 }
 .sapMShell, .sapMShellBG, .sapMShellGlobalOuterBackground {
-    background: transparent !important;
+    background: var(--gd-page-bg, #f4f6f8) !important;
+    background-color: var(--gd-page-bg, #f4f6f8) !important;
+  }
+
+  .sapMPage,
+  .sapMPageBgStandard,
+  .sapMPageEnableScrolling,
+  .sapMPageContent,
+  .sapMScrollCont,
+  [id$="contentContainer"],
+  [id$="contentContainer-cont"],
+  [id$="contentContainer-scroll"],
+  #contentContainer {
+    background: var(--gd-page-bg, #f4f6f8) !important;
+    background-color: var(--gd-page-bg, #f4f6f8) !important;
   }
 
   #contentContainer {
-    background: none !important;
     box-shadow: none !important;
     height: 100% !important;
     width: 100% !important;
@@ -124,7 +141,8 @@ html,
   height: clamp(4.9rem, 6.2vw, 6.6rem);
   z-index: 2;
   pointer-events: none;
-  background: var(--gd-page-bg, #f4f6f8);
+  background-color: var(--gd-page-bg, #f4f6f8);
+  background-image: none;
   box-shadow: none;
   transform: none;
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0 28 C230 54 430 80 720 80 C1010 80 1210 54 1440 28 V120 H0 Z'/%3E%3C/svg%3E");
@@ -1895,7 +1913,7 @@ html.gdDarkMode .sapUiBody,
 }
 
 .gdDarkMode .imageContainer::after {
-  background: #0b1220;
+  background-color: var(--gd-page-bg, #0b1220);
 }
 
 .gdDarkMode .greetingText,
@@ -2303,7 +2321,9 @@ html.gdDarkMode .sapUiBody,
 }
 
 .imageContainer::after {
-  transition: opacity var(--gd-theme-transition-fast);
+  transition:
+    background-color var(--gd-theme-transition-slow),
+    opacity var(--gd-theme-transition-fast);
 }
 
 .imageContainer > * {
