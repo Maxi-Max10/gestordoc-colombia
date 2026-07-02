@@ -42,6 +42,7 @@ sap.ui.define([
                 const sTelefono         = user.personalPhone || "";               
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sfechaBaja        = oController.formatDateRaw(user.endDateBaja);
+                const localDateLong = oController.formatDateToWords(new Date());
                 //const sFechaBajaLarga = oController.formatDateToWords(user.endDateBaja);
                 
                 // ── Institución de formación ──────────────────────────────────
@@ -101,7 +102,7 @@ sap.ui.define([
                         templatePath: wordTemplatePath,
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Aprendizaje_Lectivo.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, 
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, localDateLong,
                             sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sInstitucion, sCargo
                         }
                     });
@@ -1337,14 +1338,13 @@ sap.ui.define([
                         "DECIMO SÉPTIMA:",
                         "VIGENCIA.",
                         `
-                        Para los efectos de Ley, el presente contrato rige a partir del <strong>24 DE
-                        SEPTIEMBRE DEL 2025 AL 12 DE NOVIEMBRE DEL 2026</strong> prevista como terminación de la etapa
+                        Para los efectos de Ley, el presente contrato rige a partir del <strong>${sfechaContratacion}</strong> al <strong>${sfechaBaja}</strong> prevista como terminación de la etapa
                         productiva que se describe en la cláusula segunda de este contrato.
                         `
                     )}
 
                     ${_bloqueContrato(`
-                        Para efectos de lo anterior, firman el veinticuatro (24) de septiembre de 2025,
+                        Para efectos de lo anterior, firman el ${localDateLong}
                     `)}
 
                     <!-- Firmas -->
@@ -1356,10 +1356,9 @@ sap.ui.define([
                     ">
 
                         <!-- EMPLEADOR -->
-                        <div style="width:40%;">
+                        <div style="width:40%;position:relative;">
+                            ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;position:absolute;bottom:100%;left:0;margin-bottom:4px;">` : ""}
                             <div style="border-top:1px solid #000;padding-top:6px;">
-
-                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;margin-bottom:4px;display:block;">` : ""}
 
                                 <div style="font-weight:bold;min-height:18px;">
                                     ${empresaData.repNombre}
@@ -1373,22 +1372,13 @@ sap.ui.define([
                         <!-- TRABAJADOR -->
                         <div style="width:40%;">
 
-                            <div style="
-                                border-top:1px solid #000;
-                                padding-top:6px;
-                            ">
+                            <div style="border-top:1px solid #000;padding-top:6px;">
 
-                                <div style="
-                                    font-weight:bold;
-                                    min-height:18px;
-                                ">
+                                <div style="font-weight:bold;min-height:18px;">
                                     ${sNombre}
                                 </div>
 
-                                <div style="
-                                    margin-top:2px;
-                                    font-weight:bold;
-                                ">
+                                <div style="margin-top:2px;font-weight:bold;">
                                     CC. ${sCedula}
                                 </div>
 

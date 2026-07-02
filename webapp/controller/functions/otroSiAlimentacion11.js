@@ -110,7 +110,7 @@ sap.ui.define([
                             <div style="display:table-cell;width:50%;vertical-align:top;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${sNombre}</strong><br>
-                                    C.C. No. ${sCedula}
+                                     C.C. ${sCedula}
                                 </div>
                             </div>
                         </div>

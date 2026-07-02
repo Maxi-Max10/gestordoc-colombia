@@ -35,15 +35,19 @@ sap.ui.define([
                 // ── Empresa ───────────────────────────────────────────────────
                 const isCyrgo = user.company === "CO24";
 
-                // ── Word ──────────────────────────────────────────────────────
+
+                // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
-                    const isCyrgoWord = user.company === "CO24";
+                    const wordTemplatePath = isCyrgo
+                        ? "templates/word/Compromiso_Etica_Cyrgo.docx"
+                        : "templates/word/Compromiso_Etica_Diaco.docx";
+
                     await wordGenerator.generateWord({
-                        templatePath: isCyrgoWord
-                            ? "pdf/Compromiso_Etica_Cyrgo.docx"
-                            : "pdf/Compromiso_Etica.docx",
-                        fileName: `${user.firstName}_${user.lastName}_Compromiso_Etica.docx`,
-                        data: { sNombre, sCedula, localDate }
+                        templatePath: wordTemplatePath,
+                        fileName:     `${user.firstName}_${user.lastName}_Compromiso_Etica.docx`,
+                        data: {
+                            sNombre, sCedula, localDate, 
+                        }
                     });
                     continue;
                 }
