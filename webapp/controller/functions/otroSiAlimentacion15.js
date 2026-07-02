@@ -49,12 +49,14 @@ sap.ui.define([
                     repGenero:     "identificado",
                     repCargo:      "Representante Legal",
                     empresaNombre: "CYRGO S.A.S",
+                    templatePDF:   "templates/pdf/Cyrgo.pdf"
                 } : {
                     repNombre:     "LAURA CRISTINA CERÓN MUÑOZ",
                     repCC:         "52.705.312",
                     repGenero:     "identificada",
                     repCargo:      "Representante Legal",
                     empresaNombre: "DIACO S.A.",
+                    templatePDF:   ""
                 };
 
                 // ── Word ─────────────────────────────────────────────────────
@@ -81,8 +83,8 @@ sap.ui.define([
                         OTRO SI AL CONTRATO DE TRABAJO
                     </p>
 
-                    <p style="text-align:justify;margin:0 0 16px 0;"><span style="background-color:#ea80fc;">En ${sCiudadFirma}, a los ${localDateLong}, 
-                    se reunieron por una parte</span> <strong>${sNombre}</strong> ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong> 
+                    <p style="text-align:justify;margin:0 0 16px 0;">En ${sCiudadFirma}, a los ${localDateLong}, 
+                    se reunieron por una parte <strong>${sNombre}</strong> ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong> 
                     como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>${empresaData.repNombre}</strong> ${empresaData.repGenero} con la C.C. No. 
                     ${empresaData.repCC} y quien actúa en representación de <strong>${empresaData.empresaNombre}</strong>, quien en 
                     adelante se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo provisto de las siguientes cláusulas.</p>
@@ -115,7 +117,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                        <mark style="background-color:#ea80fc;padding:0;">En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.</mark>
+                        En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
                     </p>
 
                     <div style="width:100%;display:table;">
@@ -130,14 +132,14 @@ sap.ui.define([
                             <div style="display:table-cell;width:50%;vertical-align:top;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${sNombre}</strong><br>
-                                    <mark style="background-color:#ea80fc;padding:0;"> C.C. </mark>${sCedula}
+                                     C.C. ${sCedula}
                                 </div>
                             </div>
                         </div>
                     </div>
 
                 </div>`;
-
+                
                 // Insertar en DOM y esperar layout completo antes de capturar
                 const div = document.createElement("div");
                 div.style.position        = "absolute";
@@ -170,9 +172,12 @@ sap.ui.define([
                 // ── Crear o cargar documento según empresa ────────────────────
                 let pdfDoc, templatePageImage, pageWidth, pageHeight;
 
-                if (isCyrgo) {
-                    const existingPdfBytes = await fetch("templates/pdf/PlantillaCyrgo.pdf")
-                        .then(res => res.arrayBuffer());
+                if (isCyrgo && empresaData.templatePDF) {
+                    const pdfResponse = await fetch(empresaData.templatePDF);
+                    if (!pdfResponse.ok) {
+                        throw new Error(`No se pudo cargar la plantilla PDF de Cyrgo (status ${pdfResponse.status}): ${empresaData.templatePDF}`);
+                    }
+                    const existingPdfBytes = await pdfResponse.arrayBuffer();
                     pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
                     const [templatePage] = pdfDoc.getPages();
                     const { width, height } = templatePage.getSize();
@@ -180,6 +185,7 @@ sap.ui.define([
                     pageHeight        = height;
                     templatePageImage = await pdfDoc.embedPage(templatePage);
                 } else {
+                    // Diaco (o Cyrgo sin plantilla configurada): fondo blanco
                     pdfDoc    = await PDFLibRef.PDFDocument.create();
                     pageWidth = 595;
                 }

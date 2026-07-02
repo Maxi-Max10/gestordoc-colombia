@@ -62,8 +62,8 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
-                        <mark style="background-color:#fff380;padding:0;"> En ${sCiudadFirma}, a los ${localDateLong} se reunieron por una parte <strong>${sNombre}</strong>
-                        ${sIdentificado} con C.C. </mark><strong>${sCedula}</strong> como aparece al pie de su firma y quien actúa en su propio nombre y por la otra,
+                        En ${sCiudadFirma}, a los ${localDateLong} se reunieron por una parte <strong>${sNombre}</strong>
+                        ${sIdentificado} con C.C. <strong>${sCedula}</strong> como aparece al pie de su firma y quien actúa en su propio nombre y por la otra,
                         <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de  <strong>DIACO S.A.</strong>, 
                         con el fin de suscribir un acuerdo provisto de las siguientes cláusulas:
                     </p>
@@ -95,7 +95,7 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                    <mark style="background-color:#fff380;padding:0;">En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.</mark>
+                    En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
                     </p>
 
                     <div style="width:100%;display:table;">
@@ -110,7 +110,7 @@ sap.ui.define([
                             <div style="display:table-cell;width:50%;vertical-align:top;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${sNombre}</strong><br>
-                                    <mark style="background-color:#fff380;padding:0;"> C.C. No. </mark> ${sCedula}
+                                     C.C. ${sCedula}
                                 </div>
                             </div>
                         </div>
