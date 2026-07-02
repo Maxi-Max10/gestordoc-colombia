@@ -104,14 +104,14 @@ sap.ui.define([
 
                 function _buildHtmlCyrgo() {
                     return `
-                    <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+                    <div style="font-family:Arial,sans-serif;font-size:12pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
                         Código de Ética Gerdau y Cartilla de la Seguridad de la Información
                     </p>
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        Yo, ${sNombre} identificado con documento de identidad N° ${sCedula} declaro que he recibido el
+                        Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido el
                         Código de Ética Gerdau y la Cartilla de la Seguridad de la Información,
                         de la cual <strong>CYRGO S.A.S.</strong> forma parte; y conozco las normas y
                         directrices de la Empresa.
@@ -172,9 +172,12 @@ sap.ui.define([
                 const contentBlocks = [htmlPagina1];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-               const templateFile = isCyrgo
+                const templateFile = isCyrgo
                     ? "templates/pdf/plantilaProtocoloReciboCyrgo.pdf"
                     : "templates/pdf/plantilaProtocoloRecibo.pdf";
+
+                // Espacio superior (header de la plantilla) — ajustable por empresa
+                const topOffset = isCyrgo ? 175 : 210;
 
                 const existingPdfBytes = await fetch(templateFile)
                     .then(res => res.arrayBuffer());
@@ -214,7 +217,7 @@ sap.ui.define([
 
                     newPage.drawImage(img, {
                         x:      (width - imgWidth) / 2,
-                        y:      height - imgHeight - 210,  // 160 = espacio que ocupa el header de la plantilla
+                        y:      height - imgHeight - topOffset,
                         width:  imgWidth,
                         height: imgHeight
                     });

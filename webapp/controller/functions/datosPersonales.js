@@ -138,7 +138,7 @@ sap.ui.define([
                         templatePath: "templates/word/Datos_Personales.docx",
                         fileName:     `${user.firstName}_${user.lastName}Datos_Personales.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadResidencia, localDate, sCargo, sPais,
+                            sNombre, sCedula, sCiudadResidencia, localDate, sCargo, sPlanta, sPais,
                             sTelefono, sEmail, sNacional, sSexo, sEstadoCivil,
                             sGrupoSangre, sDireccion, sFechaExpedicion, sJefeNombre,
                             sDocCardType, sFechaNacimiento

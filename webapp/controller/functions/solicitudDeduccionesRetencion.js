@@ -182,7 +182,7 @@ sap.ui.define([
 
                         <p style="margin:0 0 6px 20px;">Firma: ____________________________________</p>
                         <p style="margin:0 0 6px 20px;">Nombre: ${sNombre}</p>
-                        <p style="margin:0 0 0 20px;">C.C.:${sCedula}</p>
+                        <p style="margin:0 0 0 20px;">C.C.: ${sCedula}</p>
                     </div>`;
 
                 // Crear PDF en blanco y renderizar cada página

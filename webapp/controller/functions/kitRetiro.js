@@ -151,8 +151,8 @@ sap.ui.define([
 
                             <p style="margin:0 0 16px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
-                            <p style="margin:0 0 16px 0;">Señor(a):</p>
-                            <p style="font-weight:bold;margin:0 0 16px 0;">${sNombre},</p>
+                            <p style="margin:0;">Señor:</p>
+                            <p style="font-weight:bold;margin:0;">${sNombre}</p>
                             <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                             <p style="text-align:justify;margin:0 0 16px 0;">
@@ -174,9 +174,11 @@ sap.ui.define([
 
                             <p style="margin:0 0 60px 0;">Cordialmente,</p>
 
-                            <p style="font-weight:bold;border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
-                                Gestión Personas
-                            </p>
+                            <div style="text-align:center;">
+                                <p style="border-top:1.5px solid #000;width:260px;margin:0 auto;padding-top:6px;">
+                                    <strong>Gestión Personas</strong>
+                                </p>
+                            </div>
 
                         </div>
                     `;
@@ -184,7 +186,7 @@ sap.ui.define([
                     const htmlPagina2 = `
                         <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                            <p style="margin:0 0 4px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
+                            <p style="margin:0 0 16px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
                             <p style="margin:0;">Señor:</p>
                             <p style="font-weight:bold;margin:0;">${sNombre}</p>
@@ -314,7 +316,7 @@ sap.ui.define([
                                 </tr>
                             </table>
 
-                            <p style="text-align:justify;margin:0 0 60px 0;">
+                            <p style="text-align:justify;margin:0 0 70px 0;">
                                 La anterior se expide en Ciudad de ${sCiudadFirma} el ${localDate}
                             </p>
 
@@ -336,10 +338,10 @@ sap.ui.define([
                     const htmlPagina1 = `
                         <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                            <p style="margin:0 0 20px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
+                            <p style="margin:0 0 30px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
-                            <p style="margin:0;">Señor(a):</p>
-                            <p style="font-weight:bold;margin:10;">${sNombre}</p>
+                            <p style="margin:0;">Señor:</p>
+                            <p style="font-weight:bold;margin:0;">${sNombre}</p>
 
                             <p style="text-align:justify;margin:0 0 16px 0;">
                                 Con referencia al retiro de la empresa, a continuación, se relaciona lista documentos
@@ -381,10 +383,10 @@ sap.ui.define([
                     const htmlPagina2 = `
                         <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                            <p style="margin:0 0 20px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
+                            <p style="margin:0 0 30px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
-                            <p style="margin:0 0 16px 0;">Señor(a):</p>
-                            <p style="font-weight:bold;margin:0 0 16px 0;">${sNombre}</p>
+                            <p style="margin:0;">Señor:</p>
+                            <p style="font-weight:bold;margin:0;">${sNombre}</p>
                             <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                             <p style="text-align:justify;margin:0 0 14px 0;">
@@ -482,7 +484,7 @@ sap.ui.define([
                     const htmlPagina3 = `
                         <div style="${STYLE}width:100%;box-sizing:border-box;padding-top:70px;">
 
-                            <p style="margin:0 0 40px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
+                            <p style="margin:0 0 50px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
                             <p style="font-weight:bold;text-align:center;letter-spacing:1px;margin:0 0 28px 0;">
                                 EL ÁREA DE GESTIÓN DE PERSONAS
@@ -531,8 +533,8 @@ sap.ui.define([
 
                             <p style="margin:0 0 20px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
-                            <p style="margin:0 0 16px 0;">Señor(a):</p>
-                            <p style="font-weight:bold;margin:0 0 16px 0;">${sNombre}</p>
+                            <p style="margin:0;">Señor:</p>
+                            <p style="font-weight:bold;margin:0;">${sNombre}</p>
 
 
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
@@ -568,7 +570,7 @@ sap.ui.define([
                     const htmlPagina5 = `
                         <div style="${STYLE}width:100%;box-sizing:border-box;">
 
-                            <p style="margin:0 0 20px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
+                            <p style="margin:0 0 30px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
                             <p style="margin:0;">Señor(a):</p>
                             <p style="font-weight:bold;margin:0;">ZONAMEDICA MR SA S</p>
                             <p style="margin:0;">${sDireccion}</p>

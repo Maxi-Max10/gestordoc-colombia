@@ -50,7 +50,7 @@ sap.ui.define([
                 const htmlRaw = `
                     <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
-                        <p style="text-align:center;font-weight:bold;font-size:13pt;margin:0 0 40px 0;">
+                        <p style="text-align:center;font-weight:bold;font-size:15pt;margin:0 0 40px 0;">
                             AUTORIZACIÓN DE DESCUENTO
                         </p>
 
