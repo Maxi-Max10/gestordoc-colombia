@@ -2922,3 +2922,147 @@ html.gdThemeTransitionReady .card-horizontal {
 .companySelectorCancelButton:hover .sapMBtnInner {
   color: #15263d !important;
 }
+
+.sapMDialog.documentProgressDialog {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-shadow: 0 18px 44px rgba(21, 38, 61, 0.22) !important;
+}
+
+.documentProgressDialog .sapMDialogScrollCont {
+  padding: 0 !important;
+  background: #ffffff !important;
+}
+
+.documentProgressContent {
+  gap: 0.85rem;
+  padding: 1.15rem 1.25rem 1.2rem !important;
+  background:
+    radial-gradient(circle at top right, rgba(10, 110, 209, 0.12), transparent 42%),
+    linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+}
+
+.documentProgressHeader {
+  gap: 0.8rem;
+}
+
+.documentProgressIcon {
+  align-items: center !important;
+  background: #e8f3ff !important;
+  border: 1px solid #c9e3ff !important;
+  border-radius: 999px !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.74) !important;
+  color: #0a6ed1 !important;
+  display: inline-flex !important;
+  height: 2.65rem !important;
+  justify-content: center !important;
+  min-width: 2.65rem !important;
+  width: 2.65rem !important;
+}
+
+.documentProgressHeaderText {
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.documentProgressTitle {
+  color: #172b45 !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+}
+
+.documentProgressText {
+  color: #4d6078 !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+}
+
+.documentProgressMeta {
+  margin-top: 0.2rem;
+}
+
+.documentProgressLabel {
+  color: #6d7f95 !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+}
+
+.documentProgressPercent {
+  background: #edf5ff !important;
+  border: 1px solid #d5e8ff !important;
+  border-radius: 999px !important;
+  color: #075caf !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  padding: 0.25rem 0.55rem !important;
+}
+
+.documentProgressDetail {
+  color: #61738a !important;
+  font-size: 0.78rem !important;
+  line-height: 1.4 !important;
+  margin-top: 0.1rem;
+}
+
+.documentProgressBar.sapMPI {
+  background: #d9e0e8 !important;
+  border-radius: 999px !important;
+  height: 0.56rem !important;
+  min-height: 0.56rem !important;
+  overflow: hidden !important;
+}
+
+.documentProgressBar .sapMPIBar {
+  background: linear-gradient(90deg, #0a6ed1 0%, #13a4f8 100%) !important;
+  border-radius: 999px !important;
+}
+
+.documentProgressBar .sapMPIBarRemaining {
+  background: #d9e0e8 !important;
+}
+
+.gdDarkMode .sapMDialog.documentProgressDialog {
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42) !important;
+}
+
+.gdDarkMode .documentProgressDialog .sapMDialogScrollCont {
+  background: #172131 !important;
+}
+
+.gdDarkMode .documentProgressContent {
+  background:
+    radial-gradient(circle at top right, rgba(19, 164, 248, 0.18), transparent 44%),
+    linear-gradient(180deg, #1f2d40 0%, #172131 100%);
+}
+
+.gdDarkMode .documentProgressIcon {
+  background: rgba(19, 164, 248, 0.16) !important;
+  border-color: rgba(130, 198, 255, 0.28) !important;
+  color: #8ed0ff !important;
+}
+
+.gdDarkMode .documentProgressTitle {
+  color: #f5f7fa !important;
+}
+
+.gdDarkMode .documentProgressText,
+.gdDarkMode .documentProgressDetail,
+.gdDarkMode .documentProgressLabel {
+  color: #c8d1dc !important;
+}
+
+.gdDarkMode .documentProgressPercent {
+  background: rgba(19, 164, 248, 0.14) !important;
+  border-color: rgba(130, 198, 255, 0.25) !important;
+  color: #a9ddff !important;
+}
+
+.gdDarkMode .documentProgressBar.sapMPI,
+.gdDarkMode .documentProgressBar .sapMPIBarRemaining {
+  background: #344255 !important;
+}

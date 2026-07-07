@@ -3,6 +3,7 @@ sap.ui.define([
   "sap/ui/core/mvc/Controller",            // Clase base de la que extiende este controller
   "sap/ui/model/json/JSONModel",           // Modelo JSON para manejar el estado de la vista y el usuario
   "sap/m/MessageToast",                    // Muestra mensajes breves tipo "toast" al usuario
+  "sap/ui/core/Icon",                     // Icono del diálogo de progreso de documentos
   "gestordoccolombia/util/LibraryLoader",  // Carga librerías externas (pdf-lib, html2canvas) solo cuando se necesitan
   // Helpers reutilizables
   "gestordoccolombia/controller/helpers/uiHelpers",
@@ -29,7 +30,7 @@ sap.ui.define([
 
 // El segundo argumento de sap.ui.define es la función que recibe cada módulo cargado,
 // en el mismo orden que el array de arriba.
-], (Controller, JSONModel, MessageToast, LibraryLoader, uiHelpers, formatHelpers,
+], (Controller, JSONModel, MessageToast, Icon, LibraryLoader, uiHelpers, formatHelpers,
     kitRetiro, otroSiRodamiento, otroSiAlimentacion15, otroSiAlimentacion11,
     otroSiAlimentacion10, beneficiosExtralegales, solicitudDeduccionesRetencion,
     compromisoEtica, autorizacionDescuento, datosPersonales, noDeclarante,
@@ -37,15 +38,42 @@ sap.ui.define([
   "use strict";
 
   const DOCUSIGN_DOCUMENTS = {
-    contratoTerminoFijo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_TERMINO_FIJO, generator: contratoTerminoFijo.generatePdfDocuments },
-    contratoTerminoIndef: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_TERMINO_INDEFINIDO, generator: contratoTerminoIndef.generatePdfDocuments },
-    contratoAprendizajeLectivo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_LECTIVO, generator: contratoAprendizajeLectivo.generatePdfDocuments },
-    contratoAprendizajeProductivo: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_PRODUCTIVO, generator: contratoAprendizajeProductivo.generatePdfDocuments },
-    contratoIndefIntegral: { documentType: CpiService.DOCUMENT_TYPES.CONTRATO_INDEFINIDO_INTEGRAL, generator: contratoIndefIntegral.generatePdfDocuments },
-    otroSiAlimentacion10: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_10000, generator: otroSiAlimentacion10.generatePdfDocuments },
-    otroSiAlimentacion11: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_11500, generator: otroSiAlimentacion11.generatePdfDocuments },
-    otroSiAlimentacion15: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_15000, generator: otroSiAlimentacion15.generatePdfDocuments },
-    otroSiRodamiento: { documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_RODAMIENTO, generator: otroSiRodamiento.generatePdfDocuments }
+    contratoTerminoFijo: {
+      documentType: CpiService.DOCUMENT_TYPES.CONTRATO_TERMINO_FIJO,
+      generator: controller => contratoTerminoFijo.onDownloadPDFContratoTerminoFijo(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    },
+    contratoTerminoIndef: {
+      documentType: CpiService.DOCUMENT_TYPES.CONTRATO_TERMINO_INDEFINIDO,
+      generator: controller => contratoTerminoIndef.onDownloadPDFContratoTerminoIndef(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    },
+    contratoAprendizajeLectivo: {
+      documentType: CpiService.DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_LECTIVO,
+      generator: controller => contratoAprendizajeLectivo.onDownloadPDFContratoAprendizajeLectivo(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    },
+    contratoAprendizajeProductivo: {
+      documentType: CpiService.DOCUMENT_TYPES.CONTRATO_APRENDIZAJE_PRODUCTIVO,
+      generator: controller => contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    },
+    contratoIndefIntegral: {
+      documentType: CpiService.DOCUMENT_TYPES.CONTRATO_INDEFINIDO_INTEGRAL,
+      generator: controller => contratoIndefIntegral.onDownloadPDFContratoIndefIntegral(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    },
+    otroSiAlimentacion10: {
+      documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_10000,
+      generator: controller => otroSiAlimentacion10.onDownloadPDFOtroSiAlimentacion10(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    },
+    otroSiAlimentacion11: {
+      documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_11500,
+      generator: controller => otroSiAlimentacion11.onDownloadPDFOtroSiAlimentacion11(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    },
+    otroSiAlimentacion15: {
+      documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_ALIMENTACION_15000,
+      generator: controller => otroSiAlimentacion15.onDownloadPDFOtroSiAlimentacion15(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    },
+    otroSiRodamiento: {
+      documentType: CpiService.DOCUMENT_TYPES.OTRO_SI_RODAMIENTO,
+      generator: controller => otroSiRodamiento.onDownloadPDFOtroSiRodamiento(controller, "docusignDataInfo", { returnPdfDocuments: true, throwErrors: true })
+    }
   };
 
   return Controller.extend("gestordoccolombia.controller.View1", {
@@ -172,6 +200,172 @@ sap.ui.define([
       return Promise.resolve()
         .then(fn)
         .finally(() => this._endBusy());
+    },
+
+    _ensureDocumentProgressDialog: function () {
+      if (this._documentProgressDialog) {
+        return;
+      }
+
+      this._documentProgressIcon = new Icon({
+        src: "sap-icon://document-text",
+        decorative: true,
+        size: "1.15rem"
+      }).addStyleClass("documentProgressIcon");
+      this._documentProgressTitle = new sap.m.Text({ text: "Procesando documento" }).addStyleClass("documentProgressTitle");
+      this._documentProgressText = new sap.m.Text({ wrapping: true }).addStyleClass("documentProgressText");
+      this._documentProgressPercent = new sap.m.Text({ text: "0%" }).addStyleClass("documentProgressPercent");
+      this._documentProgressBar = new sap.m.ProgressIndicator({
+        width: "100%",
+        percentValue: 0,
+        displayValue: "",
+        showValue: false,
+        state: "None"
+      }).addStyleClass("documentProgressBar");
+      this._documentProgressDetail = new sap.m.Text({ wrapping: true }).addStyleClass("documentProgressDetail");
+
+      const oHeaderText = new sap.m.VBox({
+        width: "100%",
+        renderType: "Div",
+        items: [
+          this._documentProgressTitle,
+          this._documentProgressText
+        ]
+      }).addStyleClass("documentProgressHeaderText");
+      const oHeader = new sap.m.HBox({
+        width: "100%",
+        renderType: "Div",
+        alignItems: "Center",
+        items: [
+          this._documentProgressIcon,
+          oHeaderText
+        ]
+      }).addStyleClass("documentProgressHeader");
+      const oProgressMeta = new sap.m.HBox({
+        width: "100%",
+        renderType: "Div",
+        justifyContent: "SpaceBetween",
+        alignItems: "Center",
+        items: [
+          new sap.m.Text({ text: "Avance" }).addStyleClass("documentProgressLabel"),
+          this._documentProgressPercent
+        ]
+      }).addStyleClass("documentProgressMeta");
+
+      const oContent = new sap.m.VBox({
+        width: "100%",
+        renderType: "Div",
+        items: [
+          oHeader,
+          oProgressMeta,
+          this._documentProgressBar,
+          this._documentProgressDetail
+        ]
+      }).addStyleClass("documentProgressContent");
+
+      this._documentProgressDialog = new sap.m.Dialog({
+        showHeader: false,
+        contentWidth: "25rem",
+        content: [oContent]
+      }).addStyleClass("documentProgressDialog");
+
+      this.getView().addDependent(this._documentProgressDialog);
+    },
+
+    _updateDocumentProgress: function (iPercent, sText, sDetail, sDisplayValue) {
+      this._ensureDocumentProgressDialog();
+
+      const iSafePercent = Math.max(0, Math.min(100, Math.round(iPercent || 0)));
+      this._documentProgressValue = iSafePercent;
+
+      if (sText !== undefined) {
+        this._documentProgressText.setText(sText || "Procesando documento...");
+      }
+      if (sDetail !== undefined) {
+        this._documentProgressDetail.setText(sDetail || "");
+      }
+
+      this._documentProgressPercent.setText(sDisplayValue || iSafePercent + "%");
+      this._documentProgressBar.setPercentValue(iSafePercent);
+      this._documentProgressBar.setDisplayValue("");
+    },
+
+    _startDocumentProgressPulse: function (iMaxPercent) {
+      this._stopDocumentProgressPulse();
+      const iLimit = Math.max(1, Math.min(99, iMaxPercent || 92));
+
+      this._documentProgressTimer = window.setInterval(() => {
+        const iCurrent = this._documentProgressValue || 0;
+        if (iCurrent >= iLimit) {
+          return;
+        }
+
+        const iStep = iCurrent < 35 ? 4 : (iCurrent < 70 ? 2 : 1);
+        this._updateDocumentProgress(Math.min(iLimit, iCurrent + iStep));
+      }, 450);
+    },
+
+    _stopDocumentProgressPulse: function () {
+      if (this._documentProgressTimer) {
+        window.clearInterval(this._documentProgressTimer);
+        this._documentProgressTimer = null;
+      }
+    },
+
+    _openDocumentProgress: function (mSettings) {
+      const oSettings = mSettings || {};
+      this._ensureDocumentProgressDialog();
+      this._documentProgressTitle.setText(oSettings.title || "Procesando documento");
+      this._documentProgressIcon.setSrc(oSettings.icon || "sap-icon://document-text");
+      this._updateDocumentProgress(
+        oSettings.startPercent || 5,
+        oSettings.text || "Preparando documento...",
+        oSettings.detail || "Esto puede tardar unos segundos.",
+        oSettings.displayValue
+      );
+      this._documentProgressDialog.open();
+      this._startDocumentProgressPulse(oSettings.maxPercent || 92);
+    },
+
+    _closeDocumentProgress: function () {
+      this._stopDocumentProgressPulse();
+      if (this._documentProgressDialog?.isOpen?.()) {
+        this._documentProgressDialog.close();
+      }
+    },
+
+    _waitDocumentProgressCloseDelay: function (iDelay) {
+      return new Promise(resolve => window.setTimeout(resolve, iDelay || 300));
+    },
+
+    _withDocumentProgress: async function (fn, mSettings) {
+      const oSettings = mSettings || {};
+      this._openDocumentProgress(oSettings);
+
+      try {
+        const vResult = await Promise.resolve().then(fn);
+        this._stopDocumentProgressPulse();
+        this._updateDocumentProgress(
+          100,
+          oSettings.doneText || "Documento generado correctamente.",
+          oSettings.doneDetail || "",
+          "100%"
+        );
+        await this._waitDocumentProgressCloseDelay(350);
+        return vResult;
+      } catch (oError) {
+        this._stopDocumentProgressPulse();
+        this._updateDocumentProgress(
+          100,
+          "No se pudo completar la operación.",
+          "Revisa el mensaje de error e inténtalo nuevamente.",
+          "Error"
+        );
+        await this._waitDocumentProgressCloseDelay(300);
+        throw oError;
+      } finally {
+        this._closeDocumentProgress();
+      }
     },
 
 
@@ -2128,56 +2322,93 @@ sap.ui.define([
     // (los botones de Word incluyen "wordDataInfo" en su ID).
     // ═══════════════════════════════════════════════════════════════════
 
-    onDownloadPDF: function (oEvent) {
+    onDownloadPDF: async function (oEvent) {
       const sCategory = this._currentCategory;
-      const sButtonId = oEvent.getSource().getId();
+      const oButton = oEvent?.getSource?.();
+      const sButtonId = oButton?.getId?.() || "";
+      const bWord = sButtonId.includes("wordDataInfo");
+      const sFormat = bWord ? "Word" : "PDF";
+      const aUsers = this.getSelectedUsers();
 
+      if (!aUsers.length) {
+        MessageToast.show("Seleccione al menos un colaborador.");
+        return;
+      }
+
+      let fnDownload;
       switch (sCategory) {
-        case "kitRetiro":                       this.onDownloadPDFKitRetiro(sButtonId); break;
-        case "otroSiRodamiento":                this.onDownloadPDFOtroSiRodamiento(sButtonId); break;
-        case "otroSiAlimentacion15":            this.onDownloadPDFOtroSiAlimentacion15(sButtonId); break;
-        case "otroSiAlimentacion11":            this.onDownloadPDFOtroSiAlimentacion11(sButtonId); break;
-        case "otroSiAlimentacion10":            this.onDownloadPDFOtroSiAlimentacion10(sButtonId); break;
-        case "beneficiosExtralegales":          this.onDownloadPDFBeneficiosExtralegales(sButtonId); break;
-        case "solicitudDeduccionesRetencion":   this.onDownloadPDFRetencionFuente(sButtonId); break;
-        case "compromisoEtica":                 this.onDownloadPDFCompromisoEtica(sButtonId); break;
-        case "autorizacionDescuento":           this.onDownloadPDFAutorizacionDescuento(sButtonId); break;
-        case "datosPersonales":                 this.onDownloadPDFDatosPersonales(sButtonId); break;
-        case "noDeclarante":                    this.onDownloadPDFNoDeclarante(sButtonId); break;
-        case "protocoloRecibo":                 this.onDownloadPDFProtocoloRecibo(sButtonId); break;
-        case "contratoIndefIntegral":           this.onDownloadPDFContratoIndefIntegral(sButtonId); break;
-        case "contratoTerminoFijo":             this.onDownloadPDFContratoTerminoFijo(sButtonId); break;
-        case "contratoTerminoIndef":            this.onDownloadPDFContratoTerminoIndef(sButtonId); break;
-        case "contratoAprendizajeLectivo":      this.onDownloadPDFContratoAprendizajeLectivo(sButtonId); break;
-        case "contratoAprendizajeProductivo":   this.onDownloadPDFContratoAprendizajeProductivo(sButtonId); break;
+        case "kitRetiro":                       fnDownload = () => this.onDownloadPDFKitRetiro(sButtonId); break;
+        case "otroSiRodamiento":                fnDownload = () => this.onDownloadPDFOtroSiRodamiento(sButtonId); break;
+        case "otroSiAlimentacion15":            fnDownload = () => this.onDownloadPDFOtroSiAlimentacion15(sButtonId); break;
+        case "otroSiAlimentacion11":            fnDownload = () => this.onDownloadPDFOtroSiAlimentacion11(sButtonId); break;
+        case "otroSiAlimentacion10":            fnDownload = () => this.onDownloadPDFOtroSiAlimentacion10(sButtonId); break;
+        case "beneficiosExtralegales":          fnDownload = () => this.onDownloadPDFBeneficiosExtralegales(sButtonId); break;
+        case "solicitudDeduccionesRetencion":   fnDownload = () => this.onDownloadPDFRetencionFuente(sButtonId); break;
+        case "compromisoEtica":                 fnDownload = () => this.onDownloadPDFCompromisoEtica(sButtonId); break;
+        case "autorizacionDescuento":           fnDownload = () => this.onDownloadPDFAutorizacionDescuento(sButtonId); break;
+        case "datosPersonales":                 fnDownload = () => this.onDownloadPDFDatosPersonales(sButtonId); break;
+        case "noDeclarante":                    fnDownload = () => this.onDownloadPDFNoDeclarante(sButtonId); break;
+        case "protocoloRecibo":                 fnDownload = () => this.onDownloadPDFProtocoloRecibo(sButtonId); break;
+        case "contratoIndefIntegral":           fnDownload = () => this.onDownloadPDFContratoIndefIntegral(sButtonId); break;
+        case "contratoTerminoFijo":             fnDownload = () => this.onDownloadPDFContratoTerminoFijo(sButtonId); break;
+        case "contratoTerminoIndef":            fnDownload = () => this.onDownloadPDFContratoTerminoIndef(sButtonId); break;
+        case "contratoAprendizajeLectivo":      fnDownload = () => this.onDownloadPDFContratoAprendizajeLectivo(sButtonId); break;
+        case "contratoAprendizajeProductivo":   fnDownload = () => this.onDownloadPDFContratoAprendizajeProductivo(sButtonId); break;
         default:
           MessageToast.show("No hay función definida para este documento.");
+          return;
+      }
+
+      if (oButton?.setBusy) {
+        oButton.setBusy(true);
+      }
+
+      try {
+        await this._withDocumentProgress(fnDownload, {
+          title: "Generando " + sFormat,
+          icon: bWord ? "sap-icon://doc-attachment" : "sap-icon://pdf-attachment",
+          text: aUsers.length > 1
+            ? "Generando " + aUsers.length + " documentos en formato " + sFormat + "..."
+            : "Generando documento en formato " + sFormat + "...",
+          detail: "No cierres esta ventana hasta que finalice la descarga.",
+          doneText: sFormat + " generado correctamente."
+        });
+      } finally {
+        if (oButton?.setBusy) {
+          oButton.setBusy(false);
+        }
       }
     },
 
     // Cada método delega al módulo de functions/ correspondiente.
-    onDownloadPDFKitRetiro:                     async function (sButtonId) { kitRetiro.onDownloadPDFKitRetiro(this, sButtonId); },
-    onDownloadPDFOtroSiRodamiento:              async function (sButtonId) { otroSiRodamiento.onDownloadPDFOtroSiRodamiento(this, sButtonId); },
-    onDownloadPDFOtroSiAlimentacion15:          async function (sButtonId) { otroSiAlimentacion15.onDownloadPDFOtroSiAlimentacion15(this, sButtonId); },
-    onDownloadPDFOtroSiAlimentacion11:          async function (sButtonId) { otroSiAlimentacion11.onDownloadPDFOtroSiAlimentacion11(this, sButtonId); },
-    onDownloadPDFOtroSiAlimentacion10:          async function (sButtonId) { otroSiAlimentacion10.onDownloadPDFOtroSiAlimentacion10(this, sButtonId); },
-    onDownloadPDFBeneficiosExtralegales:        async function (sButtonId) { beneficiosExtralegales.onDownloadPDFBeneficiosExtralegales(this, sButtonId); },
-    onDownloadPDFRetencionFuente:               async function (sButtonId) { solicitudDeduccionesRetencion.onDownloadPDFRetencionFuente(this, sButtonId); },
-    onDownloadPDFCompromisoEtica:               async function (sButtonId) { compromisoEtica.onDownloadPDFCompromisoEtica(this, sButtonId); },
-    onDownloadPDFAutorizacionDescuento:         async function (sButtonId) { autorizacionDescuento.onDownloadPDFAutorizacionDescuento(this, sButtonId); },
-    onDownloadPDFDatosPersonales:               async function (sButtonId) { datosPersonales.onDownloadPDFDatosPersonales(this, sButtonId); },
-    onDownloadPDFNoDeclarante:                  async function (sButtonId) { noDeclarante.onDownloadPDFNoDeclarante(this, sButtonId); },
-    onDownloadPDFProtocoloRecibo:               async function (sButtonId) { protocoloRecibo.onDownloadPDFProtocoloRecibo(this, sButtonId); },
-    onDownloadPDFContratoIndefIntegral:         async function (sButtonId) { contratoIndefIntegral.onDownloadPDFContratoIndefIntegral(this, sButtonId); },
-    onDownloadPDFContratoTerminoFijo:           async function (sButtonId) { contratoTerminoFijo.onDownloadPDFContratoTerminoFijo(this, sButtonId); },
-    onDownloadPDFContratoTerminoIndef:          async function (sButtonId) { contratoTerminoIndef.onDownloadPDFContratoTerminoIndef(this, sButtonId); },
-    onDownloadPDFContratoAprendizajeLectivo:    async function (sButtonId) { contratoAprendizajeLectivo.onDownloadPDFContratoAprendizajeLectivo(this, sButtonId); },
-    onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); },
+    onDownloadPDFKitRetiro:                     async function (sButtonId) { return kitRetiro.onDownloadPDFKitRetiro(this, sButtonId); },
+    onDownloadPDFOtroSiRodamiento:              async function (sButtonId) { return otroSiRodamiento.onDownloadPDFOtroSiRodamiento(this, sButtonId); },
+    onDownloadPDFOtroSiAlimentacion15:          async function (sButtonId) { return otroSiAlimentacion15.onDownloadPDFOtroSiAlimentacion15(this, sButtonId); },
+    onDownloadPDFOtroSiAlimentacion11:          async function (sButtonId) { return otroSiAlimentacion11.onDownloadPDFOtroSiAlimentacion11(this, sButtonId); },
+    onDownloadPDFOtroSiAlimentacion10:          async function (sButtonId) { return otroSiAlimentacion10.onDownloadPDFOtroSiAlimentacion10(this, sButtonId); },
+    onDownloadPDFBeneficiosExtralegales:        async function (sButtonId) { return beneficiosExtralegales.onDownloadPDFBeneficiosExtralegales(this, sButtonId); },
+    onDownloadPDFRetencionFuente:               async function (sButtonId) { return solicitudDeduccionesRetencion.onDownloadPDFRetencionFuente(this, sButtonId); },
+    onDownloadPDFCompromisoEtica:               async function (sButtonId) { return compromisoEtica.onDownloadPDFCompromisoEtica(this, sButtonId); },
+    onDownloadPDFAutorizacionDescuento:         async function (sButtonId) { return autorizacionDescuento.onDownloadPDFAutorizacionDescuento(this, sButtonId); },
+    onDownloadPDFDatosPersonales:               async function (sButtonId) { return datosPersonales.onDownloadPDFDatosPersonales(this, sButtonId); },
+    onDownloadPDFNoDeclarante:                  async function (sButtonId) { return noDeclarante.onDownloadPDFNoDeclarante(this, sButtonId); },
+    onDownloadPDFProtocoloRecibo:               async function (sButtonId) { return protocoloRecibo.onDownloadPDFProtocoloRecibo(this, sButtonId); },
+    onDownloadPDFContratoIndefIntegral:         async function (sButtonId) { return contratoIndefIntegral.onDownloadPDFContratoIndefIntegral(this, sButtonId); },
+    onDownloadPDFContratoTerminoFijo:           async function (sButtonId) { return contratoTerminoFijo.onDownloadPDFContratoTerminoFijo(this, sButtonId); },
+    onDownloadPDFContratoTerminoIndef:          async function (sButtonId) { return contratoTerminoIndef.onDownloadPDFContratoTerminoIndef(this, sButtonId); },
+    onDownloadPDFContratoAprendizajeLectivo:    async function (sButtonId) { return contratoAprendizajeLectivo.onDownloadPDFContratoAprendizajeLectivo(this, sButtonId); },
+    onDownloadPDFContratoAprendizajeProductivo: async function (sButtonId) { return contratoAprendizajeProductivo.onDownloadPDFContratoAprendizajeProductivo(this, sButtonId); },
 
     onSendToDocusign: async function (oEvent) {
       const oDocusignDocument = DOCUSIGN_DOCUMENTS[this._currentCategory];
       if (!oDocusignDocument) {
         MessageToast.show("Este documento no está habilitado para envío a DocuSign.");
+        return;
+      }
+
+      const aSelectedUsers = this.getSelectedUsers();
+      if (!aSelectedUsers.length) {
+        MessageToast.show("Seleccione al menos un colaborador.");
         return;
       }
 
@@ -2187,34 +2418,68 @@ sap.ui.define([
       }
 
       try {
-        await this._withBusy(async () => {
-          const aDocuments = await oDocusignDocument.generator(this);
-
-          if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
-            MessageToast.show("Seleccione al menos un colaborador.");
-            return;
-          }
-
-          for (let i = 0; i < aDocuments.length; i++) {
-            const oDocument = aDocuments[i];
-            const oPayload = await CpiService.buildDocusignPayload(
-              oDocument,
-              oDocusignDocument.documentType
-            );
-            const oCpiResponse = await CpiService.sendTerminoFijoToCPI(oPayload);
-            console.log("Respuesta CPI DocuSign " + oDocusignDocument.documentType + ":", oCpiResponse);
-          }
-
-          MessageToast.show(
-            aDocuments.length > 1
-              ? aDocuments.length + " documentos enviados a DocuSign correctamente."
-              : "Documento enviado a DocuSign correctamente."
-          );
+        this._openDocumentProgress({
+          title: "Enviando a DocuSign",
+          icon: "sap-icon://signature",
+          text: aSelectedUsers.length > 1
+            ? "Generando " + aSelectedUsers.length + " PDFs para DocuSign..."
+            : "Generando PDF para DocuSign...",
+          detail: "Preparando archivos antes del envío.",
+          startPercent: 5,
+          maxPercent: 45
         });
+
+        const aDocuments = await oDocusignDocument.generator(this);
+
+        if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
+          MessageToast.show("Seleccione al menos un colaborador.");
+          return;
+        }
+
+        this._stopDocumentProgressPulse();
+
+        for (let i = 0; i < aDocuments.length; i++) {
+          const oDocument = aDocuments[i];
+          const iCurrent = i + 1;
+          const sFileName = oDocument.fileName || "Documento.pdf";
+          const iStartPercent = 45 + Math.round((i / aDocuments.length) * 50);
+          const iDonePercent = 45 + Math.round((iCurrent / aDocuments.length) * 50);
+
+          this._updateDocumentProgress(
+            iStartPercent,
+            "Enviando a DocuSign " + iCurrent + " de " + aDocuments.length + "...",
+            sFileName,
+            i + "/" + aDocuments.length
+          );
+
+          const oPayload = await CpiService.buildDocusignPayload(
+            oDocument,
+            oDocusignDocument.documentType
+          );
+          const oCpiResponse = await CpiService.sendTerminoFijoToCPI(oPayload);
+          console.log("Respuesta CPI DocuSign " + oDocusignDocument.documentType + ":", oCpiResponse);
+
+          this._updateDocumentProgress(
+            Math.min(95, iDonePercent),
+            "Documento " + iCurrent + " enviado a DocuSign.",
+            sFileName,
+            iCurrent + "/" + aDocuments.length
+          );
+        }
+
+        this._updateDocumentProgress(100, "Envío completado.", "", "100%");
+        await this._waitDocumentProgressCloseDelay(350);
+
+        MessageToast.show(
+          aDocuments.length > 1
+            ? aDocuments.length + " documentos enviados a DocuSign correctamente."
+            : "Documento enviado a DocuSign correctamente."
+        );
       } catch (oError) {
         console.error("No se pudo enviar el documento a DocuSign:", oError);
         MessageToast.show("No se pudo enviar el documento a DocuSign. Inténtalo nuevamente.");
       } finally {
+        this._closeDocumentProgress();
         if (oButton?.setBusy) {
           oButton.setBusy(false);
         }
