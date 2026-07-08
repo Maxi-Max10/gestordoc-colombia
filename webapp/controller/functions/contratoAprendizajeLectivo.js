@@ -47,6 +47,7 @@ sap.ui.define([
                 
                 // ── Institución de formación ──────────────────────────────────
                 const sInstitucion      = await oController._getInstitucionFormacion(user.userId);
+                const sNit = oController.sManualNit || "";
                 const sCargo            = oController.resolveGender(user.title || "", user.gender);
 
                 /*
@@ -103,7 +104,7 @@ sap.ui.define([
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Aprendizaje_Lectivo.docx`,
                         data: {
                             sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, localDateLong,
-                            sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sInstitucion, sCargo
+                            sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sInstitucion, sNit, sCargo
                         }
                     });
                     continue;
@@ -481,7 +482,7 @@ sap.ui.define([
                             ">
                                 FECHA TERMINACIÓN CONTRATO
                             </td>
-                            <td style="padding:1px 5px;"></td> ${sfechaBaja}
+                            <td style="padding:1px 5px;">${sfechaBaja}</td>
                         </tr>
                     </table>
 
@@ -516,7 +517,7 @@ sap.ui.define([
                             ">
                                 NIT:
                             </td>
-                            <td style="padding:1px 5px;"></td>
+                            <td style="padding:1px 5px;">${sNit}</td>
                         </tr>
                     </table>
 

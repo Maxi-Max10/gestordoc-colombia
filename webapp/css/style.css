@@ -2832,6 +2832,39 @@ html.gdThemeTransitionReady .card-horizontal {
   border-color: #0c2547 !important;
 }
 
+.companySelectorNitBox {
+  margin: 18px 24px 4px 24px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E9F2;
+}
+
+.companySelectorNitLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #6B7280;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.companySelectorNitInput .sapMInputBaseInner {
+  border-radius: 8px;
+  border: 1px solid #D0D5DD;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.companySelectorNitInput .sapMInputBaseInner:focus {
+  border-color: #0A6ED1;
+  box-shadow: 0 0 0 2px rgba(10, 110, 209, 0.15);
+}
+
+/* Estado de error, para que combine con el resto */
+.companySelectorNitInput.sapMInputBaseContentWrapper.sapMInputBaseInvalid .sapMInputBaseInner {
+  border-color: #E11D48;
+}
+
 .companySelectorDialog .sapMDialogFooter {
   border-top: 1px solid #e2e9f3 !important;
   background: #ffffff !important;
@@ -2845,4 +2878,12 @@ html.gdThemeTransitionReady .card-horizontal {
 
 .companySelectorCancelButton:hover .sapMBtnInner {
   color: #15263d !important;
+}
+
+.companySelectorContinueButton {
+  display: block;
+  width: calc(100% - 48px); /* mismo margen lateral que companySelectorNitBox (24px + 24px) */
+  margin: 16px 24px 8px 24px;
+  border-radius: 8px;
+  box-sizing: border-box;
 }

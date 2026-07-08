@@ -102,6 +102,7 @@ sap.ui.define([
             "[[Area]]":              data.sArea              || "",
             "[[JefeNombre]]":        data.sJefeNombre        || "",
             "[[Institucion]]":       data.sInstitucion       || "",
+            "[[Nit]]":               data.sNit || "",
             "[[FechaIngreso]]":      data.sfechaContratacion || "",
             "[[FechaSalida]]":       data.sfechaBaja         || "",
 

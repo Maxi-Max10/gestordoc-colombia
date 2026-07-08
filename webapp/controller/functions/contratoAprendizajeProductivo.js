@@ -44,6 +44,7 @@ sap.ui.define([
                 const sfechaBaja = oController.formatDateRaw(user.endDateBaja);
                 const sInstitucion = await oController._getInstitucionFormacion(user.userId);
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
+                const sNit = oController.sManualNit || "";
 
                 /*
                  ── Fecha de terminación: inicio + 13 meses y 19 días ────────
@@ -61,7 +62,7 @@ sap.ui.define([
                         templatePath: "templates/word/Contrato_Aprendizaje_Productivo.docx",
                         fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Productivo.docx`,
                         data: {
-                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sCargo, sInstitucion
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sCargo, sInstitucion, sNit
                         }
                     });
                     continue;
@@ -442,7 +443,7 @@ sap.ui.define([
                             ">
                                 NIT:
                             </td>
-                            <td style="padding:1px 5px;"></td>
+                            <td style="padding:1px 5px;">${sNit}</td>
                         </tr>
                     </table>
 

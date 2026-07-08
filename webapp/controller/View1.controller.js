@@ -1501,39 +1501,97 @@ sap.ui.define([
       this._applyCombinedFilters();
     },
 
+    _getCompanySelectorConfig: function (sTitle) {
+      const mConfig = {
+        "Aprendizaje Etapa Lectiva":    { showCompanyButtons: true,  requiresNit: true  },
+        "Aprendizaje Etapa Productiva": { showCompanyButtons: false, requiresNit: true  }
+      };
+      return mConfig[sTitle] || { showCompanyButtons: true, requiresNit: false };
+    },
+
     _openCompanySelector: function (sTitle) {
+      const oConfig = this._getCompanySelectorConfig(sTitle);
+      this._companySelectorTitle = sTitle;
+      this._companySelectorConfig = oConfig;
+
       if (!this._oCompanyDialog) {
+
+        this._oNitInput = new sap.m.Input({
+          placeholder: "Ej: 900.123.456-7",
+          width: "100%"
+        }).addStyleClass("companySelectorNitInput");
+
+        this._oNitBox = new sap.m.VBox({
+          items: [
+            new sap.m.Label({ text: "NIT de la institución de formación" })
+              .addStyleClass("companySelectorNitLabel"),
+            this._oNitInput
+          ]
+        }).addStyleClass("companySelectorNitBox");
+
+        const fnValidateNit = () => {
+          const sNit = (this._oNitInput.getValue() || "").trim();
+          if (!sNit) {
+            this._oNitInput.setValueState("Error");
+            this._oNitInput.setValueStateText("Este campo es obligatorio.");
+            return null;
+          }
+          this._oNitInput.setValueState("None");
+          return sNit;
+        };
+
+        const fnHandleCompanyPress = (sCompany) => {
+          if (this._companySelectorConfig.requiresNit) {
+            const sNit = fnValidateNit();
+            if (!sNit) return;
+            this.sManualNit = sNit;
+          } else {
+            this.sManualNit = "";
+          }
+          this._oCompanyDialog.close();
+          this._openDialogForTitle(this._companySelectorTitle, sCompany);
+        };
+
+        // Botones de empresa (Diaco / Cyrgo)
+        this._oCompanyButtonsBox = new sap.m.HBox({
+          fitContainer: true,
+          justifyContent: "SpaceBetween",
+          items: [
+            new sap.m.Button({
+              text: "Diaco",
+              width: "9rem",
+              press: () => fnHandleCompanyPress("CO10")
+            }).addStyleClass("companySelectorButton companySelectorButtonDiaco"),
+            new sap.m.Button({
+              text: "Cyrgo",
+              width: "9rem",
+              press: () => fnHandleCompanyPress("CO24")
+            }).addStyleClass("companySelectorButton companySelectorButtonCyrgo")
+          ]
+        }).addStyleClass("sapUiSmallMargin").addStyleClass("companySelectorBox");
+
+        // Botón único "Continuar", para documentos que solo piden NIT (sin empresa)
+        this._oContinueButton = new sap.m.Button({
+          text: "Continuar",
+          type: "Emphasized",
+          press: () => {
+            const sNit = fnValidateNit();
+            if (!sNit) return;
+            this.sManualNit = sNit;
+            this._oCompanyDialog.close();
+            this._openDialogForTitle(this._companySelectorTitle); // sin sCompany: no filtra por empresa
+          }
+        }).addStyleClass("companySelectorContinueButton");
+
         this._oCompanyDialog = new sap.m.Dialog({
           title: "Seleccionar empresa",
           contentWidth: "24rem",
           contentHeight: "auto",
           class: "companySelectorDialog",
           content: [
-            new sap.m.HBox({
-              justifyContent: "Center",
-              fitContainer: true,
-              justifyContent: "SpaceBetween",
-              items: [
-                new sap.m.Button({
-                  text: "Diaco",
-                  width: "9rem",
-                  press: () => {
-                    this._oCompanyDialog.close();
-                    this._openDialogForTitle(sTitle, "CO10");
-                  }
-                }).addStyleClass("companySelectorButton companySelectorButtonDiaco"),
-                new sap.m.Button({
-                  text: "Cyrgo",
-                  width: "9rem",
-                  press: () => {
-                    this._oCompanyDialog.close();
-                    this._openDialogForTitle(sTitle, "CO24");
-                  }
-                }).addStyleClass("companySelectorButton companySelectorButtonCyrgo")
-              ]
-            })
-            .addStyleClass("sapUiSmallMargin")
-            .addStyleClass("companySelectorBox")
+            this._oCompanyButtonsBox,
+            this._oNitBox,
+            this._oContinueButton
           ],
           beginButton: new sap.m.Button({
             text: "Cancelar",
@@ -1543,6 +1601,15 @@ sap.ui.define([
         });
         this.getView().addDependent(this._oCompanyDialog);
       }
+
+      // Reset y visibilidad según el documento que se abrió
+      this._oNitInput.setValue("");
+      this._oNitInput.setValueState("None");
+      this._oNitBox.setVisible(oConfig.requiresNit);
+      this._oCompanyButtonsBox.setVisible(oConfig.showCompanyButtons);
+      this._oContinueButton.setVisible(!oConfig.showCompanyButtons);
+
+      this._oCompanyDialog.setTitle(oConfig.showCompanyButtons ? "Seleccionar empresa" : "Ingresar NIT");
       this._oCompanyDialog.open();
     },
 
@@ -2063,7 +2130,10 @@ sap.ui.define([
     onContratoAprendizajeProductivoPress: function () {
       this.sSelectedContract = "Aprendizaje Etapa Productiva";
       this._currentCategory  = "contratoAprendizajeProductivo";
-      this._handleTileSelection(this.sSelectedContract)
+      this._ensureDataForTitle(this.sSelectedContract)
+        .then(() => {
+          this._openCompanySelector(this.sSelectedContract);
+        })
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
 
