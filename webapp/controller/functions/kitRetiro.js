@@ -71,14 +71,14 @@ sap.ui.define([
                     repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
                     repCC:         "74.371.977",
                     firmaImg:      "img/firma_Daniel_Cyrgo.jpg",
-                    qrImg:         "img/qr_cyrgo_retiro.jpg",
+                    qrImg:         "img/qrImg.png",
                     nit:            "860.009.694-2"
                 } : {
                     empresaNombre: "DIACO S.A.",
                     repNombre:     "LAURA CRISTINA CERÓN MUÑOZ",
                     repCC:         "52.705.312",
                     firmaImg:      "",
-                    qrImg:         "img/qr_diaco_retiro.png",
+                    qrImg:         "img/qrImg.png",
                     nit:           "891.800.111-5"
                 };
 
