@@ -80,7 +80,7 @@ sap.ui.define([
                 if (sButtonId.includes("wordDataInfo")) {
                     const wordTemplatePath = isCyrgo
                         ? "templates/word/Contrato_Termino_Indefinido_Cyrgo.docx"
-                        : "templates/word/Contrato_Termino_Indefinido_Diaco.docx";
+                        : "templates/word/Contrato_Termino_Indefinido.docx";
 
                     await wordGenerator.generateWord({
                         templatePath: wordTemplatePath,

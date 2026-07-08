@@ -1696,6 +1696,7 @@ sap.ui.define([
     },
 
     _openCompanySelector: function (sTitle) {
+      this._companySelectorTitle = sTitle;
       if (!this._oCompanyDialog) {
         this._oCompanyDialog = new sap.m.Dialog({
           title: "Seleccionar empresa",
@@ -1713,7 +1714,7 @@ sap.ui.define([
                   width: "9rem",
                   press: () => {
                     this._oCompanyDialog.close();
-                    this._openDialogForTitle(sTitle, "CO10");
+                    this._openDialogForTitle(this._companySelectorTitle, "CO10");
                   }
                 }).addStyleClass("companySelectorButton companySelectorButtonDiaco"),
                 new sap.m.Button({
@@ -1721,7 +1722,7 @@ sap.ui.define([
                   width: "9rem",
                   press: () => {
                     this._oCompanyDialog.close();
-                    this._openDialogForTitle(sTitle, "CO24");
+                    this._openDialogForTitle(this._companySelectorTitle, "CO24");
                   }
                 }).addStyleClass("companySelectorButton companySelectorButtonCyrgo")
               ]
