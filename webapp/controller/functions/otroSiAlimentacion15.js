@@ -47,14 +47,12 @@ sap.ui.define([
                     repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
                     repCC:         "79.553.641",
                     repGenero:     "identificado",
-                    repCargo:      "Representante Legal",
                     empresaNombre: "CYRGO S.A.S",
                     templatePDF:   "templates/pdf/Cyrgo.pdf"
                 } : {
                     repNombre:     "LAURA CRISTINA CERÓN MUÑOZ",
                     repCC:         "52.705.312",
                     repGenero:     "identificada",
-                    repCargo:      "Representante Legal",
                     empresaNombre: "DIACO S.A.",
                     templatePDF:   ""
                 };
@@ -84,7 +82,7 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">En ${sCiudadFirma}, a los ${localDateLong}, 
-                    se reunieron por una parte <strong>${sNombre}</strong> ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong> 
+                    se reunieron por una parte <strong>${sNombre}</strong> ${sIdentificado} <strong>${sCedula}</strong> 
                     como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>${empresaData.repNombre}</strong> ${empresaData.repGenero} con la C.C. No. 
                     ${empresaData.repCC} y quien actúa en representación de <strong>${empresaData.empresaNombre}</strong>, quien en 
                     adelante se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo provisto de las siguientes cláusulas.</p>
@@ -126,13 +124,12 @@ sap.ui.define([
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${empresaData.repNombre}</strong><br>
                                     C.C. No. ${empresaData.repCC}<br>
-                                    ${empresaData.repCargo}
                                 </div>
                             </div>
                             <div style="display:table-cell;width:50%;vertical-align:top;">
                                 <div style="border-top:1.5px solid #000;padding-top:6px;">
                                     <strong>${sNombre}</strong><br>
-                                     C.C. ${sCedula}
+                                     C.C. No. ${sCedula}
                                 </div>
                             </div>
                         </div>
