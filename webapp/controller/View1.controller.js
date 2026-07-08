@@ -2359,25 +2359,15 @@ sap.ui.define([
           return;
       }
 
-      if (oButton?.setBusy) {
-        oButton.setBusy(true);
-      }
-
-      try {
-        await this._withDocumentProgress(fnDownload, {
-          title: "Generando " + sFormat,
-          icon: bWord ? "sap-icon://doc-attachment" : "sap-icon://pdf-attachment",
-          text: aUsers.length > 1
-            ? "Generando " + aUsers.length + " documentos en formato " + sFormat + "..."
-            : "Generando documento en formato " + sFormat + "...",
-          detail: "No cierres esta ventana hasta que finalice la descarga.",
-          doneText: sFormat + " generado correctamente."
-        });
-      } finally {
-        if (oButton?.setBusy) {
-          oButton.setBusy(false);
-        }
-      }
+      await this._withDocumentProgress(fnDownload, {
+        title: "Generando " + sFormat,
+        icon: bWord ? "sap-icon://doc-attachment" : "sap-icon://pdf-attachment",
+        text: aUsers.length > 1
+          ? "Generando " + aUsers.length + " documentos en formato " + sFormat + "..."
+          : "Generando documento en formato " + sFormat + "...",
+        detail: "No cierres esta ventana hasta que finalice la descarga.",
+        doneText: sFormat + " generado correctamente."
+      });
     },
 
     // Cada método delega al módulo de functions/ correspondiente.
@@ -2410,11 +2400,6 @@ sap.ui.define([
       if (!aSelectedUsers.length) {
         MessageToast.show("Seleccione al menos un colaborador.");
         return;
-      }
-
-      const oButton = oEvent?.getSource?.();
-      if (oButton?.setBusy) {
-        oButton.setBusy(true);
       }
 
       try {
@@ -2480,9 +2465,6 @@ sap.ui.define([
         MessageToast.show("No se pudo enviar el documento a DocuSign. Inténtalo nuevamente.");
       } finally {
         this._closeDocumentProgress();
-        if (oButton?.setBusy) {
-          oButton.setBusy(false);
-        }
       }
     },
 
