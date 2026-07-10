@@ -23,6 +23,11 @@
 sap.ui.define([], function () {
     "use strict";
 
+    function capitalize(text) {
+        if (!text) return "";
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
     return {
 
         // ─────────────────────────────────────────────────────────────────────────
@@ -592,14 +597,12 @@ sap.ui.define([], function () {
             return user.businessPhone || "";
         },
 
-        // Correo electrónico corporativo del empleado
         getEmail: function (user) {
             return user.email || "";
         },
 
-        // Código de nacionalidad tal como viene de SuccessFactors
         getNacionalidad: function (user) {
-            return user.nationality || "";
+            return capitalize(user.nationality || "");
         },
 
         // Sexo en texto legible ("Femenino" / "Masculino") a partir del código SAP
@@ -609,7 +612,7 @@ sap.ui.define([], function () {
 
         // Estado civil del empleado (campo estándar de SuccessFactors)
         getEstadoCivil: function (user) {
-            return user.maritalStatus || "";
+            return capitalize(user.maritalStatus || "");
         },
 
         // Grupo sanguíneo del empleado
@@ -698,7 +701,7 @@ sap.ui.define([], function () {
                     businessPhone:  getProp("businessPhone"),
 
                     // Nacionalidad y ubicación
-                    nationality:    gentilicio,                     // Ej: "colombiana"
+                    nationality:    capitalize(gentilicio),    // Ej: "Colombiana"
                     country:        this.getPaisName(getProp("country")),
                     state:          getProp("state"),
                     city:             getProp("city") || "",
@@ -772,6 +775,8 @@ sap.ui.define([], function () {
                     // Empresa (CO10 = Diaco, CO24 = Cyrgo)
                     company:     getProp("company") || "",
                     companyName: { "CO10": "Diaco S.A.", "CO24": "Cyrgo S.A." }[getProp("company")] || getProp("company") || "",
+
+                    
                 };
             });
         }

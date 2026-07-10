@@ -189,32 +189,54 @@ sap.ui.define([
      * @returns {string} XML con todos los placeholders reemplazados
      */
     function _replaceVariables(xml, variables) {
-        // Paso 1: unir los fragmentos separados por w:proofErr
-        xml = _cleanProofErr(xml);
-
-        for (const [key, value] of Object.entries(variables)) {
-            const escaped = _escXml(value); // Preparar el valor para insertarlo en XML
-
-            // Paso 2: reemplazo directo (cubre los placeholders completos y los ya unidos en el paso 1)
-            xml = xml.split(key).join(escaped);
-
-            // Paso 3: reemplazo con regex por si quedan tags XML intercalados entre los caracteres
-            // del placeholder (ej: [[No<w:rPr/>mbre]] → busca cada letra con tags opcionales entre ellas)
-            const inner        = key.slice(2, -2); // Extraer "Nombre" de "[[Nombre]]"
-            const anyXmlInline = "(?:<[^>]*>)*";   // Patrón que ignora cualquier tag XML entre caracteres
-            const bracketOpen  = "\\[\\[" + anyXmlInline;
-            const bracketClose = anyXmlInline + "\\]\\]";
-            const innerPattern = inner.split("").map(c => _escapeRegex(c) + anyXmlInline).join("");
-            const pattern = bracketOpen + innerPattern + bracketClose;
-            xml = xml.replace(new RegExp(pattern, "g"), escaped);
-
-            // Debug: detectar si "Ciudad de trabajo" aparece en el XML (útil para diagnosticar problemas de tabla)
-            const idx4 = xml.indexOf("Ciudad de trabajo");
-            if (idx4 !== -1) {
-                console.log("CONTEXTO tabla completa:", xml.substring(idx4 - 1000, idx4 + 500));
-            }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xml, "application/xml");
+        if (doc.getElementsByTagName("parsererror").length) {
+            // El XML de la plantilla ya venía roto antes de tocarlo
+            throw new Error("La plantilla tiene XML inválido de base.");
         }
-        return xml;
+
+        const NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        const paragraphs = doc.getElementsByTagNameNS(NS, "p");
+
+        for (let i = 0; i < paragraphs.length; i++) {
+            const p = paragraphs[i];
+            const runs = Array.from(p.children).filter(el => el.localName === "r");
+            if (runs.length === 0) continue;
+
+            // Texto completo del párrafo (todos los <w:t> de todos los runs)
+            let fullText = "";
+            for (const run of runs) {
+                for (const t of Array.from(run.children).filter(el => el.localName === "t")) {
+                    fullText += t.textContent;
+                }
+            }
+            if (!fullText.includes("[[")) continue; // este párrafo no tiene placeholders, no tocar
+
+            // Reemplazar variables sobre el texto ya concatenado
+            let replaced = fullText;
+            for (const [key, value] of Object.entries(variables)) {
+                replaced = replaced.split(key).join(value);
+            }
+            if (replaced === fullText) continue; // no había placeholder real, dejar como estaba
+
+            // Colapsar el párrafo en un solo run (formato del primer run) con el texto final
+            const firstRun = runs[0];
+            const firstTs = Array.from(firstRun.children).filter(el => el.localName === "t");
+            for (let k = 1; k < firstTs.length; k++) firstRun.removeChild(firstTs[k]);
+
+            let targetT = firstTs[0];
+            if (!targetT) {
+                targetT = doc.createElementNS(NS, "w:t");
+                firstRun.appendChild(targetT);
+            }
+            targetT.setAttribute("xml:space", "preserve");
+            targetT.textContent = replaced;
+
+            for (let k = 1; k < runs.length; k++) p.removeChild(runs[k]);
+        }
+
+        return new XMLSerializer().serializeToString(doc);
     }
 
     /**
@@ -235,25 +257,6 @@ sap.ui.define([
      * @param {string} xml - XML del archivo interno del .docx
      * @returns {string}   - XML con los fragmentos unidos donde corresponde
      */
-    function _cleanProofErr(xml) {
-        let prev;
-        do {
-            prev = xml;
-            xml = xml.replace(
-                // Detecta: <w:t>texto1</w:t></w:r> + <w:proofErr/> + <w:r><w:rPr>...</w:rPr><w:t>texto2</w:t>
-                /<w:t([^>]*)>([^<]*)<\/w:t><\/w:r>(?:<w:proofErr[^>]*\/>|<w:proofErr[^>]*><\/w:proofErr>)<w:r(?:[^>]*)><w:rPr>[\s\S]*?<\/w:rPr><w:t([^>]*)>([^<]*)<\/w:t>/g,
-                function(match, attr1, text1, attr2, text2) {
-                    const combined = text1 + text2;
-                    // Solo unir si el texto combinado tiene parte de un placeholder
-                    if (combined.includes("[") || combined.includes("]")) {
-                        return `<w:t xml:space="preserve">${combined}</w:t>`;
-                    }
-                    return match; // No es un placeholder: dejar el XML tal como está
-                }
-            );
-        } while (xml !== prev); // Repetir hasta que no quede nada más por unir
-        return xml;
-    }
 
     /**
      * Escapa los caracteres especiales de una cadena para poder usarla en una búsqueda RegExp.
