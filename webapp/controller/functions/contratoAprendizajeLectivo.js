@@ -250,21 +250,6 @@ sap.ui.define([
                     `;
                 }
 
-                function _versionContrato() {
-                    return `
-                        <div style="
-                            position:absolute;
-                            bottom:10px;
-                            right:24px;
-                            font-size:6pt;
-                            text-align:right;
-                        ">
-                            Versión: 28 de julio de 2025
-                        </div>
-                    `;
-                }
-
-
                 // ── PÁGINA 1 — Tablas + intro + PRIMERA ───────────────────────────────────────
                 const htmlPagina1 = `
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
@@ -550,8 +535,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -637,8 +620,6 @@ sap.ui.define([
                         desarrollar una formación profesional metódica, lo cual no implica la prestación de servicios a favor
                         `
                     )}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -729,8 +710,6 @@ sap.ui.define([
                         Poner toda la diligencia y aplicación para lograr el mayor rendimiento en su formación;
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -792,8 +771,6 @@ sap.ui.define([
                         documentos, archivos y demás fuentes de <strong>INFORMACION CONFIDENCIAL</strong> que se encuentren en su
                         poder. Esta obligación deberá ser cumplida por el <strong>APRENDIZ</strong> aún después de terminado su contrato
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -884,8 +861,6 @@ sap.ui.define([
                         Presentarse a cumplir con su etapa práctica en estado de embriaguez o bajo la influencia de
                         narcóticos o sustancias psicoactivas;
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -994,8 +969,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -1093,8 +1066,6 @@ sap.ui.define([
                         <strong>${empresaData.empresaNombre}</strong>
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -1180,8 +1151,6 @@ sap.ui.define([
                         previstas en el presente contrato.
                         `
                     )}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1269,8 +1238,6 @@ sap.ui.define([
                         sobre nuevas conductas ilícitas, la PARTE cumplida podrá rescindir el contrato unilateralmente y sin
                         indemnización.
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1389,10 +1356,6 @@ sap.ui.define([
 
                     </div>
 
-                </div>
-
-                <div style="${STYLE}width:100%;box-sizing:border-box;">
-                    ${_versionContrato()}
                 </div>`;
 
                 // ── Array final ───────────────────────────────────────────────────────────────

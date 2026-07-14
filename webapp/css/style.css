@@ -2963,6 +2963,100 @@ html.gdThemeTransitionReady .card-horizontal {
   border-radius: 8px;
   box-sizing: border-box;
 }
+/* ==========================================
+   MODO OSCURO OPTIMIZADO (.gdDarkMode)
+   ========================================== */
+
+/* Fondo principal del diálogo, scrolls, headers y footers */
+.gdDarkMode .companySelectorDialog.sapMDialog,
+.gdDarkMode .companySelectorDialog .sapMDialogSection,
+.gdDarkMode .companySelectorDialog .sapMDialogScroll,
+.gdDarkMode .companySelectorDialog .sapMDialogScrollCont,
+.gdDarkMode .companySelectorDialog .sapMDialogFooter,
+.gdDarkMode .companySelectorDialog header,
+.gdDarkMode .companySelectorDialog .sapMDialogTitleGroup,
+.gdDarkMode .companySelectorDialog .sapMIBar.sapMHeader-CTX,
+.gdDarkMode .companySelectorDialog .sapMBar.sapMHeader-CTX,
+.gdDarkMode .companySelectorDialog .sapMDialogFooter .sapMIBar,
+.gdDarkMode .companySelectorDialog .sapMDialogFooter .sapMTB,
+.gdDarkMode .companySelectorDialog .sapMDialogFooter .sapContrast,
+.gdDarkMode .companySelectorDialog .sapMDialogFooter .sapContrastPlus {
+  background: #111b2e !important;
+}
+
+/* Bordes y sombras del contenedor principal */
+.gdDarkMode .companySelectorDialog.sapMDialog {
+  border-color: rgba(190, 210, 235, 0.18) !important;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 20px 52px rgba(0, 0, 0, 0.48) !important;
+}
+
+/* Elementos internos que deben ser transparentes */
+.gdDarkMode .companySelectorDialog .companySelectorBox,
+.gdDarkMode .companySelectorDialog .companySelectorNitBox,
+.gdDarkMode .companySelectorDialog .sapMFlexBox,
+.gdDarkMode .companySelectorDialog .sapMFlexBoxBGTransparent {
+  background: transparent !important;
+}
+
+/* Textos y títulos */
+.gdDarkMode .companySelectorDialog .sapMDialogTitle,
+.gdDarkMode .companySelectorCancelButton:hover .sapMBtnInner {
+  color: #eef5ff !important;
+}
+
+.gdDarkMode .companySelectorNitLabel {
+  color: #9fb3cc !important;
+}
+
+.gdDarkMode .companySelectorCancelButton .sapMBtnInner {
+  color: #a8b9cf !important;
+}
+
+/* Líneas divisorias (Borders) */
+.gdDarkMode .companySelectorDialog .sapMBar.sapMHeader-CTX,
+.gdDarkMode .companySelectorDialog header,
+.gdDarkMode .companySelectorDialog .sapMIBar.sapMHeader-CTX {
+  border-bottom-color: rgba(190, 210, 235, 0.14) !important;
+}
+
+.gdDarkMode .companySelectorDialog .sapMDialogTitleGroup {
+  box-shadow: 0 1px 0 rgba(190, 210, 235, 0.14) !important;
+}
+
+.gdDarkMode .companySelectorNitBox {
+  border-top-color: rgba(190, 210, 235, 0.16) !important;
+}
+
+.gdDarkMode .companySelectorDialog .sapMDialogFooter {
+  border-top-color: rgba(190, 210, 235, 0.14) !important;
+}
+
+/* Campos de entrada (Inputs) */
+.gdDarkMode .companySelectorNitInput .sapMInputBaseInner,
+.gdDarkMode .companySelectorNitInput .sapMInputBaseContentWrapper {
+  background: #172235 !important;
+  border-color: #31455f !important;
+}
+
+.gdDarkMode .companySelectorNitInput .sapMInputBaseInner {
+  color: #e2edf9 !important;
+}
+
+.gdDarkMode .companySelectorNitInput .sapMInputBaseContentWrapper {
+  box-shadow: none !important;
+}
+
+/* Estados del Input (Focus y Error) */
+.gdDarkMode .companySelectorNitInput .sapMInputBaseInner:focus {
+  border-color: #74b8ff !important;
+  box-shadow: 0 0 0 2px rgba(116, 184, 255, 0.16) !important;
+}
+
+.gdDarkMode .companySelectorNitInput.sapMInputBaseContentWrapper.sapMInputBaseInvalid .sapMInputBaseInner {
+  border-color: #f43f5e !important;
+}
 
 .sapMDialog.documentProgressDialog {
   border-radius: 14px !important;

@@ -1781,7 +1781,7 @@ sap.ui.define([
           title: "Seleccionar empresa",
           contentWidth: "24rem",
           contentHeight: "auto",
-          class: "companySelectorDialog",
+          //class: "companySelectorDialog",
           content: [
             this._oCompanyButtonsBox,
             this._oNitBox,
@@ -1793,6 +1793,8 @@ sap.ui.define([
             press: () => this._oCompanyDialog.close()
           }).addStyleClass("companySelectorCancelButton")
         });
+        
+        this._oCompanyDialog.addStyleClass("companySelectorDialog"); // 👈 ESTA LÍNEA FALTA
         this.getView().addDependent(this._oCompanyDialog);
       }
 
