@@ -1923,6 +1923,7 @@ sap.ui.define([
     _applyCombinedFilters: function () {
       const oView           = this.getView();
       const oViewStateModel = oView.getModel("view");
+      const oTable          = oView.byId("idUserTable");
       const isExColaborador = this._isInactiveDocumentTitle(this.sSelectedContract);
 
       // Parte de la lista base definida al abrir el diálogo
@@ -1938,8 +1939,12 @@ sap.ui.define([
 
       if (!bHasDateFilter && !sSearch) {
         if (oViewStateModel?.getProperty("/FilteredUsers") !== filtered) {
+          // La tabla recicla los items al reemplazar el array. Si no se limpian,
+          // una selección puede quedar aplicada al mismo índice de otro usuario.
+          oTable?.removeSelections(true);
           oViewStateModel?.setProperty("/FilteredUsers", filtered);
         }
+        this._restoreEmployeeSelections();
         return;
       }
 
@@ -1981,11 +1986,37 @@ sap.ui.define([
         );
       }
 
+      // El estado visual de sap.m.Table está asociado a los items renderizados.
+      // Se limpia antes del rebind y luego se restaura usando la identidad real.
+      oTable?.removeSelections(true);
       oViewStateModel?.setProperty("/FilteredUsers", filtered);
 
       // Fuerza el refresco del binding para que UI5 actualice la tabla
-      const oItemsBinding = this.byId("idUserTable")?.getBinding("items");
+      const oItemsBinding = oTable?.getBinding("items");
       if (typeof oItemsBinding?.refresh === "function") oItemsBinding.refresh();
+      this._restoreEmployeeSelections();
+    },
+
+    // Restaura la selección por userId y no por la posición que ocupaba la fila.
+    // updateFinished también llama este método cuando growing agrega más items.
+    _restoreEmployeeSelections: function () {
+      const oTable = this.byId("idUserTable");
+      if (!oTable) return;
+
+      const aSelectedIds = new Set(
+        (this.aSelectedEmployees || [])
+          .map(oEmployee => oEmployee?.userId)
+          .filter(sUserId => sUserId !== undefined && sUserId !== null)
+          .map(String)
+      );
+
+      oTable.getItems().forEach(oItem => {
+        const oEmployee = oItem.getBindingContext("view")?.getObject();
+        const bSelected = oEmployee?.userId !== undefined &&
+          oEmployee?.userId !== null &&
+          aSelectedIds.has(String(oEmployee.userId));
+        oItem.setSelected(bSelected);
+      });
     },
 
     // Handler del selector de fechas: actualiza el filtro de rango activo.

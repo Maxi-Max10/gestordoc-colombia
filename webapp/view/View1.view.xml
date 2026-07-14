@@ -556,6 +556,7 @@
                             growingScrollToLoad="false"
                             growingTriggerText="Cargar más"
                             selectionChange="onSelectionChange"
+                            updateFinished="_restoreEmployeeSelections"
                             inset="false"
                             mode="MultiSelect"
                             items="{ path: 'view>/FilteredUsers' }"
