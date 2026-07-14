@@ -590,6 +590,7 @@ sap.ui.define([
         SelectedUsers:      [], // Empleados marcados en la tabla (uso interno)
         DialogTitle:        "",
         DialogIcon:         "sap-icon://document-text",
+        ShowDateFilter:     false,
         ShowDocuSignButton: false,
         IsDarkMode:         bDarkMode,
         ThemeToggleText:    bDarkMode ? "☾" : "☀",
@@ -1312,7 +1313,9 @@ sap.ui.define([
             user.personalEmail    = mgr.personalEmail    || "";  // ← NUEVO
             user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
             user.city             = mgr.city             || "";  // ← NUEVO: ciudad real (sobrescribe el city vacío del enrichedUsers inicial)
-            user.endDateBaja      = empEndDateMap[user.userId] || null;
+            user.endDate          = empEndDateMap[user.userId] || user.endDate ||
+              user.empInfo?.endDate || null;
+            user.endDateBaja      = user.endDate;
             user.company          = mgr.company || "";   // ← NUEVO
 
           });
@@ -1597,7 +1600,9 @@ sap.ui.define([
             user.personalPhone    = mgr.personalPhone    || "";  // ← NUEVO
             user.city             = mgr.city             || "";  // ← NUEVO: ciudad real (sobrescribe el city vacío del enrichedUsers inicial)
             user.company          = mgr.company || "";   // ← NUEVO
-            user.endDateBaja      = empEndDateMap[user.userId] || null;
+            user.endDate          = empEndDateMap[user.userId] || user.endDate ||
+              user.empInfo?.endDate || null;
+            user.endDateBaja      = user.endDate;
           });
 
         } catch (e) {
@@ -1680,6 +1685,7 @@ sap.ui.define([
       oViewStateModel.setProperty("/BaseUsers",     aFilteredUsers);
       oViewStateModel.setProperty("/FilteredUsers", aFilteredUsers);
       oViewStateModel.setProperty("/DialogTitle",   sTitle);
+      oViewStateModel.setProperty("/ShowDateFilter", this._currentCategory === "kitRetiro");
       oViewStateModel.setProperty("/ShowDocuSignButton", this._shouldShowDocuSignButton());
       this._applyDialogPresentation();
 
@@ -1955,7 +1961,10 @@ sap.ui.define([
         const utcTo   = toUTC(this._activeDateFilter.dTo);
 
         filtered = filtered.filter(user => {
-          const raw  = isExColaborador ? user.empInfo?.endDate : user.hireDate;
+          // Kit de Retiro filtra por la fecha en que el usuario dejó la compañía.
+          const raw = isExColaborador
+            ? (user.endDate || user.endDateBaja || user.empInfo?.endDate)
+            : user.hireDate;
           if (!raw) return false;
           const d    = new Date(raw);
           const utcD = toUTC(new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));

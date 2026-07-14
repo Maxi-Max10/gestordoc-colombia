@@ -541,6 +541,7 @@
                             <DateRangeSelection
                                 id="dateRange"
                                 width="16rem"
+                                visible="{view>/ShowDateFilter}"
                                 change="onDateFilterChange"
                                 placeholder="Filtrar por fecha"
                                 class="employeeDateRange"
