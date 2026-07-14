@@ -177,21 +177,6 @@ sap.ui.define([
                         </div>
                     `;
                 }
-                
-                function _versionContrato() {
-                    return `
-                        <div style="
-                            position:absolute;
-                            bottom:10px;
-                            right:24px;
-                            font-size:6pt;
-                            text-align:right;
-                        ">
-                            Versión: 28 de julio de 2025
-                        </div>
-                    `;
-                }
-
 
                 // ── PÁGINA 1 — Tablas + intro + PRIMERA ───────────────────────────────────────
                 const htmlPagina1 = `
@@ -477,8 +462,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -560,8 +543,6 @@ sap.ui.define([
                         el proceso de aprendizaje y desarrollo de la formación profesional metódica. Adicionalmente, se
                         `
                     )}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -660,7 +641,6 @@ sap.ui.define([
                         de la <strong>EMPRESA</strong>, deberá acatar fielmente sus políticas institucionales, en especial las
                     `)}
 
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -724,8 +704,6 @@ sap.ui.define([
                         APRENDIZ</strong> será responsable por los perjuicios que el incumplimiento de la presente obligación cause
                         a la <strong>EMPRESA</strong>; o a un tercero. En el evento en que la <strong>EMPRESA</strong>; tuviese que asumir la responsabilidad
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -824,8 +802,6 @@ sap.ui.define([
                         Presentarse a cumplir con su etapa práctica en estado de embriaguez o bajo la influencia de
                         narcóticos o sustancias psicoactivas;
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -936,8 +912,6 @@ sap.ui.define([
 
                     ${_itemContrato("a)", `Por mutuo acuerdo entre las partes.`)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -1042,8 +1016,6 @@ sap.ui.define([
                         llegare a tener con la compañía.
                     `)}
 
-                    ${_versionContrato()}
-
                 </div>`;
 
 
@@ -1120,8 +1092,6 @@ sap.ui.define([
                         previstas en el presente contrato.
                         `
                     )}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1209,8 +1179,6 @@ sap.ui.define([
                         sobre nuevas conductas ilícitas, la PARTE cumplida podrá rescindir el contrato unilateralmente y sin
                         indemnización.
                     `)}
-
-                    ${_versionContrato()}
 
                 </div>`;
 
@@ -1351,10 +1319,6 @@ sap.ui.define([
 
                     </div>
 
-                </div>
-
-                <div style="${STYLE}width:100%;box-sizing:border-box;">
-                    ${_versionContrato()}
                 </div>`;
 
 
