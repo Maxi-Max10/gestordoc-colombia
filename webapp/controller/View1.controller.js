@@ -1715,6 +1715,23 @@ sap.ui.define([
       this._companySelectorConfig = oConfig;
 
       if (!this._oCompanyDialog) {
+        this._oCompanySelectorIntroText = new sap.m.Text({
+          text: "Elige la empresa para continuar con la generación del documento.",
+          wrapping: true
+        }).addStyleClass("companySelectorIntroText");
+
+        this._oCompanySelectorIntro = new sap.m.HBox({
+          alignItems: "Center",
+          items: [
+            new sap.ui.core.Icon({
+              src: "sap-icon://building",
+              size: "1.15rem"
+            }).addStyleClass("companySelectorIntroIcon"),
+            new sap.m.VBox({
+              items: [this._oCompanySelectorIntroText]
+            })
+          ]
+        }).addStyleClass("companySelectorIntro");
 
         this._oNitInput = new sap.m.Input({
           placeholder: "Ej: 900.123.456-7",
@@ -1755,16 +1772,18 @@ sap.ui.define([
         // Botones de empresa (Diaco / Cyrgo)
         this._oCompanyButtonsBox = new sap.m.HBox({
           fitContainer: true,
-          justifyContent: "SpaceBetween",
+          justifyContent: "Center",
           items: [
             new sap.m.Button({
               text: "Diaco",
-              width: "9rem",
+              icon: "sap-icon://factory",
+              width: "8.5rem",
               press: () => fnHandleCompanyPress("CO10")
             }).addStyleClass("companySelectorButton companySelectorButtonDiaco"),
             new sap.m.Button({
               text: "Cyrgo",
-              width: "9rem",
+              icon: "sap-icon://building",
+              width: "8.5rem",
               press: () => fnHandleCompanyPress("CO24")
             }).addStyleClass("companySelectorButton companySelectorButtonCyrgo")
           ]
@@ -1785,10 +1804,11 @@ sap.ui.define([
 
         this._oCompanyDialog = new sap.m.Dialog({
           title: "Seleccionar empresa",
-          contentWidth: "24rem",
+          contentWidth: "27rem",
           contentHeight: "auto",
           class: "companySelectorDialog",
           content: [
+            this._oCompanySelectorIntro,
             this._oCompanyButtonsBox,
             this._oNitBox,
             this._oContinueButton
@@ -1810,6 +1830,9 @@ sap.ui.define([
       this._oContinueButton.setVisible(!oConfig.showCompanyButtons);
 
       this._oCompanyDialog.setTitle(oConfig.showCompanyButtons ? "Seleccionar empresa" : "Ingresar NIT");
+      this._oCompanySelectorIntroText.setText(oConfig.showCompanyButtons
+        ? "Elige la empresa para continuar con la generación del documento."
+        : "Ingresa el NIT de la institución de formación para continuar.");
       this._oCompanyDialog.open();
     },
 
