@@ -1803,7 +1803,7 @@ sap.ui.define([
         }).addStyleClass("companySelectorContinueButton");
 
         this._oCompanyDialog = new sap.m.Dialog({
-          title: "Seleccionar empresa",
+          title: "Elija una empresa",
           contentWidth: "27rem",
           contentHeight: "auto",
           class: "companySelectorDialog",
@@ -1829,7 +1829,7 @@ sap.ui.define([
       this._oCompanyButtonsBox.setVisible(oConfig.showCompanyButtons);
       this._oContinueButton.setVisible(!oConfig.showCompanyButtons);
 
-      this._oCompanyDialog.setTitle(oConfig.showCompanyButtons ? "Seleccionar empresa" : "Ingresar NIT");
+      this._oCompanyDialog.setTitle(oConfig.showCompanyButtons ? "Elija una empresa" : "Ingreso de NIT");
       this._oCompanySelectorIntroText.setText(oConfig.showCompanyButtons
         ? "Elige la empresa para continuar con la generación del documento."
         : "Ingresa el NIT de la institución de formación para continuar.");
