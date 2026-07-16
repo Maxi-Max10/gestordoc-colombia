@@ -64,7 +64,7 @@ sap.ui.define([
                         </p>
 
                         <p style="text-align:justify;margin:0 0 16px 0;">
-                            El suscrito <strong>${sNombre}</strong> ${sIdentif} como <strong>${sCedula}</strong> 
+                            El suscrito ${sNombre} ${sIdentif} como ${sCedula} 
                             aparece al pie de mi firma, por medio del presente escrito me permito manifestar lo siguiente:
                         </p>
 
@@ -146,14 +146,16 @@ sap.ui.define([
 
                         <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 60px 0;">Cordialmente,</p>
 
-                        <div style="border-top:1.5px solid #000;width:260px;padding-top:6px;margin-bottom:40px;">
-                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;"><strong>${sNombre}</strong></p>
-                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">NOMBRE TRABAJADOR</p>
-                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;"><strong>C.C. ${sCedula}</strong> de <strong>${sCiudadExpedicion}</strong></p>
+                        <div style="border-top:1.5px solid #000;width:260px;margin-bottom:0;"></div>
+                        
+                        <div style="padding-top:6px;margin-bottom:40px;">
+                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">${sNombre}</p>
+                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0; font-weight:bold;">NOMBRE TRABAJADOR</p>
+                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">C.C. ${sCedula} de ${sCiudadExpedicion}</p>
                         </div>
 
                         <p style="font-size:9pt;font-family:Arial,sans-serif;margin:0;text-align:right;color:#555;">
-                            Pág. 1 de 1
+                            Pág. <strong>1 de 1</strong>
                         </p>
 
                     </div>

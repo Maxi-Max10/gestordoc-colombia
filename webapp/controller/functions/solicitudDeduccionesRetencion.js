@@ -62,8 +62,8 @@ sap.ui.define([
                         <p style="margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                         <p style="text-align:justify;margin:0 0 16px 0;">
-                            Yo <strong>${sNombre}</strong>, con cédula número <strong>${sCedula}</strong>
-                            de <strong>${sCiudadExpedicion}</strong> atendiendo lo dispuesto en la Ley 1607 de 2012 y el decreto 0099
+                            Yo ${sNombre}, con cédula número ${sCedula}
+                            de ${sCiudadExpedicion} atendiendo lo dispuesto en la Ley 1607 de 2012 y el decreto 0099
                             de 2013, manifiesto bajo la gravedad de juramento:
                         </p>
 
@@ -170,19 +170,22 @@ sap.ui.define([
                         <p style="margin:0 0 6px 0;">
                             <strong>2.</strong> Que soy declarante del impuesto de renta (Marcar con una X) &nbsp;&nbsp; SI___ &nbsp;&nbsp; NO___
                         </p>
-                        <p style="text-align:justify;margin:0 0 4px 0;">
+                        <p style="text-align:justify;margin:0 0 6px 0;">
                             Si selecciona que es declarante del impuesto de renta puede (si así lo desea) solicitar un valor
                             adicional de retención en la fuente al calculado por el sistema de nómina:
                         </p>
                         <p style="margin:0 0 20px 0; text-align:center">Valor <strong>adicional Mensual</strong> solicitado: $____________</p>
 
-                        <p style="text-align:justify;margin:0 0 40px 0;">
+                        <p style="text-align:justify;margin:0 0 80px 0;">
                             <strong>3.</strong> Me comprometo a comunicar cualquier cambio que pueda modificar los beneficios obtenidos.
                         </p>
 
-                        <p style="margin:0 0 6px 20px;">Firma: ____________________________________</p>
-                        <p style="margin:0 0 6px 20px;">Nombre: ${sNombre}</p>
-                        <p style="margin:0 0 0 20px;">C.C.: ${sCedula}</p>
+                        <p style="margin:0 0 0 0; line-height:2;">
+                            Firma: ____________________________________<br>
+                            Nombre: ${sNombre}<br>
+                            C.C.: ${sCedula}
+                        </p>
+
                     </div>`;
 
                 // Crear PDF en blanco y renderizar cada página

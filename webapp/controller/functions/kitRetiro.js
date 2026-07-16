@@ -341,7 +341,7 @@ sap.ui.define([
                             <p style="margin:0 0 30px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
                             <p style="margin:0;">Señor:</p>
-                            <p style="font-weight:bold;margin:0;">${sNombre}</p>
+                            <p style="font-weight:bold;margin:0 0 25px 0;">${sNombre}</p>
 
                             <p style="text-align:justify;margin:0 0 16px 0;">
                                 Con referencia al retiro de la empresa, a continuación, se relaciona lista documentos
@@ -386,8 +386,8 @@ sap.ui.define([
                             <p style="margin:0 0 30px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
                             <p style="margin:0;">Señor:</p>
-                            <p style="font-weight:bold;margin:0;">${sNombre}</p>
-                            <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadFirma}</p>
+                            <p style="font-weight:bold;margin:0 0 25px 0;">${sNombre}</p>
+                            <p style="margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                             <p style="text-align:justify;margin:0 0 14px 0;">
                                 Pensando en su comodidad, tenemos disponible para usted las siguientes opciones (Marque X):
@@ -421,7 +421,7 @@ sap.ui.define([
                                 </tr>
                             </table>
 
-                            <p style="text-align:justify;margin:0 0 14px 0;">
+                            <p style="text-align:justify;margin:0 0 14px 24px;">
                                 En caso contrario de no aceptación de los puntos 1 o 2, deberá dirigirse personalmente a las
                                 instalaciones de la empresa, para recibir los documentos o reclamar el pago de su liquidación
                                 de prestaciones sociales.
@@ -468,14 +468,14 @@ sap.ui.define([
                                 </tr>
                             </table>
 
-                            <p style="text-align:justify;margin:0 0 40px 0;">
+                            <p style="text-align:justify;margin:0 0 40px 24px;">
                                 Declaró que comprendí la información contenida en esta comunicación y en señal a lo anterior
                                 firmo de recibido y enterado.
                             </p>
 
                             <p style="border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
                                 <strong>${sNombre}</strong><br>
-                                <strong>C.C. ${sCedula}</strong>
+                                C.C. ${sCedula}
                             </p>
 
                         </div>
@@ -494,14 +494,14 @@ sap.ui.define([
                                 HACE CONSTAR
                             </p>
 
-                            <p style="text-align:justify;line-height:1.7;margin:30px 0 24px 0;">
+                            <p style="text-align:justify;line-height:1.7;margin:30px 0 20px 0;">
                                 Que, <strong>${sNombre}</strong> ${sIdentif} con la cédula de ciudadanía número
                                 <strong>${sCedula},</strong> estuvo vinculado(a) con nuestra empresa mediante contrato de trabajo 
-                                a término Indefinido, prestando sus servicios en el <strong>PV MALAMBO</strong> desde el día 
-                                <strong>${sfechaContratacion}</strong> hasta el <strong>${sfechaBaja}</strong>
+                                a término <strong>Indefinido</strong>, prestando sus servicios en el <strong>PV MALAMBO</strong> desde el día 
+                                <strong>${sfechaContratacion}</strong> hasta el <strong>${sfechaBaja}.</strong>
                             </p>
 
-                            <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
+                            <p style="text-align:justify;line-height:1.7;margin:0 0 45px 0;">
                                 A la fecha de su retiro desempeñaba el cargo de <strong>${sCargo}</strong> con un Salario Básico Mensual de <strong>${sSalario}</strong>.
                             </p>
 
@@ -533,8 +533,8 @@ sap.ui.define([
 
                             <p style="margin:0 0 20px 0;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</p>
 
-                            <p style="margin:0;">Señor:</p>
-                            <p style="font-weight:bold;margin:0;">${sNombre}</p>
+                            <p style="margin:0 0 14px 0;">Señor:</p>
+                            <p style="font-weight:bold;margin:0 0 14px 0;">${sNombre}</p>
 
 
                             <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
@@ -555,7 +555,7 @@ sap.ui.define([
                                     </p>
 
                                     <p style="font-size:9pt;width:320px;padding-top:2px;margin:0 auto;">
-                                        ${empresaData.empresaNombre}
+                                        <strong>${empresaData.empresaNombre}</strong>
                                     </p>
 
                                 </div>
@@ -576,18 +576,18 @@ sap.ui.define([
                             <p style="margin:0;">${sDireccion}</p>
                             <p style="margin:0;">${sCiudadFirma}</p>
 
-                            <p style="text-align:justify;line-height:1.7;margin:60px 0 24px 0;">
+                            <p style="text-align:justify;line-height:1.7;margin:60px 0 20px 0;">
                                 Apreciados Señores:
                             </p>
 
-                            <p style="text-align:justify;line-height:1.7;margin:0 0 24px 0;">
+                            <p style="text-align:justify;line-height:1.7;margin:0 0 40px 0;">
                                 Cordialmente solicito sean practicado el examen médico de retiro de 
                                 <strong>${sNombre}</strong> ${sIdentif} con la cédula de ciudadanía número 
                                 <strong>${sCedula}</strong>, quien desempeñaba el cargo de <strong>${sCargo}</strong>.
                             </p>
 
                             <p style="text-align:justify;line-height:1.7;margin:60px 0 24px 0;">
-                                Favor facturarlos a nombre de ${empresaData.empresaNombre}, ${empresaData.nit}.
+                                Favor facturarlos a nombre de ${empresaData.empresaNombre}, Nit.${empresaData.nit}.
                             </p>
 
                             <p style="margin:0 0 20px 0;">Atentamente,</p>
@@ -615,7 +615,7 @@ sap.ui.define([
                 const contentBlocks = isCyrgo ? _buildCyrgo() : _buildDiaco();
 
                 const templateFile = isCyrgo
-                    ? "templates/pdf/Cyrgo.pdf"
+                    ? "templates/pdf/Kit_Retiro_Cyrgo.pdf"
                     : "templates/pdf/hojaDiaco.pdf";
 
                 const existingPdfBytes = await fetch(templateFile).then(res => res.arrayBuffer());
