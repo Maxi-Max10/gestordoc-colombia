@@ -61,6 +61,9 @@ sap.ui.define([
                     await wordGenerator.generateWord({
                         templatePath: "templates/word/Contrato_Aprendizaje_Productivo.docx",
                         fileName:     `${user.firstName}_${user.lastName}Contrato_Aprendizaje_Productivo.docx`,
+                        boldPlaceholders: ["[[Nombre]]", "[[Cedula]]", "[[CiudadExpedicion]]"],
+                        boldParagraphContains: "Entre los suscritos",
+                        signatureGapBefore: 720,
                         data: {
                             sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sCargo, sInstitucion, sNit
                         }
@@ -458,7 +461,7 @@ sap.ui.define([
                         de una relación de aprendizaje, la cual de ninguna manera implica subordinación laboral por parte de
                         la <strong>EMPRESA</strong> sobre el <strong>APRENDIZ</strong> pues este no es considerado para ningún efecto como un trabajador
                         de la <strong>EMPRESA</strong> y la subordinación se limita a las actividades propias del aprendizaje de acuerdo con
-                        el literal b) del artículo 21 de la Ley 2466 de 2025
+                        el literal b) del artículo 21 de la Ley 2466 de 2025.
                         `
                     )}
 

@@ -108,6 +108,9 @@ sap.ui.define([
                     await wordGenerator.generateWord({
                         templatePath: wordTemplatePath,
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Aprendizaje_Lectivo.docx`,
+                        boldPlaceholders: ["[[Nombre]]", "[[Cedula]]", "[[CiudadExpedicion]]"],
+                        boldParagraphContains: "Entre los suscritos",
+                        signatureGapBefore: 720,
                         data: {
                             sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, localDateLong,
                             sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sInstitucion, sNit, sCargo

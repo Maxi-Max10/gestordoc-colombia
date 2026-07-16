@@ -40,7 +40,14 @@ sap.ui.define([
      *                                        (viene de getSelectedUsers en Formatter.js)
      */
     async function generateWord(config) {
-        const { templatePath, fileName, data = {} } = config;
+        const {
+            templatePath,
+            fileName,
+            data = {},
+            boldPlaceholders = [],
+            boldParagraphContains = "",
+            signatureGapBefore = 0
+        } = config;
 
         // ── Paso 1: Asegurar que JSZip esté disponible ─────────────────────────
         // JSZip se carga solo cuando hace falta (lazy loading) para no frenar
@@ -148,7 +155,10 @@ sap.ui.define([
             const isCyrgoOtroSi15 = /(?:^|\/)Otro_Si_Alimentacion_15_Cyrgo\.docx$/i.test(templatePath);
             xml = _replaceVariables(xml, variables, {
                 addSignatureGap: /(?:^|\/)Otro_Si_/i.test(templatePath),
-                compactConsecutiveEmptyParagraphs: path === "word/document.xml" && isCyrgoOtroSi15
+                compactConsecutiveEmptyParagraphs: path === "word/document.xml" && isCyrgoOtroSi15,
+                boldPlaceholders,
+                boldParagraphContains,
+                signatureGapBefore
             }); // Hacer los reemplazos
             zip.file(path, xml); // Guardar el XML modificado de vuelta en el ZIP
         }
@@ -201,11 +211,36 @@ sap.ui.define([
 
         const NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         const paragraphs = doc.getElementsByTagNameNS(NS, "p");
+        const signatureGapBefore = Number(options.signatureGapBefore) || 0;
 
         for (let i = 0; i < paragraphs.length; i++) {
             const p = paragraphs[i];
             const textNodes = Array.from(p.getElementsByTagNameNS(NS, "t"));
             if (textNodes.length === 0) continue;
+            const paragraphText = textNodes.map(node => node.textContent || "").join("");
+            const isLastNameParagraph = signatureGapBefore > 0 &&
+                paragraphText.includes("[[Nombre]]") &&
+                !Array.from(paragraphs).slice(i + 1).some(nextParagraph =>
+                    Array.from(nextParagraph.getElementsByTagNameNS(NS, "t"))
+                        .some(node => (node.textContent || "").includes("[[Nombre]]"))
+                );
+            if (isLastNameParagraph) {
+                let paragraphProperties = Array.from(p.children)
+                    .find(child => child.localName === "pPr");
+                if (!paragraphProperties) {
+                    paragraphProperties = doc.createElementNS(NS, "w:pPr");
+                    p.insertBefore(paragraphProperties, p.firstChild);
+                }
+                let spacing = Array.from(paragraphProperties.children)
+                    .find(child => child.localName === "spacing");
+                if (!spacing) {
+                    spacing = doc.createElementNS(NS, "w:spacing");
+                    paragraphProperties.appendChild(spacing);
+                }
+                spacing.setAttributeNS(NS, "w:before", String(signatureGapBefore));
+            }
+            const canApplyBold = !options.boldParagraphContains ||
+                paragraphText.includes(options.boldParagraphContains);
 
             // Conservar tabs, saltos y campos de Word presentes entre los runs.
             const hasTabs = p.getElementsByTagNameNS(NS, "tab").length > 0;
@@ -215,7 +250,13 @@ sap.ui.define([
                 const replacement = options.addSignatureGap && isWorkerSignature
                     ? "\u00A0\u00A0\u00A0" + value
                     : value;
-                _replacePlaceholderInTextNodes(textNodes, key, replacement);
+                _replacePlaceholderInTextNodes(
+                    textNodes,
+                    key,
+                    replacement,
+                    canApplyBold && options.boldPlaceholders.includes(key),
+                    NS
+                );
             }
         }
 
@@ -262,7 +303,7 @@ sap.ui.define([
      * Sustituye un placeholder dividido entre varios nodos de texto sin alterar
      * los demas elementos del parrafo (tabs, breaks, campos y formato).
      */
-    function _replacePlaceholderInTextNodes(textNodes, placeholder, value) {
+    function _replacePlaceholderInTextNodes(textNodes, placeholder, value, bold, NS) {
         let fullText = textNodes.map(node => node.textContent || "").join("");
         let matchStart = fullText.indexOf(placeholder);
 
@@ -297,6 +338,24 @@ sap.ui.define([
 
             startNode.textContent = prefix + String(value || "") + suffix;
             startNode.setAttribute("xml:space", "preserve");
+
+            if (bold) {
+                const run = startNode.closest("w\\:r") || startNode.parentElement;
+                if (run && run.localName === "r") {
+                    let runProperties = Array.from(run.children)
+                        .find(child => child.localName === "rPr");
+                    if (!runProperties) {
+                        runProperties = run.ownerDocument.createElementNS(NS, "w:rPr");
+                        run.insertBefore(runProperties, run.firstChild);
+                    }
+                    if (!Array.from(runProperties.children).some(child => child.localName === "b")) {
+                        runProperties.appendChild(run.ownerDocument.createElementNS(NS, "w:b"));
+                    }
+                    if (!Array.from(runProperties.children).some(child => child.localName === "bCs")) {
+                        runProperties.appendChild(run.ownerDocument.createElementNS(NS, "w:bCs"));
+                    }
+                }
+            }
 
             for (let i = startNodeIndex + 1; i <= endNodeIndex; i++) {
                 textNodes[i].textContent = "";
