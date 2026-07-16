@@ -64,7 +64,7 @@ sap.ui.define([
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         En ${sCiudadFirma}, a los ${localDateLong} se reunieron por una parte <strong>${sNombre}</strong>
                         ${sIdentificado} <strong>C.C. No. ${sCedula}</strong> como aparece al pie de su firma y quien actúa en su propio nombre y por la otra,
-                        <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312 y quien actúa en representación de  <strong>DIACO S.A.</strong>, 
+                        <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la <strong>C.C. No. 52.705.312</strong> y quien actúa en representación de  <strong>DIACO S.A.</strong>, 
                         con el fin de suscribir un acuerdo provisto de las siguientes cláusulas:
                     </p>
 
