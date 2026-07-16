@@ -56,16 +56,16 @@ sap.ui.define([
                 const htmlRaw = `
                 <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
-                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;">
+                    <p style="text-align:center;font-weight:bold;font-size:15pt;margin:0 0 4px 0;">
                         OTRO SI AL CONTRATO DE TRABAJO
                     </p>
-                    <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 28px 0;">
-                        AUXÍLIO NO SALARIAL DE TRANSPORTE EXTRALEGAL
+                    <p style="text-align:center;font-weight:normal;font-size:10.5pt;margin:0 0 28px 0;">
+                        AUXILIO NO SALARIAL DE TRANSPORTE EXTRALEGAL
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         Siendo, el ${localDate}, se reunieron por una parte <strong>${sNombre}</strong>
-                        ${sIdentificado} con cédula de ciudadanía N.° <strong>${sCedula}</strong>
+                        ${sIdentificado} N.° <strong>${sCedula}</strong>
                         como aparece al pie de su firma y quien en adelante se denominará
                         <strong>EL TRABAJADOR</strong>, y por la otra,
                         <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312
@@ -109,7 +109,7 @@ sap.ui.define([
                     <p style="margin:0 0 60px 0;">
                         En constancia se firma en ${sCiudadFirma}, el ${localDate}.
                     </p>
-
+<br>
                     <div style="width:100%;display:flex;gap:20px;">
                         <div style="flex:1;">
                             <div style="border-top:1.5px solid #000;padding-top:6px;">

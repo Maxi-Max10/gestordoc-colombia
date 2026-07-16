@@ -82,7 +82,7 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 16px 0;">En ${sCiudadFirma}, a los ${localDateLong}, 
-                    se reunieron por una parte <strong>${sNombre}</strong> ${sIdentificado} <strong>${sCedula}</strong> 
+                    se reunieron por una parte <strong>${sNombre}</strong> ${sIdentificado} N.° <strong>${sCedula}</strong> 
                     como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>${empresaData.repNombre}</strong> ${empresaData.repGenero} con la C.C. No. 
                     ${empresaData.repCC} y quien actúa en representación de <strong>${empresaData.empresaNombre}</strong>, quien en 
                     adelante se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo provisto de las siguientes cláusulas.</p>
