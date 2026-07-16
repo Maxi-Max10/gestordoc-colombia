@@ -3276,50 +3276,70 @@ html.gdThemeTransitionReady .card-horizontal {
 }
 
 .documentProgressMeta {
-  margin-top: 0.2rem;
+  margin-top: 0.3rem;
 }
 
 .documentProgressLabel {
-  color: #6d7f95 !important;
-  font-size: 0.74rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0 !important;
+  color: #52677f !important;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.055em !important;
   text-transform: uppercase;
 }
 
 .documentProgressPercent {
-  background: #edf5ff !important;
-  border: 1px solid #d5e8ff !important;
+  background: #e7f3ff !important;
+  border: 1px solid #c8e2ff !important;
   border-radius: 999px !important;
   color: #075caf !important;
-  font-size: 0.78rem !important;
+  font-size: 0.76rem !important;
   font-weight: 800 !important;
   line-height: 1 !important;
-  padding: 0.25rem 0.55rem !important;
+  min-width: 2.25rem;
+  padding: 0.3rem 0.55rem !important;
+  text-align: center !important;
 }
 
 .documentProgressDetail {
   color: #61738a !important;
-  font-size: 0.78rem !important;
+  font-size: 0.76rem !important;
   line-height: 1.4 !important;
-  margin-top: 0.1rem;
+  margin-top: 0.05rem;
 }
 
 .documentProgressBar.sapMPI {
-  background: #d9e0e8 !important;
+  background: #edf7ff !important;
+  border: 1px solid #d6ebfb !important;
   border-radius: 999px !important;
-  height: 0.56rem !important;
-  min-height: 0.56rem !important;
+  box-sizing: border-box !important;
+  height: 0.72rem !important;
+  min-height: 0.72rem !important;
   overflow: hidden !important;
 }
 
 .documentProgressBar .sapMPIBar {
-  background: linear-gradient(90deg, #0a6ed1 0%, #13a4f8 100%) !important;
+  background: linear-gradient(90deg, #0868c8 0%, #0a8fe3 58%, #25b3f5 100%) !important;
   border-radius: 999px !important;
+  box-shadow: 0 0 7px rgba(10, 143, 227, 0.32) !important;
+  min-width: 0 !important;
+  transition: width 300ms ease-out !important;
 }
 
 .documentProgressBar .sapMPIBarRemaining {
-  background: #d9e0e8 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.documentProgressBar .sapMPIBarRemaining::before,
+.documentProgressBar .sapMPIBarRemaining::after {
+  display: none !important;
+}
+
+.documentProgressBar .sapMPIText,
+.documentProgressBar .sapMPITextLeft,
+.documentProgressBar .sapMPITextRight {
+  display: none !important;
 }
 
 .gdDarkMode .sapMDialog.documentProgressDialog {
@@ -3361,4 +3381,5 @@ html.gdThemeTransitionReady .card-horizontal {
 .gdDarkMode .documentProgressBar.sapMPI,
 .gdDarkMode .documentProgressBar .sapMPIBarRemaining {
   background: #344255 !important;
+  border-color: #46566b !important;
 }
