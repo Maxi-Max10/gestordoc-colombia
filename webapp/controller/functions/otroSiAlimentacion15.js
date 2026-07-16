@@ -94,7 +94,7 @@ sap.ui.define([
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         Con esta finalidad, las partes han convenido que por cada día laborado el trabajador recibe un valor de
-                        <strong>${sSalarioLetras} (${sSalario})</strong>, por día trabajado, por medio de una tarjeta recargable con la cual 
+                        <strong>QUINCE MIL PESOS 00/100 MCTE. ($15.000,00)</strong>, por día trabajado, por medio de una tarjeta recargable con la cual 
                         podrá acceder a comprar alimentos en los establecimientos que tengan y acepten el convenio con la entidad expendedora de las tarjeta.
                     </p>
 
@@ -117,20 +117,18 @@ sap.ui.define([
                     <p style="margin:0 0 60px 0;">
                         En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
                     </p>
-
-                    <div style="width:100%;display:table;">
-                        <div style="display:table-row;">
-                            <div style="display:table-cell;width:50%;vertical-align:top;padding-right:20px;">
-                                <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>${empresaData.repNombre}</strong><br>
-                                    C.C. No. ${empresaData.repCC}<br>
-                                </div>
+                    <br>
+                    <div style="width:100%;display:flex;gap:20px;">
+                        <div style="flex:1;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                <strong>${empresaData.repNombre}</strong><br>
+                                C.C. No. ${empresaData.repCC}<br>
                             </div>
-                            <div style="display:table-cell;width:50%;vertical-align:top;">
-                                <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>${sNombre}</strong><br>
-                                     C.C. No. ${sCedula}
-                                </div>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                <strong>${sNombre}</strong><br>
+                                 C.C. No. ${sCedula}
                             </div>
                         </div>
                     </div>
@@ -144,7 +142,7 @@ sap.ui.define([
                 div.style.left            = "-9999px";
                 div.style.width           = "794px";
                 div.style.padding         = "60px 56px";
-                div.style.backgroundColor = "#ffffff";
+                div.style.backgroundColor = isCyrgo ? "transparent" : "#ffffff";
                 div.style.boxSizing       = "border-box";
                 div.innerHTML             = htmlRaw;
                 document.body.appendChild(div);
@@ -157,7 +155,7 @@ sap.ui.define([
                 const canvas = await html2canvasRef(div, {
                     scale:           2,
                     useCORS:         true,
-                    backgroundColor: "#ffffff",
+                    backgroundColor: isCyrgo ? null : "#ffffff",
                     width:           794,
                     height:          totalHeight,
                     windowWidth:     794,

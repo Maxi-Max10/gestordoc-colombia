@@ -110,20 +110,18 @@ sap.ui.define([
                         En constancia se firma en ${sCiudadFirma}, el ${localDate}.
                     </p>
 
-                    <div style="width:100%;display:table;">
-                        <div style="display:table-row;">
-                            <div style="display:table-cell;width:50%;vertical-align:top;padding-right:20px;">
-                                <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
-                                    C.C. No. 52.705.312<br>
-                                    Representante Legal
-                                </div>
+                    <div style="width:100%;display:flex;gap:20px;">
+                        <div style="flex:1;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
+                                C.C. No. 52.705.312<br>
+                                Representante Legal
                             </div>
-                            <div style="display:table-cell;width:50%;vertical-align:top;">
-                                <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>${sNombre}</strong><br>
-                                    C.C. GNo. ${sCedula}
-                                </div>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                <strong>${sNombre}</strong><br>
+                                C.C. GNo. ${sCedula}
                             </div>
                         </div>
                     </div>

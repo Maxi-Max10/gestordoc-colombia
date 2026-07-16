@@ -74,7 +74,7 @@ sap.ui.define([
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         Con esta finalidad, las partes han convenido que por cada día laborado el trabajador recibe un valor de
-                        <strong>${sSalarioLetras} (${sSalario})</strong>, por día trabajado, por medio de una tarjeta recargable con la cual podrá
+                        <strong> DIEZ MIL PESOS 00/100 MCTE. ($10.000,00)</strong>, por día trabajado, por medio de una tarjeta recargable con la cual podrá
                         acceder a comprar alimentos en los establecimientos que tengan y acepten el convenio con la entidad expendedora de las tarjetas. 
                     </p>
 
@@ -97,21 +97,20 @@ sap.ui.define([
                     <p style="margin:0 0 60px 0;">
                     En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
                     </p>
-
-                    <div style="width:100%;display:table;">
-                        <div style="display:table-row;">
-                            <div style="display:table-cell;width:50%;vertical-align:top;padding-right:20px;">
-                                <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
-                                    C.C. No. 52.705.312<br>
-                                    Representante
-                                </div>
+                    <br>
+                    <br>
+                    <div style="width:100%;display:flex;gap:20px;">
+                        <div style="flex:1;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
+                                C.C. No. 52.705.312<br>
+                                Representante
                             </div>
-                            <div style="display:table-cell;width:50%;vertical-align:top;">
-                                <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>${sNombre}</strong><br>
-                                     C.C. No. ${sCedula}
-                                </div>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                <strong>${sNombre}</strong><br>
+                                 C.C. No. ${sCedula}
                             </div>
                         </div>
                     </div>

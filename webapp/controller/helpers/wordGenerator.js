@@ -145,7 +145,11 @@ sap.ui.define([
         for (const path of targets) {
             if (!zip.files[path]) continue; // No todas las plantillas tienen todos estos archivos
             let xml = await zip.files[path].async("string");
-            xml = _replaceVariables(xml, variables); // Hacer los reemplazos
+            const isCyrgoOtroSi15 = /(?:^|\/)Otro_Si_Alimentacion_15_Cyrgo\.docx$/i.test(templatePath);
+            xml = _replaceVariables(xml, variables, {
+                addSignatureGap: /(?:^|\/)Otro_Si_/i.test(templatePath),
+                compactConsecutiveEmptyParagraphs: path === "word/document.xml" && isCyrgoOtroSi15
+            }); // Hacer los reemplazos
             zip.file(path, xml); // Guardar el XML modificado de vuelta en el ZIP
         }
 
@@ -188,7 +192,7 @@ sap.ui.define([
      * @param {object} variables  - Mapa { "[[Placeholder]]": "valor" }
      * @returns {string} XML con todos los placeholders reemplazados
      */
-    function _replaceVariables(xml, variables) {
+    function _replaceVariables(xml, variables, options = {}) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(xml, "application/xml");
         if (doc.getElementsByTagName("parsererror").length) {
@@ -201,42 +205,107 @@ sap.ui.define([
 
         for (let i = 0; i < paragraphs.length; i++) {
             const p = paragraphs[i];
-            const runs = Array.from(p.children).filter(el => el.localName === "r");
-            if (runs.length === 0) continue;
+            const textNodes = Array.from(p.getElementsByTagNameNS(NS, "t"));
+            if (textNodes.length === 0) continue;
 
-            // Texto completo del párrafo (todos los <w:t> de todos los runs)
-            let fullText = "";
-            for (const run of runs) {
-                for (const t of Array.from(run.children).filter(el => el.localName === "t")) {
-                    fullText += t.textContent;
-                }
-            }
-            if (!fullText.includes("[[")) continue; // este párrafo no tiene placeholders, no tocar
-
-            // Reemplazar variables sobre el texto ya concatenado
-            let replaced = fullText;
+            // Conservar tabs, saltos y campos de Word presentes entre los runs.
+            const hasTabs = p.getElementsByTagNameNS(NS, "tab").length > 0;
             for (const [key, value] of Object.entries(variables)) {
-                replaced = replaced.split(key).join(value);
+                const isWorkerSignature = hasTabs &&
+                    (key === "[[Nombre]]" || key === "[[Cedula]]");
+                const replacement = options.addSignatureGap && isWorkerSignature
+                    ? "\u00A0\u00A0\u00A0" + value
+                    : value;
+                _replacePlaceholderInTextNodes(textNodes, key, replacement);
             }
-            if (replaced === fullText) continue; // no había placeholder real, dejar como estaba
+        }
 
-            // Colapsar el párrafo en un solo run (formato del primer run) con el texto final
-            const firstRun = runs[0];
-            const firstTs = Array.from(firstRun.children).filter(el => el.localName === "t");
-            for (let k = 1; k < firstTs.length; k++) firstRun.removeChild(firstTs[k]);
-
-            let targetT = firstTs[0];
-            if (!targetT) {
-                targetT = doc.createElementNS(NS, "w:t");
-                firstRun.appendChild(targetT);
-            }
-            targetT.setAttribute("xml:space", "preserve");
-            targetT.textContent = replaced;
-
-            for (let k = 1; k < runs.length; k++) p.removeChild(runs[k]);
+        if (options.compactConsecutiveEmptyParagraphs) {
+            _removeExtraEmptyBodyParagraphs(doc, NS);
         }
 
         return new XMLSerializer().serializeToString(doc);
+    }
+
+    /**
+     * Reduce grupos de párrafos vacíos consecutivos a uno solo. La plantilla
+     * Cyrgo contiene varios grupos usados como espaciadores; al crecer un nombre
+     * esos párrafos empujan las firmas a una segunda página.
+     */
+    function _removeExtraEmptyBodyParagraphs(doc, NS) {
+        const body = doc.getElementsByTagNameNS(NS, "body")[0];
+        if (!body) return;
+
+        let previousWasEmpty = false;
+        for (const child of Array.from(body.children)) {
+            if (child.localName !== "p") {
+                previousWasEmpty = false;
+                continue;
+            }
+
+            const text = Array.from(child.getElementsByTagNameNS(NS, "t"))
+                .map(node => node.textContent || "")
+                .join("")
+                .trim();
+            const hasFloatingContent = ["drawing", "pict", "object", "sectPr"]
+                .some(name => child.getElementsByTagNameNS(NS, name).length > 0);
+            const isEmpty = !text && !hasFloatingContent;
+
+            if (isEmpty && previousWasEmpty) {
+                body.removeChild(child);
+                continue;
+            }
+            previousWasEmpty = isEmpty;
+        }
+    }
+
+    /**
+     * Sustituye un placeholder dividido entre varios nodos de texto sin alterar
+     * los demas elementos del parrafo (tabs, breaks, campos y formato).
+     */
+    function _replacePlaceholderInTextNodes(textNodes, placeholder, value) {
+        let fullText = textNodes.map(node => node.textContent || "").join("");
+        let matchStart = fullText.indexOf(placeholder);
+
+        while (matchStart !== -1) {
+            const matchEnd = matchStart + placeholder.length;
+            let cursor = 0;
+            let startNodeIndex = -1;
+            let endNodeIndex = -1;
+            let startOffset = 0;
+            let endOffset = 0;
+
+            for (let i = 0; i < textNodes.length; i++) {
+                const length = (textNodes[i].textContent || "").length;
+                if (startNodeIndex === -1 && matchStart < cursor + length) {
+                    startNodeIndex = i;
+                    startOffset = matchStart - cursor;
+                }
+                if (matchEnd <= cursor + length) {
+                    endNodeIndex = i;
+                    endOffset = matchEnd - cursor;
+                    break;
+                }
+                cursor += length;
+            }
+
+            if (startNodeIndex === -1 || endNodeIndex === -1) break;
+
+            const startNode = textNodes[startNodeIndex];
+            const endNode = textNodes[endNodeIndex];
+            const prefix = (startNode.textContent || "").slice(0, startOffset);
+            const suffix = (endNode.textContent || "").slice(endOffset);
+
+            startNode.textContent = prefix + String(value || "") + suffix;
+            startNode.setAttribute("xml:space", "preserve");
+
+            for (let i = startNodeIndex + 1; i <= endNodeIndex; i++) {
+                textNodes[i].textContent = "";
+            }
+
+            fullText = textNodes.map(node => node.textContent || "").join("");
+            matchStart = fullText.indexOf(placeholder);
+        }
     }
 
     /**
