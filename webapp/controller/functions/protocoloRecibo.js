@@ -43,7 +43,7 @@ sap.ui.define([
                 if (sButtonId.includes("wordDataInfo")) {
                     const wordTemplatePath = isCyrgo
                         ? "templates/word/Protocolo_Recibo_Cyrgo.docx"
-                        : "templates/word/Protocolo_Recibo.docx";
+                        : "templates/word/Protocolo_Recibo_Diaco.docx";
 
                     await wordGenerator.generateWord({
                         templatePath: wordTemplatePath,
@@ -61,7 +61,7 @@ sap.ui.define([
                     <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido 
+                        Yo, ${sNombre} identificado con documento de identidad N° ${sCedula} declaro que he recibido 
                         la socialización del contenido del Reglamento Interno de Trabajo, Comité de convivencia Laboral y Política de Alcohol, Tabaco y Drogas.
                     </p>
 
@@ -88,13 +88,13 @@ sap.ui.define([
                     <div style="width:100%;border:1px solid #000;border-collapse:collapse;display:table;margin-top:20px;">
                         <div style="display:table-row;">
                             <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Fecha:</strong> ${localDate}
+                                Fecha: ${localDate}
                             </div>
                             <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Planta:</strong> ${sPlanta}
+                                Planta: ${sPlanta}
                             </div>
                             <div style="display:table-cell;width:34%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Área:</strong> ${sArea}
+                                Área: ${sArea}
                             </div>
                         </div>
                     </div>
@@ -111,7 +111,7 @@ sap.ui.define([
                     </p>
 
                     <p style="text-align:justify;margin:0 0 28px 0;">
-                        Yo, <strong>${sNombre}</strong> identificado con documento de identidad N° <strong>${sCedula}</strong> declaro que he recibido el
+                        Yo, ${sNombre} identificado con documento de identidad N° ${sCedula} declaro que he recibido el
                         Código de Ética Gerdau y la Cartilla de la Seguridad de la Información,
                         de la cual <strong>CYRGO S.A.S.</strong> forma parte; y conozco las normas y
                         directrices de la Empresa.
@@ -133,8 +133,14 @@ sap.ui.define([
                     </p>
 
                     <div style="width:100%;margin-bottom:50px;">
-                        <div style="width:60%;margin-left:200px;">
+                        <div style="width:60%;margin-left:200px;position:relative;">
+
+                            <div style="position:absolute;top:-20px;left:0;">
+                                ${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}
+                            </div>
+
                             <div style="border-top:1.5px solid #000;"></div>
+
                             <div style="padding-top:10px;text-align:left;">
                                 Ciudad, fecha
                             </div>
@@ -153,13 +159,13 @@ sap.ui.define([
                     <div style="width:100%;border:1px solid #000;border-collapse:collapse;display:table;margin-top:20px;">
                         <div style="display:table-row;">
                             <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Fecha:</strong> ${localDate}
+                                Fecha: ${localDate}
                             </div>
                             <div style="display:table-cell;width:33%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Planta:</strong> ${sPlanta}
+                                Planta: ${sPlanta}
                             </div>
                             <div style="display:table-cell;width:34%;border:1px solid #000;padding:8px 10px;vertical-align:top;">
-                                <strong>Área:</strong> ${sArea}
+                                Área: ${sArea}
                             </div>
                         </div>
                     </div>

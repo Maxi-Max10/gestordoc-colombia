@@ -38,7 +38,7 @@ sap.ui.define([
                 if (sButtonId.includes("wordDataInfo")) {
                     await wordGenerator.generateWord({
                         templatePath: "templates/word/Autorizacion_Descuento.docx",
-                        fileName:     `${user.firstName}_${user.lastName}Autorizacion_Descuento.docx`,
+                        fileName:     `${user.firstName}_${user.lastName}_Autorizacion_Descuento.docx`,
                         data: {
                             sNombre, sCedula, sIdentificado, sCiudadFirma, localDate
                         }
@@ -50,7 +50,7 @@ sap.ui.define([
                 const htmlRaw = `
                     <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
 
-                        <p style="text-align:center;font-weight:bold;font-size:15pt;margin:0 0 40px 0;">
+                        <p style="text-align:center;font-weight:bold;font-size:15pt;margin:0 0 80px 0;">
                             AUTORIZACIÓN DE DESCUENTO
                         </p>
 
@@ -61,7 +61,7 @@ sap.ui.define([
                             diarios por concepto de servicio de alimentación de acuerdo al reporte enviado a nómina mensualmente.
                         </p>
 
-                        <p style="text-align:justify;margin:0 0 40px 0;">
+                        <p style="text-align:justify;margin:0 0 80px 0;">
                             En caso de retiro de la empresa, autorizo a Diaco S.A. a descontar el saldo existente a la
                             fecha de mi retiro de mi liquidación final de prestaciones sociales, lo cual incluye, primas
                             y extralegales, cesantías, intereses de cesantías, sueldo y cualquier otro devengo incluido

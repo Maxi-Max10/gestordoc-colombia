@@ -68,20 +68,26 @@ sap.ui.define([
                 const isCyrgo = user.company === "CO24";
                 const empresaData = isCyrgo ? {
                     empresaNombre: "CYRGO S.A.S.",
-                    domicilio:     "Bogotá",
+                    nit:            "860009694",
+                    expendida:      "",
+                    telefono:      "5 - 145 050",
                     repNombre:     "DANIEL EDUARDO NUNCIRA AGUDELO",
-                    repCC:         "74.371.977",
+                    cargo:         "REPRESENTANTE LEGAL",
+                    repCC:         "79.553.641",
                     repGenero:     "identificado",
                     firmaImg:      "img/firma_Daniel_Cyrgo.jpg",
-                    nit:            "860.009.694-2"
+                    direccion:     "CALLE 93 B #18 - 12",
                 } : {
                     empresaNombre: "DIACO S.A.",
-                    domicilio:     "Bogotá",
+                    nit:           "891800111",
+                    expendida:      "de Pasto - Nariño",
+                    telefono:       "6 - 003 900",
                     repNombre:     "LAURA CRISTINA CERÓN MUÑOZ",
-                    repCC:         "52.705.312",
+                    cargo:         "GERENTE RELACIONES LABORALES Y SEGURIDAD EMPRESARIAL",
+                    repCC:         "74.371.977",
                     repGenero:     "identificada",
                     firmaImg:      "",
-                    nit:           "891.800.111-5"
+                    direccion:     "CALLE 93 B N° 18 - 12",
                 };
 
                 //Si la empresa es CYRGO, convierto la imagen de la firma de Daniel en base64
@@ -290,7 +296,7 @@ sap.ui.define([
                                 NIT
                             </td>
                             <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                891800111
+                                ${empresaData.nit}
                             </td>
                         </tr>
 
@@ -305,7 +311,7 @@ sap.ui.define([
                                 DIRECCION
                             </td>
                             <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                CALLE 93 B N° 18- 12
+                                ${empresaData.direccion}
                             </td>
                         </tr>
 
@@ -320,22 +326,7 @@ sap.ui.define([
                                 TELEFONO
                             </td>
                             <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                6-003 900
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                REPRESENTANTE LEGAL
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                DANIEL EDUARDO NUNCIRA AGUDELO
+                                ${empresaData.telefono}
                             </td>
                         </tr>
 
@@ -350,7 +341,7 @@ sap.ui.define([
                                 CARGO
                             </td>
                             <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                GERENTE RELACIONES LABORALES Y SEGURIDAD EMPRESARIAL
+                                ${empresaData.cargo}
                             </td>
                         </tr>
 
@@ -364,11 +355,11 @@ sap.ui.define([
                                 CÉDULA
                             </td>
                             <td style="padding:1px 5px;">
-                                74.371.977
+                                ${empresaData.repCC}
                             </td>
                         </tr>
-                    </table>
 
+                    </table>
 
                     <table style="
                         width:100%;
@@ -510,7 +501,7 @@ sap.ui.define([
 
                     ${_bloqueContrato(`
                         Entre los suscritos a saber, <strong>${empresaData.repNombre}</strong>, identificado con la cédula de ciudadanía
-                        No. <strong>${empresaData.repCC}</strong> de ${empresaData.domicilio}, actuando como Representante de la Empresa <strong>${empresaData.empresaNombre}</strong> Sociedad
+                        No. <strong>${empresaData.repCC}</strong> ${empresaData.domicilio}, actuando como Representante de la Empresa <strong>${empresaData.empresaNombre}</strong> Sociedad
                         identificada con el número de NIT ${empresaData.nit}, quien para los efectos del presente Contrato se
                         denominará <strong>EMPRESA</strong>, y <strong>${sNombre}</strong> identificada con cédula de ciudadanía No.
                         <strong>${sCedula}</strong> Expedida en <strong>${sCiudadExpedicion}</strong>, quien para los efectos del presente contrato se
@@ -1323,8 +1314,8 @@ sap.ui.define([
                         padding:0 20px;
                     ">
 
-                        <!-- EMPLEADOR -->
-                        <div style="width:40%;position:relative;">
+                       <!-- EMPLEADOR -->
+                        <div style="width:47%;position:relative;">
                             ${firmaBase64 ? `<img src="${firmaBase64}" style="height:50px;position:absolute;bottom:100%;left:0;margin-bottom:4px;">` : ""}
                             <div style="border-top:1px solid #000;padding-top:6px;">
 
@@ -1338,7 +1329,7 @@ sap.ui.define([
                         </div>
 
                         <!-- TRABAJADOR -->
-                        <div style="width:40%;">
+                        <div style="width:47%;">
 
                             <div style="border-top:1px solid #000;padding-top:6px;">
 

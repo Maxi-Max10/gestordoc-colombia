@@ -76,22 +76,24 @@ sap.ui.define([
 
                 function _buildHtmlCyrgo() {
                     return `
-                    <div style="font-size:14pt;font-family:Arial,sans-serif;padding:0;margin:0;">
+                    <div style="font-size:13.5pt; font-family:Arial, sans-serif; padding:0; margin:0; line-height:1.2;">
 
-                        <p style="margin:0 0 5px 0;color:#104574;font-weight:bold;margin-bottom:20px;">Firma</p>
+                        <!-- El título "Firma" en azul oscuro, negrita y con un margen inferior amplio para dar espacio -->
+                        <p style="margin:0 0 20px 0; color:#104574; font-weight:bold;">Firma</p>
 
-                        <p style="margin:0 0 4px 0;">
-                            <span style="color:#265680;font-weight:bold;">Nombre del empleado:</span>
-                            <span style="color:#265680;"> ${sNombre}</span>
+                        <!-- Los campos de abajo en azul medio, estilo regular y con un espaciado muy sutil entre ellos -->
+                        <p style="margin:0 0 6px 0; color:#265680;">
+                            Nombre del empleado: ${sNombre}
                         </p>
-                        <p style="margin:0 0 4px 0;">
-                            <span style="color:#265680;font-weight:bold;">Número de cedula:</span>
-                            <span style="color:#265680;"> ${sCedula}</span>
+                        
+                        <p style="margin:0 0 6px 0; color:#265680;">
+                            Número de cedula: ${sCedula}
                         </p>
-                        <p style="margin:0;">
-                            <span style="color:#265680;font-weight:bold;">Fecha firma del documento:</span>
-                            <span style="color:#265680;"> ${localDate}</span>
+                        
+                        <p style="margin:0; color:#265680;">
+                            Fecha firma del documento: ${localDate}
                         </p>
+
                     </div>`;
                 }
 

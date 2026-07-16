@@ -1078,12 +1078,6 @@ sap.ui.define([
                         `
                     )}
 
-                    ${_tituloContrato(
-                        "19.",
-                        "PROTECCIÓN Y TRATAMIENTO DE DATOS PERSONALES:",
-                        ""
-                    )}
-
                 </div>`;
 
                 // ── PÁGINA 11 ──────────────────────────────────────────────────
@@ -1091,6 +1085,12 @@ sap.ui.define([
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
                     ${HEADER}
+
+                    ${_tituloContrato(
+                        "19.",
+                        "PROTECCIÓN Y TRATAMIENTO DE DATOS PERSONALES:",
+                        ""
+                    )}
 
                     ${_tituloContrato(
                         "19.1.",
@@ -1162,7 +1162,10 @@ sap.ui.define([
                         tiene derecho a lo siguiente: a) Conocer, actualizar y rectificar sus datos
                         personales, b) Solicitar prueba de la autorización otorgada; c) Ser informado,
                         previa solicitud, respecto del uso que le ha dado a sus datos personales;
-                        d) Presentar ante la Superintendencia de
+                        d) Presentar ante la Superintendencia de Industria y Comercio quejas
+                        e) Revocar la autorización y/o solicitar la supresión del dato; y
+                        f) Acceder en forma gratuita a sus datos personales que hayan sido objeto de
+                        Tratamiento.
                         `
                     )}
 
@@ -1173,15 +1176,6 @@ sap.ui.define([
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
                     ${HEADER}           
-                    
-                    ${_bloqueContrato(
-                        `
-                        Industria y Comercio quejas
-                        e) Revocar la autorización y/o solicitar la supresión del dato; y
-                        f) Acceder en forma gratuita a sus datos personales que hayan sido objeto de
-                        Tratamiento.
-                        `
-                    )}
 
                     ${_tituloContrato(
                         "19.4.",
@@ -1251,7 +1245,7 @@ sap.ui.define([
 
                     ${_bloqueContrato(`
                         Las PARTES se comprometen a cumplir todas las leyes y regulaciones vigentes, incluyendo la
-                        Ley 1778 de 2016, el FCPA, el UK Bribery Act y otras relacionadas con soborno, corrupción y
+                        Ley 1778 de 2016, el FCPA, el UK Bribery Act y otras relacionadas con soborno, corrupción y conflictos de interés.
                     `)}
 
                 </div>`;
@@ -1261,10 +1255,6 @@ sap.ui.define([
                 <div style="${STYLE}width:100%;box-sizing:border-box;">
 
                     ${HEADER}
-
-                    ${_bloqueContrato(`
-                        conflictos de interés.
-                    `)}
 
                     ${_bloqueContrato(`
                         Las PARTES no ofrecerán, recibirán ni autorizarán pagos o beneficios ilegales o corruptos,
