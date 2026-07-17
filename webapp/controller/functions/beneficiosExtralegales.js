@@ -72,7 +72,7 @@ sap.ui.define([
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">1.</td>
                                 <td style="text-align:justify;">
-                                    Que es de mi conocimiento que DIACO S.A., ha implementado un Plan de Beneficios Extralegales, que 
+                                    Que es de mi conocimiento que <strong>DIACO S.A.</strong>, ha implementado un Plan de Beneficios Extralegales, que 
                                     busca garantizar al bienestar y mejoramiento del nivel de vida de sus trabajadores.
                                 </td>
                             </tr>
@@ -102,7 +102,7 @@ sap.ui.define([
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">4.</td>
                                 <td style="text-align:justify;">
-                                    Que declaro que los beneficios allí contenidos son de carácter unilateral, extralegal, por lo que entiendo que DIACO S.A., 
+                                    Que declaro que los beneficios allí contenidos son de carácter unilateral, extralegal, por lo que entiendo que <strong>DIACO S.A.,</strong> 
                                     se reserva el derecho de modificar, ajustar y/o suprimir los auxilios aquí incluidos cuando resulte necesario 
                                     para la empresa sin que ello se entienda como una desmejora en las condiciones laborales.
                                 </td>

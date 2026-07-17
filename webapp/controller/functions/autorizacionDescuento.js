@@ -69,15 +69,15 @@ sap.ui.define([
                         </p>
 
                         <p style="margin:0 0 24px 0;">
-                            <strong>Ciudad y fecha:</strong> ${sCiudadFirma}, ${localDate}&nbsp;</span>
+                            Ciudad y fecha: ${sCiudadFirma}, ${localDate}&nbsp;</span>
                         </p>
 
                         <p style="margin:0 0 24px 0;">
-                            <strong>Firma:</strong> 
+                            Firma: 
                         </p>
 
                         <p style="margin:0;">
-                            <strong>C.C. No</strong>: ${sCedula}&nbsp;</span>
+                            C.C. No: ${sCedula}&nbsp;</span>
                         </p>
 
                     </div>`
