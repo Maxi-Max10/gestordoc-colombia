@@ -77,6 +77,7 @@ sap.ui.define([
             "[[Nombre]]":          data.sNombre          || "",
             "[[Cedula]]":          data.sCedula           || "",
             "[[FechaNacimiento]]": data.sFechaNacimiento  || "",
+            "[[FechaNacimientoMayus]]": data.sFechaNacimientoMayus || "",
             "[[Sexo]]":            data.sSexo             || "",
             "[[EstadoCivil]]":     data.sEstadoCivil      || "",
             "[[GrupoSanguineo]]":  data.sGrupoSangre      || "",
@@ -109,9 +110,12 @@ sap.ui.define([
             "[[Area]]":              data.sArea              || "",
             "[[JefeNombre]]":        data.sJefeNombre        || "",
             "[[Institucion]]":       data.sInstitucion       || "",
+            "[[InstitucionMayus]]":  data.sInstitucionMayus  || "",
             "[[Nit]]":               data.sNit || "",
             "[[FechaIngreso]]":      data.sfechaContratacion || "",
+            "[[FechaIngresoMayus]]": data.sFechaIniciacionMayus || "",
             "[[FechaSalida]]":       data.sfechaBaja         || "",
+            "[[FechaSalidaMayus]]":  data.sFechaBajaMayus    || "",
 
             // Alias: distintas plantillas escriben distinto el mismo campo (diferencia de mayúscula)
             "[[FechaContratacion]]": data.sFechaContratacion || data.sfechaContratacion || "",
@@ -128,6 +132,7 @@ sap.ui.define([
 
             // ── Fecha y lugar del documento ──────────────────────────────────
             "[[Fecha]]":     data.localDate     || "",
+            "[[FechaMayus]]": data.slocalDateMayus || "",
             "[[FechaLarga]]": data.localDateLong || "",
             "[[FechaCert]]": data.localDate     || "",  // Alias que usan los certificados laborales
 
@@ -136,6 +141,11 @@ sap.ui.define([
             "[[CiudadFecha]]": data.sCiudadFirma
                 ? `${data.sCiudadFirma}, ${data.localDate}`
                 : (data.localDate || ""),
+
+            
+            "[[CiudadFechaContratos]]": data.sCiudadFirma
+                ? `${data.sCiudadFirma}, ${data.slocalDateMayus}`
+                : (data.slocalDateMayus || ""),
         };
 
         // ── Paso 4: Reemplazar los placeholders en los XMLs internos del .docx ─

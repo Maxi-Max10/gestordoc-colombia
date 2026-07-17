@@ -95,10 +95,9 @@ sap.ui.define([
                     </p>
 
                     <p style="margin:0 0 60px 0;">
-                    En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
+                        En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
                     </p>
-                    <br>
-                    <br>
+
                     <div style="width:100%;display:flex;gap:20px;">
                         <div style="flex:1;">
                             <div style="border-top:1.5px solid #000;padding-top:6px;">
@@ -146,6 +145,13 @@ sap.ui.define([
                 const drawH   = (img.height * drawW) / img.width;
                 const sliceH  = PAGE_H - MARGIN * 2;
                 const totalPgs = Math.ceil(drawH / sliceH);
+
+                // Si la última "franja" es muy chica (ej: menos del 15% de una página),
+                // la absorbemos en la página anterior para no dejar contenido huérfano.
+                const lastSliceHeight = drawH - (totalPgs - 1) * sliceH;
+                if (totalPgs > 1 && lastSliceHeight < sliceH * 0.15) {
+                    totalPgs -= 1;
+}
 
                 for (let p = 0; p < totalPgs; p++) {
                     const pg = pdfDoc.addPage([PAGE_W, PAGE_H]);

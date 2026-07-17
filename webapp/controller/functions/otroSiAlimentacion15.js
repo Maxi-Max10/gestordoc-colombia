@@ -4,6 +4,21 @@ sap.ui.define([
 ], function (MessageToast,wordGenerator ) {
     "use strict";
 
+    // ── Helper: convierte un recurso (imagen/pdf) a base64 (data URL) ──────
+    async function _toBase64(sUrl) {
+        const oResponse = await fetch(sUrl);
+        if (!oResponse.ok) {
+            throw new Error(`No se pudo cargar el archivo (status ${oResponse.status}): ${sUrl}`);
+        }
+        const oBlob = await oResponse.blob();
+        return await new Promise((resolve, reject) => {
+            const oReader = new FileReader();
+            oReader.onloadend = () => resolve(oReader.result);
+            oReader.onerror   = reject;
+            oReader.readAsDataURL(oBlob);
+        });
+    }
+
     async function onDownloadPDFOtroSiAlimentacion15(oController, sButtonId, mOptions) {
         const oOptions = mOptions || {};
         const bReturnPdfDocuments = !!oOptions.returnPdfDocuments;
@@ -48,13 +63,15 @@ sap.ui.define([
                     repCC:         "79.553.641",
                     repGenero:     "identificado",
                     empresaNombre: "CYRGO S.A.S",
-                    templatePDF:   "templates/pdf/Cyrgo.pdf"
+                    templatePDF:   "templates/pdf/Cyrgo.pdf",
+                    firmaImagen:   "img/firma_Daniel_Cyrgo.jpg"
                 } : {
                     repNombre:     "LAURA CRISTINA CERÓN MUÑOZ",
                     repCC:         "52.705.312",
                     repGenero:     "identificada",
                     empresaNombre: "DIACO S.A.",
-                    templatePDF:   ""
+                    templatePDF:   "",
+                    firmaImagen:   ""
                 };
 
                 // ── Word ─────────────────────────────────────────────────────
@@ -71,6 +88,16 @@ sap.ui.define([
                         }
                     });
                     continue;
+                }
+
+                // ── Firma (solo Cyrgo) ──────────────────────────────────────
+                let firmaBase64 = "";
+                if (isCyrgo && empresaData.firmaImagen) {
+                    try {
+                        firmaBase64 = await _toBase64(empresaData.firmaImagen);
+                    } catch (eFirma) {
+                        console.warn("No se pudo cargar la firma de Cyrgo, se continúa sin imagen:", eFirma.message);
+                    }
                 }
 
                 // ── PDF ───────────────────────────────────────────────────────
@@ -114,16 +141,23 @@ sap.ui.define([
                         Ratifico que, desde el primer pago recibido por concepto de auxilio de alimentación, este fue pactado como no salarial por las partes.
                     </p>
 
-                    <p style="margin:0 0 60px 0;">
+                    <p style="margin:0 0 20px 0;">
                         En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
                     </p>
-                    <br>
-                    <div style="width:100%;display:flex;gap:20px;">
+                    <div style="width:100%;display:flex;gap:20px;align-items:flex-end;">
                         <div style="flex:1;">
-                            <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                <strong>${empresaData.repNombre}</strong><br>
-                                C.C. No. ${empresaData.repCC}<br>
-                            </div>
+                            ${isCyrgo ? `
+                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:75px;display:block;margin-bottom:2px;">` : ""}
+                                <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                    <strong>${empresaData.repNombre}</strong><br>
+                                    C.C. No. ${empresaData.repCC}<br>
+                                </div>
+                            ` : `
+                                <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                    <strong>${empresaData.repNombre}</strong><br>
+                                    C.C. No. ${empresaData.repCC}<br>
+                                </div>
+                            `}
                         </div>
                         <div style="flex:1;">
                             <div style="border-top:1.5px solid #000;padding-top:6px;">

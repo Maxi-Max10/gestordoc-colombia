@@ -46,6 +46,13 @@ sap.ui.define([
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sNit = oController.sManualNit || "";
 
+                const sFechaIniciacionMayus = sfechaContratacion.toUpperCase();
+                const sFechaBajaMayus = sfechaBaja.toUpperCase();
+                const sFechaNacimientoMayus = sFechaNacimiento.toUpperCase();
+                const sInstitucionMayus = (sInstitucion || "").toUpperCase();
+
+
+
                 /*
                  ── Fecha de terminación: inicio + 13 meses y 19 días ────────
                 const dFechaInicio = new Date(user.originalStartDate);
@@ -65,7 +72,8 @@ sap.ui.define([
                         boldParagraphContains: "Entre los suscritos",
                         signatureGapBefore: 720,
                         data: {
-                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sCargo, sInstitucion, sNit
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, 
+                            sCargo, sInstitucion, sNit,sFechaIniciacionMayus, sFechaIniciacionMayus, sFechaBajaMayus, sInstitucionMayus, sFechaNacimientoMayus
                         }
                     });
                     continue;
@@ -345,7 +353,7 @@ sap.ui.define([
                             ">
                                 FECHA NACIMIENTO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaNacimiento}</td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaNacimientoMayus}</td>
                         </tr>
 
                         <tr>
@@ -384,7 +392,7 @@ sap.ui.define([
                             ">
                                 FECHA INICIACIÓN CONTRATO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sfechaContratacion}</td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaIniciacionMayus}</td>
                         </tr>
 
                         <tr>
@@ -396,7 +404,7 @@ sap.ui.define([
                             ">
                                 FECHA TERMINACIÓN CONTRATO
                             </td>
-                            <td style="padding:1px 5px;">${sfechaBaja}</td> 
+                            <td style="padding:1px 5px;">${sFechaBajaMayus}</td> 
                         </tr>
                     </table>
 
@@ -419,7 +427,7 @@ sap.ui.define([
                             ">
                                 INSTITUCIÓN DE FORMACION:
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sInstitucion}</td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sInstitucionMayus}</td>
                         </tr>
 
                         <tr>
@@ -442,7 +450,7 @@ sap.ui.define([
                         No. <strong>52.705.312</strong> de Pasto - Nariño, actuando como Representante de la Empresa <strong>DIACO S.A.</strong> Sociedad
                         identificada con el número de NIT 891.800.111-5, quien para los efectos del presente Contrato se
                         denominará <strong>EMPRESA</strong>, y <strong>${sNombre}</strong> identificada con cédula de ciudadanía No.
-                        <strong>${sCedula}</strong> Expedida en <strong>${sCiudadExpedicion}</strong>, quien para los efectos del presente contrato se
+                        <strong>${sCedula}</strong> Expedida en ${sCiudadExpedicion}, quien para los efectos del presente contrato se
                         denominará el <strong>APRENDIZ</strong>, se suscribe el presente Contrato de Aprendizaje, el cual, conforme el
                         artículo 21 de la Ley 2466 de 2025 es considerado un contrato laboral especial a término fijo y de
                         acuerdo a las siguientes cláusulas:
@@ -452,9 +460,8 @@ sap.ui.define([
                         "PRIMERA:",
                         "OBJETO.",
                         `
-                        El presente contrato tiene como objeto garantizar al <st
-                        APRENDIZ la formación
-                        profesional metódica y requerida dentro del plan de estudios del APRENDIZ en la especialidad de
+                        El presente contrato tiene como objeto garantizar al <strong>APRENDIZ</strong> la formación
+                        profesional metódica y requerida dentro del plan de estudios del <strong>APRENDIZ</strong> en la especialidad de
                         <strong>${sCargo}</strong>, la cual se desarrollara en su etapa práctica por el ${sInstitucion}
                         o por la Institución Educativa donde el aprendiz adelanta sus estudios) y la <strong>EMPRESA</strong>,
                         proporcionara los medios para que el APRENDIZ adquiera formación profesional y metódica, dentro

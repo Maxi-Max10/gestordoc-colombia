@@ -153,7 +153,7 @@ sap.ui.define([
 
                             <p style="margin:0;">Señor:</p>
                             <p style="font-weight:bold;margin:0;">${sNombre}</p>
-                            <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadFirma}</p>
+                            <p style="margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                             <p style="text-align:justify;margin:0 0 16px 0;">
                                 Con referencia al retiro de la empresa, a continuación, se relaciona lista documentos
@@ -190,7 +190,7 @@ sap.ui.define([
 
                             <p style="margin:0;">Señor:</p>
                             <p style="font-weight:bold;margin:0;">${sNombre}</p>
-                            <p style="font-weight:bold;margin:0 0 16px 0;">${sCiudadFirma}</p>
+                            <p style="margin:0 0 16px 0;">${sCiudadFirma}</p>
 
                             <p style="text-align:justify;margin:0 0 14px 0;">
                                 Pensando en su comodidad, tenemos disponible para usted las siguientes opciones (Marque X):
