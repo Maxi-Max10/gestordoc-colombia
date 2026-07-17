@@ -109,22 +109,24 @@ sap.ui.define([
                     <p style="margin:0 0 60px 0;">
                         En constancia se firma en ${sCiudadFirma}, el ${localDate}.
                     </p>
-<br>
-                    <div style="width:100%;display:flex;gap:20px;">
-                        <div style="flex:1;">
-                            <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
-                                C.C. No. 52.705.312<br>
-                                Representante Legal
-                            </div>
-                        </div>
-                        <div style="flex:1;">
-                            <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                <strong>${sNombre}</strong><br>
-                                C.C. GNo. ${sCedula}
-                            </div>
-                        </div>
-                    </div>
+
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr>
+                            <td style="width:50%;padding-right:20px;vertical-align:top;">
+                                <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                    <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
+                                    C.C. No. 52.705.312<br>
+                                    Representante Legal
+                                </div>
+                            </td>
+                            <td style="width:50%;vertical-align:top;">
+                                <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                    <strong>${sNombre}</strong><br>
+                                    C.C. No. ${sCedula}
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
 
                 </div>`;
 
@@ -136,14 +138,21 @@ sap.ui.define([
                 div.style.position        = "absolute";
                 div.style.top             = "-9999px";
                 div.style.left            = "-9999px";
-                div.innerHTML             = htmlRaw;
+                div.innerHTML = htmlRaw;
                 document.body.appendChild(div);
+
+                // fuerza reflow y evita que html2canvas mida antes de tiempo
+                void div.offsetHeight;
+                await new Promise(requestAnimationFrame);
 
                 const canvas = await html2canvasRef(div, {
                     scale:           2,
                     useCORS:         true,
-                    backgroundColor: "#ffffff"
+                    backgroundColor: "#ffffff",
+                    height:          div.scrollHeight,
+                    windowHeight:    div.scrollHeight
                 });
+
                 const imgData = canvas.toDataURL("image/png");
                 document.body.removeChild(div);
 

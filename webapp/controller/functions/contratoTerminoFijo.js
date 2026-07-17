@@ -39,13 +39,16 @@ sap.ui.define([
                 const sCedula      = user.nationalId || "";
                 const sCiudadExpedicion = user.docExpeditionCity || "";
                 const sCiudadFirma = user.ciudadFirma || "";
-                const localDate    = oController.getLocalDate();
+                const localDate    = (oController.getLocalDate() || "").toUpperCase();
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sSalario    = oController.formatSalary(user.paycompvalue);
                 const sSalarioLetras  = user.payCompValueWord || "";
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sDireccion = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
+
+                const slocalDateMayus = localDate.toUpperCase(); //Mayúsculas solo para Word
+                const sFechaIniciacionMayus = sfechaContratacion.toUpperCase(); //Mayúsculas solo para Word
                 
                 // ── Word ─────────────────────────────────────────────────────
                 if (sButtonId.includes("wordDataInfo")) {
@@ -54,7 +57,7 @@ sap.ui.define([
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Fijo.docx`,
                         data: {
                             sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sCargo, 
-                            sSalario, sSalarioLetras, sfechaContratacion, sDireccion, sPeriodoPago
+                            sSalario, sSalarioLetras, sfechaContratacion, sDireccion, sPeriodoPago, sFechaIniciacionMayus, slocalDateMayus
                         }
                     });
                     continue;
@@ -215,12 +218,12 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${slocalDateMayus}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Un (1) mes</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion.toUpperCase()}</td></tr>                        
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">UN (1) MES</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO FIJO</td></tr>
                     </table>
 
@@ -253,7 +256,7 @@ sap.ui.define([
                         de conformidad con los reglamentos, órdenes e instrucciones que le impartan
                         los representantes de <strong>EL EMPLEADOR</strong>, todo lo cual forma parte
                         integrante del presente contrato, observando en su desempeño el cuidado y
-                        diligencia necesarios, especialmente como ${sCargo}, pudiendo
+                        diligencia necesarios, especialmente como <strong>${sCargo}</strong>, pudiendo
                         <strong>EL EMPLEADOR</strong> cambiarlo de función cuando lo considere necesario.
                     `)}
 

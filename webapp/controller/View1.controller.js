@@ -1734,8 +1734,16 @@ sap.ui.define([
         }).addStyleClass("companySelectorIntro");
 
         this._oNitInput = new sap.m.Input({
-          placeholder: "Ej: 900.123.456-7",
-          width: "100%"
+          placeholder: "Ej: 9001234567",
+          width: "100%",
+          liveChange: (oEvent) => {
+            const oInput = oEvent.getSource();
+            const sValue = oInput.getValue();
+            const sDigitsOnly = sValue.replace(/\D/g, "");
+            if (sValue !== sDigitsOnly) {
+              oInput.setValue(sDigitsOnly);
+            }
+          }
         }).addStyleClass("companySelectorNitInput");
 
         this._oNitBox = new sap.m.VBox({
@@ -1751,6 +1759,11 @@ sap.ui.define([
           if (!sNit) {
             this._oNitInput.setValueState("Error");
             this._oNitInput.setValueStateText("Este campo es obligatorio.");
+            return null;
+          }
+          if (!/^\d+$/.test(sNit)) {
+            this._oNitInput.setValueState("Error");
+            this._oNitInput.setValueStateText("El NIT debe contener solo números, sin puntos ni guiones.");
             return null;
           }
           this._oNitInput.setValueState("None");

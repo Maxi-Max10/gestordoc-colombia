@@ -45,6 +45,9 @@ sap.ui.define([
                 const sfechaContratacion = oController.formatDateRaw(user.originalStartDate);
                 const sPeriodoPago = user.paymentFrequency || ""; //para periodo de pago
 
+                const slocalDateMayus = localDate.toUpperCase(); //Mayúsculas solo para Word
+                const sFechaIniciacionMayus = sfechaContratacion.toUpperCase(); //Mayúsculas solo para Word
+
                 const templateFile = user.company === "CO24"
                     ? "templates/pdf/Cyrgo.pdf"
                     : "templates/pdf/hojaDiaco.pdf";
@@ -87,7 +90,7 @@ sap.ui.define([
                         fileName:     `${user.firstName}_${user.lastName}_Contrato_Termino_Indefinido.docx`,
                         data: {
                             sNombre, sCedula, sCiudadExpedicion, sCiudadFirma, localDate, sPais, sDireccion,
-                            sCargo, sSalario, sSalarioLetras, sfechaContratacion, sPeriodoPago
+                            sCargo, sSalario, sSalarioLetras, sfechaContratacion, sPeriodoPago, slocalDateMayus, sFechaIniciacionMayus
                         }
                     });
                     continue;
@@ -235,12 +238,12 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${slocalDateMayus}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">Dos (2) meses</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sFechaIniciacionMayus}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">DOS (2) MESES</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO INDEFINIDO</td></tr>
                     </table>
 

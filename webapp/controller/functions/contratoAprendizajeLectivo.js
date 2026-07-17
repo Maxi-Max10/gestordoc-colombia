@@ -50,6 +50,11 @@ sap.ui.define([
                 const sNit = oController.sManualNit || "";
                 const sCargo            = oController.resolveGender(user.title || "", user.gender);
 
+                const sFechaIniciacionMayus = sfechaContratacion.toUpperCase();
+                const sFechaBajaMayus = sfechaBaja.toUpperCase();
+                const sFechaNacimientoMayus = sFechaNacimiento.toUpperCase();
+                const sInstitucionMayus = (sInstitucion || "").toUpperCase();
+
                 /*
                  ── Fecha de terminación: inicio + 13 meses y 19 días ────────
                 const dFechaInicio = new Date(user.originalStartDate);
@@ -113,7 +118,8 @@ sap.ui.define([
                         signatureGapBefore: 720,
                         data: {
                             sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, localDateLong,
-                            sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sInstitucion, sNit, sCargo
+                            sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sInstitucion, sNit, sCargo,
+                            sFechaIniciacionMayus, sFechaBajaMayus, sFechaNacimientoMayus, sInstitucionMayus, 
                         }
                     });
                     continue;
@@ -410,7 +416,7 @@ sap.ui.define([
                             ">
                                 FECHA NACIMIENTO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaNacimiento}</td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaNacimientoMayus}</td>
                         </tr>
 
                         <tr>
@@ -449,7 +455,7 @@ sap.ui.define([
                             ">
                                 FECHA INICIACIÓN CONTRATO
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sfechaContratacion}</td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaIniciacionMayus}</td>
                         </tr>
 
                         <tr>
@@ -461,7 +467,7 @@ sap.ui.define([
                             ">
                                 FECHA TERMINACIÓN CONTRATO
                             </td>
-                            <td style="padding:1px 5px;">${sfechaBaja}</td>
+                            <td style="padding:1px 5px;">${sFechaBajaMayus}</td>
                         </tr>
                     </table>
 
@@ -484,7 +490,7 @@ sap.ui.define([
                             ">
                                 INSTITUCIÓN DE FORMACION:
                             </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sInstitucion}</td>
+                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sInstitucionMayus}</td>
                         </tr>
 
                         <tr>
@@ -505,7 +511,7 @@ sap.ui.define([
                     ${_bloqueContrato(`
                         Entre los suscritos a saber, <strong>${empresaData.repNombre}</strong>, identificado con la cédula de ciudadanía
                         No. <strong>${empresaData.repCC}</strong> ${empresaData.domicilio}, actuando como Representante de la Empresa <strong>${empresaData.empresaNombre}</strong> Sociedad
-                        identificada con el número de NIT ${empresaData.nit}, quien para los efectos del presente Contrato se
+                        identificado (a) con el número de NIT ${empresaData.nit}, quien para los efectos del presente Contrato se
                         denominará <strong>EMPRESA</strong>, y <strong>${sNombre}</strong> identificada con cédula de ciudadanía No.
                         <strong>${sCedula}</strong> Expedida en <strong>${sCiudadExpedicion}</strong>, quien para los efectos del presente contrato se
                         denominará el <strong>APRENDIZ</strong>, se suscribe el presente Contrato de Aprendizaje, el cual, conforme el
@@ -519,7 +525,7 @@ sap.ui.define([
                         `
                         El presente contrato tiene como objeto garantizar al <strong>APRENDIZ</strong> la formación
                         profesional metódica y requerida dentro del plan de estudios del <strong>APRENDIZ</strong> en la especialidad de
-                        ${sCargo}, la cual se impartirá en su etapa lectiva por el Centro de Formación Profesional
+                        <strong>${sCargo}</strong>, la cual se impartirá en su etapa lectiva por el Centro de Formación Profesional
                         ${sInstitucion} mientras su etapa práctica se desarrollará en la <strong>EMPRESA</strong>, quien proporcionara los
                         medios para que el <strong>APRENDIZ</strong> adquiera formación profesional y metódica, dentro de una relación de
                         aprendizaje, la cual de ninguna manera implica subordinación laboral por parte de la <strong>EMPRESA</strong> sobre
