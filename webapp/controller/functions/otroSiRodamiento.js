@@ -84,7 +84,7 @@ sap.ui.define([
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         En consecuencia, de lo anterior, las partes han convenido que EL TRABAJADOR reciba
-                        un valor de <strong>${sSalarioLetras} (${sSalario})</strong>, como monto fijo
+                        un valor de <strong>UN MILLÓN CUATROCIENTOS SETENTA Y UN MIL DOCIENTOS SESENTA Y SIETE PESOS M/CTE ($1.471.267)</strong>, como monto fijo
                         mensual que será consignado a la cuenta de nómina del colaborador, con el ánimo de
                         reintegrar al trabajador el dinero que gaste en su movilización para la realización
                         del cargo que desempeña en Diaco S.A.
