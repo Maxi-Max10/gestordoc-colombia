@@ -195,252 +195,29 @@ sap.ui.define([
 
                     ${HEADER}
 
-                    <table style="
-                        width:100%;
-                        border-collapse:collapse;
-                        font-size:9.5pt;
-                        margin:0 0 10px 0;
-                        border:1px solid #000000;
-                    ">
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                width:45%;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                EMPRESA
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                DIACO S.A
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                NIT
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                891800111
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                DIRECCION
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                CALLE 93 B N° 18- 12
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                TELEFONO
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                6-003 900
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                REPRESENTANTE LEGAL
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                DANIEL EDUARDO NUNCIRA AGUDELO
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                CARGO
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">
-                                GERENTE RELACIONES LABORALES Y SEGURIDAD EMPRESARIAL
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                CÉDULA
-                            </td>
-                            <td style="padding:1px 5px;">
-                                74.371.977
-                            </td>
-                        </tr>
+                    <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:0 0 10px 0;border:1px solid #000000;">
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;width:45%;font-weight:bold;background-color:#DCEEFF;">EMPRESA</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">DIACO S.A</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">NIT</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">891800111</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DIRECCION</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">CALLE 93 B N° 18- 12</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TELEFONO</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">6-003 900</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">REPRESENTANTE LEGAL</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">DANIEL EDUARDO NUNCIRA AGUDELO</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">GERENTE RELACIONES LABORALES Y SEGURIDAD EMPRESARIAL</td></tr>
+                        <tr><td style="border-right:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CÉDULA</td><td style="padding:1px 5px;font-weight:normal;">74.371.977</td></tr>
                     </table>
 
-
-                    <table style="
-                        width:100%;
-                        border-collapse:collapse;
-                        font-size:9.5pt;
-                        margin:0 0 10px 0;
-                        border:1px solid #000000;
-                    ">
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                width:45%;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                NOMBRE APRENDIZ
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sNombre}</td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                CÉDULA O TARJETA IDENTIDAD
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sCedula}</td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                FECHA NACIMIENTO
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaNacimientoMayus}</td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                DIRECCION
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sDireccion}</td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                TELEFONO
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sTelefono}</td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                FECHA INICIACIÓN CONTRATO
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sFechaIniciacionMayus}</td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                FECHA TERMINACIÓN CONTRATO
-                            </td>
-                            <td style="padding:1px 5px;">${sFechaBajaMayus}</td> 
-                        </tr>
+                    <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:0 0 10px 0;border:1px solid #000000;">
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;width:45%;font-weight:bold;background-color:#DCEEFF;">NOMBRE APRENDIZ</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">${sNombre}</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CÉDULA O TARJETA IDENTIDAD</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">${sCedula}</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA NACIMIENTO</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">${sFechaNacimientoMayus}</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DIRECCION</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">${sDireccion}</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TELEFONO</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">${sTelefono}</td></tr>
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA INICIACIÓN CONTRATO</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">${sFechaIniciacionMayus}</td></tr>
+                        <tr><td style="border-right:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA TERMINACIÓN CONTRATO</td><td style="padding:1px 5px;font-weight:normal;">${sFechaBajaMayus}</td></tr>
                     </table>
 
-
-                    <table style="
-                        width:100%;
-                        border-collapse:collapse;
-                        font-size:9.5pt;
-                        margin:0 0 14px 0;
-                        border:1px solid #000000;
-                    ">
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                border-bottom:1px solid #000000;
-                                padding:1px 5px;
-                                width:45%;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                INSTITUCIÓN DE FORMACION:
-                            </td>
-                            <td style="border-bottom:1px solid #000000;padding:1px 5px;">${sInstitucionMayus}</td>
-                        </tr>
-
-                        <tr>
-                            <td style="
-                                border-right:1px solid #000000;
-                                padding:1px 5px;
-                                font-weight:bold;
-                                background-color:#DCEEFF;
-                            ">
-                                NIT:
-                            </td>
-                            <td style="padding:1px 5px;">${sNit}</td>
-                        </tr>
+                    <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:0 0 14px 0;border:1px solid #000000;">
+                        <tr><td style="border-right:1px solid #000000;border-bottom:1px solid #000000;padding:1px 5px;width:45%;font-weight:bold;background-color:#DCEEFF;">INSTITUCIÓN DE FORMACION:</td><td style="border-bottom:1px solid #000000;padding:1px 5px;font-weight:normal;">${sInstitucionMayus}</td></tr>
+                        <tr><td style="border-right:1px solid #000000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">NIT:</td><td style="padding:1px 5px;font-weight:normal;">${sNit}</td></tr>
                     </table>
 
                     <div style="text-align:center;font-weight:bold;margin:10px 0 14px 0;font-size:10pt;">CLÁUSULAS</div>

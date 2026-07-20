@@ -55,19 +55,19 @@ sap.ui.define([
             
                 function _buildHtmlDiaco() {
                     return `
-                    <div style="font-size:14pt;font-family:Arial,sans-serif;padding:0;margin:0;">
+                    <div style="font-size:14pt;font-family:Arial,sans-serif;padding:0;margin:0;margin-top:-20px;">
 
                         <p style="margin:0 0 12px 0;color:#E8601C;font-weight:bold;">Firma</p>
 
-                        <p style="margin:0 0 12px 0;">
+                        <p style="margin:0 0 12px 0;white-space:nowrap;">
                             <span style="color:#E8601C;font-weight:bold;">Nombre del empleado:</span>
                             <span style="color:#E8601C;"> ${sNombre}</span>
                         </p>
-                        <p style="margin:0 0 12px 0;">
+                        <p style="margin:0 0 12px 0;white-space:nowrap;">
                             <span style="color:#E8601C;font-weight:bold;">Número de cedula:</span>
                             <span style="color:#E8601C;"> ${sCedula}</span>
                         </p>
-                        <p style="margin:0;">
+                        <p style="margin:0;white-space:nowrap;">
                             <span style="color:#E8601C;font-weight:bold;">Fecha firma del documento:</span>
                             <span style="color:#E8601C;"> ${localDate}</span>
                         </p>

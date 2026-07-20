@@ -541,7 +541,7 @@ sap.ui.define([
                                 Encontrará a continuación la solicitud de servicio para la realización de sus exámenes médicos post – 
                                 ocupacionales, deberá hacer uso de este servicio dentro de los cinco (5) días hábiles siguientes a la 
                                 fecha de este comunicado, de lo contrario daremos por entendido que no se encuentra interesado (a) 
-                                en realizar este trámite
+                                en realizar este trámite.
                             </p>
 
                             <div style="margin-top:100px;">

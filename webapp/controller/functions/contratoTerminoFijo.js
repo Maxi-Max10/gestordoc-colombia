@@ -214,17 +214,17 @@ sap.ui.define([
                     ${HEADER}
 
                     <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:14px 0 16px 0;">
-                        <tr><td style="border:1px solid #000;padding:1px 5px;width:45%;font-weight:bold;">EMPLEADOR</td><td style="border:1px solid #000;padding:1px 5px;">DIACO S.A.</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;">${sNombre}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;">${sCedula}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;">${sCargo}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${slocalDateMayus}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;">${sCiudadFirma}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;">${sSalario}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;">${sPeriodoPago}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;">${sfechaContratacion.toUpperCase()}</td></tr>                        
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;">UN (1) MES</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;">TÉRMINO FIJO</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;width:45%;font-weight:bold;">EMPLEADOR</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">DIACO S.A.</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sNombre}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sCedula}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sCargo}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DE CELEBRACIÓN Y FECHA</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sCiudadFirma ? sCiudadFirma + ", " : ""}${slocalDateMayus}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">LUGAR DONDE PRESTARÁ EL SERVICIO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sCiudadFirma}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sSalario}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sPeriodoPago}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sfechaContratacion.toUpperCase()}</td></tr>                      
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">UN (1) MES</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">TÉRMINO FIJO</td></tr>
                     </table>
 
                     ${_bloqueContrato(`
@@ -1619,7 +1619,7 @@ sap.ui.define([
                 ];
 
                 // ── Carga plantilla de fondo ───────────────────────────────────
-                const existingPdfBytes = await fetch("templates/pdf/hojaDiaco.pdf")
+                const existingPdfBytes = await fetch("templates/pdf/hojaDiaco2.pdf")
                     .then(res => res.arrayBuffer());
 
                 const pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
