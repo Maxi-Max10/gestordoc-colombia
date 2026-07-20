@@ -174,11 +174,17 @@ sap.ui.define([
                     <title>Formato DIACO</title>
 
                     <style>
+                        :root {
+                            --fs-base: 10px;    /* antes 10px — cuerpo, campos */
+                            --fs-header: 10.5px; /* antes 10.5px — encabezados de sección */
+                            --fs-sub: 12px;      /* antes 12px — subtítulo bajo el header */
+                        }
+
                         * {
                             box-sizing: border-box;
                             margin: 0;
                             padding: 0;
-                            font-family: Arial, Helvetica, sans-serif;
+                            font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
                             color: #000;
                         }
 
@@ -208,7 +214,7 @@ sap.ui.define([
 
                         .cell {
                             padding: 4px 7px;
-                            font-size: 10px;
+                            font-size: var(--fs-base);
                             line-height: 1.45;
                             vertical-align: top;
                             flex-shrink: 0;
@@ -233,7 +239,7 @@ sap.ui.define([
                             color: #fff;
                             text-align: center;
                             font-weight: bold;
-                            font-size: 10.5px;
+                            font-size: var(--fs-header);
                             padding: 4px 8px;
                             border-top: 1px solid #000;
                             line-height: 1.4;
@@ -242,7 +248,7 @@ sap.ui.define([
                         .section-header span {
                             display: block;
                             font-weight: normal;
-                            font-size: 12px;
+                            font-size: var(--fs-sub);
                             color: #fff;
                         }
 
@@ -284,7 +290,7 @@ sap.ui.define([
 
                         .sub-cell {
                             padding: 4px 6px;
-                            font-size: 10px;
+                            font-size: var(--fs-base);
                             line-height: 1.45;
                         }
 
@@ -332,7 +338,7 @@ sap.ui.define([
                                 <strong>No.</strong> ${sCedula}
                                 <br>
                                 <div style="display:flex; align-items:center; gap:4px; margin-top:4px;">
-                                    <strong style="white-space:nowrap; font-size:10px;">Fecha de expedición del documento:</strong> ${sFechaExpedicion}
+                                    <strong style="white-space:nowrap; font-size:var(--fs-base);">Fecha de expedición del documento:</strong> ${sFechaExpedicion}
                                 </div>
                             </div>
                         </div>
@@ -420,9 +426,6 @@ sap.ui.define([
                             INFORMACIÓN DEPENDIENTES
                             <span>Si este espacio no es suficiente, por favor adicione la información en documento aparte</span>
                         </div>
-
-                        <!-- DEP 1 al 3: bloques idénticos, uno por cada dependiente.
-                             Los campos están vacíos — los completa el empleado en papel. -->
 
                         <!-- DEP 1 -->
                         <div class="row">
@@ -583,11 +586,17 @@ sap.ui.define([
                     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
                     <style>
+                        :root {
+                            --fs-base: 11px;
+                            --fs-header: 11.5px;
+                            --fs-sub: 13px;
+                        }
+
                         * {
                             box-sizing: border-box;
                             margin: 0;
                             padding: 0;
-                            font-family: Arial, Helvetica, sans-serif;
+                            font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
                             color: #000;
                         }
 
@@ -615,7 +624,7 @@ sap.ui.define([
 
                         .cell {
                             padding: 4px 7px;
-                            font-size: 10px;
+                            font-size: var(--fs-base);
                             line-height: 1.45;
                             vertical-align: top;
                             flex-shrink: 0;
@@ -635,7 +644,7 @@ sap.ui.define([
                             color: #fff;
                             text-align: center;
                             font-weight: bold;
-                            font-size: 10.5px;
+                            font-size: var(--fs-header);
                             padding: 4px 8px;
                             border-top: 1px solid #000;
                             line-height: 1.4;
@@ -644,7 +653,7 @@ sap.ui.define([
                         .section-header span {
                             display: block;
                             font-weight: normal;
-                            font-size: 12px;
+                            font-size: var(--fs-sub);
                             color: #fff;
                         }
 
@@ -792,7 +801,7 @@ sap.ui.define([
 
                     </div>
 
-                    <div style="font-size:12px; margin-top:20px; margin-bottom:12px; font-weight:bold; margin-left:10px;">
+                    <div style="font-size:var(--fs-sub); margin-top:20px; margin-bottom:12px; font-weight:bold; margin-left:10px;">
                         Si tiene más dependientes, por favor allegue la información solicitada en hoja aparte.
                     </div>
 
@@ -832,7 +841,7 @@ sap.ui.define([
                     </div>
 
                     <!-- Inicio del texto legal (Ley 1582/2012 de protección de datos) -->
-                    <div style="width:760px; margin-left:10px; margin-top:20px; margin-bottom:12px; font-size:10px; font-weight:normal;">
+                    <div style="width:760px; margin-left:10px; margin-top:20px; margin-bottom:12px; font-size:var(--fs-base); font-weight:normal;">
                         Dando cumplimiento a lo dispuesto en la Ley 1582 de 2012,
                         "Por la cual se dictan disposiciones generales para la protección
                         de datos personales" y de conformidad con lo señalado en el
@@ -856,7 +865,7 @@ sap.ui.define([
                     </div>
 
                     <!-- Caja con las finalidades del tratamiento de datos -->
-                    <div style="width:730px; margin-left:28px; margin-top:10px; border:1px solid #000; font-size:10px; line-height:1.45;">
+                    <div style="width:730px; margin-left:28px; margin-top:10px; border:1px solid #000; font-size:var(--fs-base); line-height:1.45;">
                         <div style="padding:6px 8px; border-bottom:1px solid #000;">
                             Efectuar todas las gestiones necesarias para el desarrollo del objeto Social de <strong>DIACO S.A.</strong>,
                             en todo lo relacionado con el cumplimiento del objeto del contrato celebrado entre la Compañía
@@ -885,11 +894,17 @@ sap.ui.define([
                     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
                     <style>
+                        :root{
+                            --fs-base: 11px;
+                            --fs-header: 11.5px;
+                            --fs-sub: 13px;
+                        }
+
                         *{
                             box-sizing:border-box;
                             margin:0;
                             padding:0;
-                            font-family:Arial, Helvetica, sans-serif;
+                            font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
                             color:#000;
                         }
 
@@ -917,7 +932,7 @@ sap.ui.define([
 
                         .cell{
                             padding:4px 7px;
-                            font-size:10px;
+                            font-size: var(--fs-base);
                             line-height:1.45;
                             vertical-align:top;
                             flex-shrink:0;
@@ -959,7 +974,7 @@ sap.ui.define([
                     <body>
 
                         <!-- Continuación de la lista de finalidades (viene de la página 2) -->
-                        <div style="width:730px; margin-left:28px; border:1px solid #000; font-size:10px; line-height:1.45;">
+                        <div style="width:730px; margin-left:28px; border:1px solid #000; font-size:var(--fs-base); line-height:1.45;">
                             <!-- Fila vacía de alineación para encajar con el borde de la página 2 -->
                             <div style="height:18px; border-bottom:1px solid #000;"></div>
 
@@ -985,7 +1000,7 @@ sap.ui.define([
                         </div>
 
                         <!-- Puntos 3 al 10: derechos del titular, canales de contacto, compromisos de DIACO S.A. -->
-                        <div style="width:760px; margin-left:10px; margin-top:16px; font-size:10px; line-height:1.45;">
+                        <div style="width:760px; margin-left:10px; margin-top:16px; font-size:var(--fs-base); line-height:1.45;">
                             <strong>3.</strong>&nbsp;
                             Que la Política de Datos Personales y Privacidad de <strong>DIACO S.A.</strong>,
                             puede ser consultada en la página web

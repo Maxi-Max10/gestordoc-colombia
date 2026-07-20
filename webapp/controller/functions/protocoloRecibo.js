@@ -135,11 +135,11 @@ sap.ui.define([
                     <div style="width:100%;margin-bottom:50px;">
                         <div style="width:60%;margin-left:200px;position:relative;">
 
-                            <div style="position:absolute;top:-20px;left:0;">
+                            <div style="position:absolute;top:-24px;left:0;">
                                 ${sCiudadFirma ? sCiudadFirma + ", " : ""}${localDate}
                             </div>
 
-                            <div style="border-top:1.5px solid #000;"></div>
+                            <div style="border-top:1.5px solid #000;margin-top:8px;"></div>
 
                             <div style="padding-top:10px;text-align:left;">
                                 Ciudad, fecha
@@ -150,7 +150,7 @@ sap.ui.define([
                     <div style="width:100%;margin-bottom:40px;">
                         <div style="width:60%;margin-left:200px;">
                             <div style="border-top:1.5px solid #000;"></div>
-                            <div style="padding-top:10px;text-align:center;font-weight:bold;">
+                            <div style="padding-top:10px;text-align:center;">
                                 Firma
                             </div>
                         </div>
