@@ -35,6 +35,7 @@ sap.ui.define([
                 const sNombre      = `${user.firstName} ${user.lastName}`;
                 const sCedula      = user.nationalId || "";
                 const sCiudadExpedicion = user.docExpeditionCity || "";
+                const sCiudadFirma = user.ciudadFirma || "";
                 const sFechaNacimiento = user.dateOfBirth 
                     ? oController.formatDateRaw(user.dateOfBirth) 
                     : "";
@@ -45,6 +46,7 @@ sap.ui.define([
                 const sInstitucion = await oController._getInstitucionFormacion(user.userId);
                 const sCargo      = oController.resolveGender(user.title || "", user.gender);
                 const sNit = oController.sManualNit || "";
+                const localDateLong = oController.formatDateToWords(new Date());
 
                 const sFechaIniciacionMayus = sfechaContratacion.toUpperCase();
                 const sFechaBajaMayus = sfechaBaja.toUpperCase();
@@ -72,8 +74,8 @@ sap.ui.define([
                         boldParagraphContains: "Entre los suscritos",
                         signatureGapBefore: 720,
                         data: {
-                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, 
-                            sCargo, sInstitucion, sNit,sFechaIniciacionMayus, sFechaIniciacionMayus, sFechaBajaMayus, sInstitucionMayus, sFechaNacimientoMayus
+                            sNombre, sCedula, sCiudadExpedicion ,sFechaNacimiento, sDireccion, sTelefono, sfechaContratacion, sfechaBaja, sCargo, sInstitucion,
+                            sNit,sFechaIniciacionMayus, sFechaIniciacionMayus, sFechaBajaMayus, sInstitucionMayus, sFechaNacimientoMayus, localDateLong, sCiudadFirma
                         }
                     });
                     continue;
@@ -1041,7 +1043,7 @@ sap.ui.define([
                     )}
 
                     ${_bloqueContrato(`
-                        Para efectos de lo anterior, firman el dieciséis (16) de enero del año 2026 en Tuta Boyacá
+                        Para efectos de lo anterior, firman el ${localDateLong} en ${sCiudadFirma}
                     `)}
 
                     <!-- Firmas -->

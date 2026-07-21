@@ -101,9 +101,24 @@ sap.ui.define([
                 }
 
                 // ── PDF ───────────────────────────────────────────────────────
-                const htmlRaw = `
-                <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+                // ── PDF: contenido común de firmas ─────────────────────────
+                const sFirmaEmpleador = isCyrgo
+                    ? `
+                        ${firmaBase64 ? `<img src="${firmaBase64}" style="height:75px;display:block;margin-bottom:2px;">` : ""}
+                        <div style="border-top:1.5px solid #000;padding-top:6px;">
+                            <strong>${empresaData.repNombre}</strong><br>
+                            C.C. No. ${empresaData.repCC}<br>
+                            ${empresaData.empresaNombre}
+                        </div>
+                    `
+                    : `
+                        <div style="border-top:1.5px solid #000;padding-top:6px;">
+                            <strong>${empresaData.repNombre}</strong><br>
+                            C.C. No. ${empresaData.repCC}<br>
+                        </div>
+                    `;
 
+                const sCuerpoComun = `
                     <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 4px 0;margin-bottom: 20px;">
                         OTRO SI AL CONTRATO DE TRABAJO
                     </p>
@@ -140,34 +155,52 @@ sap.ui.define([
                     <p style="text-align:justify;margin:0 0 20px 0;">
                         Ratifico que, desde el primer pago recibido por concepto de auxilio de alimentación, este fue pactado como no salarial por las partes.
                     </p>
+                `;
 
-                    <p style="margin:0 0 20px 0;">
+                // ── HTML específico Diaco ───────────────────────────────────
+                const htmlDiaco = `
+                <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+                    ${sCuerpoComun}
+                    <p style="margin:0 0 120px 0;">
                         En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
                     </p>
                     <div style="width:100%;display:flex;gap:20px;align-items:flex-end;">
                         <div style="flex:1;">
-                            ${isCyrgo ? `
-                                ${firmaBase64 ? `<img src="${firmaBase64}" style="height:75px;display:block;margin-bottom:2px;">` : ""}
-                                <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>${empresaData.repNombre}</strong><br>
-                                    C.C. No. ${empresaData.repCC}<br>
-                                </div>
-                            ` : `
-                                <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                    <strong>${empresaData.repNombre}</strong><br>
-                                    C.C. No. ${empresaData.repCC}<br>
-                                </div>
-                            `}
+                            ${sFirmaEmpleador}
                         </div>
                         <div style="flex:1;">
                             <div style="border-top:1.5px solid #000;padding-top:6px;">
                                 <strong>${sNombre}</strong><br>
-                                 C.C. No. ${sCedula}
+                                <strong>C.C. No.</strong> ${sCedula}
                             </div>
                         </div>
                     </div>
-
                 </div>`;
+
+                // ── HTML específico Cyrgo ───────────────────────────────────
+                const htmlCyrgo = `
+                <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+                    ${sCuerpoComun}
+                    <p style="margin:0 0 80px 0;">
+                        En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
+                    </p>
+                    <div style="width:100%;display:flex;gap:20px;align-items:flex-end;">
+                        <div style="flex:1;">
+                            ${sFirmaEmpleador}
+                        </div>
+                        <div style="flex:1;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                <strong>${sNombre}</strong><br>
+                                <strong>C.C. No.</strong> ${sCedula}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+                const htmlRaw = isCyrgo ? htmlCyrgo : htmlDiaco;
+
+                const A4_WIDTH  = 595.28;
+                const A4_HEIGHT = 841.89;
                 
                 // Insertar en DOM y esperar layout completo antes de capturar
                 const div = document.createElement("div");
@@ -200,6 +233,8 @@ sap.ui.define([
 
                 // ── Crear o cargar documento según empresa ────────────────────
                 let pdfDoc, templatePageImage, pageWidth, pageHeight;
+                pageWidth  = A4_WIDTH;
+                pageHeight = A4_HEIGHT;
 
                 if (isCyrgo && empresaData.templatePDF) {
                     const pdfResponse = await fetch(empresaData.templatePDF);
@@ -209,21 +244,19 @@ sap.ui.define([
                     const existingPdfBytes = await pdfResponse.arrayBuffer();
                     pdfDoc = await PDFLibRef.PDFDocument.load(existingPdfBytes);
                     const [templatePage] = pdfDoc.getPages();
-                    const { width, height } = templatePage.getSize();
-                    pageWidth         = width;
-                    pageHeight        = height;
                     templatePageImage = await pdfDoc.embedPage(templatePage);
                 } else {
                     // Diaco (o Cyrgo sin plantilla configurada): fondo blanco
-                    pdfDoc    = await PDFLibRef.PDFDocument.create();
-                    pageWidth = 595;
+                    pdfDoc = await PDFLibRef.PDFDocument.create();
                 }
 
-                const img = await pdfDoc.embedPng(imgData);
+                const img = await pdfDoc.embedPng(imgData);   // ← ESTA LÍNEA, aquí
 
                 if (isCyrgo) {
                     const newPage = pdfDoc.addPage([pageWidth, pageHeight]);
-                    newPage.drawPage(templatePageImage);
+                    newPage.drawPage(templatePageImage, {
+                        x: 0, y: 0, width: pageWidth, height: pageHeight
+                    });
                     const imgWidth  = pageWidth * 0.88;
                     const imgHeight = (img.height * imgWidth) / img.width;
                     newPage.drawImage(img, {
@@ -234,14 +267,21 @@ sap.ui.define([
                     });
                     pdfDoc.removePage(0);
                 } else {
-                    const MARGIN = 36;
-                    const drawW  = pageWidth - MARGIN * 2;
-                    const drawH  = (img.height * drawW) / img.width;
-                    const PAGE_H = drawH + MARGIN * 2;
-                    const pg     = pdfDoc.addPage([pageWidth, PAGE_H]);
+                    const MARGIN   = 36;
+                    const maxDrawW = pageWidth - MARGIN * 2;
+                    const maxDrawH = pageHeight - MARGIN * 2;
+
+                    let drawW = maxDrawW;
+                    let drawH = (img.height * drawW) / img.width;
+                    if (drawH > maxDrawH) {
+                        drawH = maxDrawH;
+                        drawW = (img.width * drawH) / img.height;
+                    }
+
+                    const pg = pdfDoc.addPage([pageWidth, pageHeight]);
                     pg.drawImage(img, {
-                        x:      MARGIN,
-                        y:      MARGIN,
+                        x: (pageWidth - drawW) / 2,
+                        y: pageHeight - drawH - MARGIN,
                         width:  drawW,
                         height: drawH
                     });

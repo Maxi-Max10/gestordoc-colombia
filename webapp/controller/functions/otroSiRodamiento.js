@@ -65,12 +65,10 @@ sap.ui.define([
 
                     <p style="text-align:justify;margin:0 0 16px 0;">
                         Siendo, el ${localDate}, se reunieron por una parte <strong>${sNombre}</strong>
-                        ${sIdentificado} N.° <strong>${sCedula}</strong>
-                        como aparece al pie de su firma y quien en adelante se denominará
-                        <strong>EL TRABAJADOR</strong>, y por la otra,
-                        <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312
+                        ${sIdentificado} N.° ${sCedula} como aparece al pie de su firma y quien en adelante se denominará
+                        EL TRABAJADOR, y por la otra, <strong>LAURA CRISTINA CERÓN MUÑOZ</strong> identificada con la C.C. No. 52.705.312
                         y quien actúa en representación de <strong>DIACO S.A.</strong>, quien en adelante
-                        se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo
+                        se denominará EL EMPLEADOR, con el fin de suscribir un acuerdo
                         provisto de las siguientes cláusulas.
                     </p>
 
@@ -138,12 +136,16 @@ sap.ui.define([
                 div.style.position        = "absolute";
                 div.style.top             = "-9999px";
                 div.style.left            = "-9999px";
+                div.style.webkitFontSmoothing = "antialiased";
+                div.style.textRendering       = "optimizeLegibility";
                 div.innerHTML = htmlRaw;
                 document.body.appendChild(div);
 
                 // fuerza reflow y evita que html2canvas mida antes de tiempo
                 void div.offsetHeight;
                 await new Promise(requestAnimationFrame);
+                // Espera a que todas las fuentes estén listas antes de capturar
+                await document.fonts.ready;
 
                 const canvas = await html2canvasRef(div, {
                     scale:           2,

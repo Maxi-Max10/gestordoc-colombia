@@ -100,16 +100,16 @@ sap.ui.define([
 
                     <div style="width:100%;display:flex;gap:20px;">
                         <div style="flex:1;">
-                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;width:85%;">
                                 <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
                                 C.C. No. 52.705.312<br>
                                 Representante
                             </div>
                         </div>
                         <div style="flex:1;">
-                            <div style="border-top:1.5px solid #000;padding-top:6px;">
+                            <div style="border-top:1.5px solid #000;padding-top:6px;width:85%;">
                                 <strong>${sNombre}</strong><br>
-                                 C.C. No. ${sCedula}
+                                C.C. No. ${sCedula}<br>
                             </div>
                         </div>
                     </div>
@@ -124,13 +124,19 @@ sap.ui.define([
                 div.style.position        = "absolute";
                 div.style.top             = "-9999px";
                 div.style.left            = "-9999px";
+                div.style.webkitFontSmoothing = "antialiased";
+                div.style.textRendering       = "optimizeLegibility";
                 div.innerHTML             = htmlRaw;
                 document.body.appendChild(div);
+
+                // Espera a que todas las fuentes estén listas antes de capturar
+                await document.fonts.ready;
 
                 const canvas = await html2canvasRef(div, {
                     scale:           2,
                     useCORS:         true,
-                    backgroundColor: "#ffffff"
+                    backgroundColor: "#ffffff",
+                    letterRendering: true
                 });
                 const imgData = canvas.toDataURL("image/png");
                 document.body.removeChild(div);
@@ -165,7 +171,7 @@ sap.ui.define([
                     if (p === totalPgs - 1) {
                         pg.drawText("[[FIRMA_EMPLEADO]]", {
                             x: PAGE_W * 0.63,
-                            y: 190,
+                            y: 15,        // pegado al margen inferior, fuera del bloque de firma
                             size: 6,
                             color: PDFLibRef.rgb(1, 1, 1)
                         });
