@@ -223,8 +223,8 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sfechaContratacion.toUpperCase()}</td></tr>                      
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">UN (1) MES</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">TÉRMINO FIJO</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">UN (1) MES</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">TÉRMINO FIJO</td></tr>
                     </table>
 
                     ${_bloqueContrato(`
@@ -1259,7 +1259,7 @@ sap.ui.define([
                         "FECHA DE INICIACIÓN:",
                         `
                         Se deja constancia que <strong>EL TRABAJADOR</strong> inició sus labores el día
-                        ${sfechaContratacion}, fecha ésta que las partes consideran como la del comienzo de la vigencia del
+                        <strong>${sfechaContratacion}</strong>, fecha ésta que las partes consideran como la del comienzo de la vigencia del
                         presente contrato.
                         `
                     )}

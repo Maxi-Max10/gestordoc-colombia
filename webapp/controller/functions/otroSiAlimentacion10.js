@@ -103,7 +103,7 @@ sap.ui.define([
                             <div style="border-top:1.5px solid #000;padding-top:6px;width:85%;">
                                 <strong>LAURA CRISTINA CERÓN MUÑOZ</strong><br>
                                 C.C. No. 52.705.312<br>
-                                Representante
+                                <strong>Representante</strong>
                             </div>
                         </div>
                         <div style="flex:1;">

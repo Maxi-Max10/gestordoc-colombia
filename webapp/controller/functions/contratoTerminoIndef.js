@@ -234,7 +234,7 @@ sap.ui.define([
                     ${HEADER}
 
                     <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:14px 0 16px 0;">
-                        <tr><td style="border:1px solid #000;padding:1px 5px;width:45%;font-weight:bold;background-color:#DCEEFF;">EMPLEADOR</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${empresaData.empresaNombre}</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;width:45%;font-weight:bold;background-color:#DCEEFF;">EMPLEADOR</td><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">${empresaData.empresaNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">TRABAJADOR</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sNombre}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DOCUMENTO DE IDENTIDAD</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sCedula}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">CARGO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sCargo}</td></tr>
@@ -243,8 +243,8 @@ sap.ui.define([
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">SALARIO BASICO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sSalario}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERÍODO DE PAGO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sPeriodoPago}</td></tr>
                         <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">FECHA DE INICIACIÓN DE LABORES</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">${sFechaIniciacionMayus}</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">DOS (2) MESES</td></tr>
-                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:normal;">TÉRMINO INDEFINIDO</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">PERIODO DE PRUEBA</td><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">DOS (2) MESES</td></tr>
+                        <tr><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;background-color:#DCEEFF;">DURACIÓN DEL CONTRATO</td><td style="border:1px solid #000;padding:1px 5px;font-weight:bold;">TÉRMINO INDEFINIDO</td></tr>
                     </table>
 
                     ${_bloqueContrato(`

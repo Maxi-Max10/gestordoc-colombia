@@ -101,10 +101,13 @@ sap.ui.define([
                 }
 
                 // ── PDF ───────────────────────────────────────────────────────
+
                 // ── PDF: contenido común de firmas ─────────────────────────
                 const sFirmaEmpleador = isCyrgo
                     ? `
-                        ${firmaBase64 ? `<img src="${firmaBase64}" style="height:75px;display:block;margin-bottom:2px;">` : ""}
+                        <div style="height:80px;display:flex;align-items:flex-end;">
+                            ${firmaBase64 ? `<img src="${firmaBase64}" style="height:75px;">` : ""}
+                        </div>
                         <div style="border-top:1.5px solid #000;padding-top:6px;">
                             <strong>${empresaData.repNombre}</strong><br>
                             C.C. No. ${empresaData.repCC}<br>
@@ -112,6 +115,7 @@ sap.ui.define([
                         </div>
                     `
                     : `
+                        <div style="height:80px;"></div>
                         <div style="border-top:1.5px solid #000;padding-top:6px;">
                             <strong>${empresaData.repNombre}</strong><br>
                             C.C. No. ${empresaData.repCC}<br>
@@ -126,7 +130,7 @@ sap.ui.define([
                     <p style="text-align:justify;margin:0 0 16px 0;">En ${sCiudadFirma}, a los ${localDateLong}, 
                     se reunieron por una parte <strong>${sNombre}</strong> ${sIdentificado} N.° <strong>${sCedula}</strong> 
                     como aparece al pie de su firma y quien en adelante se denominará <strong>EL TRABAJADOR</strong>, y por la otra, <strong>${empresaData.repNombre}</strong> ${empresaData.repGenero} con la C.C. No. 
-                    ${empresaData.repCC} y quien actúa en representación de <strong>${empresaData.empresaNombre}</strong>, quien en 
+                    <strong>${empresaData.repCC}</strong> y quien actúa en representación de <strong>${empresaData.empresaNombre}</strong>, quien en 
                     adelante se denominará <strong>EL EMPLEADOR</strong>, con el fin de suscribir un acuerdo provisto de las siguientes cláusulas.</p>
 
                     <p style="text-align:justify;margin:0 0 10px 0;">
@@ -179,24 +183,25 @@ sap.ui.define([
 
                 // ── HTML específico Cyrgo ───────────────────────────────────
                 const htmlCyrgo = `
-                <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
-                    ${sCuerpoComun}
-                    <p style="margin:0 0 80px 0;">
-                        En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
-                    </p>
-                    <div style="width:100%;display:flex;gap:20px;align-items:flex-end;">
-                        <div style="flex:1;">
-                            ${sFirmaEmpleador}
-                        </div>
-                        <div style="flex:1;">
-                            <div style="border-top:1.5px solid #000;padding-top:6px;">
-                                <strong>${sNombre}</strong><br>
-                                <strong>C.C. No.</strong> ${sCedula}
+                    <div style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.7;color:#000;width:100%;box-sizing:border-box;">
+                        ${sCuerpoComun}
+                        <p style="margin:0 0 80px 0;">
+                            En constancia se firma en la ciudad de ${sCiudadFirma} a los ${localDateLong}.
+                        </p>
+                        <div style="width:100%;display:flex;gap:20px;align-items:flex-start;">
+                            <div style="flex:1;">
+                                ${sFirmaEmpleador}
+                            </div>
+                            <div style="flex:1;">
+                                <div style="height:80px;"></div>
+                                <div style="border-top:1.5px solid #000;padding-top:6px;">
+                                    <strong>${sNombre}</strong><br>
+                                    C.C. No. ${sCedula}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>`;
-
+                    </div>`;
+                
                 const htmlRaw = isCyrgo ? htmlCyrgo : htmlDiaco;
 
                 const A4_WIDTH  = 595.28;

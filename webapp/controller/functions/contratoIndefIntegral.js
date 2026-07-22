@@ -401,7 +401,7 @@ sap.ui.define([
                         `
                         Por los servicios que preste <strong>EL TRABAJADOR</strong>,
                         <strong>EL EMPLEADOR</strong> reconocerá un salario integral básico por valor de
-                        <strong>${sSalario} (${sSalarioLetras})</strong>, pagaderos por quincenas vencidas,
+                        <strong>${sSalarioLetras} (${sSalario})</strong>, pagaderos por quincenas vencidas,
                         y en el lugar donde presta sus servicios, el cual con base en lo previsto en el
                         Artículo 132 del CST, subrogado por el Artículo 18 de la Ley 50 de 1990,
                         está compuesto de la siguiente manera:
