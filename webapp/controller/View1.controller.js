@@ -458,6 +458,15 @@ sap.ui.define([
     // La carga se hace una sola vez por sesión; si ya se hizo, no se repite.
     // ═══════════════════════════════════════════════════════════════════
 
+    _isSelfServiceUser: function () {
+      const sProfile = this.getOwnerComponent().getModel("user")?.getProperty("/profile");
+      return sProfile === "operativo" || sProfile === "aprendiz";
+    },
+
+    _getCurrentUserId: function () {
+      return this.getOwnerComponent().getModel("user")?.getProperty("/firstname") || "";
+    },
+
     _ensureDataForTitle: function (sTitle) {
 
       const needsInactive = this._isInactiveDocumentTitle(sTitle);
@@ -465,7 +474,8 @@ sap.ui.define([
       const aPromises     = [];
 
       if (needsActive && !this._activeEmployeesLoaded) {
-        aPromises.push(this.loadEmployees());
+        const sUserId = this._isSelfServiceUser() ? this._getCurrentUserId() : "";
+        aPromises.push(this.loadEmployees(sUserId ? { userId: sUserId } : undefined));
       }
       if (needsInactive && !this._inactiveEmployeesLoaded) {
         aPromises.push(this.loadEmployeesBkp());
@@ -488,10 +498,16 @@ sap.ui.define([
       }
 
       const aPreloads = [];
+      const bOperational = this._isSelfServiceUser();
       if (!this._activeEmployeesLoaded) {
-        aPreloads.push(this.loadEmployees({ suppressBusy: true, silent: true }));
+        aPreloads.push(this.loadEmployees({
+          suppressBusy: true,
+          silent: true,
+          userId: bOperational ? this._getCurrentUserId() : ""
+        }));
       }
-      if (!this._inactiveEmployeesLoaded) {
+      // El perfil operativo nunca consulta ni expone listas de otros colaboradores.
+      if (!bOperational && !this._inactiveEmployeesLoaded) {
         aPreloads.push(this.loadEmployeesBkp({ suppressBusy: true, silent: true }));
       }
 
@@ -517,7 +533,7 @@ sap.ui.define([
       }
 
       if (bPreloadEmployees && typeof window.gmaSetAppPreloaderStatus === "function") {
-        window.gmaSetAppPreloaderStatus("Cargando colaboradores...", "Preparando tablas para abrir sin espera", 92);
+        window.gmaSetAppPreloaderStatus("Cargando datos...", "Preparando tablas para abrir sin espera", 92);
       }
 
       let pPreload;
@@ -554,7 +570,9 @@ sap.ui.define([
         window.gmaHoldAppPreloader();
       }
 
-      if (typeof window.gmaSetAppPreloaderStatus === "function") {
+      if (typeof window.gmaShowAppPreloaderError === "function") {
+        window.gmaShowAppPreloaderError(sStatus, sCopy);
+      } else if (typeof window.gmaSetAppPreloaderStatus === "function") {
         window.gmaSetAppPreloaderStatus(sStatus, sCopy, 99);
       }
     },
@@ -618,41 +636,21 @@ sap.ui.define([
       this._activeSearch             = "";    // Texto actual del buscador de empleados
       this._activeDateFilter         = null;  // Rango de fechas activo en el filtro
 
-      // Arranca el flujo de autenticación: usuario → empresa → permisos
-      // ── MOCK PARA PRUEBAS — BORRAR ANTES DE PRODUCCIÓN ──────────────
-      const UseroModel = new JSONModel({
-          firstname:   "TEST_USER_01",
-          company:     "CO24",
-          displayName: "Usuario Prueba",
-          gender:      "M",
-          grupo:       "Gestor Documental - Administradores",
-          permisos:    "admin"
-      });
-      this.getOwnerComponent().setModel(UseroModel, "user");
+      // Ningún documento se muestra hasta validar grupos y perfil del usuario.
+      [
+        "customListItemKitRetiro", "customListItemOtroSiRodamiento",
+        "customListItemOtroSiAlimentacion15", "customListItemOtroSiAlimentacion11",
+        "customListItemOtroSiAlimentacion10", "customListItemBeneficios",
+        "customListItemSolicitudDeduccionesRetencion", "customListItemCompromisoEtica",
+        "customListItemAutorizacionDescuento", "customListItemDatosPersonales",
+        "customListItemNoDeclarante", "customListItemProtocoloRecibo",
+        "customListItemContratoIntegral", "customListItemContratoTerminoFijo",
+        "customListItemContratoTerminoIndef", "customListItemContratoAprendizajeLectivo",
+        "customListItemContratoAprendizajeProductivo"
+      ].forEach(sId => this.byId(sId)?.setVisible(false));
 
-      const aTileIds = [
-          "customListItemKitRetiro",
-          "customListItemOtroSiRodamiento",
-          "customListItemOtroSiAlimentacion15",
-          "customListItemOtroSiAlimentacion11",
-          "customListItemOtroSiAlimentacion10",
-          "customListItemBeneficios",
-          "customListItemSolicitudDeduccionesRetencion",
-          "customListItemCompromisoEtica",
-          "customListItemAutorizacionDescuento",
-          "customListItemDatosPersonales",
-          "customListItemNoDeclarante",
-          "customListItemProtocoloRecibo",
-          "customListItemContratoIntegral",
-          "customListItemContratoTerminoFijo",
-          "customListItemContratoTerminoIndef",
-          "customListItemContratoAprendizajeLectivo",
-          "customListItemContratoAprendizajeProductivo"
-      ];
-      aTileIds.forEach(sId => { this.byId(sId)?.setVisible(true); });
-
-      this._completeInitialPreload(true);
-      // ── FIN MOCK ─────────────────────────────────────────────────────
+      // Arranca el flujo real de autenticación: usuario → empresa → grupos → perfil.
+      this.getUserInfo();
 
       this.updateGreeting();
 
@@ -907,22 +905,25 @@ sap.ui.define([
     },
 
     // Consulta la empresa del usuario en SuccessFactors.
-    // Si la consulta falla, usa "CO10" como valor por defecto para no romper el flujo.
+    // Si no existe o la consulta falla, bloquea el flujo para no asumir una empresa.
     getUserCompany: function (userId) {
       const oModel = this.getOwnerComponent().getModel();
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         oModel.read("/User('" + userId + "')", {
           urlParameters: {
             "$select": "userId,empInfo/jobInfoNav/company",
             "$expand": "empInfo/jobInfoNav"
           },
           success: function (oData) {
-            const sCompany = oData?.empInfo?.jobInfoNav?.results?.[0]?.company || "CO10";
+            const sCompany = oData?.empInfo?.jobInfoNav?.results?.[0]?.company;
+            if (!sCompany) {
+              reject(new Error("SuccessFactors no devolvió la empresa del usuario " + userId + "."));
+              return;
+            }
             resolve(sCompany);
           },
-          error: function () {
-            console.warn("No se pudo obtener la empresa, usando CO10 por defecto.");
-            resolve("CO10"); // Resuelve igual (sin rechazar) para no cortar el flujo de login
+          error: function (oError) {
+            reject(oError);
           }
         });
       });
@@ -932,17 +933,15 @@ sap.ui.define([
     // y encadena getUserCompany() y getDataUser().
     getUserInfo: function () {
       const that = this;
-      const url  = this.getBaseURL() + "/user-api/currentUser";
+      const sTestUserId = "1039458159"; // PRUEBA TEMPORAL; dejar vacío para usar el usuario real.
+      // Diaco
+      //Operativo: 60001016
+      // Administrativo: 60000778
+      // No autorizado: 50001956
+
       const UseroModel = new JSONModel();
-      UseroModel.loadData(url);
 
-      UseroModel.attachRequestCompleted(function () {
-        // En desarrollo local sin usuario real, usa un usuario de prueba fijo
-        let userId = (!UseroModel.getData().email ||
-                      UseroModel.getData().email === "rodrigo.lopez@agprodservicios.com")
-          ? "excagp"
-          : UseroModel.getData().name;
-
+      const fnContinueWithUser = function (userId) {
         UseroModel.setProperty("/firstname", userId);
         that.getOwnerComponent().setModel(UseroModel, "user");
 
@@ -958,6 +957,26 @@ sap.ui.define([
             oError
           );
         });
+      };
+
+      // En modo de prueba no se llama /user-api/currentUser, que no existe localmente.
+      if (sTestUserId) {
+        UseroModel.setData({ name: sTestUserId, testMode: true });
+        fnContinueWithUser(sTestUserId);
+        return;
+      }
+
+      const url = this.getBaseURL() + "/user-api/currentUser";
+      UseroModel.attachRequestCompleted(function () {
+        const sUserId = UseroModel.getProperty("/name");
+        if (!sUserId) {
+          that._showInitialPreloadError(
+            "Error cargando usuario",
+            "La API de usuario no devolvió un identificador válido."
+          );
+          return;
+        }
+        fnContinueWithUser(sUserId);
       });
 
       UseroModel.attachRequestFailed(function (oError) {
@@ -968,81 +987,202 @@ sap.ui.define([
           oError
         );
       });
+
+      UseroModel.loadData(url);
     },
 
-    // Consulta el grupo y permisos del usuario desde la entidad custom de SuccessFactors
-    // y configura qué tiles son visibles según su perfil:
-    //   - "admin"   → ve todos los documentos
-    //   - "usuario" → no ve ningún documento
-    //   - "ninguno" → sin acceso
+    // Datos personales básicos del usuario.
+    getUserProfile: function (userId) {
+      return this._readOData(this.getOwnerComponent().getModel(), "/User('" + userId + "')", {
+        urlParameters: { "$select": "userId,displayName,gender,custom02" }
+      });
+    },
+
+    // Clasificación laboral efectiva:
+    // employeeClass 7 = aprendiz; customString2 12/13 = administrativo/operativo.
+    getUserEmploymentProfile: function (userId) {
+      const sSafeUserId = String(userId).replace(/'/g, "''");
+      const sAsOfDate = new Date().toISOString().slice(0, 10);
+
+      return this._readOData(this.getOwnerComponent().getModel(), "/EmpJob", {
+        urlParameters: {
+          "$filter": `userId eq '${sSafeUserId}' and effectiveLatestChange eq true`,
+          "$select": [
+            "userId", "employeeClass", "employeeClassNav/externalCode",
+            "employeeClassNav/localeLabel", "customString2",
+            "customString2Nav/externalCode", "customString2Nav/localeLabel",
+            "location", "locationNav/name",
+            "locationNav/customString1Nav/localeLabel"
+          ].join(","),
+          "$expand": "employeeClassNav,customString2Nav,locationNav/customString1Nav",
+          "asOfDate": sAsOfDate
+        }
+      }).then(oData => oData?.results?.[0] || null);
+    },
+
+    // Autoriza por grupos dinámicos: 6307 administradores y 6308 usuarios.
     getDataUser: function (user) {
-      const that             = this;
-      const readUrlModelGroup = "/cust_GD_mantenedorGrupos('" + user + "')";
+      const that = this;
+      const mAllowedGroups = {
+        "6307": { permisos: "admin", grupo: "Gestor Documental COL- Administradores" },
+        "6308": { permisos: "usuario", grupo: "Gestor Documental COL- Usuarios" }
+      };
 
-      this.getView().getModel().read(readUrlModelGroup, {
-        success: function (oData) {
+      this.getOwnerComponent().getModel().callFunction("/getDynamicGroupsByUser", {
+        method: "GET",
+        urlParameters: { userId: user, groupSubType: "permission" },
+        success: async function (oData) {
           const userModel = that.getOwnerComponent().getModel("user");
-          const cleanData = JSON.parse(JSON.stringify(oData)); // Clona el objeto para evitar referencias internas de OData
+          const aGroups = oData?.results || [];
+          const oAdminGroup = aGroups.find(oGroup => String(oGroup.groupId) === "6307");
+          const oUserGroup = aGroups.find(oGroup => String(oGroup.groupId) === "6308");
+          const oAccess = oAdminGroup ? mAllowedGroups["6307"]
+            : (oUserGroup ? mAllowedGroups["6308"] : null);
 
-          userModel.setProperty("/datos",       cleanData);
-          userModel.setProperty("/displayName", cleanData.displayName);
-          that.updateGreeting(); // Ahora sí, actualiza el saludo con el nombre real
+          userModel.setProperty("/dynamicGroups", aGroups);
+          if (!oAccess) {
+            userModel.setProperty("/grupo", "");
+            userModel.setProperty("/permisos", "ninguno");
+            userModel.setProperty("/authorized", false);
+            if (typeof window.gmaShowAppPreloaderError === "function") {
+              window.gmaShowAppPreloaderError(
+                "Acceso no autorizado",
+                "Tu usuario no pertenece a un grupo habilitado para Gestor Documental."
+              );
+            } else {
+              that._showInitialPreloadError(
+                "Acceso no autorizado",
+                "Tu usuario no pertenece a un grupo habilitado para Gestor Documental."
+              );
+            }
+            return;
+          }
 
-          // Género para el tratamiento gramatical en los documentos
-          userModel.setProperty("/gender",
-            cleanData.gender === "F" ? "genero_Femenino" : "genero_Masculino"
-          );
+          userModel.setProperty("/grupo", oAccess.grupo);
+          userModel.setProperty("/permisos", oAccess.permisos);
+          userModel.setProperty("/authorized", true);
 
-          // Grupo y permisos
-          const grupo = cleanData.cust_grupo;
-          userModel.setProperty("/grupo", grupo);
+          try {
+            const [oUserData, oEmployment] = await Promise.all([
+              that.getUserProfile(user),
+              that.getUserEmploymentProfile(user)
+            ]);
+            if (!oEmployment) {
+              throw new Error("No se encontró información laboral efectiva para " + user + ".");
+            }
 
-          let permisos = "ninguno";
-          if (grupo === "Gestor Documental - Administradores") permisos = "admin";
-          else if (grupo === "Gestor Documental - Usuarios")   permisos = "usuario";
-          userModel.setProperty("/permisos", permisos);
+            const sEmployeeClassCode = String(
+              oEmployment.employeeClassNav?.externalCode || ""
+            );
+            const sEmploymentRelationCode = String(
+              oEmployment.customString2Nav?.externalCode || ""
+            );
+            const sFallbackType = String(oUserData.custom02 || "").trim().toLowerCase();
+            const sProfile = sEmployeeClassCode === "7" ? "aprendiz"
+              : (sEmploymentRelationCode === "13" ? "operativo"
+                : (sEmploymentRelationCode === "12" ? "administrativo"
+                  : (sFallbackType === "operativo" || sFallbackType === "administrativo"
+                    ? sFallbackType
+                    : "sin_clasificar")));
 
-          // IDs de todos los tiles de documentos
+            // ciudadFirma proviene de la ciudad configurada en la ubicación laboral.
+            const sCiudadFirma = oEmployment.locationNav?.customString1Nav?.localeLabel || "";
+            const sNormalizedCiudadFirma = String(sCiudadFirma)
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .toLowerCase();
+            const bLocatedInBogota = sNormalizedCiudadFirma.includes("bogota");
+
+            userModel.setProperty("/datos", oUserData);
+            userModel.setProperty("/employmentData", oEmployment);
+            userModel.setProperty("/displayName", oUserData.displayName || user);
+            userModel.setProperty("/employeeType", oEmployment.customString2Nav?.localeLabel || oUserData.custom02 || "");
+            userModel.setProperty("/employeeClass", oEmployment.employeeClassNav?.localeLabel || "");
+            userModel.setProperty("/employeeClassCode", sEmployeeClassCode);
+            userModel.setProperty("/employmentRelationCode", sEmploymentRelationCode);
+            userModel.setProperty("/ciudadFirma", sCiudadFirma);
+            userModel.setProperty("/locatedInBogota", bLocatedInBogota);
+            userModel.setProperty("/profile", sProfile);
+            userModel.setProperty("/gender",
+              oUserData.gender === "F" ? "genero_Femenino" : "genero_Masculino"
+            );
+            that.updateGreeting();
+          } catch (oError) {
+            that._showInitialPreloadError(
+              "Error cargando perfil",
+              "El acceso fue validado, pero no se pudo consultar el tipo de usuario.",
+              oError
+            );
+            return;
+          }
+
           const aTileIds = [
-            "customListItemKitRetiro",
-            "customListItemOtroSiRodamiento",
-            "customListItemOtroSiAlimentacion15",
-            "customListItemOtroSiAlimentacion11",
-            "customListItemOtroSiAlimentacion10",
-            "customListItemBeneficios",
-            "customListItemSolicitudDeduccionesRetencion",
-            "customListItemCompromisoEtica",
-            "customListItemAutorizacionDescuento",
-            "customListItemDatosPersonales",
-            "customListItemNoDeclarante",
-            "customListItemProtocoloRecibo",
-            "customListItemContratoIntegral",
-            "customListItemContratoTerminoFijo",
-            "customListItemContratoTerminoIndef",
-            "customListItemContratoAprendizajeLectivo",
+            "customListItemKitRetiro", "customListItemOtroSiRodamiento",
+            "customListItemOtroSiAlimentacion15", "customListItemOtroSiAlimentacion11",
+            "customListItemOtroSiAlimentacion10", "customListItemBeneficios",
+            "customListItemSolicitudDeduccionesRetencion", "customListItemCompromisoEtica",
+            "customListItemAutorizacionDescuento", "customListItemDatosPersonales",
+            "customListItemNoDeclarante", "customListItemProtocoloRecibo",
+            "customListItemContratoIntegral", "customListItemContratoTerminoFijo",
+            "customListItemContratoTerminoIndef", "customListItemContratoAprendizajeLectivo",
             "customListItemContratoAprendizajeProductivo"
           ];
+          const sProfile = userModel.getProperty("/profile");
+          const bLocatedInBogota = userModel.getProperty("/locatedInBogota") === true;
+          const aSelfServiceBaseIds = [
+            "customListItemCompromisoEtica",
+            "customListItemContratoTerminoIndef",
+            "customListItemContratoTerminoFijo",
+            "customListItemContratoIntegral",
+            "customListItemProtocoloRecibo"
+          ];
+          const oFoodTileIds = new Set([
+            "customListItemOtroSiAlimentacion10",
+            "customListItemOtroSiAlimentacion11",
+            "customListItemOtroSiAlimentacion15"
+          ]);
+          let aVisibleTileIds;
 
-          // Los admins ven todos los tiles; los demás no ven ninguno
-          const bVisible = (permisos === "admin");
-          aTileIds.forEach(sId => {
-            that.byId(sId)?.setVisible(bVisible);
-          });
+          if (sProfile === "aprendiz") {
+            aVisibleTileIds = aSelfServiceBaseIds.concat("customListItemOtroSiAlimentacion10");
+          } else if (sProfile === "operativo") {
+            aVisibleTileIds = aSelfServiceBaseIds.concat(
+              bLocatedInBogota
+                ? "customListItemOtroSiAlimentacion15"
+                : "customListItemOtroSiAlimentacion11"
+            );
+          } else {
+            aVisibleTileIds = aTileIds.filter(sId => !oFoodTileIds.has(sId));
+            if (sProfile === "administrativo" && bLocatedInBogota) {
+              aVisibleTileIds.push("customListItemOtroSiAlimentacion15");
+            }
+          }
 
-          that._completeInitialPreload(bVisible); // Ya se sabe qué mostrar: precarga tablas y libera el splash
+          const oVisibleTiles = new Set(aVisibleTileIds);
+          aTileIds.forEach(sId => that.byId(sId)?.setVisible(oVisibleTiles.has(sId)));
+
+          // Grid reserva huecos para controles invisibles; se reconstruye en orden.
+          const oGrid = that.byId("gridItems");
+          if (oGrid) {
+            oGrid.removeAllContent();
+            aVisibleTileIds.forEach(sId => {
+              const oTile = that.byId(sId);
+              if (oTile) oGrid.addContent(oTile);
+            });
+          }
+
+          that._completeInitialPreload(true);
         },
-
         error: function (oError) {
-          MessageToast.show("Error al leer grupo de usuario.");
+          MessageToast.show("Error al validar los grupos del usuario.");
           that._showInitialPreloadError(
-            "Error cargando permisos",
-            "No se pudieron validar permisos ni completar la carga inicial de SSFF.",
+            "No tienes permisos para acceder",
+            "",
             oError
           );
         }
       });
     },
-
 
     // ═══════════════════════════════════════════════════════════════════
     // CARGA DE EMPLEADOS ACTIVOS
@@ -1066,7 +1206,6 @@ sap.ui.define([
       if (this._activeEmployeesRequest) return this._activeEmployeesRequest;
 
       const oComponentModel = this.getOwnerComponent().getModel();
-      const sUserCompany    = this.getOwnerComponent().getModel("user").getProperty("/company") || "CO10";
       const oViewStateModel = this.getOwnerComponent().getModel("view");
 
       const sSelect = [
@@ -1112,10 +1251,14 @@ sap.ui.define([
       // Bloquea el botón Descargar hasta que EmpJob termine
       oViewStateModel.setProperty("/EmpJobLoaded", false);
 
+      const sUserFilter = mOptions.userId
+        ? `userId eq '${String(mOptions.userId).replace(/'/g, "''")}' and status eq 't'`
+        : "status eq 't' and (empInfo/jobInfoNav/company eq 'CO10' or empInfo/jobInfoNav/company eq 'CO24')";
+
       const fnReadUsers = () => this._readOData(oComponentModel, "/User", {
         urlParameters: {
           "$select": sSelect,
-          "$filter": `status eq 't' and (empInfo/jobInfoNav/company eq 'CO10' or empInfo/jobInfoNav/company eq 'CO24')`,
+          "$filter": sUserFilter,
           "$expand": sExpand
         }
       });
@@ -1282,7 +1425,7 @@ sap.ui.define([
                 };
               }
             });
-            
+
           }
 
           // ← NUEVO: fecha de baja desde EmpEmployment (en activos vendrá null normalmente)
@@ -1362,7 +1505,6 @@ sap.ui.define([
       if (this._inactiveEmployeesRequest) return this._inactiveEmployeesRequest;
 
       const oComponentModel = this.getOwnerComponent().getModel();
-      const sUserCompany    = this.getOwnerComponent().getModel("user").getProperty("/company") || "CO10";
 
       const sSelect = [
         "userId", "status", "firstName", "lastName", "email", "nationality",
@@ -1832,7 +1974,7 @@ sap.ui.define([
             press: () => this._oCompanyDialog.close()
           }).addStyleClass("companySelectorCancelButton")
         });
-        
+
         this._oCompanyDialog.addStyleClass("companySelectorDialog"); // 👈 ESTA LÍNEA FALTA
         this.getView().addDependent(this._oCompanyDialog);
       }
@@ -2289,6 +2431,10 @@ sap.ui.define([
     onOtroSiAlimentacion15Press: function () {
       this.sSelectedContract = "Otro Sí - Alim. $15.000";
       this._currentCategory  = "otroSiAlimentacion15";
+      if (this._isSelfServiceUser()) {
+        this._downloadCurrentUserPDF().catch(() => MessageToast.show("Error generando el documento."));
+        return;
+      }
       this._ensureDataForTitle(this.sSelectedContract)
         .then(() => {
           this._openCompanySelector(this.sSelectedContract);
@@ -2299,6 +2445,10 @@ sap.ui.define([
     onOtroSiAlimentacion11Press: function () {
       this.sSelectedContract = "Otro Sí - Alim. $11.500";
       this._currentCategory  = "otroSiAlimentacion11";
+      if (this._isSelfServiceUser()) {
+        this._downloadCurrentUserPDF().catch(() => MessageToast.show("Error generando el documento."));
+        return;
+      }
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
@@ -2306,6 +2456,10 @@ sap.ui.define([
     onOtroSiAlimentacion10Press: function () {
       this.sSelectedContract = "Otro Sí - Alim. $10.000";
       this._currentCategory  = "otroSiAlimentacion10";
+      if (this._isSelfServiceUser()) {
+        this._downloadCurrentUserPDF().catch(() => MessageToast.show("Error generando el documento."));
+        return;
+      }
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
@@ -2327,6 +2481,10 @@ sap.ui.define([
     onCompromisoEticaPress: function () {
       this.sSelectedContract = "Compromiso con la Ética";
       this._currentCategory  = "compromisoEtica";
+      if (this._isSelfServiceUser()) {
+        this._downloadCurrentUserPDF().catch(() => MessageToast.show("Error generando el documento."));
+        return;
+      }
       this._ensureDataForTitle(this.sSelectedContract)
         .then(() => {
           this._openCompanySelector(this.sSelectedContract);
@@ -2358,6 +2516,10 @@ sap.ui.define([
     onProtocoloReciboPress: function () {
       this.sSelectedContract = "Protocolo Reglamento Interno";
       this._currentCategory  = "protocoloRecibo";
+      if (this._isSelfServiceUser()) {
+        this._downloadCurrentUserPDF().catch(() => MessageToast.show("Error generando el documento."));
+        return;
+      }
       this._ensureDataForTitle(this.sSelectedContract)
         .then(() => {
           this._openCompanySelector(this.sSelectedContract);
@@ -2368,6 +2530,10 @@ sap.ui.define([
     onContratoIntegralPress: function () {
       this.sSelectedContract = "Contrato Indefinido Integral";
       this._currentCategory  = "contratoIndefIntegral";
+      if (this._isSelfServiceUser()) {
+        this._downloadCurrentUserPDF().catch(() => MessageToast.show("Error generando el documento."));
+        return;
+      }
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
@@ -2375,6 +2541,10 @@ sap.ui.define([
     onContratoTerminoFijoPress: function () {
       this.sSelectedContract = "Contrato Término Fijo";
       this._currentCategory  = "contratoTerminoFijo";
+      if (this._isSelfServiceUser()) {
+        this._downloadCurrentUserPDF().catch(() => MessageToast.show("Error generando el documento."));
+        return;
+      }
       this._handleTileSelection(this.sSelectedContract)
         .catch(() => MessageToast.show("Error cargando los datos."));
     },
@@ -2382,6 +2552,10 @@ sap.ui.define([
     onContratoIndefinidoPress: function () {
       this.sSelectedContract = "Contrato Término Indefinido";
       this._currentCategory  = "contratoTerminoIndef";
+      if (this._isSelfServiceUser()) {
+        this._downloadCurrentUserPDF().catch(() => MessageToast.show("Error generando el documento."));
+        return;
+      }
       this._ensureDataForTitle(this.sSelectedContract)
         .then(() => {
           this._openCompanySelector(this.sSelectedContract);
@@ -2454,6 +2628,23 @@ sap.ui.define([
         return match.split(" ")[0];
       }
       return sCode;
+    },
+
+
+    // Genera el documento del usuario operativo sin abrir la tabla.
+    _downloadCurrentUserPDF: async function () {
+      await this._ensureDataForTitle(this.sSelectedContract);
+
+      const sUserId = this._getCurrentUserId();
+      const aUsers = this.getView().getModel()?.getProperty("/User") || [];
+      const oCurrentUser = aUsers.find(oUser => String(oUser.userId) === String(sUserId));
+
+      if (!oCurrentUser) {
+        throw new Error("No se encontraron los datos del usuario " + sUserId + ".");
+      }
+
+      this.aSelectedEmployees = [oCurrentUser];
+      await this.onDownloadPDF();
     },
 
 
