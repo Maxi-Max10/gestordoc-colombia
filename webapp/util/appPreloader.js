@@ -64,6 +64,28 @@
     }
   };
 
+  window.gmaShowAppPreloaderError = function (sStatus, sCopy) {
+    var oPreloader = document.getElementById("appPreloader");
+    if (!oPreloader) {
+      return;
+    }
+
+    window.clearInterval(oTimer);
+    oPreloader.classList.add("is-error");
+    oPreloader.setAttribute("aria-label", "No tienes permisos para acceder");
+
+    var oStatus = oPreloader.querySelector(".appPreloader__status");
+    var oCopy = oPreloader.querySelector(".appPreloader__copy");
+
+    if (oStatus) {
+      oStatus.textContent = "No tienes permisos para acceder";
+    }
+    if (oCopy) {
+      oCopy.textContent = "";
+      oCopy.hidden = true;
+    }
+  };
+
   window.gmaHideAppPreloader = function () {
     var oPreloader = document.getElementById("appPreloader");
     if (!oPreloader || oPreloader.classList.contains("is-hiding")) {

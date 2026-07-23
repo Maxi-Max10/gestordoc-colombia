@@ -425,3 +425,70 @@
     bottom: 6.6rem;
   }
 }
+
+/* Estado bloqueado: conserva la ilustración, pero la convierte en error rojo. */
+.appPreloader__errorMark {
+  display: none;
+}
+
+.appPreloader.is-error .appPreloader__icon {
+  filter: drop-shadow(0 18px 28px rgba(217, 45, 32, 0.2));
+}
+
+.appPreloader.is-error #appPreloaderFolder stop:first-child,
+.appPreloader.is-error #appPreloaderFolderLip stop:first-child {
+  stop-color: #ff9b91;
+}
+
+.appPreloader.is-error #appPreloaderFolder stop:last-child,
+.appPreloader.is-error #appPreloaderFolderLip stop:last-child {
+  stop-color: #d92d20;
+}
+
+.appPreloader.is-error #appPreloaderCheck stop:first-child {
+  stop-color: #fff0ee;
+}
+
+.appPreloader.is-error #appPreloaderCheck stop:last-child {
+  stop-color: #ffc7c2;
+}
+
+.appPreloader.is-error .appPreloader__illustrationShadow {
+  fill: #d92d20;
+}
+
+.appPreloader.is-error .appPreloader__folder path:last-child {
+  stroke: #ffd1cc;
+}
+
+.appPreloader.is-error .appPreloader__checkMark {
+  display: none;
+}
+
+.appPreloader.is-error .appPreloader__errorMark {
+  display: block;
+}
+
+.appPreloader.is-error .appPreloader__paperBack,
+.appPreloader.is-error .appPreloader__paperFront,
+.appPreloader.is-error .appPreloader__folder,
+.appPreloader.is-error .appPreloader__checkBadge {
+  animation-play-state: paused;
+}
+
+.appPreloader.is-error .appPreloader__status {
+  color: #b42318;
+}
+
+.appPreloader.is-error .appPreloader__progress,
+.appPreloader.is-error .appPreloader__percent {
+  display: none;
+}
+
+.appPreloader.is-error .appPreloader__copy {
+  max-width: 30rem;
+  margin-right: auto;
+  margin-left: auto;
+  color: #667085;
+  font-size: 0.95rem;
+}
