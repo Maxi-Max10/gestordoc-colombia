@@ -3383,3 +3383,21 @@ html.gdThemeTransitionReady .card-horizontal {
   background: #344255 !important;
   border-color: #46566b !important;
 }
+
+.documentNoResults {
+  min-height: clamp(14rem, 38vh, 24rem);
+  padding: 1rem var(--page-gutter) 3rem;
+  box-sizing: border-box;
+}
+
+.documentNoResultsText {
+  color: #52657d !important;
+  font-size: clamp(1rem, 1.8vw, 1.35rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.gdDarkMode .documentNoResultsText {
+  color: #d6e4f5 !important;
+}

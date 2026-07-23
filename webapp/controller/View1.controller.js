@@ -2356,8 +2356,9 @@ sap.ui.define([
         ?? "";
       const sQuery = this._normalizeSearchText(sValue);
       const aCards = this._getDocumentSearchCards();
-      const oGrid  = this.byId("gridItems");
-      const bHasQuery = Boolean(sQuery);
+      const oGrid      = this.byId("gridItems");
+      const oNoResults = this.byId("documentNoResults");
+      const bHasQuery  = Boolean(sQuery);
 
       [oMainSearch, oHeaderSearch, oMobileSearch].forEach(oField => {
         if (!oField) return;
@@ -2399,6 +2400,7 @@ sap.ui.define([
           });
           this._documentSearchBaseState = null;
         }
+        oNoResults?.setVisible(false);
         return;
       }
 
@@ -2415,6 +2417,8 @@ sap.ui.define([
           oGrid.addContent(oItem);
         }
       });
+
+      oNoResults?.setVisible(oGrid.getContent().length === 0);
     },
 
 

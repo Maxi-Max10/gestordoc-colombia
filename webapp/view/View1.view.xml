@@ -478,6 +478,17 @@
                     </sap.ui.layout:content>
                 </sap.ui.layout:Grid>
 
+                <VBox
+                    id="documentNoResults"
+                    visible="false"
+                    width="100%"
+                    alignItems="Center"
+                    justifyContent="Center"
+                    class="documentNoResults"
+                >
+                    <Text text="NO HAY COINCIDENCIAS" class="documentNoResultsText" />
+                </VBox>
+
                 <!-- ═══════════════════════════════════════════
                      DIÁLOGO DE SELECCIÓN DE COLABORADORES
                 ════════════════════════════════════════════ -->
