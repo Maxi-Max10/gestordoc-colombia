@@ -297,10 +297,8 @@ sap.ui.define([
                 signaturePage.drawText("[[FIRMA_EMPLEADO]]", {
                     x: pageWidth * 0.51,
                     y: isCyrgo ? 136 : 142,
-                    size: bReturnPdfDocuments ? 6 : 10,
-                    color: bReturnPdfDocuments
-                        ? PDFLibRef.rgb(1, 1, 1)
-                        : PDFLibRef.rgb(1, 0, 0)
+                    size: 6,
+                    color: PDFLibRef.rgb(1, 1, 1)
                 });
 
                 const pdfBytes = await pdfDoc.save();

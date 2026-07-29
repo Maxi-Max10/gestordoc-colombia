@@ -1213,10 +1213,8 @@ sap.ui.define([
                         newPage.drawText("[[FIRMA_EMPLEADO]]", {
                             x: width * 0.52,
                             y: 210,
-                            size: bReturnPdfDocuments ? 6 : 10,
-                            color: bReturnPdfDocuments
-                                ? PDFLibRef.rgb(1, 1, 1)
-                                : PDFLibRef.rgb(1, 0, 0)
+                            size: 6,
+                            color: PDFLibRef.rgb(1, 1, 1)
                         });
                     }
                 }
