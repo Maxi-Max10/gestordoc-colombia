@@ -2010,9 +2010,15 @@ sap.ui.define([
       this._oContinueButton.setVisible(!oConfig.showCompanyButtons);
 
       this._oCompanyDialog.setTitle(oConfig.showCompanyButtons ? "Elija una empresa" : "Ingreso de NIT");
-      this._oCompanySelectorIntroText.setText(oConfig.showCompanyButtons
-        ? "1. Ingresa el NIT de la institución de formación.\n2. Elige la empresa para continuar."
-        : "Ingresa el NIT de la institución de formación para continuar.");
+      let sIntroText;
+      if (oConfig.showCompanyButtons && oConfig.requiresNit) {
+        sIntroText = "1. Ingresa el NIT de la institución de formación.\n2. Elige la empresa para continuar.";
+      } else if (oConfig.showCompanyButtons) {
+        sIntroText = "Elige la empresa para continuar.";
+      } else {
+        sIntroText = "Ingresa el NIT de la institución de formación para continuar.";
+      }
+      this._oCompanySelectorIntroText.setText(sIntroText);
       this._oCompanyDialog.open();
     },
 

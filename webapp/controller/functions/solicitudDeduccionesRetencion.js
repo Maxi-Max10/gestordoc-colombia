@@ -104,44 +104,44 @@ sap.ui.define([
                         </p>
 
                     <!-- Tabla dependientes -->
-                        <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-bottom:8px;">
+                        <table style="width:100%;border-collapse:collapse;font-size:9.5pt;line-height:1.15;margin-bottom:8px;">
                             <thead>
                                 <tr>
-                                    <th style="border:1px solid #000;padding:4px 6px;text-align:center;width:14%;background-color:#cccccc;">Cantidad</th>
-                                    <th style="border:1px solid #000;padding:4px 6px;text-align:center;width:28%;background-color:#cccccc;">Tipo</th>
-                                    <th style="border:1px solid #000;padding:4px 6px;text-align:center;width:22%;background-color:#cccccc;">Nombre y Apellido</th>
-                                    <th style="border:1px solid #000;padding:4px 6px;text-align:center;width:18%;background-color:#cccccc;">No. Identificación</th>
-                                    <th style="border:1px solid #000;padding:4px 6px;text-align:center;width:18%;background-color:#cccccc;">* Tipo de identificación</th>
+                                    <th style="border:1px solid #000;padding:2px 4px;text-align:center;width:12%;background-color:#cccccc;">Cantidad</th>
+                                    <th style="border:1px solid #000;padding:2px 4px;text-align:center;width:31%;background-color:#cccccc;">Tipo</th>
+                                    <th style="border:1px solid #000;padding:2px 4px;text-align:center;width:25%;background-color:#cccccc;">Nombre y Apellido</th>
+                                    <th style="border:1px solid #000;padding:2px 4px;text-align:center;width:16%;background-color:#cccccc;">No. Identificación</th>
+                                    <th style="border:1px solid #000;padding:2px 4px;text-align:center;width:16%;background-color:#cccccc;">* Tipo de identificación</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">Hijos hasta 18 años</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">Hijos hasta 18 años</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">Hijos entre 18 y 23 años a quienes los padres financian la educación</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">Hijos entre 18 y 23 años a quienes los padres financian la educación</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">Hijos mayores de 23 años</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">Hijos mayores de 23 años</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">Cónyuge o compañera permanente, padres o hermanos</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
-                                    <td style="border:1px solid #000;padding:4px 6px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">Cónyuge o compañera permanente, padres o hermanos</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
+                                    <td style="border:1px solid #000;padding:2px 4px;">&nbsp;</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -193,9 +193,10 @@ sap.ui.define([
 
                 for (const blockHtml of [htmlPagina1, htmlPagina2]) {
                     const div = document.createElement("div");
-                    div.style.width           = "794px";
-                    div.style.height          = "1020px";
-                    div.style.padding         = "40px 90px";
+                    // Hoja carta a 96 px/pulgada, con los márgenes de la plantilla Word.
+                    div.style.width           = "816px";
+                    div.style.height          = "1056px";
+                    div.style.padding         = "88px 112px";
                     div.style.backgroundColor = "#ffffff";
                     div.style.boxSizing       = "border-box";
                     div.style.position        = "absolute";
@@ -209,20 +210,20 @@ sap.ui.define([
                     document.body.removeChild(div);
 
                     const img       = await pdfDoc.embedPng(imgData);
-                    const page      = pdfDoc.addPage([595, 842]);
-                    const imgWidth  = 595 * 0.9;
-                    const imgHeight = (img.height * imgWidth) / img.width;
+                    const PAGE_WIDTH  = 612;
+                    const PAGE_HEIGHT = 792;
+                    const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
 
                     page.drawImage(img, {
-                        x:      (595 - imgWidth) / 2,
-                        y:      842 - imgHeight - 30,
-                        width:  imgWidth,
-                        height: imgHeight
+                        x: 0,
+                        y: 0,
+                        width: PAGE_WIDTH,
+                        height: PAGE_HEIGHT
                     });
                 }
 
-                const pdfBytes = await pdfDoc.save();
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Solicitud Deducciones Retención`);
+                const pdfBytes = await pdfDoc.save();
 
                 const fileName = `${user.firstName}_${user.lastName}_Solicitud_Deducciones_Retencion.pdf`;
                 const blob     = new Blob([pdfBytes], { type: "application/pdf" });

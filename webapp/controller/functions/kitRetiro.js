@@ -275,7 +275,7 @@ sap.ui.define([
                                 Declaró que comprendí la información contenida en esta comunicación y en señal a lo anterior
                                 firmo de recibido y enterado.
                             </p>
-
+                            <br>
                             <p style="border-top:1.5px solid #000;width:260px;padding-top:6px;margin:0;">
                                 <strong>${sNombre}</strong><br>
                                 <strong>C.C. ${sCedula}</strong>
@@ -627,7 +627,8 @@ sap.ui.define([
                 for (let pageIndex = 0; pageIndex < contentBlocks.length; pageIndex++) {
                     const blockHtml = contentBlocks[pageIndex];
                     const div = document.createElement("div");
-                    div.style.width               = "794px";
+                    // 8.5 in × 96 px: ancho CSS equivalente a una hoja tamaño carta.
+                    div.style.width               = "816px";
                     div.style.padding             = "0px";
                     div.style.marginTop           = "-40px";
                     div.style.backgroundColor     = "transparent";
@@ -658,16 +659,24 @@ sap.ui.define([
 
                     const img     = await pdfDoc.embedPng(imgData);
                     const newPage = pdfDoc.addPage([width, height]);
-                    newPage.drawPage(templatePageImage);
-
-                    const maxH = height - 100;
-                    let imgW = width * 0.95;
-                    let imgH = (img.height * imgW) / img.width;
-
-                    if (imgH > maxH) {
-                        imgH = maxH;
-                        imgW = (img.width * imgH) / img.height;
+                    if (isCyrgo) {
+                        newPage.drawPage(templatePageImage);
+                    } else {
+                        // hojaDiaco.pdf tiene el MediaBox desplazado 7.92 pt.
+                        // Se agrega sangrado inferior para cubrir la hoja carta completa.
+                        const diacoBottomBleed = 8;
+                        newPage.drawPage(templatePageImage, {
+                            x: 0,
+                            y: -diacoBottomBleed,
+                            width: width,
+                            height: height + diacoBottomBleed
+                        });
                     }
+
+                    // Las páginas HTML ya están diseñadas como páginas independientes.
+                    // No se deben reducir por altura: hacerlo encoge texto, QR y firmas.
+                    const imgW = width * 0.95;
+                    const imgH = (img.height * imgW) / img.width;
                     
                     newPage.drawImage(img, {
                         x:      (width - imgW) / 2,

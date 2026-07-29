@@ -50,13 +50,15 @@ sap.ui.define([
                 const htmlRaw = `
                     <div style="
                         font-family:Arial,sans-serif;
-                        font-size:11pt;
-                        line-height:1.5;
+                        font-size:10pt;
+                        line-height:1.2;
                         color:#000;
                         width:100%;
+                        height:100%;
+                        position:relative;
                         box-sizing:border-box;
                         border:1px solid #666;
-                        padding:15px;
+                        padding:40px;
                     ">
 
                         <p style="text-align:center;font-weight:bold;font-size:12pt;margin:0 0 20px 0;">
@@ -64,11 +66,11 @@ sap.ui.define([
                         </p>
 
                         <p style="text-align:justify;margin:0 0 16px 0;">
-                            El suscrito ${sNombre} ${sIdentif} como ${sCedula} 
+                            El suscrito, ${sNombre} ${sIdentif} como ${sCedula} 
                             aparece al pie de mi firma, por medio del presente escrito me permito manifestar lo siguiente:
                         </p>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                        <table style="font-size:10pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">1.</td>
                                 <td style="text-align:justify;">
@@ -78,7 +80,7 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                        <table style="font-size:10pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">2.</td>
                                 <td style="text-align:justify;">
@@ -88,7 +90,7 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                        <table style="font-size:10pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">3.</td>
                                 <td style="text-align:justify;">
@@ -98,7 +100,7 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                        <table style="font-size:10pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">4.</td>
                                 <td style="text-align:justify;">
@@ -109,7 +111,7 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                        <table style="font-size:10pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">5.</td>
                                 <td style="text-align:justify;">
@@ -120,7 +122,7 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                        <table style="font-size:10pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">6.</td>
                                 <td style="text-align:justify;">
@@ -132,7 +134,7 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <table style="font-size:11pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
+                        <table style="font-size:10pt;font-family:Arial,sans-serif;width:100%;border-collapse:collapse;margin-bottom:14px;">
                             <tr>
                                 <td style="width:24px;vertical-align:top;font-weight:bold;">7.</td>
                                 <td style="text-align:justify;">
@@ -144,17 +146,17 @@ sap.ui.define([
                             </tr>
                         </table>
 
-                        <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0 0 60px 0;">Cordialmente,</p>
+                        <p style="font-size:10pt;font-family:Arial,sans-serif;margin:0 0 60px 0;">Cordialmente,</p>
 
                         <div style="border-top:1.5px solid #000;width:260px;margin-bottom:0;"></div>
                         
                         <div style="padding-top:6px;margin-bottom:40px;">
-                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">${sNombre}</p>
-                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0; font-weight:bold;">NOMBRE TRABAJADOR</p>
-                            <p style="font-size:11pt;font-family:Arial,sans-serif;margin:0;">C.C. ${sCedula} de ${sCiudadExpedicion}</p>
+                            <p style="font-size:10pt;font-family:Arial,sans-serif;margin:0;">${sNombre}</p>
+                            <p style="font-size:10pt;font-family:Arial,sans-serif;margin:0; font-weight:bold;">NOMBRE TRABAJADOR</p>
+                            <p style="font-size:10pt;font-family:Arial,sans-serif;margin:0;">C.C. ${sCedula} de ${sCiudadExpedicion}</p>
                         </div>
 
-                        <p style="font-size:9pt;font-family:Arial,sans-serif;margin:0;text-align:right;color:#555;">
+                        <p style="font-size:9pt;font-family:Arial,sans-serif;margin:0;position:absolute;right:15px;bottom:15px;color:#555;">
                             Pág. <strong>1 de 1</strong>
                         </p>
 
@@ -167,8 +169,9 @@ sap.ui.define([
                 div.style.position        = "absolute";
                 div.style.top             = "-9999px";
                 div.style.left            = "-9999px";
-                div.style.width           = "794px";
-                div.style.padding         = "10px";
+                div.style.width           = "816px";
+                div.style.height          = "1056px";
+                div.style.padding         = "32px";
                 div.style.backgroundColor = "#ffffff";
                 div.style.boxSizing       = "border-box";
                 div.innerHTML             = htmlRaw;
@@ -177,15 +180,14 @@ sap.ui.define([
                 // Esperar dos frames para que el layout esté completamente calculado
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-                const totalHeight = div.scrollHeight;
 
                 const canvas = await html2canvasRef(div, {
                     scale:           2,
                     useCORS:         true,
                     backgroundColor: "#ffffff",
-                    width:           794,
-                    height:          totalHeight,
-                    windowWidth:     794,
+                    width:           816,
+                    height:          1056,
+                    windowWidth:     816,
                     scrollY:         0
                 });
                 const imgData = canvas.toDataURL("image/png");
@@ -194,21 +196,15 @@ sap.ui.define([
                 const pdfDoc = await PDFLibRef.PDFDocument.create();
                 const img    = await pdfDoc.embedPng(imgData);
 
-                // Página A4 en puntos
-                const PAGE_W  = 595;
-                const MARGIN  = 36;
-                const drawW   = PAGE_W - MARGIN * 2;
-                // Altura proporcional real de la imagen escalada al ancho de página
-                const drawH   = (img.height * drawW) / img.width;
-                const PAGE_H  = drawH + MARGIN * 2;
-
-                // Una sola página que contiene todo el documento sin cortar nada
+                // Página carta fija: 8.5 × 11 pulgadas a 72 puntos por pulgada.
+                const PAGE_W = 612;
+                const PAGE_H = 792;
                 const pg = pdfDoc.addPage([PAGE_W, PAGE_H]);
                 pg.drawImage(img, {
-                    x:      MARGIN,
-                    y:      MARGIN,
-                    width:  drawW,
-                    height: drawH
+                    x: 0,
+                    y: 0,
+                    width: PAGE_W,
+                    height: PAGE_H
                 });
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Beneficios Extralegales`);
 

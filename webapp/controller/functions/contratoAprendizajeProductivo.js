@@ -1160,7 +1160,10 @@ sap.ui.define([
 
                     const img     = await pdfDoc.embedPng(imgData);
                     const newPage = pdfDoc.addPage([width, height]);
-                    newPage.drawPage(templatePageImage);
+                    // Compensa el MediaBox desplazado 7.92 pt de las plantillas Diaco y Cyrgo.
+                    newPage.drawPage(templatePageImage, {
+                        x: 0, y: -8, width: width, height: height + 8
+                    });
 
                     const imgWidth  = width * 0.88;
                     const imgHeight = (img.height * imgWidth) / img.width;
