@@ -1951,7 +1951,12 @@ sap.ui.define([
         }).addStyleClass("companySelectionHeader")
       }).addStyleClass("companySelectionDialog");
       this._oSimpleCompanyDialog.attachAfterOpen(() => { this.getView().byId("contentContainer").addStyleClass("blurredBackground"); });
-      this._oSimpleCompanyDialog.attachAfterClose(() => { this.getView().byId("contentContainer").removeStyleClass("blurredBackground"); });
+      this._oSimpleCompanyDialog.attachAfterClose(() => {
+        const oEmployeeDialog = this.byId("employeeDialog");
+        if (!oEmployeeDialog || !oEmployeeDialog.isOpen()) {
+          this.getView().byId("contentContainer").removeStyleClass("blurredBackground");
+        }
+      });
       oView.addDependent(this._oSimpleCompanyDialog);
       fnSelectCompany("CO10");
       this._oSimpleCompanyDialog.open();
@@ -2070,7 +2075,12 @@ sap.ui.define([
         }).addStyleClass("companySelectionHeader")
       }).addStyleClass("companySelectionDialog companyNitSelectionDialog");
       this._oNitCompanyDialog.attachAfterOpen(() => { this.getView().byId("contentContainer").addStyleClass("blurredBackground"); });
-      this._oNitCompanyDialog.attachAfterClose(() => { this.getView().byId("contentContainer").removeStyleClass("blurredBackground"); });
+      this._oNitCompanyDialog.attachAfterClose(() => {
+        const oEmployeeDialog = this.byId("employeeDialog");
+        if (!oEmployeeDialog || !oEmployeeDialog.isOpen()) {
+          this.getView().byId("contentContainer").removeStyleClass("blurredBackground");
+        }
+      });
       oView.addDependent(this._oNitCompanyDialog);
       fnSelectCompany("CO10");
       this._oNitCompanyDialog.open();
@@ -2146,7 +2156,12 @@ sap.ui.define([
         }).addStyleClass("companySelectionHeader")
       }).addStyleClass("companySelectionDialog companyNitOnlyDialog");
       this._oNitOnlyDialog.attachAfterOpen(() => { this.getView().byId("contentContainer").addStyleClass("blurredBackground"); });
-      this._oNitOnlyDialog.attachAfterClose(() => { this.getView().byId("contentContainer").removeStyleClass("blurredBackground"); });
+      this._oNitOnlyDialog.attachAfterClose(() => {
+        const oEmployeeDialog = this.byId("employeeDialog");
+        if (!oEmployeeDialog || !oEmployeeDialog.isOpen()) {
+          this.getView().byId("contentContainer").removeStyleClass("blurredBackground");
+        }
+      });
       oView.addDependent(this._oNitOnlyDialog);
       this._oNitOnlyDialog.open();
     },
