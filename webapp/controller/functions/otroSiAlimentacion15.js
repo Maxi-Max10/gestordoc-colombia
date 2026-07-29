@@ -237,7 +237,7 @@ sap.ui.define([
                 document.body.removeChild(div);
 
                 // ── Crear o cargar documento según empresa ────────────────────
-                let pdfDoc, templatePageImage, pageWidth, pageHeight;
+                let pdfDoc, templatePageImage, signaturePage, pageWidth, pageHeight;
                 pageWidth  = A4_WIDTH;
                 pageHeight = A4_HEIGHT;
 
@@ -259,6 +259,7 @@ sap.ui.define([
 
                 if (isCyrgo) {
                     const newPage = pdfDoc.addPage([pageWidth, pageHeight]);
+                    signaturePage = newPage;
                     newPage.drawPage(templatePageImage, {
                         x: 0, y: 0, width: pageWidth, height: pageHeight
                     });
@@ -284,6 +285,7 @@ sap.ui.define([
                     }
 
                     const pg = pdfDoc.addPage([pageWidth, pageHeight]);
+                    signaturePage = pg;
                     pg.drawImage(img, {
                         x: (pageWidth - drawW) / 2,
                         y: pageHeight - drawH - MARGIN,
@@ -291,6 +293,15 @@ sap.ui.define([
                         height: drawH
                     });
                 }
+
+                signaturePage.drawText("[[FIRMA_EMPLEADO]]", {
+                    x: pageWidth * 0.51,
+                    y: isCyrgo ? 136 : 142,
+                    size: bReturnPdfDocuments ? 6 : 10,
+                    color: bReturnPdfDocuments
+                        ? PDFLibRef.rgb(1, 1, 1)
+                        : PDFLibRef.rgb(1, 0, 0)
+                });
 
                 const pdfBytes = await pdfDoc.save();
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Otro Si Al Contrato 15.000 Alimentación`);

@@ -947,6 +947,9 @@ sap.ui.define([
       //Adminstrativo: 1039458159
       //Operativo: 10189776
 
+      //aprendiz
+      //[[FIRMA_EMPLEADO]]
+
       const UseroModel = new JSONModel();
 
       const fnContinueWithUser = function (userId) {

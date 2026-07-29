@@ -1670,10 +1670,12 @@ sap.ui.define([
                     // Este marcador permite ubicar la firma del trabajador mediante anchorString.
                     if (pageIndex === contentBlocks.length - 1) {
                         newPage.drawText("[[FIRMA_EMPLEADO]]", {
-                            x: width * 0.63,
-                            y: 306,
-                            size: 6,
-                            color: PDFLibRef.rgb(1, 1, 1)
+                            x: width * 0.57,
+                            y: 302,
+                            size: bReturnPdfDocuments ? 6 : 10,
+                            color: bReturnPdfDocuments
+                                ? PDFLibRef.rgb(1, 1, 1)
+                                : PDFLibRef.rgb(1, 0, 0)
                         });
                     }
                 }

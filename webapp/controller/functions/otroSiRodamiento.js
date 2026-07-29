@@ -107,6 +107,7 @@ sap.ui.define([
                     <p style="margin:0 0 60px 0;">
                         En constancia se firma en ${sCiudadFirma}, el ${localDate}.
                     </p>
+                    <br>
 
                     <table style="width:100%;border-collapse:collapse;">
                         <tr>
@@ -180,10 +181,12 @@ sap.ui.define([
 
                     if (p === totalPgs - 1) {
                         pg.drawText("[[FIRMA_EMPLEADO]]", {
-                            x: PAGE_W * 0.60,
-                            y: 183,
+                            x: PAGE_W * 0.50,
+                            y: 155,
                             size: 10,
-                            color: PDFLibRef.rgb(1, 1, 1)
+                            color: bReturnPdfDocuments
+                                ? PDFLibRef.rgb(1, 1, 1)
+                                : PDFLibRef.rgb(1, 0, 0)
                         });
                     }
                 }

@@ -157,10 +157,12 @@ sap.ui.define([
 
                     if (p === totalPgs - 1) {
                         pg.drawText("[[FIRMA_EMPLEADO]]", {
-                            x: PAGE_W * 0.63,
+                            x: PAGE_W * 0.51,
                             y: 210,
-                            size: 6,
-                            color: PDFLibRef.rgb(1, 1, 1)
+                            size: bReturnPdfDocuments ? 6 : 10,
+                            color: bReturnPdfDocuments
+                                ? PDFLibRef.rgb(1, 1, 1)
+                                : PDFLibRef.rgb(1, 0, 0)
                         });
                     }
                 }
