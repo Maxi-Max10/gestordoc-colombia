@@ -3229,6 +3229,193 @@ html.gdThemeTransitionReady .card-horizontal {
   }
 }
 
+/* Selector visual de empresa */
+.companySelectionDialog.sapMDialog {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  border: 1px solid #d6e0ee !important;
+  box-shadow: 0 22px 58px rgba(20, 39, 68, 0.28) !important;
+}
+.companySelectionDialog .sapMDialogScrollCont { padding: 0 !important; background: #fff !important; }
+.companySelectionDialog .sapMDialogSection { background: #fff !important; }
+.companySelectionDialog .sapMBar.sapMHeader-CTX {
+  height: 4.6rem !important;
+  padding: 0 .85rem !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e7edf5 !important;
+  box-shadow: none !important;
+}
+.companySelectionDialog .sapMBarLeft,
+.companySelectionDialog .sapMBarRight { height: 4.6rem !important; display: flex; align-items: center; }
+.companySelectionDialog .sapMBarMiddle { height: 4.6rem !important; left: 4.4rem !important; right: 3.5rem !important; }
+.companySelectionHeaderIcon {
+  padding: .8rem;
+  border-radius: 50%;
+  color: #1677e8 !important;
+  background: #eaf3ff;
+  font-size: 1.35rem !important;
+}
+.companySelectionHeaderText { justify-content: center; height: 4.6rem; }
+.companySelectionHeaderText .sapMTitle { color: #1f2f46 !important; font-size: 1.08rem !important; font-weight: 800 !important; }
+.companySelectionHeaderText .sapMText { color: #738197 !important; font-size: .7rem !important; }
+.companySelectionContent { gap: 1.15rem; padding: 1.05rem 1.35rem 1.4rem !important; }
+.companySelectionNotice {
+  gap: .65rem;
+  padding: .72rem .85rem;
+  border: 1px solid #dce9f8;
+  border-radius: 7px;
+  background: #f2f7ff;
+}
+.companySelectionNotice .sapUiIcon { color: #1473dc !important; font-size: .9rem !important; }
+.companySelectionNotice .sapMText { color: #687990 !important; font-size: .72rem !important; }
+.companySelectionCards { gap: .9rem; align-items: stretch !important; }
+.companySelectionCard.sapMLIB {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 10.3rem;
+  padding: 1rem !important;
+  border: 1px solid #dfe6ef !important;
+  border-radius: 8px;
+  background: #fff !important;
+  box-sizing: border-box;
+}
+.companySelectionCard.sapMLIB:hover { border-color: #7db6ff !important; background: #f8fbff !important; }
+.companySelectionCardSelected.sapMLIB { border-color: #1683ff !important; background: #f3f8ff !important; box-shadow: 0 0 0 1px rgba(22,131,255,.08); }
+.companySelectionCard .sapMLIBContent { padding: 0 !important; }
+.companySelectionCardHeading { gap: .7rem; padding-bottom: .7rem; border-bottom: 1px solid #e3e9f1; }
+.companySelectionRadio { color: #1884f4 !important; font-size: .9rem !important; align-self: flex-start; margin-top: .2rem; }
+.companySelectionCardIcon {
+  padding: .72rem;
+  border-radius: 50%;
+  color: #1677e8 !important;
+  background: #e5f1ff;
+  font-size: 1.45rem !important;
+}
+.companySelectionCardHeading .sapMTitle { margin-top: .2rem; color: #24354d !important; font-size: .9rem !important; font-weight: 800 !important; }
+.companySelectionTag { margin-top: .28rem; padding: .1rem .35rem; border-radius: 4px; color: #317dcc !important; background: #e5f1ff; font-size: .56rem !important; }
+.companySelectionDescription { display: block; min-height: 2rem; padding: .75rem 0 .45rem; color: #65758b !important; font-size: .68rem !important; }
+.companySelectionCount { gap: .35rem; color: #65758b; }
+.companySelectionCount .sapUiIcon { color: #356fae !important; font-size: .75rem !important; }
+.companySelectionCount .sapMText { color: #65758b !important; font-size: .64rem !important; }
+.companySelectionCount .companySelectionCountNumber { color: #253750 !important; font-weight: 800 !important; }
+@media (max-width: 600px) {
+  .companySelectionDialog.sapMDialog { width: calc(100% - 1rem) !important; }
+  .companySelectionCards { flex-direction: column !important; }
+  .companySelectionCard.sapMLIB { min-height: 9.3rem; }
+}
+
+/* Ajustes de las tarjetas con logos corporativos */
+.companySelectionDialog .sapMDialogFooter {
+  min-height: 3.2rem !important;
+  padding: 0 .9rem !important;
+  border-top: 1px solid #e7edf5 !important;
+  background: #fff !important;
+}
+.companySelectionDialog .sapMDialogFooter .sapMBarRight { gap: .55rem; }
+.companySelectionCancelButton .sapMBtnInner { color: #176fd1 !important; font-size: .72rem !important; }
+.companySelectionContinueButton .sapMBtnInner { min-width: 6.3rem !important; border-radius: 7px !important; font-size: .75rem !important; }
+.companySelectionCard.sapMLIB { min-height: 11.8rem; padding: .65rem 1.45rem .9rem !important; }
+.companySelectionCard .sapMVBox { width: 100%; }
+.companySelectionCard .companySelectionRadio { margin: 0 -.85rem -.35rem 0; align-self: auto; }
+.companySelectionLogo { width: 8.2rem !important; height: 3.5rem !important; object-fit: contain; margin: 0 auto .25rem; }
+.companySelectionName { margin: 0 !important; color: #24354d !important; font-size: .9rem !important; font-weight: 800 !important; }
+.companySelectionCard .companySelectionTag { margin: .25rem 0 .65rem; padding: .1rem .35rem; }
+.companySelectionCard .companySelectionCount {
+  width: 100%;
+  justify-content: center;
+  padding: .5rem 0 .42rem;
+  border-top: 1px solid #e3e9f1;
+}
+.companySelectionCard .companySelectionDescription {
+  min-height: 0;
+  padding: .1rem 0 0;
+  color: #65758b !important;
+  font-size: .64rem !important;
+  text-align: center !important;
+}
+.companySelectionCard .companySelectionDescription strong { color: #1677e8; }
+
+/* Corrección de encabezado, logos y radios del selector */
+.companySelectionDialog .companySelectionHeader.sapMTB {
+  height: 4.6rem !important;
+  min-height: 4.6rem !important;
+  padding: 0 1rem !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e7edf5 !important;
+}
+.companySelectionHeader .companySelectionHeaderText {
+  height: auto !important;
+  justify-content: center;
+  margin-left: .65rem;
+}
+.companySelectionHeader .companySelectionHeaderText .sapMTitle { line-height: 1.25 !important; }
+.companySelectionContent { padding-top: 1.15rem !important; }
+.companySelectionCard .companySelectionRadio { margin: 0 -.75rem -.3rem 0 !important; align-self: auto !important; }
+.companySelectionCard .companySelectionRadio.sapMRb { height: 1.25rem !important; padding: 0 !important; }
+.companySelectionCard .companySelectionRadio .sapMRbB { margin: 0 !important; }
+.companySelectionLogo { transform: scale(2.05); transform-origin: center; margin-top: .15rem !important; margin-bottom: .35rem !important; }
+
+/* Radio sin recorte y logo como identificador principal */
+.companySelectionCard .companySelectionRadioRow {
+  height: 1.65rem !important;
+  min-height: 1.65rem !important;
+  overflow: visible !important;
+}
+.companySelectionCard .companySelectionRadio {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+.companySelectionCard .companySelectionRadio .sapMRbB {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+}
+
+/* Modo oscuro del selector visual de empresa */
+.gdDarkMode .companySelectionDialog.sapMDialog,
+.gdDarkMode .companySelectionDialog .sapMDialogSection,
+.gdDarkMode .companySelectionDialog .sapMDialogScrollCont,
+.gdDarkMode .companySelectionDialog .companySelectionHeader.sapMTB,
+.gdDarkMode .companySelectionDialog .sapMDialogFooter {
+  background: #111c2d !important;
+  border-color: #2a3b53 !important;
+}
+.gdDarkMode .companySelectionHeaderText .sapMTitle,
+.gdDarkMode .companySelectionCard .sapMTitle,
+.gdDarkMode .companySelectionCount .companySelectionCountNumber {
+  color: #eef5ff !important;
+}
+.gdDarkMode .companySelectionHeaderText .sapMText,
+.gdDarkMode .companySelectionDescription,
+.gdDarkMode .companySelectionCount .sapMText {
+  color: #9fb0c7 !important;
+}
+.gdDarkMode .companySelectionCard.sapMLIB {
+  background: #172438 !important;
+  border-color: #334760 !important;
+}
+.gdDarkMode .companySelectionCard.sapMLIB:hover {
+  background: #1b2b42 !important;
+  border-color: #559bf0 !important;
+}
+.gdDarkMode .companySelectionCardSelected.sapMLIB {
+  background: #183154 !important;
+  border-color: #4b9cff !important;
+  box-shadow: 0 0 0 1px rgba(75,156,255,.18) !important;
+}
+.gdDarkMode .companySelectionCard .companySelectionCount {
+  border-top-color: #334760 !important;
+}
+.gdDarkMode .companySelectionTag {
+  color: #8ec4ff !important;
+  background: #243b59 !important;
+}
+.gdDarkMode .companySelectionCancelButton .sapMBtnInner { color: #8ec4ff !important; }
+
 .sapMDialog.documentProgressDialog {
   border-radius: 14px !important;
   overflow: hidden !important;
@@ -3410,4 +3597,208 @@ html.gdThemeTransitionReady .card-horizontal {
 
 .gdDarkMode .documentNoResultsText {
   color: #d6e4f5 !important;
+}
+
+
+/* Prioridad final: selector de empresa en modo oscuro */
+.gdDarkMode .companySelectionDialog .sapMDialogFooter,
+.gdDarkMode .companySelectionDialog .sapMDialogFooter .sapMIBar,
+.gdDarkMode .companySelectionDialog .sapMDialogFooter .sapMBar,
+.gdDarkMode .companySelectionDialog .sapMDialogFooter .sapMTB,
+.gdDarkMode .companySelectionDialog footer {
+  background: #111c2d !important;
+  border-color: #2a3b53 !important;
+  box-shadow: none !important;
+}
+.gdDarkMode .companySelectionDialog .sapMDialogFooter::before { border-top-color: #2a3b53 !important; }
+.gdDarkMode .companySelectionDialog .companySelectionLogo {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  filter: none;
+}
+.gdDarkMode .companySelectionDialog .companySelectionCancelButton .sapMBtnInner {
+  color: #8ec4ff !important;
+  background: transparent !important;
+}
+
+
+/* Pie compacto del selector de empresa */
+.companySelectionDialog .sapMDialogFooter {
+  height: 3rem !important;
+  min-height: 3rem !important;
+  padding: 0 .9rem !important;
+  margin: 0 !important;
+}
+.companySelectionDialog .sapMDialogFooter .sapMIBar,
+.companySelectionDialog .sapMDialogFooter .sapMBar,
+.companySelectionDialog .sapMDialogFooter .sapMBarPH {
+  height: 3rem !important;
+  min-height: 3rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+}
+.companySelectionDialog .sapMDialogFooter .sapMBarRight,
+.companySelectionDialog .sapMDialogFooter .sapMBarContainer {
+  height: 3rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+
+/* Acciones de cancelación en rojo */
+.companySelectionDialog .companySelectionCancelButton .sapMBtnInner,
+.gdDarkMode .companySelectionDialog .companySelectionCancelButton .sapMBtnInner,
+.companySelectionDialog .companySelectionCloseButton .sapMBtnIcon,
+.gdDarkMode .companySelectionDialog .companySelectionCloseButton .sapMBtnIcon {
+  color: #d92d20 !important;
+}
+.companySelectionDialog .companySelectionCancelButton:hover .sapMBtnInner,
+.companySelectionDialog .companySelectionCloseButton:hover .sapMBtnIcon {
+  color: #b42318 !important;
+}
+.companySelectionDialog .companySelectionCloseButton:hover .sapMBtnInner,
+.companySelectionDialog .companySelectionCloseButton .sapMBtnInner:hover {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+
+/* Diálogo combinado: NIT y empresa */
+.companyNitSelectionContent { gap: 1rem; padding: 1rem 1.5rem 1.25rem !important; }
+.companyNitSelectionForm { gap: .7rem; }
+.companyNitSelectionLabel,
+.companyNitSelectionSectionLabel {
+  color: #536a86 !important;
+  font-size: .72rem !important;
+  font-weight: 800 !important;
+}
+.companyNitSelectionSectionLabel { margin-top: .35rem; }
+.companyNitSelectionInput.sapMInputBase { height: 2.55rem !important; }
+.companyNitSelectionInput .sapMInputBaseContentWrapper {
+  height: 2.55rem !important;
+  border: 1px solid #bdcce0 !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 1px rgba(84,120,166,.08) !important;
+}
+.companyNitSelectionInput .sapMInputBaseInner {
+  height: 2.45rem !important;
+  color: #23364e !important;
+  font-size: .78rem !important;
+  font-style: italic;
+}
+.companyNitSelectionInput .sapMInputBaseContentWrapper:focus-within {
+  border-color: #1683ff !important;
+  box-shadow: 0 0 0 2px rgba(22,131,255,.13) !important;
+}
+.companyNitSelectionCard.sapMLIB { min-height: 8.5rem; padding: .85rem 1.4rem !important; }
+.companyNitSelectionCard .companySelectionLogo { margin-bottom: .45rem !important; }
+.companyNitCardDescription {
+  width: 100%;
+  gap: .55rem;
+  justify-content: center;
+  padding-top: .55rem;
+  border-top: 1px solid #e3e9f1;
+  color: #65758b;
+}
+.companyNitCardDescription .sapUiIcon { color: #1677e8 !important; font-size: .78rem !important; }
+.companyNitCardDescription .sapMFT { color: #65758b !important; font-size: .64rem !important; }
+.companyNitCardDescription strong { color: #1677e8; }
+.gdDarkMode .companyNitSelectionLabel,
+.gdDarkMode .companyNitSelectionSectionLabel { color: #afc0d6 !important; }
+.gdDarkMode .companyNitSelectionInput .sapMInputBaseContentWrapper { background: #172438 !important; border-color: #3b506b !important; }
+.gdDarkMode .companyNitSelectionInput .sapMInputBaseInner { color: #eaf2fc !important; background: transparent !important; }
+.gdDarkMode .companyNitCardDescription { border-top-color: #334760; }
+.gdDarkMode .companyNitCardDescription .sapMFT { color: #9fb0c7 !important; }
+@media (max-width: 600px) {
+  .companyNitSelectionContent { padding: .9rem 1rem 1rem !important; }
+}
+
+
+/* Proporciones finales del diálogo NIT + empresa */
+.companyNitSelectionDialog .companySelectionCards {
+  display: flex !important;
+  width: 100% !important;
+  gap: .9rem !important;
+  box-sizing: border-box;
+}
+.companyNitSelectionDialog .companyNitSelectionCard.sapMLIB {
+  flex: 0 0 calc(50% - .45rem) !important;
+  width: calc(50% - .45rem) !important;
+  min-width: calc(50% - .45rem) !important;
+  max-width: calc(50% - .45rem) !important;
+  min-height: 8rem !important;
+  padding: .65rem 1.25rem .75rem !important;
+}
+.companyNitSelectionDialog .companyNitSelectionCard .companySelectionLogo {
+  width: 8.6rem !important;
+  height: 3.1rem !important;
+  margin: 0 auto .2rem !important;
+  transform: scale(2.2);
+}
+.companyNitSelectionDialog .companyNitSelectionCard .companySelectionTag {
+  margin: .1rem 0 .45rem !important;
+}
+.companyNitSelectionDialog .companyNitCardDescription {
+  padding-top: .45rem;
+  white-space: normal;
+  text-align: center;
+}
+.companyNitSelectionDialog .companyNitCardDescription .sapMFT {
+  line-height: 1.25 !important;
+  text-align: center !important;
+}
+@media (max-width: 600px) {
+  .companyNitSelectionDialog .companySelectionCards { flex-direction: column !important; }
+  .companyNitSelectionDialog .companyNitSelectionCard.sapMLIB { width: 100% !important; }
+}
+
+
+/* Columnas estables para las tarjetas NIT + empresa */
+.companyNitSelectionDialog .companyNitSelectionContent,
+.companyNitSelectionDialog .companyNitSelectionForm,
+.companyNitSelectionDialog .companySelectionCards {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.companyNitSelectionDialog .companyNitCardColumn {
+  flex: 0 0 49% !important;
+  width: 49% !important;
+  max-width: 49% !important;
+  min-width: 0 !important;
+}
+.companyNitSelectionDialog .companyNitCardColumn > .sapMFlexItem,
+.companyNitSelectionDialog .companyNitCardColumn .companyNitSelectionCard.sapMLIB {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 600px) {
+  .companyNitSelectionDialog .companyNitCardColumn {
+    flex-basis: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+
+/* Diálogo moderno de solo NIT */
+.companyNitOnlyContent {
+  width: 100% !important;
+  padding: 1.2rem 1.5rem 1.35rem !important;
+  box-sizing: border-box !important;
+}
+.companyNitOnlyForm {
+  width: 100% !important;
+  gap: .45rem !important;
+}
+.companyNitOnlyDialog .sapMDialogScrollCont { overflow: visible !important; }
+@media (max-width: 600px) {
+  .companyNitOnlyContent { padding: 1rem !important; }
 }

@@ -1869,10 +1869,307 @@ sap.ui.define([
       return mConfig[sTitle] || { showCompanyButtons: true, requiresNit: false };
     },
 
+    _openSimpleCompanySelector: function (sTitle) {
+      this._companySelectorTitle = sTitle;
+      const oView = this.getView();
+      const bInactive = this._isInactiveDocumentTitle(sTitle);
+      const oModel = bInactive ? oView.getModel("inactive") : oView.getModel();
+      const aUsers = (oModel && oModel.getProperty(bInactive ? "/InactiveUsers" : "/User")) || [];
+
+      if (this._oSimpleCompanyDialog) this._oSimpleCompanyDialog.destroy();
+
+      let sSelectedCompany = "CO10";
+      const mCards = {};
+      const fnSelectCompany = function (sCompany) {
+        sSelectedCompany = sCompany;
+        Object.keys(mCards).forEach(function (sKey) {
+          const bSelected = sKey === sCompany;
+          mCards[sKey].toggleStyleClass("companySelectionCardSelected", bSelected);
+        });
+      };
+
+      const fnCreateCard = (sCompany, sName, sLogo) => {
+        const oCard = new sap.m.CustomListItem({
+          type: "Active",
+          content: [new sap.m.VBox({
+            alignItems: "Center",
+            items: [
+              new sap.m.Image({ src: sLogo, decorative: false, alt: "Logo " + sName }).addStyleClass("companySelectionLogo"),
+              new sap.m.Label({ text: "Entorno " + sName }).addStyleClass("companySelectionTag"),
+              new sap.m.FormattedText({ htmlText: "Accede a la tabla de trabajadores de <strong>" + sName + "</strong>." }).addStyleClass("companySelectionDescription")
+            ]
+          })],
+          press: function () { fnSelectCompany(sCompany); }
+        }).addStyleClass("companySelectionCard");
+        mCards[sCompany] = oCard;
+        return oCard;
+      };
+
+      const oCards = new sap.m.HBox({
+        items: [
+          fnCreateCard("CO10", "Diaco", "img/logoDiaco.png"),
+          fnCreateCard("CO24", "Cyrgo", "img/logoCyrgo.png")
+        ]
+      }).addStyleClass("companySelectionCards");
+
+      const oCancelButton = new sap.m.Button({
+        text: "Cancelar",
+        type: "Transparent",
+        press: () => this._oSimpleCompanyDialog.close()
+      }).addStyleClass("companySelectionCancelButton");
+      const oContinueButton = new sap.m.Button({
+        text: "Continuar",
+        icon: "sap-icon://navigation-right-arrow",
+        iconFirst: false,
+        type: "Emphasized",
+        press: () => {
+          this._oSimpleCompanyDialog.close();
+          this._openDialogForTitle(this._companySelectorTitle, sSelectedCompany);
+        }
+      }).addStyleClass("companySelectionContinueButton");
+
+      this._oSimpleCompanyDialog = new sap.m.Dialog({
+        contentWidth: "34rem",
+        content: [new sap.m.VBox({ items: [oCards] }).addStyleClass("companySelectionContent")],
+        buttons: [oCancelButton, oContinueButton],
+        customHeader: new sap.m.Toolbar({
+          content: [
+            new sap.ui.core.Icon({ src: "sap-icon://building" }).addStyleClass("companySelectionHeaderIcon"),
+            new sap.m.VBox({
+              items: [
+                new sap.m.Title({ text: "Seleccionar empresa", level: "H3" }),
+                new sap.m.Text({ text: "Elige la empresa con la que deseas continuar." })
+              ]
+            }).addStyleClass("companySelectionHeaderText"),
+            new sap.m.ToolbarSpacer(),
+            new sap.m.Button({
+              icon: "sap-icon://decline",
+              type: "Transparent",
+              press: () => this._oSimpleCompanyDialog.close()
+            }).addStyleClass("companySelectionCloseButton")
+          ]
+        }).addStyleClass("companySelectionHeader")
+      }).addStyleClass("companySelectionDialog");
+      this._oSimpleCompanyDialog.attachAfterOpen(() => { this.getView().byId("contentContainer").addStyleClass("blurredBackground"); });
+      this._oSimpleCompanyDialog.attachAfterClose(() => { this.getView().byId("contentContainer").removeStyleClass("blurredBackground"); });
+      oView.addDependent(this._oSimpleCompanyDialog);
+      fnSelectCompany("CO10");
+      this._oSimpleCompanyDialog.open();
+    },
+
+    _openNitCompanySelector: function (sTitle) {
+      this._companySelectorTitle = sTitle;
+      const oView = this.getView();
+      if (this._oNitCompanyDialog) this._oNitCompanyDialog.destroy();
+
+      let sSelectedCompany = "CO10";
+      const mCards = {};
+      const fnSelectCompany = function (sCompany) {
+        sSelectedCompany = sCompany;
+        Object.keys(mCards).forEach(function (sKey) {
+          mCards[sKey].toggleStyleClass("companySelectionCardSelected", sKey === sCompany);
+        });
+      };
+
+      const oNitInput = new sap.m.Input({
+        placeholder: "Ej.: 9001234567",
+        width: "100%",
+        liveChange: function (oEvent) {
+          const oInput = oEvent.getSource();
+          const sDigits = oInput.getValue().replace(/\D/g, "");
+          if (oInput.getValue() !== sDigits) oInput.setValue(sDigits);
+          if (sDigits) oInput.setValueState("None");
+        }
+      }).addStyleClass("companyNitSelectionInput");
+
+      const fnCreateCard = (sCompany, sName, sLogo) => {
+        const oCard = new sap.m.CustomListItem({
+          type: "Active",
+          content: [new sap.m.VBox({
+            alignItems: "Center",
+            items: [
+              new sap.m.Image({ src: sLogo, decorative: false, alt: "Logo " + sName }).addStyleClass("companySelectionLogo"),
+              new sap.m.Label({ text: "Entorno " + sName }).addStyleClass("companySelectionTag"),
+              new sap.m.HBox({
+                alignItems: "Center",
+                justifyContent: "Center",
+                items: [
+                  new sap.ui.core.Icon({ src: "sap-icon://group" }),
+                  new sap.m.FormattedText({ htmlText: "Accede a la tabla de trabajadores de <strong>" + sName + "</strong>." })
+                ]
+              }).addStyleClass("companyNitCardDescription")
+            ]
+          })],
+          press: function () { fnSelectCompany(sCompany); }
+        }).addStyleClass("companySelectionCard companyNitSelectionCard");
+        mCards[sCompany] = oCard;
+        return oCard;
+      };
+
+      const oForm = new sap.m.VBox({
+        items: [
+          new sap.m.Label({ text: "NIT de la institución de formación", required: true }).addStyleClass("companyNitSelectionLabel"),
+          oNitInput,
+          new sap.m.Label({ text: "Selecciona la empresa" }).addStyleClass("companyNitSelectionSectionLabel"),
+          new sap.m.HBox({
+            fitContainer: true,
+            width: "100%",
+            justifyContent: "SpaceBetween",
+            items: [
+              new sap.m.VBox({ width: "49%", items: [fnCreateCard("CO10", "Diaco", "img/logoDiaco.png")] }).addStyleClass("companyNitCardColumn"),
+              new sap.m.VBox({ width: "49%", items: [fnCreateCard("CO24", "Cyrgo", "img/logoCyrgo.png")] }).addStyleClass("companyNitCardColumn")
+            ]
+          }).addStyleClass("companySelectionCards")
+        ]
+      }).addStyleClass("companyNitSelectionForm");
+
+      const oCancelButton = new sap.m.Button({
+        text: "Cancelar",
+        type: "Transparent",
+        press: () => this._oNitCompanyDialog.close()
+      }).addStyleClass("companySelectionCancelButton");
+      const oContinueButton = new sap.m.Button({
+        text: "Continuar",
+        icon: "sap-icon://navigation-right-arrow",
+        iconFirst: false,
+        type: "Emphasized",
+        press: () => {
+          const sNit = oNitInput.getValue().trim();
+          if (!sNit) {
+            oNitInput.setValueState("Error");
+            oNitInput.setValueStateText("Este campo es obligatorio.");
+            oNitInput.focus();
+            return;
+          }
+          this.sManualNit = sNit;
+          this._oNitCompanyDialog.close();
+          this._openDialogForTitle(this._companySelectorTitle, sSelectedCompany);
+        }
+      }).addStyleClass("companySelectionContinueButton");
+
+      this._oNitCompanyDialog = new sap.m.Dialog({
+        contentWidth: "34rem",
+        content: [new sap.m.VBox({ items: [oForm] }).addStyleClass("companySelectionContent companyNitSelectionContent")],
+        buttons: [oCancelButton, oContinueButton],
+        customHeader: new sap.m.Toolbar({
+          content: [
+            new sap.ui.core.Icon({ src: "sap-icon://building" }).addStyleClass("companySelectionHeaderIcon"),
+            new sap.m.VBox({
+              items: [
+                new sap.m.Title({ text: "Seleccionar empresa", level: "H3" }),
+                new sap.m.Text({ text: "Ingresa el NIT y selecciona la empresa con la que deseas continuar." })
+              ]
+            }).addStyleClass("companySelectionHeaderText"),
+            new sap.m.ToolbarSpacer(),
+            new sap.m.Button({
+              icon: "sap-icon://decline",
+              type: "Transparent",
+              press: () => this._oNitCompanyDialog.close()
+            }).addStyleClass("companySelectionCloseButton")
+          ]
+        }).addStyleClass("companySelectionHeader")
+      }).addStyleClass("companySelectionDialog companyNitSelectionDialog");
+      this._oNitCompanyDialog.attachAfterOpen(() => { this.getView().byId("contentContainer").addStyleClass("blurredBackground"); });
+      this._oNitCompanyDialog.attachAfterClose(() => { this.getView().byId("contentContainer").removeStyleClass("blurredBackground"); });
+      oView.addDependent(this._oNitCompanyDialog);
+      fnSelectCompany("CO10");
+      this._oNitCompanyDialog.open();
+    },
+
+    _openNitOnlySelector: function (sTitle) {
+      this._companySelectorTitle = sTitle;
+      const oView = this.getView();
+      if (this._oNitOnlyDialog) this._oNitOnlyDialog.destroy();
+
+      const oNitInput = new sap.m.Input({
+        placeholder: "Ej.: 9001234567",
+        width: "100%",
+        liveChange: function (oEvent) {
+          const oInput = oEvent.getSource();
+          const sDigits = oInput.getValue().replace(/\D/g, "");
+          if (oInput.getValue() !== sDigits) oInput.setValue(sDigits);
+          if (sDigits) oInput.setValueState("None");
+        }
+      }).addStyleClass("companyNitSelectionInput");
+
+      const oForm = new sap.m.VBox({
+        items: [
+          new sap.m.Label({ text: "NIT de la institución de formación", required: true }).addStyleClass("companyNitSelectionLabel"),
+          oNitInput
+        ]
+      }).addStyleClass("companyNitSelectionForm companyNitOnlyForm");
+
+      const oCancelButton = new sap.m.Button({
+        text: "Cancelar",
+        type: "Transparent",
+        press: () => this._oNitOnlyDialog.close()
+      }).addStyleClass("companySelectionCancelButton");
+      const oContinueButton = new sap.m.Button({
+        text: "Continuar",
+        icon: "sap-icon://navigation-right-arrow",
+        iconFirst: false,
+        type: "Emphasized",
+        press: () => {
+          const sNit = oNitInput.getValue().trim();
+          if (!sNit) {
+            oNitInput.setValueState("Error");
+            oNitInput.setValueStateText("Este campo es obligatorio.");
+            oNitInput.focus();
+            return;
+          }
+          this.sManualNit = sNit;
+          this._oNitOnlyDialog.close();
+          this._openDialogForTitle(this._companySelectorTitle);
+        }
+      }).addStyleClass("companySelectionContinueButton");
+
+      this._oNitOnlyDialog = new sap.m.Dialog({
+        contentWidth: "34rem",
+        content: [new sap.m.VBox({ items: [oForm] }).addStyleClass("companySelectionContent companyNitOnlyContent")],
+        buttons: [oCancelButton, oContinueButton],
+        customHeader: new sap.m.Toolbar({
+          content: [
+            new sap.ui.core.Icon({ src: "sap-icon://building" }).addStyleClass("companySelectionHeaderIcon"),
+            new sap.m.VBox({
+              items: [
+                new sap.m.Title({ text: "Ingreso de NIT", level: "H3" }),
+                new sap.m.Text({ text: "Ingresa el NIT de la institución de formación para continuar." })
+              ]
+            }).addStyleClass("companySelectionHeaderText"),
+            new sap.m.ToolbarSpacer(),
+            new sap.m.Button({
+              icon: "sap-icon://decline",
+              type: "Transparent",
+              press: () => this._oNitOnlyDialog.close()
+            }).addStyleClass("companySelectionCloseButton")
+          ]
+        }).addStyleClass("companySelectionHeader")
+      }).addStyleClass("companySelectionDialog companyNitOnlyDialog");
+      this._oNitOnlyDialog.attachAfterOpen(() => { this.getView().byId("contentContainer").addStyleClass("blurredBackground"); });
+      this._oNitOnlyDialog.attachAfterClose(() => { this.getView().byId("contentContainer").removeStyleClass("blurredBackground"); });
+      oView.addDependent(this._oNitOnlyDialog);
+      this._oNitOnlyDialog.open();
+    },
+
     _openCompanySelector: function (sTitle) {
       const oConfig = this._getCompanySelectorConfig(sTitle);
       this._companySelectorTitle = sTitle;
       this._companySelectorConfig = oConfig;
+
+      if (!oConfig.showCompanyButtons && oConfig.requiresNit) {
+        this._openNitOnlySelector(sTitle);
+        return;
+      }
+
+      if (oConfig.showCompanyButtons && oConfig.requiresNit) {
+        this._openNitCompanySelector(sTitle);
+        return;
+      }
+
+      if (oConfig.showCompanyButtons && !oConfig.requiresNit) {
+        this._openSimpleCompanySelector(sTitle);
+        return;
+      }
 
       if (!this._oCompanyDialog) {
         this._oCompanySelectorIntroText = new sap.m.Text({
