@@ -1876,8 +1876,9 @@ sap.ui.define([
 
       if (!this._oCompanyDialog) {
         this._oCompanySelectorIntroText = new sap.m.Text({
-          text: "Elige la empresa para continuar con la generación del documento.",
-          wrapping: true
+          text: "1. Ingresa el NIT de la institución de formación.\n2. Elige la empresa para continuar.",
+          wrapping: true,
+          renderWhitespace: true
         }).addStyleClass("companySelectorIntroText");
 
         this._oCompanySelectorIntro = new sap.m.HBox({
@@ -2010,7 +2011,7 @@ sap.ui.define([
 
       this._oCompanyDialog.setTitle(oConfig.showCompanyButtons ? "Elija una empresa" : "Ingreso de NIT");
       this._oCompanySelectorIntroText.setText(oConfig.showCompanyButtons
-        ? "Elige la empresa para continuar con la generación del documento."
+        ? "1. Ingresa el NIT de la institución de formación.\n2. Elige la empresa para continuar."
         : "Ingresa el NIT de la institución de formación para continuar.");
       this._oCompanyDialog.open();
     },
