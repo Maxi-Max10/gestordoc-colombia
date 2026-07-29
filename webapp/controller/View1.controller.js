@@ -1903,9 +1903,11 @@ sap.ui.define([
             if (sValue !== sDigitsOnly) {
               oInput.setValue(sDigitsOnly);
             }
+            if (sDigitsOnly) {
+              oInput.setValueState("None");
+            }
           }
         }).addStyleClass("companySelectorNitInput");
-
         this._oNitBox = new sap.m.VBox({
           items: [
             new sap.m.Label({ text: "NIT de la institución de formación" })
@@ -1919,11 +1921,13 @@ sap.ui.define([
           if (!sNit) {
             this._oNitInput.setValueState("Error");
             this._oNitInput.setValueStateText("Este campo es obligatorio.");
+            this._oNitInput.focus();
             return null;
           }
           if (!/^\d+$/.test(sNit)) {
             this._oNitInput.setValueState("Error");
             this._oNitInput.setValueStateText("El NIT debe contener solo números, sin puntos ni guiones.");
+            this._oNitInput.focus();
             return null;
           }
           this._oNitInput.setValueState("None");
@@ -1982,8 +1986,8 @@ sap.ui.define([
           //class: "companySelectorDialog",
           content: [
             this._oCompanySelectorIntro,
-            this._oCompanyButtonsBox,
             this._oNitBox,
+            this._oCompanyButtonsBox,
             this._oContinueButton
           ],
           beginButton: new sap.m.Button({

@@ -2956,6 +2956,11 @@ html.gdThemeTransitionReady .card-horizontal {
   color: #15263d !important;
 }
 
+.companySelectorNitInput .sapMInputBaseContentWrapper.sapMInputBaseContentWrapperError {
+  border-color: #d20a0a !important;
+  box-shadow: 0 0 0 2px rgba(210, 10, 10, 0.14) !important;
+}
+
 .companySelectorContinueButton {
   display: block;
   width: calc(100% - 48px); /* mismo margen lateral que companySelectorNitBox (24px + 24px) */
@@ -3172,6 +3177,11 @@ html.gdThemeTransitionReady .card-horizontal {
 .companySelectorNitInput .sapMInputBaseContentWrapper:focus-within {
   border-color: #0a6ed1 !important;
   box-shadow: 0 0 0 3px rgba(10, 110, 209, 0.13) !important;
+}
+
+.companySelectorNitInput .sapMInputBaseContentWrapper.sapMInputBaseContentWrapperError {
+  border-color: #d20a0a !important;
+  box-shadow: 0 0 0 2px rgba(210, 10, 10, 0.14) !important;
 }
 
 .companySelectorContinueButton {
