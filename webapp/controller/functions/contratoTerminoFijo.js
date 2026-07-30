@@ -1671,12 +1671,13 @@ sap.ui.define([
                     // Marcador real de texto para DocuSign.
                     // No se agrega en el HTML porque html2canvas lo convertiría en imagen.
                     // Este marcador permite ubicar la firma del trabajador mediante anchorString.
-                    if (pageIndex === contentBlocks.length - 1) {
+                    if (bReturnPdfDocuments && pageIndex === contentBlocks.length - 1) {
                         newPage.drawText("[[FIRMA_EMPLEADO]]", {
                             x: width * 0.57,
                             y: 302,
                             size: 6,
-                            color: PDFLibRef.rgb(1, 1, 1)
+                            color: PDFLibRef.rgb(1, 1, 1),
+                            opacity: 0
                         });
                     }
                 }

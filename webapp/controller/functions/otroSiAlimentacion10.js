@@ -168,12 +168,13 @@ sap.ui.define([
                         height: drawH
                     });
 
-                    if (p === totalPgs - 1) {
+                    if (bReturnPdfDocuments && p === totalPgs - 1) {
                         pg.drawText("[[FIRMA_EMPLEADO]]", {
                             x: PAGE_W * 0.63,
                             y: 15,        // pegado al margen inferior, fuera del bloque de firma
                             size: 6,
-                            color: PDFLibRef.rgb(1, 1, 1)
+                            color: PDFLibRef.rgb(1, 1, 1),
+                            opacity: 0
                         });
                     }
                 }

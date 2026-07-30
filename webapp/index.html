@@ -32,53 +32,6 @@
         <div class="appPreloader__content">
             <h1 class="appPreloader__brand">G<span>M</span>A</h1>
             <div class="appPreloader__title">Gestión de Documentos</div>
-            <div class="appPreloader__icon">
-                <svg viewBox="0 0 220 170" aria-hidden="true" focusable="false">
-                    <defs>
-                        <linearGradient id="appPreloaderPaper" x1="70" y1="14" x2="150" y2="120" gradientUnits="userSpaceOnUse">
-                            <stop offset="0" stop-color="#ffffff"/>
-                            <stop offset="1" stop-color="#e7f1ff"/>
-                        </linearGradient>
-                        <linearGradient id="appPreloaderFolder" x1="44" y1="56" x2="168" y2="143" gradientUnits="userSpaceOnUse">
-                            <stop offset="0" stop-color="#7cc0ff"/>
-                            <stop offset="1" stop-color="#0a6ed1"/>
-                        </linearGradient>
-                        <linearGradient id="appPreloaderFolderLip" x1="46" y1="50" x2="160" y2="94" gradientUnits="userSpaceOnUse">
-                            <stop offset="0" stop-color="#9bd2ff"/>
-                            <stop offset="1" stop-color="#4b9df2"/>
-                        </linearGradient>
-                        <linearGradient id="appPreloaderCheck" x1="138" y1="92" x2="181" y2="143" gradientUnits="userSpaceOnUse">
-                            <stop offset="0" stop-color="#dff3ff"/>
-                            <stop offset="1" stop-color="#83bbff"/>
-                        </linearGradient>
-                        <filter id="appPreloaderSoftShadow" x="-20%" y="-20%" width="140%" height="150%">
-                            <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#0a6ed1" flood-opacity="0.18"/>
-                        </filter>
-                    </defs>
-                    <ellipse class="appPreloader__illustrationShadow" cx="112" cy="147" rx="78" ry="12" fill="#9fc6f1" opacity="0.22"/>
-                    <g class="appPreloader__paperBack" filter="url(#appPreloaderSoftShadow)">
-                        <path d="M78 18h61l25 25v75H78z" fill="url(#appPreloaderPaper)"/>
-                        <path d="M139 18v25h25" fill="#d4e8ff"/>
-                        <path d="M96 49h39M96 68h52M96 87h36" fill="none" stroke="#8bb9e9" stroke-width="5" stroke-linecap="round"/>
-                    </g>
-                    <g class="appPreloader__paperFront">
-                        <path d="M56 31h58l23 23v70H56z" fill="#ffffff" opacity="0.92"/>
-                        <path d="M114 31v23h23" fill="#dcecff"/>
-                        <path d="M75 59h34M75 76h50M75 93h40" fill="none" stroke="#b1cdf0" stroke-width="5" stroke-linecap="round"/>
-                    </g>
-                    <g class="appPreloader__folder" filter="url(#appPreloaderSoftShadow)">
-                        <path d="M35 68c0-8.3 6.7-15 15-15h39c5 0 7.8 2.2 11.2 6.2l6.2 7.2H170c8.3 0 15 6.7 15 15v5H35z" fill="url(#appPreloaderFolderLip)"/>
-                        <path d="M35 78h150l-9.6 52.8c-1.5 8.2-8.6 14.2-17 14.2H56.6c-8.4 0-15.5-6-17-14.2z" fill="url(#appPreloaderFolder)"/>
-                        <path d="M49 84h122" fill="none" stroke="#b8ddff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
-                    </g>
-                    <g class="appPreloader__checkBadge" filter="url(#appPreloaderSoftShadow)">
-                        <circle cx="158" cy="119" r="31" fill="url(#appPreloaderCheck)"/>
-                        <circle cx="158" cy="119" r="30" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.72"/>
-                        <path class="appPreloader__checkMark" d="M144 118.5l9.2 9.2 19.3-21.3" fill="none" stroke="#0a6ed1" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path class="appPreloader__errorMark" d="M147 108l22 22m0-22l-22 22" fill="none" stroke="#b42318" stroke-width="7" stroke-linecap="round"/>
-                    </g>
-                </svg>
-            </div>
             <div class="appPreloader__status">Preparando tu experiencia...</div>
             <div class="appPreloader__copy">Cargando documentos y servicios</div>
             <div class="appPreloader__progress"><div class="appPreloader__bar"></div></div>
@@ -91,7 +44,15 @@
                     </svg>
                 </div>
                 <strong>GMA</strong> - Comprometidos con una gestión eficiente y transparente
-
+            </div>
+            <div class="appPreloader__companyLogos" aria-label="Empresas Diaco y Cyrgo">
+                <span class="appPreloader__companyLogoFrame">
+                    <img src="img/logoDiaco.png" alt="Diaco" decoding="async">
+                </span>
+                <span class="appPreloader__companyLogoDivider" aria-hidden="true"></span>
+                <span class="appPreloader__companyLogoFrame">
+                    <img src="img/logoCyrgo.png" alt="Cyrgo" decoding="async">
+                </span>
             </div>
         </div>
     </div>
