@@ -72,17 +72,19 @@
 
     window.clearInterval(oTimer);
     oPreloader.classList.add("is-error");
-    oPreloader.setAttribute("aria-label", "No tienes permisos para acceder");
+    var sErrorStatus = sStatus || "No se pudo iniciar la aplicación";
+    var sErrorCopy = sCopy || "";
+    oPreloader.setAttribute("aria-label", sErrorStatus);
 
     var oStatus = oPreloader.querySelector(".appPreloader__status");
     var oCopy = oPreloader.querySelector(".appPreloader__copy");
 
     if (oStatus) {
-      oStatus.textContent = "No tienes permisos para acceder";
+      oStatus.textContent = sErrorStatus;
     }
     if (oCopy) {
-      oCopy.textContent = "";
-      oCopy.hidden = true;
+      oCopy.textContent = sErrorCopy;
+      oCopy.hidden = !sErrorCopy;
     }
   };
 

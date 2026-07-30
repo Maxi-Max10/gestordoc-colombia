@@ -956,18 +956,9 @@ sap.ui.define([
         UseroModel.setProperty("/firstname", userId);
         that.getOwnerComponent().setModel(UseroModel, "user");
 
-        that.getUserCompany(userId).then(function (sCompany) {
-          UseroModel.setProperty("/company", sCompany);
-          that.getDataUser(userId);
-        }).catch(function (oError) {
-          MessageToast.show("Error al obtener información de la empresa.");
-          that.oGlobalBusyDialog.close();
-          that._showInitialPreloadError(
-            "Error cargando empresa",
-            "No se pudo completar la carga inicial desde SuccessFactors.",
-            oError
-          );
-        });
+        // La autorización depende del grupo dinámico. La empresa laboral no es
+        // obligatoria para administradores externos y no debe bloquear el acceso.
+        that.getDataUser(userId);
       };
 
       // En modo de prueba no se llama /user-api/currentUser, que no existe localmente.
@@ -1051,7 +1042,13 @@ sap.ui.define([
         urlParameters: { userId: user, groupSubType: "permission" },
         success: async function (oData) {
           const userModel = that.getOwnerComponent().getModel("user");
-          const aGroups = oData?.results || [];
+          // SuccessFactors puede devolver esta FunctionImport como:
+          // { d: [...] }, { d: { results: [...] } }, { results: [...] }
+          // o directamente como arreglo, según el formato y el parser OData.
+          const aGroups = Array.isArray(oData) ? oData
+            : (Array.isArray(oData?.results) ? oData.results
+              : (Array.isArray(oData?.d) ? oData.d
+                : (Array.isArray(oData?.d?.results) ? oData.d.results : [])));
           const oAdminGroup = aGroups.find(oGroup => String(oGroup.groupId) === "6307");
           const oUserGroup = aGroups.find(oGroup => String(oGroup.groupId) === "6308");
           const oAccess = oAdminGroup ? mAllowedGroups["6307"]
@@ -1081,30 +1078,32 @@ sap.ui.define([
           userModel.setProperty("/authorized", true);
 
           try {
+            const bIsAdmin = oAccess.permisos === "admin";
             const [oUserData, oEmployment] = await Promise.all([
               that.getUserProfile(user),
-              that.getUserEmploymentProfile(user)
+              bIsAdmin ? Promise.resolve(null) : that.getUserEmploymentProfile(user)
             ]);
-            if (!oEmployment) {
+            if (!oEmployment && !bIsAdmin) {
               throw new Error("No se encontró información laboral efectiva para " + user + ".");
             }
 
             const sEmployeeClassCode = String(
-              oEmployment.employeeClassNav?.externalCode || ""
+              oEmployment?.employeeClassNav?.externalCode || ""
             );
             const sEmploymentRelationCode = String(
-              oEmployment.customString2Nav?.externalCode || ""
+              oEmployment?.customString2Nav?.externalCode || ""
             );
             const sFallbackType = String(oUserData.custom02 || "").trim().toLowerCase();
-            const sProfile = sEmployeeClassCode === "7" ? "aprendiz"
+            const sProfile = bIsAdmin ? "administrativo"
+              : (sEmployeeClassCode === "7" ? "aprendiz"
               : (sEmploymentRelationCode === "13" ? "operativo"
                 : (sEmploymentRelationCode === "12" ? "administrativo"
                   : (sFallbackType === "operativo" || sFallbackType === "administrativo"
                     ? sFallbackType
-                    : "sin_clasificar")));
+                    : "sin_clasificar"))));
 
             // ciudadFirma proviene de la ciudad configurada en la ubicación laboral.
-            const sCiudadFirma = oEmployment.locationNav?.customString1Nav?.localeLabel || "";
+            const sCiudadFirma = oEmployment?.locationNav?.customString1Nav?.localeLabel || "";
             const sNormalizedCiudadFirma = String(sCiudadFirma)
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "")
@@ -1114,8 +1113,8 @@ sap.ui.define([
             userModel.setProperty("/datos", oUserData);
             userModel.setProperty("/employmentData", oEmployment);
             userModel.setProperty("/displayName", oUserData.displayName || user);
-            userModel.setProperty("/employeeType", oEmployment.customString2Nav?.localeLabel || oUserData.custom02 || "");
-            userModel.setProperty("/employeeClass", oEmployment.employeeClassNav?.localeLabel || "");
+            userModel.setProperty("/employeeType", oEmployment?.customString2Nav?.localeLabel || oUserData.custom02 || "");
+            userModel.setProperty("/employeeClass", oEmployment?.employeeClassNav?.localeLabel || "");
             userModel.setProperty("/employeeClassCode", sEmployeeClassCode);
             userModel.setProperty("/employmentRelationCode", sEmploymentRelationCode);
             userModel.setProperty("/ciudadFirma", sCiudadFirma);
@@ -1161,7 +1160,9 @@ sap.ui.define([
           ]);
           let aVisibleTileIds;
 
-          if (sProfile === "aprendiz") {
+          if (userModel.getProperty("/permisos") === "admin") {
+            aVisibleTileIds = aTileIds.slice();
+          } else if (sProfile === "aprendiz") {
             aVisibleTileIds = aSelfServiceBaseIds.concat("customListItemOtroSiAlimentacion10");
           } else if (sProfile === "operativo") {
             aVisibleTileIds = aSelfServiceBaseIds.concat(
@@ -1192,10 +1193,16 @@ sap.ui.define([
           that._completeInitialPreload(true);
         },
         error: function (oError) {
+          const sStatusCode = String(oError?.statusCode || oError?.status || "").trim();
+          const sStatusText = String(oError?.statusText || "").trim();
+          const sHttpDetail = [sStatusCode && "HTTP " + sStatusCode, sStatusText]
+            .filter(Boolean)
+            .join(" - ");
           MessageToast.show("Error al validar los grupos del usuario.");
           that._showInitialPreloadError(
-            "No tienes permisos para acceder",
-            "",
+            "Error validando permisos",
+            "No se pudo consultar los grupos en SuccessFactors" +
+              (sHttpDetail ? " (" + sHttpDetail + ")." : "."),
             oError
           );
         }
