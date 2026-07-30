@@ -933,23 +933,6 @@ sap.ui.define([
     // y encadena getUserCompany() y getDataUser().
     getUserInfo: function () {
       const that = this;
-      // QAS: permite probar otro usuario con ?testUser=1010235394.
-      // IMPORTANTE: cambiar a false antes de desplegar en PRD.
-      const bAllowTestUserFromUrl = true;
-      const sTestUserId = bAllowTestUserFromUrl
-        ? (new URLSearchParams(window.location.search).get("testUser") || "").trim()
-        : "";
-      // Diaco
-      //Operativo: 60001016
-      // Administrativo: 60000778
-      // No autorizado: 50001956
-      //Cyrgo
-      //Adminstrativo: 1039458159
-      //Operativo: 10189776
-
-      //aprendiz
-      //[[FIRMA_EMPLEADO]]
-
       const UseroModel = new JSONModel();
 
       const fnContinueWithUser = function (userId) {
@@ -960,20 +943,16 @@ sap.ui.define([
         // obligatoria para administradores externos y no debe bloquear el acceso.
         that.getDataUser(userId);
       };
+            // Diaco
+      //Operativo: 60001016
+      // Administrativo: 60000778
+      // No autorizado: 50001956
+      //Cyrgo
+      //Adminstrativo: 1039458159
+      //Operativo: 10189776
 
-      // En modo de prueba no se llama /user-api/currentUser, que no existe localmente.
-      if (sTestUserId) {
-        if (!/^[A-Za-z0-9._-]+$/.test(sTestUserId)) {
-          that._showInitialPreloadError(
-            "Error cargando usuario",
-            "El parámetro testUser no tiene un formato válido."
-          );
-          return;
-        }
-        UseroModel.setData({ name: sTestUserId, testMode: true });
-        fnContinueWithUser(sTestUserId);
-        return;
-      }
+      //aprendiz
+      //[[FIRMA_EMPLEADO]]
 
       const url = this.getBaseURL() + "/user-api/currentUser";
       UseroModel.attachRequestCompleted(function () {

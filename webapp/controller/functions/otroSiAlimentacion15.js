@@ -294,12 +294,15 @@ sap.ui.define([
                     });
                 }
 
-                signaturePage.drawText("[[FIRMA_EMPLEADO]]", {
-                    x: pageWidth * 0.51,
-                    y: isCyrgo ? 136 : 142,
-                    size: 6,
-                    color: PDFLibRef.rgb(1, 1, 1)
-                });
+                if (bReturnPdfDocuments) {
+                    signaturePage.drawText("[[FIRMA_EMPLEADO]]", {
+                        x: pageWidth * 0.51,
+                        y: isCyrgo ? 136 : 142,
+                        size: 6,
+                        color: PDFLibRef.rgb(1, 1, 1),
+                        opacity: 0
+                    });
+                }
 
                 const pdfBytes = await pdfDoc.save();
                 pdfDoc.setTitle(`${user.firstName} ${user.lastName} - Otro Si Al Contrato 15.000 Alimentación`);

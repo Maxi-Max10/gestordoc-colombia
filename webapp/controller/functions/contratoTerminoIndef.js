@@ -1613,12 +1613,13 @@ sap.ui.define([
                         height: imgHeight
                     });
 
-                    if (pageIndex === contentBlocks.length - 1) {
+                    if (bReturnPdfDocuments && pageIndex === contentBlocks.length - 1) {
                         newPage.drawText("[[FIRMA_EMPLEADO]]", {
                             x: width * 0.57,
                             y: 379,
                             size: 6,
-                            color: PDFLibRef.rgb(1, 1, 1)
+                            color: PDFLibRef.rgb(1, 1, 1),
+                            opacity: 0
                         });
                     }
                 }
