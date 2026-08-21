@@ -58,6 +58,7 @@ sap.ui.define([
                 const sfechaBaja = oController.formatDateRaw(user.endDateBaja);
                 const sIdentif       = (user.gender === "F") ? "identificada" : "identificado";
                 const sDireccion     = (user.addressLine1 || "").replace(/\s+/g, " ").trim();
+                const sHrbp = user.hrbpName || "";
 
                 // ← NUEVO: campos que ahora vienen desde la carga enriquecida
                 const sEmail       = user.personalEmail || "";
@@ -94,7 +95,7 @@ sap.ui.define([
                         data: {
                             sNombre, sCedula, localDate, sCargo,
                             sSalario, sfechaContratacion, sfechaBaja, sfechaContratacion, sIdentif,
-                            sEmail, sTelefono, sDireccion, sCiudadFirma, sCiudadResidencia
+                            sEmail, sTelefono, sDireccion, sCiudadFirma, sCiudadResidencia, sHrbp
                         }
                     });
                     continue;
@@ -175,8 +176,11 @@ sap.ui.define([
                             <p style="margin:0 0 60px 0;">Cordialmente,</p>
 
                             <div style="text-align:center;">
-                                <p style="border-top:1.5px solid #000;width:260px;margin:0 auto;padding-top:6px;">
-                                    <strong>Gestión Personas</strong>
+                                <p style="border-top:1.5px solid #000;width:260px;margin:0 auto;padding:6px 0 0 0;">
+                                    <strong>${sHrbp}</strong>
+                                </p>
+                                <p style="margin:2px 0 0 0;">
+                                    Gestión Personas
                                 </p>
                             </div>
 

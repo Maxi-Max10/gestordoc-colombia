@@ -780,6 +780,9 @@ sap.ui.define([], function () {
                     // Empresa (CO10 = Diaco, CO24 = Cyrgo)
                     company:     getProp("company") || "",
                     companyName: { "CO10": "Diaco S.A.", "CO24": "Cyrgo S.A." }[getProp("company")] || getProp("company") || "",
+                        
+                    // HRBP del empleado (obtenido vía $expand en OData: hrbpNav)
+                    hrbpName: getProp("hrbpName") || "",
 
                     
                 };

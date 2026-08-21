@@ -1536,7 +1536,8 @@ sap.ui.define([
         "custom05Nav/externalCode",
         "custom05Nav/localeLabel",
         "empInfo/personNav/nationalIdNav/customString2",
-        "empInfo/personNav/nationalIdNav/customString2Nav/localeLabel"
+        "empInfo/personNav/nationalIdNav/customString2Nav/localeLabel",
+        "hr/userId", "hr/displayName"
       ].join(",");
 
       const sExpand = [
@@ -1546,7 +1547,8 @@ sap.ui.define([
         "empInfo/personNav/personalInfoNav",
         "empInfo/personNav/nationalIdNav",
         "custom05Nav",
-        "empInfo/personNav/nationalIdNav/customString2Nav"
+        "empInfo/personNav/nationalIdNav/customString2Nav",
+        "hr"
       ].join(",");
 
       const fnReadUsers = () => this._readOData(oComponentModel, "/User", {
@@ -1570,6 +1572,7 @@ sap.ui.define([
           user.defaultFullName  = user.defaultFullName || "";
           user.fullNameReverse  = `${user.lastName || ""} ${user.firstName || ""}`.toLowerCase();
           user.customLong1      = user?.empInfo?.personNav?.customLong1 || "";
+          user.hrbpName = user.hr?.displayName || "";
 
           user.salut = user.salutation === "3526" ? "Sra."
                     : user.salutation === "3525" ? "Sr."

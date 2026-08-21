@@ -116,6 +116,7 @@ sap.ui.define([
             "[[FechaIngresoMayus]]": data.sFechaIniciacionMayus || "",
             "[[FechaSalida]]":       data.sfechaBaja         || "",
             "[[FechaSalidaMayus]]":  data.sFechaBajaMayus    || "",
+            "[[Hrbp]]":              data.sHrbp              || "",
 
             // Alias: distintas plantillas escriben distinto el mismo campo (diferencia de mayúscula)
             "[[FechaContratacion]]": data.sFechaContratacion || data.sfechaContratacion || "",
