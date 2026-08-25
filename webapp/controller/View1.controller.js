@@ -943,7 +943,11 @@ sap.ui.define([
         // obligatoria para administradores externos y no debe bloquear el acceso.
         that.getDataUser(userId);
       };
-            // Diaco
+      //////////
+      //fnContinueWithUser("exgisella");
+      //return;
+      //exgisella
+      // Diaco
       //Operativo: 60001016
       // Administrativo: 60000778
       // No autorizado: 50001956
