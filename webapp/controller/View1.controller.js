@@ -958,7 +958,7 @@ sap.ui.define([
       //aprendiz
       //[[FIRMA_EMPLEADO]]
 
-      const url = this.getBaseURL() + "/user-api/currentUser";
+      const url = "./user-api/currentUser";
       UseroModel.attachRequestCompleted(function () {
         const sUserId = UseroModel.getProperty("/name");
         if (!sUserId) {
@@ -973,12 +973,22 @@ sap.ui.define([
 
       UseroModel.attachRequestFailed(function (oError) {
         that.oGlobalBusyDialog.close();
+
+        const mParams = oError?.getParameters?.() || {};
+        const sStatus = String(mParams.statusCode || "N/A");
+
+        console.error("User API falló", {
+            url: url,
+            statusCode: mParams.statusCode,
+            statusText: mParams.statusText,
+            responseText: mParams.responseText
+        });
+
         that._showInitialPreloadError(
-          "Error cargando usuario",
-          "No se pudo obtener el usuario actual para iniciar la carga de SSFF.",
-          oError
+            "Error cargando usuario",
+            "No fue posible identificar tu usuario. Código técnico: USER_API_" + sStatus
         );
-      });
+    });
 
       UseroModel.loadData(url);
     },
